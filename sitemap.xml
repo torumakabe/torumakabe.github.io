@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://torumakabe.github.io/</loc>
+    <lastmod>2015-04-04T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/terraform-openstack-minimum/</loc>
+    <lastmod>2015-04-04T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/monasca/</loc>
+    <lastmod>2014-12-12T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/longtermsupport/</loc>
+    <lastmod>2014-12-09T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/handsome-openstack/</loc>
+    <lastmod>2014-12-06T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/openstack-tools/</loc>
+    <lastmod>2014-09-14T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/vagrant-openstack/</loc>
+    <lastmod>2014-09-06T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/vagrant-icehouse/</loc>
+    <lastmod>2014-05-06T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/vagrant-hpcloud/</loc>
+    <lastmod>2014-05-05T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/OpenStack-3primer/</loc>
+    <lastmod>2014-05-01T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/cloud-vacancy/</loc>
+    <lastmod>2014-04-13T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/OpenStack-primer/</loc>
+    <lastmod>2014-03-27T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/swift-upload/</loc>
+    <lastmod>2014-03-23T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/cloud-and-power/</loc>
+    <lastmod>2014-03-16T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/transparency-is-noisy/</loc>
+    <lastmod>2014-02-02T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/hpcos-vbox-scripts/</loc>
+    <lastmod>2014-01-05T00:00:00+09:00</lastmod>
+  </url>
+  
+</urlset>

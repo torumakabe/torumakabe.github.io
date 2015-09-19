@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Virtualbox on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/virtualbox/</link>
+    <description>Recent content in Virtualbox on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 05 Jan 2014 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/virtualbox/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>HP Cloud OS Sandbox向け VirtualBox 環境構築スクリプト</title>
+      <link>http://torumakabe.github.io/post/hpcos-vbox-scripts/</link>
+      <pubDate>Sun, 05 Jan 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/hpcos-vbox-scripts/</guid>
+      <description>
+
+&lt;h3 id=&#34;hp-cloud-os-sandboxが公開された:66b687d461813214cceb1147a0701c0d&#34;&gt;HP Cloud OS Sandboxが公開された&lt;/h3&gt;
+
+&lt;p&gt;先日、HP Cloud OS Sandboxが&lt;a href=&#34;https://cloudos.hpwsportal.com/#/Product/{&amp;quot;productId&amp;quot;:&amp;quot;570&amp;quot;}/Show&#34;&gt;公開&lt;/a&gt;されました。HP Cloud OSとは、OpenStackをコアに、HPが便利機能を追加したソフトウェアスタックです。その試用版がSandboxです。&lt;/p&gt;
+
+&lt;p&gt;OpenStackは日々成長していますが、地味な運用まわりの機能に物足りなさがあります。そこでHPは早い時期からOpenStackの商用製品・サービス化に取り組んできた経験から、HP Cloud OSではOpenStackの周辺に便利機能を付加しています。GUIでさくっとノード追加できるとか、複数のOpenStackクラウドを束ねて管理するとか。素のOpenStackもいいですが、味付けしたものもまたよし、ですよ。&lt;/p&gt;
+
+&lt;h3 id=&#34;気軽に試したい人向けに:66b687d461813214cceb1147a0701c0d&#34;&gt;気軽に試したい人向けに&lt;/h3&gt;
+
+&lt;p&gt;導入ドキュメントは&lt;a href=&#34;http://docs.hpcloud.com/cloudos&#34;&gt;公開&lt;/a&gt;されていますので、ここで必要な&lt;a href=&#34;http://docs.hpcloud.com/cloudos/prepare/supportmatrix/&#34;&gt;環境&lt;/a&gt;を確認できます。が、ちょっとリッチですね。本気で使うのであれば、このくらいあったほうがいいでしょうけど。そこで、お気軽に試したいという人へ、VirtualBox環境への導入手順をご紹介します。&lt;/p&gt;
+
+&lt;h3 id=&#34;virtualboxにhp-cloud-os-sandboxを導入するステップ:66b687d461813214cceb1147a0701c0d&#34;&gt;VirtualBoxにHP Cloud OS Sandboxを導入するステップ&lt;/h3&gt;
+
+&lt;p&gt;導入手順をざっくりまとめます。
+1. VirtualBoxのホストオンリーネットワークを作成する
+2. HP Cloud OS adminノードのVMを作成し、ISOイメージからインストールする
+3. HP Cloud OS adminノードの種々パラメータを設定し、ビルドする
+4. OpenStack controller、computeノード用のVMを作成しパワーオン。PXEでインストールする
+5. 作成したVMをHP Cloud OS環境に取り込む
+6. HP Cloud OS環境下に取り込んだVMをOpenStack controller、computeノードとして割り当て、もろもろの機能をインストールする&lt;/p&gt;
+
+&lt;h3 id=&#34;guiでチマチマとvirtualbox環境作りたくないよね:66b687d461813214cceb1147a0701c0d&#34;&gt;GUIでチマチマとVirtualBox環境作りたくないよね&lt;/h3&gt;
+
+&lt;p&gt;VirtualBoxは便利なんですけど、GUIで複数ノードのパラメータを設定するの、めんどうです。で、かなりの確率でミスります。ここはひとつ、できるところはスクリプトでやっちゃいましょう。前述した手順の1、2、4は、できるので。&lt;/p&gt;
+
+&lt;h3 id=&#34;実績あり環境:66b687d461813214cceb1147a0701c0d&#34;&gt;実績あり環境&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
+&lt;li&gt;各VMへのメモリ割り当ては、admin(4GB)、controller(4GB)、compute(2GB)&lt;/li&gt;
+&lt;li&gt;メモリ量はスクリプト内で指定していますので、適宜調整して下さい&lt;/li&gt;
+&lt;li&gt;搭載メモリ8GBマシンだと厳しいです。admin向けはケチらない方がいいです&lt;/li&gt;
+&lt;li&gt;Mac OS X 10.9.1&lt;/li&gt;
+&lt;li&gt;VirtualBox 4.3.6&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;なおシェルスクリプトで書いてますが、中身はVirtualBoxのVBoxManageコマンドの羅列なので、いじれば他環境にも流用できるかと。&lt;/p&gt;
+
+&lt;h3 id=&#34;virtualboxのホストオンリーネットワークを作成する:66b687d461813214cceb1147a0701c0d&#34;&gt;VirtualBoxのホストオンリーネットワークを作成する&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255299.js&#34;&gt;&lt;/script&gt;
+hostonlyif create時に名前指定ができないのでvboxnet0、vboxnet1決め打ちにしましたが、環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;hp-cloud-os-adminノードのvmを作成し-isoイメージからインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;HP Cloud OS adminノードのVMを作成し、ISOイメージからインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255339.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattach(2つ)のパラメータは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;openstack-controllerノード用のvmを作成しパワーオン-pxeでインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;OpenStack controllerノード用のVMを作成しパワーオン。PXEでインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255354.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattachのパスは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;openstack-computeノード用のvmを作成しパワーオン-pxeでインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;OpenStack computeノード用のVMを作成しパワーオン。PXEでインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255361.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattachのパスは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

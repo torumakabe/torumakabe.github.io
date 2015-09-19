@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStack Swiftへのファイル分割アップロード &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="OpenStack Swiftへのファイル分割アップロード &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="OpenStack Swiftへのファイル分割アップロード &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">23 Mar 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/swift-upload/" class="post-title">OpenStack Swiftへのファイル分割アップロード</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/swift-upload/" data-title="OpenStack Swiftへのファイル分割アップロード" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/swift-upload/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h3 id="swiftへ-ファイルを分割してアップロードできる:a57d4690b9ff7b620d3e3f40a88fa609">Swiftへ、ファイルを分割してアップロードできる</h3>
+
+<p>今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。</p>
+
+<h3 id="アップロード形式は大きく3つ-そのまま-dlo-slo:a57d4690b9ff7b620d3e3f40a88fa609">アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO</h3>
+
+<ol>
+<li>そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。</li>
+<li>DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。</li>
+<li>SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。</li>
+</ol>
+
+<h3 id="動きを見てみよう:a57d4690b9ff7b620d3e3f40a88fa609">動きを見てみよう</h3>
+
+<p>環境は以下の通り。</p>
+
+<ul>
+<li>HP Public Cloud US-West Region</li>
+<li>Swift Clientを動かすCompute Node &ndash; standard.large / ubuntu 12.04</li>
+<li>Swift CLI &ndash; 2.0.3</li>
+<li>約900MBあるubuntu desktopのisoファイルをアップロード</li>
+</ul>
+
+<h4 id="そのままアップロード:a57d4690b9ff7b620d3e3f40a88fa609">そのままアップロード</h4>
+
+<pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso
+No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
+non-seg.iso
+
+real    0m24.557s
+user    0m12.617s
+sys 0m11.197s
+</code></pre>
+
+<p>ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。</p>
+
+<pre><code>$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso
+
+HTTP/1.1 200 OK
+Content-Length: 925892608
+Content-Type: application/x-iso9660-image
+Accept-Ranges: bytes
+Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT
+Etag: 21ec41563ff34da27d4a0b56f2680c4f
+X-Timestamp: 1395537413.17419
+X-Object-Meta-Mtime: 1381950899.000000
+X-Trans-Id: txfee207024dd04bd599292-00532e3c5e
+Date: Sun, 23 Mar 2014 01:43:58 GMT
+</code></pre>
+
+<p>ヘッダはこんな感じ。</p>
+
+<h4 id="dlo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">DLO形式でアップロード</h4>
+
+<pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name dlo.iso --segment-size 104857600
+No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
+dlo.iso segment 0
+dlo.iso segment 5
+dlo.iso segment 1
+dlo.iso segment 2
+dlo.iso segment 3
+dlo.iso segment 4
+dlo.iso segment 8
+dlo.iso segment 7
+dlo.iso segment 6
+dlo.iso
+
+real    0m11.568s
+user    0m7.960s
+sys 0m4.448s
+</code></pre>
+
+<p>Swift CLIが各セグメントを100MBに分割してアップロードしています。並列でアップロードしているので、
+分割しない場合とくらべて転送時間は半分以下です。転送時間を重視するなら、ファイルサイズが5GB以下でも分割は有用です。</p>
+
+<pre><code>$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/dlo.iso
+HTTP/1.1 200 OK
+Content-Length: 925892608
+X-Object-Meta-Mtime: 1381950899.000000
+Accept-Ranges: bytes
+X-Object-Manifest: mak-cont_segments/dlo.iso/1381950899.000000/925892608/104857600/
+Last-Modified: Sun, 23 Mar 2014 01:22:25 GMT
+Etag: &quot;7085388575f90df99531b60f9d9b1291&quot;
+X-Timestamp: 1395537755.32458
+Content-Type: application/x-iso9660-image
+X-Trans-Id: txd90ac8f8f6a64c749de2f-00532e3c6f
+Date: Sun, 23 Mar 2014 01:44:15 GMT
+</code></pre>
+
+<p>X-Object-Manifestという属性が、セグメント化したファイルの置き場所を指しています。</p>
+
+<h4 id="slo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">SLO形式でアップロード</h4>
+
+<pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name slo.iso --segment-size 104857600 --use-slo
+No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
+slo.iso segment 3
+slo.iso segment 7
+slo.iso segment 1
+slo.iso segment 4
+slo.iso segment 8
+slo.iso segment 0
+slo.iso segment 5
+slo.iso segment 2
+slo.iso segment 6
+slo.iso
+
+real    0m12.039s
+user    0m8.189s
+sys 0m4.820s
+</code></pre>
+
+<p>転送時間はDLOと同等です。Swift CLIを使う場合は &ndash;use-sloオプションを指定するだけなので、データ完全性の観点からSLOがおすすめです。</p>
+
+<pre><code>$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/slo.iso
+HTTP/1.1 200 OK
+Content-Length: 925892608
+X-Object-Meta-Mtime: 1381950899.000000
+Accept-Ranges: bytes
+Last-Modified: Sun, 23 Mar 2014 01:24:08 GMT
+Etag: &quot;7085388575f90df99531b60f9d9b1291&quot;
+X-Timestamp: 1395537859.11815
+X-Static-Large-Object: True
+Content-Type: application/x-iso9660-image
+X-Trans-Id: tx6cec436f525f4eb89dcfc-00532e3c7b
+Date: Sun, 23 Mar 2014 01:44:27 GMT
+</code></pre>
+
+<p>X-Static-Large-Object属性がTrueになりました。</p>
+
+<p>参考情報
+- <a href="http://docs.openstack.org/developer/swift/overview_large_objects.html">Swift Documentaion &ndash; Large Object Support</a>
+- <a href="https://docs.hpcloud.com/api/object-storage/#large_objects-jumplink-span">HP Cloud Object Storage API Reference</a></p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

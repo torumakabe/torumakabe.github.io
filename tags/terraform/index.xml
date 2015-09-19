@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Terraform on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/terraform/</link>
+    <description>Recent content in Terraform on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 04 Apr 2015 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>いきなり Terraform OpenStack Provider</title>
+      <link>http://torumakabe.github.io/post/terraform-openstack-minimum/</link>
+      <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <description>
+
+&lt;h3 id=&#34;terraform-0-4でopenstack-providerリリース:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;Terraform 0.4でOpenStack Providerリリース&lt;/h3&gt;
+
+&lt;p&gt;以前からOpenStack対応は表明されていたのですが、いよいよ&lt;a href=&#34;https://hashicorp.com/blog/terraform-0-4.html&#34;&gt;v0.4&lt;/a&gt;でリリースされました。&lt;/p&gt;
+
+&lt;h3 id=&#34;小さくはじめましょう:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;小さくはじめましょう&lt;/h3&gt;
+
+&lt;p&gt;この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。&lt;/p&gt;
+
+&lt;h3 id=&#34;テストした環境:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;テストした環境&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Terraform 0.4&lt;/li&gt;
+&lt;li&gt;Mac OS 10.10.2&lt;/li&gt;
+&lt;li&gt;HP Helion Public Cloud&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;openstackerのみだしなみ-環境変数:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;OpenStackerのみだしなみ、環境変数&lt;/h3&gt;
+
+&lt;p&gt;下記、環境変数はセットされてますよね。要確認。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OS_AUTH_URL&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_USERNAME&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_PASSWORD&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_REGION_NAME&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_TENANT_NAME&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;最小限の構成ファイル:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。&lt;/p&gt;
+
+&lt;h3 id=&#34;さあ実行:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;さあ実行&lt;/h3&gt;
+
+&lt;p&gt;まずはterraform planコマンドで、実行計画を確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform plan
+Refreshing Terraform state prior to plan...
+
+
+The Terraform execution plan has been generated and is shown below.
+Resources are shown in alphabetical order for quick scanning. Green resources
+will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
+
+Note: You didn&#39;t specify an &amp;quot;-out&amp;quot; parameter to save this plan, so when &amp;quot;apply&amp;quot; is called, Terraform can&#39;t guarantee this is what will execute.
+
++ openstack_compute_instance_v2.sample-server
+    access_ip_v4:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    access_ip_v6:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    flavor_id:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_flavor_id&amp;quot;
+    flavor_name:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    floating_ip:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;aaa.bbb.ccc.ddd&amp;quot;
+    image_id:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_image_id&amp;quot;
+    image_name:        &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    key_pair:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_keypair&amp;quot;
+    name:              &amp;quot;&amp;quot; =&amp;gt; &amp;quot;tf-sample&amp;quot;
+    network.#:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    region:            &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_region&amp;quot;
+    security_groups.#: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;1&amp;quot;
+    security_groups.0: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_sg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;定義通りに動きそうですね。では実行。applyです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform apply  
+openstack_compute_instance_v2.sample-server: Creating...  
+    access_ip_v4:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    access_ip_v6:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    flavor_id:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_flavor&amp;quot;  
+    flavor_name:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    floating_ip:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;aaa.bbb.ccc.ddd&amp;quot;  
+    image_id:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_image_id&amp;quot;  
+    image_name:        &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    key_pair:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_keypair&amp;quot;  
+    name:              &amp;quot;&amp;quot; =&amp;gt; &amp;quot;tf-sample&amp;quot;  
+    network.#:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    region:            &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_region&amp;quot;
+    security_groups.#: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;1&amp;quot;
+    security_groups.0: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_sg&amp;quot;
+openstack_compute_instance_v2.test-server: Creation complete
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `terraform show` command.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;とても楽ちんですね。あとはオプションを追加して込み入った構成に挑戦してみてください。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

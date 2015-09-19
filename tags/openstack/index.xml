@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Openstack on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/openstack/</link>
+    <description>Recent content in Openstack on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 04 Apr 2015 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/openstack/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>いきなり Terraform OpenStack Provider</title>
+      <link>http://torumakabe.github.io/post/terraform-openstack-minimum/</link>
+      <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <description>
+
+&lt;h3 id=&#34;terraform-0-4でopenstack-providerリリース:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;Terraform 0.4でOpenStack Providerリリース&lt;/h3&gt;
+
+&lt;p&gt;以前からOpenStack対応は表明されていたのですが、いよいよ&lt;a href=&#34;https://hashicorp.com/blog/terraform-0-4.html&#34;&gt;v0.4&lt;/a&gt;でリリースされました。&lt;/p&gt;
+
+&lt;h3 id=&#34;小さくはじめましょう:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;小さくはじめましょう&lt;/h3&gt;
+
+&lt;p&gt;この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。&lt;/p&gt;
+
+&lt;h3 id=&#34;テストした環境:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;テストした環境&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Terraform 0.4&lt;/li&gt;
+&lt;li&gt;Mac OS 10.10.2&lt;/li&gt;
+&lt;li&gt;HP Helion Public Cloud&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;openstackerのみだしなみ-環境変数:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;OpenStackerのみだしなみ、環境変数&lt;/h3&gt;
+
+&lt;p&gt;下記、環境変数はセットされてますよね。要確認。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OS_AUTH_URL&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_USERNAME&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_PASSWORD&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_REGION_NAME&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;OS_TENANT_NAME&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;最小限の構成ファイル:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。&lt;/p&gt;
+
+&lt;h3 id=&#34;さあ実行:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;さあ実行&lt;/h3&gt;
+
+&lt;p&gt;まずはterraform planコマンドで、実行計画を確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform plan
+Refreshing Terraform state prior to plan...
+
+
+The Terraform execution plan has been generated and is shown below.
+Resources are shown in alphabetical order for quick scanning. Green resources
+will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
+
+Note: You didn&#39;t specify an &amp;quot;-out&amp;quot; parameter to save this plan, so when &amp;quot;apply&amp;quot; is called, Terraform can&#39;t guarantee this is what will execute.
+
++ openstack_compute_instance_v2.sample-server
+    access_ip_v4:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    access_ip_v6:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    flavor_id:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_flavor_id&amp;quot;
+    flavor_name:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    floating_ip:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;aaa.bbb.ccc.ddd&amp;quot;
+    image_id:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_image_id&amp;quot;
+    image_name:        &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    key_pair:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_keypair&amp;quot;
+    name:              &amp;quot;&amp;quot; =&amp;gt; &amp;quot;tf-sample&amp;quot;
+    network.#:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;
+    region:            &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_region&amp;quot;
+    security_groups.#: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;1&amp;quot;
+    security_groups.0: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_sg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;定義通りに動きそうですね。では実行。applyです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform apply  
+openstack_compute_instance_v2.sample-server: Creating...  
+    access_ip_v4:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    access_ip_v6:      &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    flavor_id:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_flavor&amp;quot;  
+    flavor_name:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    floating_ip:       &amp;quot;&amp;quot; =&amp;gt; &amp;quot;aaa.bbb.ccc.ddd&amp;quot;  
+    image_id:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_image_id&amp;quot;  
+    image_name:        &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    key_pair:          &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_keypair&amp;quot;  
+    name:              &amp;quot;&amp;quot; =&amp;gt; &amp;quot;tf-sample&amp;quot;  
+    network.#:         &amp;quot;&amp;quot; =&amp;gt; &amp;quot;&amp;lt;computed&amp;gt;&amp;quot;  
+    region:            &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_region&amp;quot;
+    security_groups.#: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;1&amp;quot;
+    security_groups.0: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;my_sg&amp;quot;
+openstack_compute_instance_v2.test-server: Creation complete
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `terraform show` command.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;とても楽ちんですね。あとはオプションを追加して込み入った構成に挑戦してみてください。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>君はOpenStack Monascaを知っているか</title>
+      <link>http://torumakabe.github.io/post/monasca/</link>
+      <pubDate>Fri, 12 Dec 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/monasca/</guid>
+      <description>
+
+&lt;p&gt;このエントリーは、&lt;a href=&#34;http://www.adventar.org/calendars/602&#34;&gt;OpenStack (2枚目) Advent Calendar 2014&lt;/a&gt;の12夜目担当作品です。&lt;/p&gt;
+
+&lt;h3 id=&#34;monitoring-as-a-service:a2dc20a10b2175cd92893d87c6bb4e06&#34;&gt;Monitoring as a Service&lt;/h3&gt;
+
+&lt;p&gt;監視をサービスとして提供するって、どういうことでしょうか。&lt;/p&gt;
+
+&lt;p&gt;[Monitoring]&lt;br /&gt;
+従来の監視。担当者が事前に監視項目を定義する。静的。&lt;/p&gt;
+
+&lt;p&gt;[Monitoring as a Service]
+監視機能をサービスとして提供する。不特定多数のユーザーが、自分の監視したい測定項目を定義し、自分の好きなタイミングでチェックする。GUIはもちろん、APIでデータ取得できる。動的。&lt;/p&gt;
+
+&lt;p&gt;まあ、AWSのCloudWatchみたいなものです。先に言うべきでしたね、すいません。&lt;/p&gt;
+
+&lt;p&gt;このMonitoring as a Service、技術的なハードルは結構高いんです。刻々と上がってくるイベントをさばき、蓄積し、APIをバシバシ叩くユーザーリクエストに応えなきゃいけない。監視というと裏方のイメージがありますが、これは、対価をいただくに値する、立派なサービスです。&lt;/p&gt;
+
+&lt;p&gt;そこでOpenStackのMonitoring as a Service事情はどうでしょうか。一見、それを実現できそうなCeilometerがあります。ただ、もともとCeilomerは課金のための利用情報収集をする、という生まれなので、マルチテナントで、ユーザーが自らメトリックを定義し、チェックするという使い方に向いていません。ユーザー向けというより、管理者向けなんです。&lt;/p&gt;
+
+&lt;p&gt;そこで&lt;a href=&#34;https://wiki.openstack.org/wiki/Monasca&#34;&gt;Monasca&lt;/a&gt;の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。&lt;/p&gt;
+
+&lt;p&gt;では、アーキテクチャーを見てみましょう。&lt;br /&gt;
+&lt;img src=&#34;https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png&#34; alt=&#34;MonascaArc&#34; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。&lt;/p&gt;
+
+&lt;p&gt;と思っていたら。&lt;/p&gt;
+
+&lt;p&gt;なんと、&lt;a href=&#34;https://github.com/stackforge/monasca-vagrant&#34;&gt;Monasca-Vagrant&lt;/a&gt;なんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。&lt;/p&gt;
+
+&lt;h3 id=&#34;気をつけること:a2dc20a10b2175cd92893d87c6bb4e06&#34;&gt;気をつけること&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。&lt;/li&gt;
+&lt;li&gt;Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。&lt;/li&gt;
+&lt;li&gt;git cloneしたディレクトリ直下にansibleのrequirementファイルが置かれるので、そこで作業&lt;/li&gt;
+&lt;li&gt;vagrant upで2つのVM、devstackとmini-monが作られる、ここは時間と帯域がいるので、スタバな人は要注意&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;気をつけるのはこれくらいです。レッツトライ。&lt;/p&gt;
+
+&lt;p&gt;年末年始休暇のお楽しみが増えましたね。&lt;/p&gt;
+
+&lt;p&gt;これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp;amp; 良いお年を。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenStackと長期バージョン固定</title>
+      <link>http://torumakabe.github.io/post/longtermsupport/</link>
+      <pubDate>Tue, 09 Dec 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/longtermsupport/</guid>
+      <description>
+
+&lt;p&gt;このエントリーは、&lt;a href=&#34;http://www.adventar.org/calendars/602&#34;&gt;OpenStack (2枚目) Advent Calendar 2014&lt;/a&gt;の9夜目担当作品です。&lt;/p&gt;
+
+&lt;h3 id=&#34;ソフトウェア-バージョン-サポート:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;ソフトウェア、バージョン、サポート&lt;/h3&gt;
+
+&lt;p&gt;たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。&lt;/p&gt;
+
+&lt;h3 id=&#34;進化著しいソフト-openstackでは:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;進化著しいソフト、OpenStackでは&lt;/h3&gt;
+
+&lt;p&gt;OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして&lt;a href=&#34;https://wiki.openstack.org/wiki/Releases&#34;&gt;公式サイト&lt;/a&gt;を見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。&lt;/p&gt;
+
+&lt;h3 id=&#34;でも-長期バージョン固定するとどうなるか:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;でも、長期バージョン固定するとどうなるか&lt;/h3&gt;
+
+&lt;p&gt;では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。&lt;/p&gt;
+
+&lt;p&gt;[とあるクラウド その1]&lt;br /&gt;
+- (Dev)  今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。&lt;br /&gt;
+- (Ops) あー、うちの環境Jよ。&lt;br /&gt;
+- (Dev) そうすか。じゃあ他のにするわ。&lt;/p&gt;
+
+&lt;p&gt;使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。&lt;/p&gt;
+
+&lt;p&gt;[とあるクラウド その2]&lt;br /&gt;
+- (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!!&lt;br /&gt;
+- (Dev) おーいいね。決定。3年のんびりするわ。&lt;br /&gt;
+〜3年後〜&lt;br /&gt;
+- (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!!&lt;br /&gt;
+- (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。&lt;/p&gt;
+
+&lt;p&gt;リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。&lt;/p&gt;
+
+&lt;h3 id=&#34;アップデートの仕組みに投資したほうが建設的と思う:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;アップデートの仕組みに投資したほうが建設的と思う&lt;/h3&gt;
+
+&lt;p&gt;もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。&lt;/p&gt;
+
+&lt;p&gt;それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。&lt;/p&gt;
+
+&lt;p&gt;最後に、&lt;a href=&#34;http://superuser.openstack.org/articles/openstack-user-survey-insights-november-2014&#34;&gt;最新のOpenStack User Survey&lt;/a&gt;を紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。&lt;/p&gt;
+
+&lt;p&gt;OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&amp;rdquo;Ability to innovate&amp;rdquo;なんですよね。
+あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。&lt;/p&gt;
+
+&lt;p&gt;メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ハンサムOpenStack</title>
+      <link>http://torumakabe.github.io/post/handsome-openstack/</link>
+      <pubDate>Sat, 06 Dec 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/handsome-openstack/</guid>
+      <description>
+
+&lt;p&gt;このエントリーは、&lt;a href=&#34;http://www.adventar.org/calendars/602&#34;&gt;OpenStack (2枚目) Advent Calendar 2014&lt;/a&gt;の6夜目担当作品です。&lt;/p&gt;
+
+&lt;h3 id=&#34;出オチ:69265e72de8632f3d558928e3a79ce26&#34;&gt;出オチ&lt;/h3&gt;
+
+&lt;p&gt;OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。&lt;/p&gt;
+
+&lt;p&gt;こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。&lt;/p&gt;
+
+&lt;h3 id=&#34;そもそも2枚目とは:69265e72de8632f3d558928e3a79ce26&#34;&gt;そもそも2枚目とは&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;「二枚目」という用語は、歌舞伎用語をもとに、江戸時代に生まれた。歌舞伎の看板は、通常は8枚から成っていた。一枚目の看板は「書き出し」と言われ、主役の名が書かれ、二枚目の看板には若い色男の役者の名が書かれることになっていた。また、三枚目の看板には道化役の名が書かれることになっていた。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://ja.wikipedia.org/wiki/%E4%BA%8C%E6%9E%9A%E7%9B%AE&#34;&gt;「二枚目」（2013年5月28日 (火) 02:17 UTCの版）『ウィキペディア日本語版』&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;8枚あるらしいぞ-いじってみよう:69265e72de8632f3d558928e3a79ce26&#34;&gt;8枚あるらしいぞ いじってみよう&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;一枚目：主役：そのまま主役。「一枚看板」という用法もある。&lt;br /&gt;
+&lt;em&gt;Novaですね。主役です。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;二枚目：色男：優男で色事担当&lt;br /&gt;
+&lt;em&gt;これはあとにとっておきましょう。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;三枚目：道化：お笑い担当&lt;br /&gt;
+&lt;em&gt;Glanceですね。何も変なことしてないのにネタにされる。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;四枚目：中軸：中堅役者　まとめ役&lt;br /&gt;
+&lt;em&gt;Cinderでしょうか。主役のNovaを活かす名脇役。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;五枚目：敵役：一般的な敵役&lt;br /&gt;
+&lt;em&gt;Heatかな。はじめのCloudFormation形式ってのが気に入らなかった。HOTが出てきたので許す。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;六枚目：実敵：憎めない善要素のある敵役&lt;br /&gt;
+&lt;em&gt;Ceilometerです。重いです。絶賛チューニング中です。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕&lt;br /&gt;
+&lt;em&gt;Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなかったのよきっと。これから良くなるよ。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;八枚目：座長：元締め&lt;br /&gt;
+&lt;em&gt;Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;じゃあ二枚目は:69265e72de8632f3d558928e3a79ce26&#34;&gt;じゃあ二枚目は?&lt;/h3&gt;
+
+&lt;p&gt;*Trove*です。若さと期待の大きさを込めてキャスティングしました。というか&lt;a href=&#34;http://www.publickey1.jp/blog/14/paasdbaasapaas12amazonidc_japan.html&#34;&gt;これ&lt;/a&gt;を見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。&lt;/p&gt;
+
+&lt;p&gt;2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenStackのツール環境をImmutableに整える</title>
+      <link>http://torumakabe.github.io/post/openstack-tools/</link>
+      <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
+      <description>
+
+&lt;h3 id=&#34;タイトルは釣りです:06c978f415868c5d089a8460c0068f0d&#34;&gt;タイトルは釣りです&lt;/h3&gt;
+
+&lt;p&gt;すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。&lt;/p&gt;
+
+&lt;h3 id=&#34;なぜ必要か:06c978f415868c5d089a8460c0068f0d&#34;&gt;なぜ必要か?&lt;/h3&gt;
+
+&lt;p&gt;いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。&lt;/p&gt;
+
+&lt;h3 id=&#34;やりたいこと:06c978f415868c5d089a8460c0068f0d&#34;&gt;やりたいこと&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい&lt;/li&gt;
+&lt;li&gt;Windows、Macどちらでも同様の環境にしたい&lt;/li&gt;
+&lt;li&gt;相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収&lt;/li&gt;
+&lt;li&gt;Windows、Mac環境を汚さない、また、汚されない&lt;/li&gt;
+&lt;li&gt;コマンド2、3発程度で、気軽に作って消せる&lt;/li&gt;
+&lt;li&gt;VMできたらすぐログイン、即OpenStack CLIが使える&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;方針:06c978f415868c5d089a8460c0068f0d&#34;&gt;方針&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る&lt;/li&gt;
+&lt;li&gt;VagrantでWindows/Macの違いを吸収する&lt;/li&gt;
+&lt;li&gt;VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う&lt;/li&gt;
+&lt;li&gt;構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;前提条件:06c978f415868c5d089a8460c0068f0d&#34;&gt;前提条件&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Windows 8.1 &amp;amp; VMware Worksation 10.0.3&lt;/li&gt;
+&lt;li&gt;OSX 10.9.4 &amp;amp; VirtualBox 4.3.16&lt;/li&gt;
+&lt;li&gt;Vagrant 1.6.5  (VMware用ライセンス買いました)&lt;/li&gt;
+&lt;li&gt;ひとまずOpenStack CLIを使えるところまで作る&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの&lt;a href=&#34;https://github.com/opscode/bento&#34;&gt;Bento&lt;/a&gt;で、事前にboxファイルを作ってます。ubuntu14.04としました。&lt;/li&gt;
+&lt;li&gt;実行ディレクトリにprovision.shを置きます。&lt;/li&gt;
+&lt;li&gt;provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。&lt;/li&gt;
+&lt;li&gt;実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;hostsファイルには以下のようにlocalhostを定義します。&lt;/p&gt;
+
+&lt;p&gt;[localhost]&lt;br /&gt;
+127.0.0.1 ansible_connection=local&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
+
+&lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;
+
+&lt;p&gt;OS_TENANT_NAME: your_tenant_name&lt;br /&gt;
+OS_USERNAME: your_username&lt;br /&gt;
+&amp;hellip;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;という感じで並べてください。.bashrcに追加されます。
+- タイムゾーンをAsia/Tokyoにします。
+- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。&lt;/p&gt;
+
+&lt;h3 id=&#34;windowsでの実行例:06c978f415868c5d089a8460c0068f0d&#34;&gt;Windowsでの実行例&lt;/h3&gt;
+
+&lt;p&gt;Vagrant &amp;amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant up
+Bringing machine &#39;default&#39; up with &#39;vmware_workstation&#39; provider...
+==&amp;gt; default: Cloning VMware VM: &#39;opscode-ubuntu1404&#39;. This can take some time...
+(snip)
+==&amp;gt; default: TASK: [install OpenStack CLIs] ************************************************
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-neutronclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-novaclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-cinderclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-swiftclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-glanceclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-troveclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-designateclient)
+==&amp;gt; default:
+==&amp;gt; default: PLAY RECAP ********************************************************************
+==&amp;gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;うまく動いたようです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant ssh
+cygwin warning:
+  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
+  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
+  CYGWIN environment variable option &amp;quot;nodosfilewarning&amp;quot; turns off this warning.
+  Consult the user&#39;s guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vagrant@vagrant:~$ nova list
++----+------+--------+------------+-------------+----------+
+| ID | Name | Status | Task State | Power State | Networks |
++----+------+--------+------------+-------------+----------+
++----+------+--------+------------+-------------+----------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いきなりnovaコマンド使えます。&lt;/p&gt;
+
+&lt;p&gt;なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
+      <link>http://torumakabe.github.io/post/vagrant-openstack/</link>
+      <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
+      <description>
+
+&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
+
+&lt;p&gt;これまでHP Public Cloudむけの&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;は、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;vagrant-hp plug-in&lt;/a&gt;を&lt;a href=&#34;http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/&#34;&gt;使って&lt;/a&gt;ました。でも最近、より汎用的で開発が活発な&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;vagrant-openstack-plugin&lt;/a&gt;へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。&lt;/p&gt;
+
+&lt;p&gt;多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。&lt;/p&gt;
+
+&lt;p&gt;さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;前提条件:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;前提条件&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vagrant 1.6.3&lt;/li&gt;
+&lt;li&gt;vagrant-openstack-plugin 0.8.0&lt;/li&gt;
+&lt;li&gt;HP Public Cloud (2014/9/6)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
+
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;フレーバーとイメージ名は正規表現で指定できます。&lt;/li&gt;
+&lt;li&gt;OpenStack CLI群と同じ環境変数を使ってます。&lt;/li&gt;
+&lt;li&gt;Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;で、ふつーに動きます。乗り換え決定です。&lt;/p&gt;
+
+&lt;h3 id=&#34;スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;スナップショット便利&lt;/h3&gt;
+
+&lt;p&gt;vagrant-hpでは使えなかったはず。こいつは便利だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vagrant openstack snapshot -n lab01_snap
+==&amp;gt; default: This server instance is snapshoting!
+==&amp;gt; default: Snapshot is ok
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>いま最も楽にIcehouse環境を作る方法</title>
+      <link>http://torumakabe.github.io/post/vagrant-icehouse/</link>
+      <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
+      <description>
+
+&lt;h3 id=&#34;あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322&#34;&gt;あえて言おう、これは甘えであると&lt;/h3&gt;
+
+&lt;p&gt;現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。&lt;/p&gt;
+
+&lt;p&gt;では始めましょう。&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;OpenStack Cloud Computing Cookbook&lt;/a&gt;の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。&lt;/p&gt;
+
+&lt;h3 id=&#34;ほんと-これだけ:bf1ea282536d85f1cef895a583837322&#34;&gt;ほんと、これだけ&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;このページ&lt;/a&gt;で確認&lt;/li&gt;
+&lt;li&gt;$ vagrant plugin install vagrant-cachier&lt;/li&gt;
+&lt;li&gt;$ git clone &lt;a href=&#34;https://github.com/OpenStackCookbook/OpenStackCookbook.git&#34;&gt;https://github.com/OpenStackCookbook/OpenStackCookbook.git&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;$ cd OpenStackCookbook&lt;/li&gt;
+&lt;li&gt;$ git checkout icehouse&lt;/li&gt;
+&lt;li&gt;$ vagrant up&lt;/li&gt;
+&lt;li&gt;何度か管理者パスワードを入力&lt;/li&gt;
+&lt;li&gt;$ vagrant ssh controller&lt;/li&gt;
+&lt;li&gt;$ . /vagrant/openrc&lt;/li&gt;
+&lt;li&gt;$/vagrant/demo.sh&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上。Horizonコンソールは &lt;a href=&#34;http://172.16.0.200/&#34;&gt;http://172.16.0.200/&lt;/a&gt; から。&lt;/p&gt;
+
+&lt;h3 id=&#34;この環境だと30分でできた:bf1ea282536d85f1cef895a583837322&#34;&gt;この環境だと30分でできた&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
+&lt;li&gt;VirtualBox 4.3.10&lt;/li&gt;
+&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;デモや新機能の試用くらいであればこれで十分ですね。&lt;br /&gt;
+著者に感謝。わたしは買いました。 &amp;ndash; &lt;a href=&#34;http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/&#34;&gt;OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenStack超入門シリーズ 初期3部作完結</title>
+      <link>http://torumakabe.github.io/post/OpenStack-3primer/</link>
+      <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/OpenStack-3primer/</guid>
+      <description>
+
+&lt;h3 id=&#34;よく聞かれることをまとめました:05fdcc29da710e097e2f23b56c9852e1&#34;&gt;よく聞かれることをまとめました&lt;/h3&gt;
+
+&lt;p&gt;ひとまず、初期3部作完結。また書くかもしれません。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-nova&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-32905609&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Swiftの使い方&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-neutron&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Neutronの使い方&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenStack超入門シリーズ</title>
+      <link>http://torumakabe.github.io/post/OpenStack-primer/</link>
+      <pubDate>Thu, 27 Mar 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/OpenStack-primer/</guid>
+      <description>
+
+&lt;h3 id=&#34;基本的な質問が増えてきた:fec58f188036762a83cb33b4dfa34673&#34;&gt;基本的な質問が増えてきた&lt;/h3&gt;
+
+&lt;p&gt;OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。&lt;/p&gt;
+
+&lt;h3 id=&#34;よく聞かれることはまとめておこう:fec58f188036762a83cb33b4dfa34673&#34;&gt;よく聞かれることはまとめておこう&lt;/h3&gt;
+
+&lt;p&gt;もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。&lt;/p&gt;
+
+&lt;p&gt;第一弾
+&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-nova&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenStack Swiftへのファイル分割アップロード</title>
+      <link>http://torumakabe.github.io/post/swift-upload/</link>
+      <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/swift-upload/</guid>
+      <description>
+
+&lt;h3 id=&#34;swiftへ-ファイルを分割してアップロードできる:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;Swiftへ、ファイルを分割してアップロードできる&lt;/h3&gt;
+
+&lt;p&gt;今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;アップロード形式は大きく3つ-そのまま-dlo-slo:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;アップロード形式は大きく3つ &amp;ndash; そのまま、DLO、SLO&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。&lt;/li&gt;
+&lt;li&gt;DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。&lt;/li&gt;
+&lt;li&gt;SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;動きを見てみよう:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;動きを見てみよう&lt;/h3&gt;
+
+&lt;p&gt;環境は以下の通り。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;HP Public Cloud US-West Region&lt;/li&gt;
+&lt;li&gt;Swift Clientを動かすCompute Node &amp;ndash; standard.large / ubuntu 12.04&lt;/li&gt;
+&lt;li&gt;Swift CLI &amp;ndash; 2.0.3&lt;/li&gt;
+&lt;li&gt;約900MBあるubuntu desktopのisoファイルをアップロード&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;そのままアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;そのままアップロード&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso
+No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
+non-seg.iso
+
+real    0m24.557s
+user    0m12.617s
+sys 0m11.197s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso
+
+HTTP/1.1 200 OK
+Content-Length: 925892608
+Content-Type: application/x-iso9660-image
+Accept-Ranges: bytes
+Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT
+Etag: 21ec41563ff34da27d4a0b56f2680c4f
+X-Timestamp: 1395537413.17419
+X-Object-Meta-Mtime: 1381950899.000000
+X-Trans-Id: txfee207024dd04bd599292-00532e3c5e
+Date: Sun, 23 Mar 2014 01:43:58 GMT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ヘッダはこんな感じ。&lt;/p&gt;
+
+&lt;h4 id=&#34;dlo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;DLO形式でアップロード&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name dlo.iso --segment-size 104857600
+No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
+dlo.iso segment 0
+dlo.iso segment 5
+dlo.iso segment 1
+dlo.iso segment 2
+dlo.iso segment 3
+dlo.iso segment 4
+dlo.iso segment 8
+dlo.iso segment 7
+dlo.iso segment 6
+dlo.iso
+
+real    0m11.568s
+user    0m7.960s
+sys 0m4.448s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Swift CLIが各セグメントを100MBに分割してアップロードしています。並列でアップロードしているので、
+分割しない場合とくらべて転送時間は半分以下です。転送時間を重視するなら、ファイルサイズが5GB以下でも分割は有用です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/dlo.iso
+HTTP/1.1 200 OK
+Content-Length: 925892608
+X-Object-Meta-Mtime: 1381950899.000000
+Accept-Ranges: bytes
+X-Object-Manifest: mak-cont_segments/dlo.iso/1381950899.000000/925892608/104857600/
+Last-Modified: Sun, 23 Mar 2014 01:22:25 GMT
+Etag: &amp;quot;7085388575f90df99531b60f9d9b1291&amp;quot;
+X-Timestamp: 1395537755.32458
+Content-Type: application/x-iso9660-image
+X-Trans-Id: txd90ac8f8f6a64c749de2f-00532e3c6f
+Date: Sun, 23 Mar 2014 01:44:15 GMT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;X-Object-Manifestという属性が、セグメント化したファイルの置き場所を指しています。&lt;/p&gt;
+
+&lt;h4 id=&#34;slo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;SLO形式でアップロード&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name slo.iso --segment-size 104857600 --use-slo
+No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
+slo.iso segment 3
+slo.iso segment 7
+slo.iso segment 1
+slo.iso segment 4
+slo.iso segment 8
+slo.iso segment 0
+slo.iso segment 5
+slo.iso segment 2
+slo.iso segment 6
+slo.iso
+
+real    0m12.039s
+user    0m8.189s
+sys 0m4.820s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;転送時間はDLOと同等です。Swift CLIを使う場合は &amp;ndash;use-sloオプションを指定するだけなので、データ完全性の観点からSLOがおすすめです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/slo.iso
+HTTP/1.1 200 OK
+Content-Length: 925892608
+X-Object-Meta-Mtime: 1381950899.000000
+Accept-Ranges: bytes
+Last-Modified: Sun, 23 Mar 2014 01:24:08 GMT
+Etag: &amp;quot;7085388575f90df99531b60f9d9b1291&amp;quot;
+X-Timestamp: 1395537859.11815
+X-Static-Large-Object: True
+Content-Type: application/x-iso9660-image
+X-Trans-Id: tx6cec436f525f4eb89dcfc-00532e3c7b
+Date: Sun, 23 Mar 2014 01:44:27 GMT
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;X-Static-Large-Object属性がTrueになりました。&lt;/p&gt;
+
+&lt;p&gt;参考情報
+- &lt;a href=&#34;http://docs.openstack.org/developer/swift/overview_large_objects.html&#34;&gt;Swift Documentaion &amp;ndash; Large Object Support&lt;/a&gt;
+- &lt;a href=&#34;https://docs.hpcloud.com/api/object-storage/#large_objects-jumplink-span&#34;&gt;HP Cloud Object Storage API Reference&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Transparency is Noisy</title>
+      <link>http://torumakabe.github.io/post/transparency-is-noisy/</link>
+      <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/transparency-is-noisy/</guid>
+      <description>
+
+&lt;h3 id=&#34;雑音が多いのは透明性の裏返し:feaab9be5861a3c8eb7306499c601395&#34;&gt;雑音が多いのは透明性の裏返し&lt;/h3&gt;
+
+&lt;p&gt;秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。&lt;/p&gt;
+
+&lt;p&gt;いっぽうで、みなで仕様を議論し、期限を定めて開発する。その過程を公開。こっちは有言実行。&lt;/p&gt;
+
+&lt;p&gt;有言実行は、叩かれやすいんです。雑音も多く生まれます。でもそれは、オープンである裏返し。&lt;/p&gt;
+
+&lt;p&gt;答えを出すのは、ユーザーとデベロッパーです。安全地帯にいる、外野ではありません。&lt;/p&gt;
+
+&lt;p&gt;元記事は、&lt;a href=&#34;http://www.openstack.org/blog/2014/01/openstack-2014-powered-by-users/&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>HP Cloud OS Sandbox向け VirtualBox 環境構築スクリプト</title>
+      <link>http://torumakabe.github.io/post/hpcos-vbox-scripts/</link>
+      <pubDate>Sun, 05 Jan 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/hpcos-vbox-scripts/</guid>
+      <description>
+
+&lt;h3 id=&#34;hp-cloud-os-sandboxが公開された:66b687d461813214cceb1147a0701c0d&#34;&gt;HP Cloud OS Sandboxが公開された&lt;/h3&gt;
+
+&lt;p&gt;先日、HP Cloud OS Sandboxが&lt;a href=&#34;https://cloudos.hpwsportal.com/#/Product/{&amp;quot;productId&amp;quot;:&amp;quot;570&amp;quot;}/Show&#34;&gt;公開&lt;/a&gt;されました。HP Cloud OSとは、OpenStackをコアに、HPが便利機能を追加したソフトウェアスタックです。その試用版がSandboxです。&lt;/p&gt;
+
+&lt;p&gt;OpenStackは日々成長していますが、地味な運用まわりの機能に物足りなさがあります。そこでHPは早い時期からOpenStackの商用製品・サービス化に取り組んできた経験から、HP Cloud OSではOpenStackの周辺に便利機能を付加しています。GUIでさくっとノード追加できるとか、複数のOpenStackクラウドを束ねて管理するとか。素のOpenStackもいいですが、味付けしたものもまたよし、ですよ。&lt;/p&gt;
+
+&lt;h3 id=&#34;気軽に試したい人向けに:66b687d461813214cceb1147a0701c0d&#34;&gt;気軽に試したい人向けに&lt;/h3&gt;
+
+&lt;p&gt;導入ドキュメントは&lt;a href=&#34;http://docs.hpcloud.com/cloudos&#34;&gt;公開&lt;/a&gt;されていますので、ここで必要な&lt;a href=&#34;http://docs.hpcloud.com/cloudos/prepare/supportmatrix/&#34;&gt;環境&lt;/a&gt;を確認できます。が、ちょっとリッチですね。本気で使うのであれば、このくらいあったほうがいいでしょうけど。そこで、お気軽に試したいという人へ、VirtualBox環境への導入手順をご紹介します。&lt;/p&gt;
+
+&lt;h3 id=&#34;virtualboxにhp-cloud-os-sandboxを導入するステップ:66b687d461813214cceb1147a0701c0d&#34;&gt;VirtualBoxにHP Cloud OS Sandboxを導入するステップ&lt;/h3&gt;
+
+&lt;p&gt;導入手順をざっくりまとめます。
+1. VirtualBoxのホストオンリーネットワークを作成する
+2. HP Cloud OS adminノードのVMを作成し、ISOイメージからインストールする
+3. HP Cloud OS adminノードの種々パラメータを設定し、ビルドする
+4. OpenStack controller、computeノード用のVMを作成しパワーオン。PXEでインストールする
+5. 作成したVMをHP Cloud OS環境に取り込む
+6. HP Cloud OS環境下に取り込んだVMをOpenStack controller、computeノードとして割り当て、もろもろの機能をインストールする&lt;/p&gt;
+
+&lt;h3 id=&#34;guiでチマチマとvirtualbox環境作りたくないよね:66b687d461813214cceb1147a0701c0d&#34;&gt;GUIでチマチマとVirtualBox環境作りたくないよね&lt;/h3&gt;
+
+&lt;p&gt;VirtualBoxは便利なんですけど、GUIで複数ノードのパラメータを設定するの、めんどうです。で、かなりの確率でミスります。ここはひとつ、できるところはスクリプトでやっちゃいましょう。前述した手順の1、2、4は、できるので。&lt;/p&gt;
+
+&lt;h3 id=&#34;実績あり環境:66b687d461813214cceb1147a0701c0d&#34;&gt;実績あり環境&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
+&lt;li&gt;各VMへのメモリ割り当ては、admin(4GB)、controller(4GB)、compute(2GB)&lt;/li&gt;
+&lt;li&gt;メモリ量はスクリプト内で指定していますので、適宜調整して下さい&lt;/li&gt;
+&lt;li&gt;搭載メモリ8GBマシンだと厳しいです。admin向けはケチらない方がいいです&lt;/li&gt;
+&lt;li&gt;Mac OS X 10.9.1&lt;/li&gt;
+&lt;li&gt;VirtualBox 4.3.6&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;なおシェルスクリプトで書いてますが、中身はVirtualBoxのVBoxManageコマンドの羅列なので、いじれば他環境にも流用できるかと。&lt;/p&gt;
+
+&lt;h3 id=&#34;virtualboxのホストオンリーネットワークを作成する:66b687d461813214cceb1147a0701c0d&#34;&gt;VirtualBoxのホストオンリーネットワークを作成する&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255299.js&#34;&gt;&lt;/script&gt;
+hostonlyif create時に名前指定ができないのでvboxnet0、vboxnet1決め打ちにしましたが、環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;hp-cloud-os-adminノードのvmを作成し-isoイメージからインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;HP Cloud OS adminノードのVMを作成し、ISOイメージからインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255339.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattach(2つ)のパラメータは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;openstack-controllerノード用のvmを作成しパワーオン-pxeでインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;OpenStack controllerノード用のVMを作成しパワーオン。PXEでインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255354.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattachのパスは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;h3 id=&#34;openstack-computeノード用のvmを作成しパワーオン-pxeでインストールする:66b687d461813214cceb1147a0701c0d&#34;&gt;OpenStack computeノード用のVMを作成しパワーオン。PXEでインストールする&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/8255361.js&#34;&gt;&lt;/script&gt;
+modifyvm &amp;ndash;hostonlyadapter(2つ)、createhd、storageattachのパスは環境にあわせて下さい。&lt;/p&gt;
+
+&lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

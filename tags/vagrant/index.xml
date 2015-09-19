@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vagrant on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/vagrant/</link>
+    <description>Recent content in Vagrant on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 14 Sep 2014 00:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OpenStackのツール環境をImmutableに整える</title>
+      <link>http://torumakabe.github.io/post/openstack-tools/</link>
+      <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
+      <description>
+
+&lt;h3 id=&#34;タイトルは釣りです:06c978f415868c5d089a8460c0068f0d&#34;&gt;タイトルは釣りです&lt;/h3&gt;
+
+&lt;p&gt;すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。&lt;/p&gt;
+
+&lt;h3 id=&#34;なぜ必要か:06c978f415868c5d089a8460c0068f0d&#34;&gt;なぜ必要か?&lt;/h3&gt;
+
+&lt;p&gt;いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。&lt;/p&gt;
+
+&lt;h3 id=&#34;やりたいこと:06c978f415868c5d089a8460c0068f0d&#34;&gt;やりたいこと&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい&lt;/li&gt;
+&lt;li&gt;Windows、Macどちらでも同様の環境にしたい&lt;/li&gt;
+&lt;li&gt;相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収&lt;/li&gt;
+&lt;li&gt;Windows、Mac環境を汚さない、また、汚されない&lt;/li&gt;
+&lt;li&gt;コマンド2、3発程度で、気軽に作って消せる&lt;/li&gt;
+&lt;li&gt;VMできたらすぐログイン、即OpenStack CLIが使える&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;方針:06c978f415868c5d089a8460c0068f0d&#34;&gt;方針&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る&lt;/li&gt;
+&lt;li&gt;VagrantでWindows/Macの違いを吸収する&lt;/li&gt;
+&lt;li&gt;VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う&lt;/li&gt;
+&lt;li&gt;構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;前提条件:06c978f415868c5d089a8460c0068f0d&#34;&gt;前提条件&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Windows 8.1 &amp;amp; VMware Worksation 10.0.3&lt;/li&gt;
+&lt;li&gt;OSX 10.9.4 &amp;amp; VirtualBox 4.3.16&lt;/li&gt;
+&lt;li&gt;Vagrant 1.6.5  (VMware用ライセンス買いました)&lt;/li&gt;
+&lt;li&gt;ひとまずOpenStack CLIを使えるところまで作る&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの&lt;a href=&#34;https://github.com/opscode/bento&#34;&gt;Bento&lt;/a&gt;で、事前にboxファイルを作ってます。ubuntu14.04としました。&lt;/li&gt;
+&lt;li&gt;実行ディレクトリにprovision.shを置きます。&lt;/li&gt;
+&lt;li&gt;provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。&lt;/li&gt;
+&lt;li&gt;実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;hostsファイルには以下のようにlocalhostを定義します。&lt;/p&gt;
+
+&lt;p&gt;[localhost]&lt;br /&gt;
+127.0.0.1 ansible_connection=local&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
+
+&lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;
+
+&lt;p&gt;OS_TENANT_NAME: your_tenant_name&lt;br /&gt;
+OS_USERNAME: your_username&lt;br /&gt;
+&amp;hellip;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;という感じで並べてください。.bashrcに追加されます。
+- タイムゾーンをAsia/Tokyoにします。
+- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。&lt;/p&gt;
+
+&lt;h3 id=&#34;windowsでの実行例:06c978f415868c5d089a8460c0068f0d&#34;&gt;Windowsでの実行例&lt;/h3&gt;
+
+&lt;p&gt;Vagrant &amp;amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant up
+Bringing machine &#39;default&#39; up with &#39;vmware_workstation&#39; provider...
+==&amp;gt; default: Cloning VMware VM: &#39;opscode-ubuntu1404&#39;. This can take some time...
+(snip)
+==&amp;gt; default: TASK: [install OpenStack CLIs] ************************************************
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-neutronclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-novaclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-cinderclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-swiftclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-glanceclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-troveclient)
+==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-designateclient)
+==&amp;gt; default:
+==&amp;gt; default: PLAY RECAP ********************************************************************
+==&amp;gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;うまく動いたようです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant ssh
+cygwin warning:
+  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
+  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
+  CYGWIN environment variable option &amp;quot;nodosfilewarning&amp;quot; turns off this warning.
+  Consult the user&#39;s guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vagrant@vagrant:~$ nova list
++----+------+--------+------------+-------------+----------+
+| ID | Name | Status | Task State | Power State | Networks |
++----+------+--------+------------+-------------+----------+
++----+------+--------+------------+-------------+----------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いきなりnovaコマンド使えます。&lt;/p&gt;
+
+&lt;p&gt;なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
+      <link>http://torumakabe.github.io/post/vagrant-openstack/</link>
+      <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
+      <description>
+
+&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
+
+&lt;p&gt;これまでHP Public Cloudむけの&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;は、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;vagrant-hp plug-in&lt;/a&gt;を&lt;a href=&#34;http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/&#34;&gt;使って&lt;/a&gt;ました。でも最近、より汎用的で開発が活発な&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;vagrant-openstack-plugin&lt;/a&gt;へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。&lt;/p&gt;
+
+&lt;p&gt;多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。&lt;/p&gt;
+
+&lt;p&gt;さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;前提条件:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;前提条件&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vagrant 1.6.3&lt;/li&gt;
+&lt;li&gt;vagrant-openstack-plugin 0.8.0&lt;/li&gt;
+&lt;li&gt;HP Public Cloud (2014/9/6)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
+
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;フレーバーとイメージ名は正規表現で指定できます。&lt;/li&gt;
+&lt;li&gt;OpenStack CLI群と同じ環境変数を使ってます。&lt;/li&gt;
+&lt;li&gt;Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;で、ふつーに動きます。乗り換え決定です。&lt;/p&gt;
+
+&lt;h3 id=&#34;スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;スナップショット便利&lt;/h3&gt;
+
+&lt;p&gt;vagrant-hpでは使えなかったはず。こいつは便利だ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vagrant openstack snapshot -n lab01_snap
+==&amp;gt; default: This server instance is snapshoting!
+==&amp;gt; default: Snapshot is ok
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>いま最も楽にIcehouse環境を作る方法</title>
+      <link>http://torumakabe.github.io/post/vagrant-icehouse/</link>
+      <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
+      <description>
+
+&lt;h3 id=&#34;あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322&#34;&gt;あえて言おう、これは甘えであると&lt;/h3&gt;
+
+&lt;p&gt;現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。&lt;/p&gt;
+
+&lt;p&gt;では始めましょう。&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;OpenStack Cloud Computing Cookbook&lt;/a&gt;の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。&lt;/p&gt;
+
+&lt;h3 id=&#34;ほんと-これだけ:bf1ea282536d85f1cef895a583837322&#34;&gt;ほんと、これだけ&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;このページ&lt;/a&gt;で確認&lt;/li&gt;
+&lt;li&gt;$ vagrant plugin install vagrant-cachier&lt;/li&gt;
+&lt;li&gt;$ git clone &lt;a href=&#34;https://github.com/OpenStackCookbook/OpenStackCookbook.git&#34;&gt;https://github.com/OpenStackCookbook/OpenStackCookbook.git&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;$ cd OpenStackCookbook&lt;/li&gt;
+&lt;li&gt;$ git checkout icehouse&lt;/li&gt;
+&lt;li&gt;$ vagrant up&lt;/li&gt;
+&lt;li&gt;何度か管理者パスワードを入力&lt;/li&gt;
+&lt;li&gt;$ vagrant ssh controller&lt;/li&gt;
+&lt;li&gt;$ . /vagrant/openrc&lt;/li&gt;
+&lt;li&gt;$/vagrant/demo.sh&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上。Horizonコンソールは &lt;a href=&#34;http://172.16.0.200/&#34;&gt;http://172.16.0.200/&lt;/a&gt; から。&lt;/p&gt;
+
+&lt;h3 id=&#34;この環境だと30分でできた:bf1ea282536d85f1cef895a583837322&#34;&gt;この環境だと30分でできた&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
+&lt;li&gt;VirtualBox 4.3.10&lt;/li&gt;
+&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;デモや新機能の試用くらいであればこれで十分ですね。&lt;br /&gt;
+著者に感謝。わたしは買いました。 &amp;ndash; &lt;a href=&#34;http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/&#34;&gt;OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Vagrant HP Public Cloud Pluginを試す</title>
+      <link>http://torumakabe.github.io/post/vagrant-hpcloud/</link>
+      <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/vagrant-hpcloud/</guid>
+      <description>
+
+&lt;h3 id=&#34;みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;みんな大好きHashiCorp&lt;/h3&gt;
+
+&lt;p&gt;クラウド界隈のデベロッパーから熱く注目されているHashiCorp。&lt;a href=&#34;http://www.packer.io/&#34;&gt;Packer&lt;/a&gt;、&lt;a href=&#34;http://www.serfdom.io/&#34;&gt;Serf&lt;/a&gt;、&lt;a href=&#34;http://www.consul.io/&#34;&gt;Consul&lt;/a&gt;と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。&lt;/p&gt;
+
+&lt;p&gt;VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。&lt;/p&gt;
+
+&lt;h3 id=&#34;前提条件:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;前提条件&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
+&lt;li&gt;vagrant-hp 0.1.4&lt;/li&gt;
+&lt;li&gt;HP Public Cloud (2014/5/5)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
+
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+
+&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/25a33c679492676bb626.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;の説明には若干のトラップがありますのでご注意を。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;イメージにUbuntu 14.04 LTSを使う例です。&lt;/li&gt;
+&lt;li&gt;Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。&lt;/li&gt;
+&lt;li&gt;Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。&lt;/li&gt;
+&lt;li&gt;Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。&lt;/li&gt;
+&lt;li&gt;ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;それではさっそくvagrant up&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vagrant up --provider=hp
+Bringing machine &#39;default&#39; up with &#39;hp&#39; provider...
+WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
+==&amp;gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant
+==&amp;gt; default: high-level network configurations (`config.vm.network`). They
+==&amp;gt; default: will be silently ignored.
+==&amp;gt; default: Finding flavor for server...
+==&amp;gt; default: Finding image for server...
+==&amp;gt; default: Finding floating-ip...
+==&amp;gt; default: Launching a server with the following settings...
+==&amp;gt; default:  -- Flavor: standard.xsmall
+==&amp;gt; default:  -- Image: Ubuntu Server 14.04 LTS (amd64 20140416.1) - Partner Image
+==&amp;gt; default:  -- Name: hogehoge
+==&amp;gt; default:  -- Key-name: your_keypair_name
+==&amp;gt; default:  -- Security Groups: [&amp;quot;default&amp;quot;, &amp;quot;http&amp;quot;]
+==&amp;gt; default: Finding network...
+==&amp;gt; default: Waiting for the server to be built...
+==&amp;gt; default: Waiting for SSH to become available...
+==&amp;gt; default: Machine is booted and ready for use!
+==&amp;gt; default: Rsyncing folder: /your_path/data/ =&amp;gt; /vagrant/data
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;できたっぽい。&amp;ndash;provider=hpを忘れずに。&lt;/p&gt;
+
+&lt;h3 id=&#34;間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;間髪入れずにvagrant ssh&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vagrant ssh
+WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+
+* Documentation:  https://help.ubuntu.com/
+
+System information disabled due to load higher than 1.0
+
+Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+0 packages can be updated.
+0 updates are security updates.
+
+
+ubuntu@hogehoge:~$ ls /vagrant/data
+test.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;フォルダ同期も効いてますね。んー、楽ちん。&lt;/p&gt;
+
+&lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

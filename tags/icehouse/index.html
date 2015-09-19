@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icehouse &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    
+    <meta name="twitter:title" content="Icehouse &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Icehouse &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">06 May 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/vagrant-icehouse/" class="post-title">いま最も楽にIcehouse環境を作る方法</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h3 id="あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322">あえて言おう、これは甘えであると</h3>
+
+<p>現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。</p>
+
+<p>では始めましょう。<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">OpenStack Cloud Computing Cookbook</a>の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。</p>
+
+<h3 id="ほんと-これだけ:bf1ea282536d85f1cef895a583837322">ほんと、これだけ</h3>
+
+<ol>
+<li>Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">このページ</a>で確認</li>
+<li>$ vagrant plugin install vagrant-cachier</li>
+<li>$ git clone <a href="https://github.com/OpenStackCookbook/OpenStackCookbook.git">https://github.com/OpenStackCookbook/OpenStackCookbook.git</a></li>
+<li>$ cd OpenStackCookbook</li>
+<li>$ git checkout icehouse</li>
+<li>$ vagrant up</li>
+<li>何度か管理者パスワードを入力</li>
+<li>$ vagrant ssh controller</li>
+<li>$ . /vagrant/openrc</li>
+<li>$/vagrant/demo.sh</li>
+</ol>
+
+<p>以上。Horizonコンソールは <a href="http://172.16.0.200/">http://172.16.0.200/</a> から。</p>
+
+<h3 id="この環境だと30分でできた:bf1ea282536d85f1cef895a583837322">この環境だと30分でできた</h3>
+
+<ul>
+<li>Vagrant 1.5.4</li>
+<li>VirtualBox 4.3.10</li>
+<li>Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB</li>
+</ul>
+
+<p>デモや新機能の試用くらいであればこれで十分ですね。<br />
+著者に感謝。わたしは買いました。 &ndash; <a href="http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/">OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)</a></p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
