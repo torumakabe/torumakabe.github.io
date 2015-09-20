@@ -6,8 +6,24 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 04 Apr 2015 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 20 Sep 2015 15:27:03 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Hugoへ移行</title>
+      <link>http://torumakabe.github.io/post/migrate-to-hugo/</link>
+      <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/migrate-to-hugo/</guid>
+      <description>
+
+&lt;h2 id=&#34;jekyllからhugoへ移行:63d64c61b0a30fb30dcadfbaac2823c1&#34;&gt;JekyllからHugoへ移行&lt;/h2&gt;
+
+&lt;p&gt;サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。&lt;/p&gt;
+
+&lt;p&gt;移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
