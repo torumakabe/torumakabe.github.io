@@ -68,6 +68,66 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">05 Nov 2015, 15:40</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_docker_extension/" class="post-title">Azure Docker VM Extensionを使う3つの理由</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66">まずはじめに</h2>
+
+<p>先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。</p>
+
+<p>もちろん、技術者個人として、中立的に、公開できるネタを書きます。</p>
+
+<p>AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。</p>
+
+<p>なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。</p>
+
+<h2 id="azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66">Azure Docker VM Extension を使う3つの理由</h2>
+
+<p>さて、今回は話題沸騰のDocker関連のネタ、<a href="https://github.com/Azure/azure-docker-extension">Azure Docker VM Extension</a>について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。</p>
+
+<p>このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。</p>
+
+<p>ずばり、答えはGuthubの<a href="https://github.com/Azure/azure-docker-extension">README</a>にまとまっています。この拡張機能のうれしさは、</p>
+
+<ol>
+<li>Docker EngineのStable最新版をインストールしてくれる</li>
+<li>Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
+
+<ul>
+<li>ポートマッピング、認証まわり、Docker Registoryサーバの定義など</li>
+</ul></li>
+<li>Docker Composeのパラメータを渡すことができる (オプション)</li>
+</ol>
+
+<p>以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。</p>
+
+<p>Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。</p>
+
+<p>ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。</p>
+
+<p>Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。</p>
+
+<p>なお、このDocker拡張、publisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないときとか、もう。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">20 Sep 2015, 15:27</h1>
                 <section class="post">
                     <header class="post-header">
@@ -328,79 +388,12 @@ The state of your infrastructure has been saved to the path below. This state is
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">06 Dec 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/handsome-openstack/" class="post-title">ハンサムOpenStack</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p>このエントリーは、<a href="http://www.adventar.org/calendars/602">OpenStack (2枚目) Advent Calendar 2014</a>の6夜目担当作品です。</p>
-
-<h3 id="出オチ:69265e72de8632f3d558928e3a79ce26">出オチ</h3>
-
-<p>OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。</p>
-
-<p>こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。</p>
-
-<h3 id="そもそも2枚目とは:69265e72de8632f3d558928e3a79ce26">そもそも2枚目とは</h3>
-
-<pre><code>「二枚目」という用語は、歌舞伎用語をもとに、江戸時代に生まれた。歌舞伎の看板は、通常は8枚から成っていた。一枚目の看板は「書き出し」と言われ、主役の名が書かれ、二枚目の看板には若い色男の役者の名が書かれることになっていた。また、三枚目の看板には道化役の名が書かれることになっていた。
-</code></pre>
-
-<p><a href="http://ja.wikipedia.org/wiki/%E4%BA%8C%E6%9E%9A%E7%9B%AE">「二枚目」（2013年5月28日 (火) 02:17 UTCの版）『ウィキペディア日本語版』</a></p>
-
-<h3 id="8枚あるらしいぞ-いじってみよう:69265e72de8632f3d558928e3a79ce26">8枚あるらしいぞ いじってみよう</h3>
-
-<ul>
-<li><p>一枚目：主役：そのまま主役。「一枚看板」という用法もある。<br />
-<em>Novaですね。主役です。</em></p></li>
-
-<li><p>二枚目：色男：優男で色事担当<br />
-<em>これはあとにとっておきましょう。</em></p></li>
-
-<li><p>三枚目：道化：お笑い担当<br />
-<em>Glanceですね。何も変なことしてないのにネタにされる。</em></p></li>
-
-<li><p>四枚目：中軸：中堅役者　まとめ役<br />
-<em>Cinderでしょうか。主役のNovaを活かす名脇役。</em></p></li>
-
-<li><p>五枚目：敵役：一般的な敵役<br />
-<em>Heatかな。はじめのCloudFormation形式ってのが気に入らなかった。HOTが出てきたので許す。</em></p></li>
-
-<li><p>六枚目：実敵：憎めない善要素のある敵役<br />
-<em>Ceilometerです。重いです。絶賛チューニング中です。</em></p></li>
-
-<li><p>七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕<br />
-<em>Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなかったのよきっと。これから良くなるよ。</em></p></li>
-
-<li><p>八枚目：座長：元締め<br />
-<em>Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。</em></p></li>
-</ul>
-
-<h3 id="じゃあ二枚目は:69265e72de8632f3d558928e3a79ce26">じゃあ二枚目は?</h3>
-
-<p>*Trove*です。若さと期待の大きさを込めてキャスティングしました。というか<a href="http://www.publickey1.jp/blog/14/paasdbaasapaas12amazonidc_japan.html">これ</a>を見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。</p>
-
-<p>2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 3</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 4</span>
     
       <a href="/post/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Azure on re-imagine</title>
+    <link>http://torumakabe.github.io/categories/azure/</link>
+    <description>Recent content in Azure on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Thu, 05 Nov 2015 15:40:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Docker VM Extensionを使う3つの理由</title>
+      <link>http://torumakabe.github.io/post/azure_docker_extension/</link>
+      <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
+      <description>
+
+&lt;h2 id=&#34;まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;まずはじめに&lt;/h2&gt;
+
+&lt;p&gt;先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。&lt;/p&gt;
+
+&lt;p&gt;もちろん、技術者個人として、中立的に、公開できるネタを書きます。&lt;/p&gt;
+
+&lt;p&gt;AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。&lt;/p&gt;
+
+&lt;p&gt;なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;Azure Docker VM Extension を使う3つの理由&lt;/h2&gt;
+
+&lt;p&gt;さて、今回は話題沸騰のDocker関連のネタ、&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;Azure Docker VM Extension&lt;/a&gt;について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。&lt;/p&gt;
+
+&lt;p&gt;このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。&lt;/p&gt;
+
+&lt;p&gt;ずばり、答えはGuthubの&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;README&lt;/a&gt;にまとまっています。この拡張機能のうれしさは、&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Docker EngineのStable最新版をインストールしてくれる&lt;/li&gt;
+&lt;li&gt;Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
+
+&lt;ul&gt;
+&lt;li&gt;ポートマッピング、認証まわり、Docker Registoryサーバの定義など&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Docker Composeのパラメータを渡すことができる (オプション)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。&lt;/p&gt;
+
+&lt;p&gt;Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。&lt;/p&gt;
+
+&lt;p&gt;ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。&lt;/p&gt;
+
+&lt;p&gt;Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。&lt;/p&gt;
+
+&lt;p&gt;なお、このDocker拡張、publisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないときとか、もう。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

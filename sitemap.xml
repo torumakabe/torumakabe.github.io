@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2015-09-20T15:27:03+09:00</lastmod>
+    <lastmod>2015-11-05T15:40:00+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/azure_docker_extension/</loc>
+    <lastmod>2015-11-05T15:40:00+09:00</lastmod>
   </url>
   
   <url>
