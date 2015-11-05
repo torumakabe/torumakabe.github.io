@@ -33,7 +33,7 @@
 
 &lt;p&gt;このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。&lt;/p&gt;
 
-&lt;p&gt;ずばり、答えはGuthubの&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;README&lt;/a&gt;にまとまっています。この拡張機能のうれしさは、&lt;/p&gt;
+&lt;p&gt;ずばり、答えはGithubの&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;README&lt;/a&gt;にまとまっています。この拡張機能のうれしさは、&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;Docker EngineのStable最新版をインストールしてくれる&lt;/li&gt;
