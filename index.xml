@@ -53,7 +53,7 @@
 
 &lt;p&gt;Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。&lt;/p&gt;
 
-&lt;p&gt;なお、このDocker拡張、publisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないときとか、もう。&lt;/p&gt;
+&lt;p&gt;なお、このDocker拡張、ARM属性で言うpublisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。&lt;/p&gt;
 </description>
     </item>
     
