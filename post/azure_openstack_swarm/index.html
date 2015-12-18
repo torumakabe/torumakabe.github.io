@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker &middot; re-imagine</title>
+    <title>OpenStackとAzureにDocker Swarmをかぶせてみた &middot; re-imagine</title>
 
-    <meta name="description" content="my life is the sum of my imagination">
+    <meta name="description" content="">
 
     <meta name="generator" content="Hugo 0.14" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Docker &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+    <meta name="twitter:title" content="OpenStackとAzureにDocker Swarmをかぶせてみた &middot; re-imagine">
+    <meta name="twitter:description" content="">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Docker &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
+    <meta property="og:title" content="OpenStackとAzureにDocker Swarmをかぶせてみた &middot; re-imagine">
+    <meta property="og:description" content="">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
@@ -67,7 +67,6 @@
         <div>
             
             <div class="posts">
-                
                 <h1 class="content-subhead">19 Dec 2015, 00:01</h1>
                 <section class="post">
                     <header class="post-header">
@@ -84,6 +83,17 @@
                         </p>
                     </header>
 
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/azure_openstack_swarm/" data-title="OpenStackとAzureにDocker Swarmをかぶせてみた" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/azure_openstack_swarm/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/azure_openstack_swarm/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
                     <div class="post-description">
                         
 
@@ -240,71 +250,9 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
 <p>OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。</p>
 
                     </div>
+                    
                 </section>
-                
-                <h1 class="content-subhead">05 Nov 2015, 15:40</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_docker_extension/" class="post-title">Azure Docker VM Extensionを使う3つの理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66">まずはじめに</h2>
-
-<p>先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。</p>
-
-<p>もちろん、技術者個人として、中立的に、公開できるネタを書きます。</p>
-
-<p>AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。</p>
-
-<p>なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。</p>
-
-<h2 id="azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66">Azure Docker VM Extension を使う3つの理由</h2>
-
-<p>さて、今回は話題沸騰のDocker関連のネタ、<a href="https://github.com/Azure/azure-docker-extension">Azure Docker VM Extension</a>について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。</p>
-
-<p>このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。</p>
-
-<p>ずばり、答えはGithubの<a href="https://github.com/Azure/azure-docker-extension">README</a>にまとまっています。この拡張機能のうれしさは、</p>
-
-<ol>
-<li>Docker EngineのStable最新版をインストールしてくれる</li>
-<li>Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
-
-<ul>
-<li>ポートマッピング、認証まわり、Docker Registoryサーバの定義など</li>
-</ul></li>
-<li>Docker Composeのパラメータを渡すことができる (オプション)</li>
-</ol>
-
-<p>以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。</p>
-
-<p>Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。</p>
-
-<p>ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。</p>
-
-<p>Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。</p>
-
-<p>なお、このDocker拡張、ARM属性で言うpublisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</p>
-
-                    </div>
-                </section>
-                
             </div>
-            
-
             <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
         <ul>
@@ -316,6 +264,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
         </div>
     </div>
 </div>
+
 
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

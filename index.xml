@@ -6,8 +6,170 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 05 Nov 2015 15:40:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 19 Dec 2015 00:01:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
+      <link>http://torumakabe.github.io/post/azure_openstack_swarm/</link>
+      <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
+      <description>
+
+&lt;h2 id=&#34;どこいってもいじられる:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;どこいってもいじられる&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.adventar.org/calendars/968&#34;&gt;OpenStack Advent Calendar 2015&lt;/a&gt; 参加作品、19夜目のエントリです。&lt;/p&gt;
+
+&lt;p&gt;OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。&lt;/p&gt;
+
+&lt;p&gt;さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;乗るしかないこのdockerウェーブに:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;乗るしかないこのDockerウェーブに&lt;/h2&gt;
+
+&lt;p&gt;どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。&lt;/p&gt;
+
+&lt;p&gt;ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。&lt;/p&gt;
+
+&lt;p&gt;条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。&lt;/p&gt;
+
+&lt;p&gt;あと、当然ですが個人で気軽にオンラインで契約できることも条件です。&lt;/p&gt;
+
+&lt;p&gt;そうすると、ほぼ一択。&lt;a href=&#34;https://www.conoha.jp/&#34;&gt;Conoha&lt;/a&gt;です。かわいらしい座敷童の&lt;a href=&#34;https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu&#34;&gt;&amp;ldquo;このは&amp;rdquo;&lt;/a&gt;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。&lt;/p&gt;
+
+&lt;p&gt;では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。&lt;/p&gt;
+
+&lt;p&gt;今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は&lt;a href=&#34;http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration&#34;&gt;前佛さんの資料&lt;/a&gt;を参考にしてください。&lt;/p&gt;
+
+&lt;h2 id=&#34;ローカル環境:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;ローカル環境&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Mac OS X (El Capitan)
+
+&lt;ul&gt;
+&lt;li&gt;Docker Toolbox 1.9.1&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
+また、Swarmのマスタはローカルに配置します。&lt;/p&gt;
+
+&lt;h2 id=&#34;いざ実行:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;いざ実行&lt;/h2&gt;
+
+&lt;p&gt;まず、Docker Machineにクラウドの諸設定を食わせます。&lt;/p&gt;
+
+&lt;p&gt;Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は&lt;a href=&#34;https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/&#34;&gt;ここ&lt;/a&gt;を。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
+$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Conoha向けにOpenStack関連の環境変数をセットします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ export OS_USERNAME=yourname
+$ export OS_TENANT_NAME=yourtenantname
+$ export OS_PASSWORD=yourpass
+$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;次はローカルコンテナ環境を整えます。&lt;/p&gt;
+
+&lt;p&gt;Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker-machine create -d virtualbox local
+$ eval &amp;quot;$(docker-machine env local)&amp;quot;
+$ docker run swarm create    
+Status: Downloaded newer image for swarm:latest
+tokentokentokentoken
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このトークンは控えておきましょう。&lt;/p&gt;
+
+&lt;p&gt;ではSwarmのマスタをローカルに作ります。先ほど生成したトークン指定を忘れずに。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://tokentokentokentoken head
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SwarmのエージェントをAzureに作ります。VMを作って、OSとDockerをインストールして、なんて不要です。Docker Machineがやってくれます。ここでもトークン指定を忘れずに。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ eval &amp;quot;$(docker-machine env head)&amp;quot;
+$ docker-machine create -d azure --swarm --swarm-discovery token://tokentokentokentoken worker-azure01 --azure-location &amp;quot;East Asia&amp;quot; worker-azure00
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Conohaにも同様に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker-machine create -d openstack --openstack-flavor-name g-1gb --openstack-image-name vmi-ubuntu-14.04-amd64 --openstack-sec-groups &amp;quot;default,gncs-ipv4-all&amp;quot; --swarm --swarm-discovery token://tokentokentokentoken worker-conoha00
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;さあ環境がサクッと出来上がりました。これ以降はSwarmクラスタ全体を操作対象にします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ eval &amp;quot;$(docker-machine env --swarm head)&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;環境をチラ見してみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker info
+Containers: 4
+Images: 3
+ Role: primary
+ Strategy: spread
+ Filters: health, port, dependency, affinity, constraint
+ Nodes: 3
+ head: 192.168.99.101:2376
+  └ Containers: 2
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.021 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=4.1.13-boot2docker, operatingsystem=Boot2Docker 1.9.1 (TCL 6.4.1); master : cef800b - Fri Dec 18 19:33:59 UTC 2015, provider=virtualbox, storagedriver=aufs
+ worker-azure00: xxx.cloudapp.net:2376
+  └ Containers: 1
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.721 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.13.0-36-generic, operatingsystem=Ubuntu 14.04.1 LTS, provider=azure, storagedriver=aufs
+ worker-conoha00: www.xxx.yyy.zzz:2376
+  └ Containers: 1
+  └ Reserved CPUs: 0 / 2
+  └ Reserved Memory: 0 B / 1.019 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.16.0-51-generic, operatingsystem=Ubuntu 14.04.3 LTS, provider=openstack, storagedriver=aufs
+CPUs: 4
+Total Memory: 3.761 GiB
+Name: 1234abcd
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;どこにどんな環境が作られたかが分かりますね。出力結果の4行目&amp;rdquo;Strategy: spread&amp;rdquo;を覚えておいてください。&lt;/p&gt;
+
+&lt;p&gt;ではコンテナを作ってみましょう。Nginxコンテナ三連星です。どの環境に作るか、という指定はしません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ for i in `seq 1 3`; do docker run -d -p 80:80 nginx; done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;どんな具合でしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                NAMES
+9cc2f5594fa5        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   5 seconds ago       Up 4 seconds        192.168.99.101:80-&amp;gt;80/tcp, 443/tcp   head/goofy_goldberg
+b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   32 seconds ago      Up 31 seconds       www.xxx.yyy.zzz:80-&amp;gt;80/tcp, 443/tcp   worker-conoha00/clever_chandrasekhar
+19e9d0e229a2        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   45 seconds ago      Up 42 seconds       zzz.yyy.xxx.www:80-&amp;gt;80/tcp, 443/tcp    worker-azure00/reverent_bhaskara
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&amp;rdquo;Strategy: spread&amp;rdquo;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。&lt;/p&gt;
+
+&lt;p&gt;まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した&lt;a href=&#34;https://www.tutum.co/&#34;&gt;Tutum&lt;/a&gt;との関係、今後どう進化していくのか、注目です。&lt;/p&gt;
+
+&lt;h2 id=&#34;ツールから入るハイブリッドクラウドも-またよし:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;ツールから入るハイブリッドクラウドも、またよし&lt;/h2&gt;
+
+&lt;p&gt;ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。&lt;/p&gt;
+
+&lt;p&gt;でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。&lt;/p&gt;
+
+&lt;p&gt;もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。&lt;/p&gt;
+
+&lt;p&gt;簡単 = 正義です。簡単であれば使う人が増えて、要望が増えて、育ちます。かっちり感は後からついてくる。もしDockerで複数のクラウド環境を簡単に使いこなせるようになるのであれば、順番が逆ではありますが、お箸、Dockerというツールから入るのもいいかもしれません。&lt;/p&gt;
+
+&lt;p&gt;まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。&lt;/p&gt;
+
+&lt;p&gt;OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure Docker VM Extensionを使う3つの理由</title>
@@ -883,46 +1045,6 @@ Date: Sun, 23 Mar 2014 01:44:27 GMT
 &lt;p&gt;参考情報
 - &lt;a href=&#34;http://docs.openstack.org/developer/swift/overview_large_objects.html&#34;&gt;Swift Documentaion &amp;ndash; Large Object Support&lt;/a&gt;
 - &lt;a href=&#34;https://docs.hpcloud.com/api/object-storage/#large_objects-jumplink-span&#34;&gt;HP Cloud Object Storage API Reference&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>クラウド = 発電所?</title>
-      <link>http://torumakabe.github.io/post/cloud-and-power/</link>
-      <pubDate>Sun, 16 Mar 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/cloud-and-power/</guid>
-      <description>
-
-&lt;h3 id=&#34;思考停止してないだろうか:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;思考停止してないだろうか&lt;/h3&gt;
-
-&lt;p&gt;クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。&lt;/p&gt;
-
-&lt;p&gt;でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。&lt;/p&gt;
-
-&lt;h3 id=&#34;本当に発電は大規模発電所任せ:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;本当に発電は大規模発電所任せ?&lt;/h3&gt;
-
-&lt;p&gt;最近CMでよく見ますが、&lt;a href=&#34;http://home.tokyo-gas.co.jp/enefarm_special/index.html&#34;&gt;エネファーム&lt;/a&gt;ってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。&lt;/p&gt;
-
-&lt;p&gt;戸別の発電は、将来的には燃料電池など新しい技術も使われて、さらに普及するんじゃないでしょうか。使う人の近くで、その使い方に合わせて発電した方が、合理的ですものね。&lt;/p&gt;
-
-&lt;h3 id=&#34;オンプレit基盤は無くなる:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;オンプレIT基盤は無くなる?&lt;/h3&gt;
-
-&lt;p&gt;で、クラウドの話です。オンプレミスのIT基盤は無くなって、全部クラウドに移ってしまうのでしょうか。でも、もしその考えが「発電所のように」という根拠であれば、「従来の」という前提が要ります。なぜなら、発電の仕組みも進化しているので。エネファームのように。&lt;/p&gt;
-
-&lt;p&gt;ネットワーク遅延を考えれば、処理する場所の近くにデータがあったほうがいいですよね。利用者みんなが、クラウドが動くデータセンターの近くにいるわけではないので。&lt;/p&gt;
-
-&lt;p&gt;また、発電所は、ピークに合わせて設備投資をしています。いっぽうで、いざというとき、あなたの契約しているクラウドは、契約者全員が使えるだけの能力を供給できるでしょうか。ピークに合わせて設備投資しているでしょうか。そもそもピークをどう定義しているでしょうか。災害時にそれを期待した利用者の需要で、パンクしないでしょうか。&lt;/p&gt;
-
-&lt;h3 id=&#34;そのインフラ知識は捨てないほうがいい:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;そのインフラ知識は捨てないほうがいい&lt;/h3&gt;
-
-&lt;p&gt;発電の世界で燃料電池が期待されているように、ITの世界でも不揮発性メモリなど、その使い方が大きく変わるイノベーションの種が研究開発されています。普段は電源を切っておいて、処理するときだけ瞬時に起動、処理、また停止するようなコンピュータ。家とかオフィスに置きたくないですか。性能的にも経済的にもリスク管理的にも、合理的かもしれませんよ。&lt;/p&gt;
-
-&lt;p&gt;そして、その設備ではリソースが足りない、読めない、あまり使わないものはクラウドに置き、動かせばいいのではないかと思います。あと、クラウドのほうが、いいものをすぐに使える場合。SaaSとか。&lt;/p&gt;
-
-&lt;p&gt;「未来はどっちだ」という白か黒かの議論をして、どちらかと心中する必要はありません。どっちも使えばいいです。かっこいい言い方をすると、ハイブリッドです。&lt;/p&gt;
-
-&lt;p&gt;なので、「クラウド時代に自分で基盤作ることなんてなくなるから、インフラの知識はもう要らないよね」とか言って、せっかく身につけたハードウェア、ITインフラの知識は、捨てるどころか磨いた方がいいですよ。知識は荷物になりません、あなたを守る懐刀。&lt;/p&gt;
 </description>
     </item>
     
