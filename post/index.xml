@@ -6,8 +6,272 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 19 Dec 2015 00:01:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 06 Jan 2016 00:16:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure ARM Templateによるデプロイと冪等性</title>
+      <link>http://torumakabe.github.io/post/arm_idempotent/</link>
+      <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/arm_idempotent/</guid>
+      <description>
+
+&lt;h2 id=&#34;宣言的に-冪等に:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;宣言的に、冪等に&lt;/h2&gt;
+
+&lt;p&gt;ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。&lt;/p&gt;
+
+&lt;p&gt;さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。&lt;/p&gt;
+
+&lt;h3 id=&#34;azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/&#34;&gt;Azure リソース マネージャーの概要&lt;/a&gt;&lt;/h3&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&lt;/p&gt;
+
+&lt;p&gt;宣言型のテンプレートを利用し、デプロイメントを定義できます&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;冪等と言い切ってはいませんが、目的は似ています。&lt;/p&gt;
+
+&lt;p&gt;なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。&lt;/p&gt;
+
+&lt;p&gt;残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;増分デプロイと完全デプロイ:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;増分デプロイと完全デプロイ&lt;/h2&gt;
+
+&lt;p&gt;まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli&#34;&gt;クロスプラットフォームCLI&lt;/a&gt;もあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。&lt;/p&gt;
+
+&lt;p&gt;今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;ドキュメント&lt;/a&gt;で確認してください。&lt;/p&gt;
+
+&lt;p&gt;さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。&lt;/p&gt;
+
+&lt;p&gt;コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します&lt;/p&gt;
+
+&lt;p&gt;テンプレートに指定されているが、リソース グループに存在しないリソースを追加します&lt;/p&gt;
+
+&lt;p&gt;テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。&lt;/p&gt;
+
+&lt;p&gt;いっぽうで、完全モードです。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/p&gt;
+
+&lt;p&gt;テンプレートに指定されているが、リソース グループに存在しないリソースを追加します&lt;/p&gt;
+
+&lt;p&gt;テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;動きをつかむ:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;動きをつかむ&lt;/h2&gt;
+
+&lt;p&gt;では動きを見ていきましょう。テンプレートはGithubに公開されている&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux&#34;&gt;Very simple deployment of an Linux VM&lt;/a&gt;を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json&#34;&gt;リンク先&lt;/a&gt;でざっと確認してください。&lt;/p&gt;
+
+&lt;p&gt;パラメータファイル(azuredeploy.parameters.json)は以下とします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&amp;quot;,
+  &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
+  &amp;quot;parameters&amp;quot;: {
+    &amp;quot;adminUsername&amp;quot;: {
+      &amp;quot;value&amp;quot;: &amp;quot;azureUser&amp;quot;
+    },
+    &amp;quot;adminPassword&amp;quot;: {
+      &amp;quot;value&amp;quot;: &amp;quot;password1234!&amp;quot;
+    },
+    &amp;quot;dnsLabelPrefix&amp;quot;: {
+      &amp;quot;value&amp;quot;: &amp;quot;armpocps&amp;quot;
+    },
+    &amp;quot;ubuntuOSVersion&amp;quot;: {
+      &amp;quot;value&amp;quot;: &amp;quot;14.04.2-LTS&amp;quot;
+    }    
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まず、1回目の実行です。リソースグループを新規作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
+
+DeploymentName    : azuredeploy
+ResourceGroupName : ARMEval
+ProvisioningState : Succeeded
+Timestamp         : 2016/01/04 11:46:41
+Mode              : Incremental
+TemplateLink      :
+Parameters        :
+                Name             Type                       Value
+                ===============  =========================  ==========
+                adminUsername    String                     azureUser
+                adminPassword    SecureString
+                dnsLabelPrefix   String                     armpocps
+                ubuntuOSVersion  String                     14.04.2-LTS
+
+Outputs           :
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;できあがりです。このリソースグループ &amp;ldquo;ARMEval&amp;rdquo;にはLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどが含まれます。Modeを指定しない場合は増分(Incremental)となります。&lt;/p&gt;
+
+&lt;p&gt;この環境にじわじわと変更を入れていきましょう。まずはazuredeploy.parameter.json上のパラメータ、DNS名のPrefix(dnsLabelPrefix)をarmpocps -&amp;gt; armpocps2と変えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;dnsLabelPrefix&amp;quot;: {
+  &amp;quot;value&amp;quot;: &amp;quot;armpocps2&amp;quot;
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;では再投入です。パラメータファイルの内容は変えましたが、コマンドは同じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
+[snip]
+Parameters        :
+                Name             Type                       Value
+                ===============  =========================  ==========
+                adminUsername    String                     azureUser
+                adminPassword    SecureString
+                dnsLabelPrefix   String                     armpocps2
+                ubuntuOSVersion  String                     14.04.2-LTS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;変更内容の確認です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; Get-AzureRmPublicIpAddress
+[snip]
+DnsSettings              : {
+                             &amp;quot;DomainNameLabel&amp;quot;: &amp;quot;armpocps2&amp;quot;,
+                             &amp;quot;Fqdn&amp;quot;: &amp;quot;armpocps2.japanwest.cloudapp.azure.com&amp;quot;
+                           }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;問題なく変わっていますね。冪等チックです。この例ではシンプルにDNS名のPrefixを変えましたが、VMインスタンス数やsubnet名を変えたりもできます。関心のある方は&lt;a href=&#34;https://gallery.technet.microsoft.com/Cloud-Consistency-with-0b79b775&#34;&gt;ドキュメント&lt;/a&gt;を。&lt;/p&gt;
+
+&lt;p&gt;増分モードによる変更は期待できそうです。が、さて、ここからが探検です。リソース削除が可能な完全モードを試してみましょう。
+リソース定義ファイル(azuredeploy.json)から、大胆にVMの定義を削ってみます。下記リソースをファイルからごっそり消します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;apiVersion&amp;quot;: &amp;quot;[variables(&#39;apiVersion&#39;)]&amp;quot;,
+  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;[variables(&#39;vmName&#39;)]&amp;quot;,
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;では、完全モード &amp;ldquo;-Mode complete&amp;rdquo;付きでコマンドを再投入します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
+
+確認
+Are you sure you want to use the complete deployment mode? Resources in the resource group &#39;ARMEval&#39; which are not included in the template will be deleted.
+[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &amp;quot;Y&amp;quot;): Y
+
+DeploymentName    : azuredeploy
+ResourceGroupName : ARMEval
+ProvisioningState : Succeeded
+Timestamp         : 2016/01/04 12:01:00
+Mode              : Complete
+TemplateLink      :
+Parameters        :
+                Name             Type                       Value
+                ===============  =========================  ==========
+                adminUsername    String                     azureUser
+                adminPassword    SecureString
+                dnsLabelPrefix   String                     armpocps2
+                ubuntuOSVersion  String                     14.04.2-LTS
+
+Outputs           :
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あっさり完了しました。本当にVMが消えているが確認します。出力が冗長ですがご容赦ください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; Find-AzureRmResource -ResourceGroupNameContains ARMEval
+
+Name              : myPublicIP
+ResourceId        :     /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/publicIPAddresses/myPublicIP
+ResourceName      : myPublicIP
+ResourceType      : Microsoft.Network/publicIPAddresses
+ResourceGroupName : ARMEval
+Location          : japanwest
+SubscriptionId    : your-subscription-id
+
+Name              : myVMNic
+ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/networkInterfaces/myVMNic
+ResourceName      : myVMNic
+ResourceType      : Microsoft.Network/networkInterfaces
+ResourceGroupName : ARMEval
+Location          : japanwest
+SubscriptionId    : your-subscription-id
+
+Name              : MyVNET
+ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/virtualNetworks/MyVNET
+ResourceName      : MyVNET
+ResourceType      : Microsoft.Network/virtualNetworks
+ResourceGroupName : ARMEval
+Location          : japanwest
+SubscriptionId    : your-subscription-id
+
+Name              : yourstorageaccount
+ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Storage/storageAccounts/yourstorageaccount
+ResourceName      : yourstorageaccount
+ResourceType      : Microsoft.Storage/storageAccounts
+ResourceGroupName : ARMEval
+Location          : japanwest
+SubscriptionId    : your-subscription-id
+Tags              : {}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;VMだけが消えています。定義からリソースがなくなれば、存在するリソースも消す、これが完全モードです。&lt;/p&gt;
+
+&lt;p&gt;さらに検証。冪等さを求めるのであれば、またリソース定義にVMを加えて再投入したら、涼しい顔で復活してほしい。先ほどazuredeploy.jsonから消したVMリソース定義を、そのまま書き戻して再投入してみます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
+
+確認
+Are you sure you want to use the complete deployment mode? Resources in the resource group &#39;ARMEval&#39; which are not included in the template will be deleted.
+[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &amp;quot;Y&amp;quot;): Y
+
+New-AzureRmResourceGroupDeployment : 21:05:52 - Resource Microsoft.Compute/virtualMachines &#39;MyUbuntuVM&#39; failed with message &#39;The resource operation completed with terminal provisioning state &#39;Failed&#39;.&#39;
+[snip]
+New-AzureRmResourceGroupDeployment : 21:05:52 - One or more errors occurred while preparing VM disks. See disk instance view for details.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;残念ながら失敗しました。どうやらdiskまわりのエラーが発生したようです。&lt;/p&gt;
+
+&lt;p&gt;これは、完全モードでのリソース削除の仕様が原因です。ARMは該当のVMリソースは消すのですが、VMが格納されているストレージを削除しません。リソース作成時は依存関係が考慮されますが、削除時は異なります。&lt;/p&gt;
+
+&lt;p&gt;試しにストレージを消して再実行してみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
+
+[snip]
+ProvisioningState : Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;p&gt;冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。&lt;/p&gt;
+
+&lt;p&gt;そこで、ARM Templateをデプロイに組み込む際、ARMによるデプロイはBootstrap用途に限定し、より構成頻度が高いConfiguration用途には、冪等性を持った別のツールを組み合わせるのが現実解と考えています。&lt;/p&gt;
+
+&lt;p&gt;Bootstrap用途では、プラットフォームの提供機能を使ったほうが、機能も多いし最適化されています。Azureで今後この層を担当していくのはARMです。そして、この用途ではChefやAnsibleなど汎用ツールに物足りなさがあります。&lt;/p&gt;
+
+&lt;p&gt;また、Bootstrapは1回切りであるケースが多いので、失敗したらリソースグループをばっさり消して再作成する、と割り切りやすいです。それならば冪等でなくともいいでしょう。&lt;/p&gt;
+
+&lt;p&gt;長くなったので、デプロイツールの組み合わせについては、あたらめて書きたいと思います。&lt;/p&gt;
+
+&lt;p&gt;参考: &lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;インフラ系技術の流れ Bootstrapping/Configuration/Orchestration&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
@@ -902,149 +1166,6 @@ test.txt
 
 &lt;p&gt;第一弾
 &lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-nova&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OpenStack Swiftへのファイル分割アップロード</title>
-      <link>http://torumakabe.github.io/post/swift-upload/</link>
-      <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/swift-upload/</guid>
-      <description>
-
-&lt;h3 id=&#34;swiftへ-ファイルを分割してアップロードできる:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;Swiftへ、ファイルを分割してアップロードできる&lt;/h3&gt;
-
-&lt;p&gt;今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。&lt;/p&gt;
-
-&lt;h3 id=&#34;アップロード形式は大きく3つ-そのまま-dlo-slo:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;アップロード形式は大きく3つ &amp;ndash; そのまま、DLO、SLO&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。&lt;/li&gt;
-&lt;li&gt;DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。&lt;/li&gt;
-&lt;li&gt;SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;動きを見てみよう:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;動きを見てみよう&lt;/h3&gt;
-
-&lt;p&gt;環境は以下の通り。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;HP Public Cloud US-West Region&lt;/li&gt;
-&lt;li&gt;Swift Clientを動かすCompute Node &amp;ndash; standard.large / ubuntu 12.04&lt;/li&gt;
-&lt;li&gt;Swift CLI &amp;ndash; 2.0.3&lt;/li&gt;
-&lt;li&gt;約900MBあるubuntu desktopのisoファイルをアップロード&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;そのままアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;そのままアップロード&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso
-No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
-non-seg.iso
-
-real    0m24.557s
-user    0m12.617s
-sys 0m11.197s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso
-
-HTTP/1.1 200 OK
-Content-Length: 925892608
-Content-Type: application/x-iso9660-image
-Accept-Ranges: bytes
-Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT
-Etag: 21ec41563ff34da27d4a0b56f2680c4f
-X-Timestamp: 1395537413.17419
-X-Object-Meta-Mtime: 1381950899.000000
-X-Trans-Id: txfee207024dd04bd599292-00532e3c5e
-Date: Sun, 23 Mar 2014 01:43:58 GMT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ヘッダはこんな感じ。&lt;/p&gt;
-
-&lt;h4 id=&#34;dlo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;DLO形式でアップロード&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name dlo.iso --segment-size 104857600
-No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
-dlo.iso segment 0
-dlo.iso segment 5
-dlo.iso segment 1
-dlo.iso segment 2
-dlo.iso segment 3
-dlo.iso segment 4
-dlo.iso segment 8
-dlo.iso segment 7
-dlo.iso segment 6
-dlo.iso
-
-real    0m11.568s
-user    0m7.960s
-sys 0m4.448s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Swift CLIが各セグメントを100MBに分割してアップロードしています。並列でアップロードしているので、
-分割しない場合とくらべて転送時間は半分以下です。転送時間を重視するなら、ファイルサイズが5GB以下でも分割は有用です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/dlo.iso
-HTTP/1.1 200 OK
-Content-Length: 925892608
-X-Object-Meta-Mtime: 1381950899.000000
-Accept-Ranges: bytes
-X-Object-Manifest: mak-cont_segments/dlo.iso/1381950899.000000/925892608/104857600/
-Last-Modified: Sun, 23 Mar 2014 01:22:25 GMT
-Etag: &amp;quot;7085388575f90df99531b60f9d9b1291&amp;quot;
-X-Timestamp: 1395537755.32458
-Content-Type: application/x-iso9660-image
-X-Trans-Id: txd90ac8f8f6a64c749de2f-00532e3c6f
-Date: Sun, 23 Mar 2014 01:44:15 GMT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;X-Object-Manifestという属性が、セグメント化したファイルの置き場所を指しています。&lt;/p&gt;
-
-&lt;h4 id=&#34;slo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609&#34;&gt;SLO形式でアップロード&lt;/h4&gt;
-
-&lt;pre&gt;&lt;code&gt;$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name slo.iso --segment-size 104857600 --use-slo
-No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot;
-slo.iso segment 3
-slo.iso segment 7
-slo.iso segment 1
-slo.iso segment 4
-slo.iso segment 8
-slo.iso segment 0
-slo.iso segment 5
-slo.iso segment 2
-slo.iso segment 6
-slo.iso
-
-real    0m12.039s
-user    0m8.189s
-sys 0m4.820s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;転送時間はDLOと同等です。Swift CLIを使う場合は &amp;ndash;use-sloオプションを指定するだけなので、データ完全性の観点からSLOがおすすめです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/slo.iso
-HTTP/1.1 200 OK
-Content-Length: 925892608
-X-Object-Meta-Mtime: 1381950899.000000
-Accept-Ranges: bytes
-Last-Modified: Sun, 23 Mar 2014 01:24:08 GMT
-Etag: &amp;quot;7085388575f90df99531b60f9d9b1291&amp;quot;
-X-Timestamp: 1395537859.11815
-X-Static-Large-Object: True
-Content-Type: application/x-iso9660-image
-X-Trans-Id: tx6cec436f525f4eb89dcfc-00532e3c7b
-Date: Sun, 23 Mar 2014 01:44:27 GMT
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;X-Static-Large-Object属性がTrueになりました。&lt;/p&gt;
-
-&lt;p&gt;参考情報
-- &lt;a href=&#34;http://docs.openstack.org/developer/swift/overview_large_objects.html&#34;&gt;Swift Documentaion &amp;ndash; Large Object Support&lt;/a&gt;
-- &lt;a href=&#34;https://docs.hpcloud.com/api/object-storage/#large_objects-jumplink-span&#34;&gt;HP Cloud Object Storage API Reference&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
