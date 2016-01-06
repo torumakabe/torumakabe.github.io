@@ -170,7 +170,7 @@
 }
 </code></pre>
 
-<p>まず、1回目の実行です。リソースグループを新規作成します。</p>
+<p>まず、1回目の実行です。リソースグループ &ldquo;ARMEval&rdquo;に対しデプロイします。このリソースグループは前もって作っておいた空の箱です。</p>
 
 <pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
 
@@ -191,7 +191,7 @@ Parameters        :
 Outputs           :
 </code></pre>
 
-<p>できあがりです。このリソースグループ &ldquo;ARMEval&rdquo;にはLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどが含まれます。Modeを指定しない場合は増分(Incremental)となります。</p>
+<p>できあがりです。空のリソースグループ にLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどがデプロイされました。Modeを指定しない場合は増分(Incremental)となります。</p>
 
 <p>この環境にじわじわと変更を入れていきましょう。まずはazuredeploy.parameter.json上のパラメータ、DNS名のPrefix(dnsLabelPrefix)をarmpocps -&gt; armpocps2と変えます。</p>
 
