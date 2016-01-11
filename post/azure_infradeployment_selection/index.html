@@ -173,11 +173,11 @@
 
 <p>ですが、<a href="http://torumakabe.github.io/post/arm_idempotent/">以前のエントリ</a>で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARMはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。</p>
 
-<p>よってARMは、Immutableな環境で使う、もしくは、ChefなどのConfugurationツールと組み合わせて使うことを念頭に設計をします。</p>
+<p>よってARMは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。</p>
 
 <p>ARMでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARMテンプレートにはDSCやシェルを実行するエクステンションが使えるので、活用します。</p>
 
-<p>また、Bootstrapping時点で、Confugurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。</p>
+<p>また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。</p>
 
 <p>以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。</p>
 
@@ -200,7 +200,7 @@
 <li>LinuxへChefサーバを導入、各種設定 (Shell Extension)</li>
 </ul></li>
 
-<li><p>ChefでConfuguration</p>
+<li><p>ChefでConfiguration</p>
 
 <ul>
 <li>各ノードのChef bootstrap(言葉が混同しやすいので注意)</li>
