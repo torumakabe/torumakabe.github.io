@@ -6,8 +6,136 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 06 Jan 2016 00:16:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 11 Jan 2016 00:20:30 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
+      <link>http://torumakabe.github.io/post/azure_infradeployment_selection/</link>
+      <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
+      <description>
+
+&lt;h2 id=&#34;ケースバイケースだけど:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
+
+&lt;p&gt;Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。&lt;/p&gt;
+
+&lt;p&gt;特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。&lt;/p&gt;
+
+&lt;p&gt;なので「ケースバイケース。以上」とは、言いにくい。&lt;/p&gt;
+
+&lt;p&gt;私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。&lt;/p&gt;
+
+&lt;h2 id=&#34;書く前に前提など:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;書く前に前提など&lt;/h2&gt;
+
+&lt;p&gt;対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。&lt;/p&gt;
+
+&lt;p&gt;レイヤリングや用語は、 @gosukenator さんの&lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;&amp;ldquo;インフラ系技術の流れ&amp;rdquo;&lt;/a&gt;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。&lt;/p&gt;
+
+&lt;p&gt;では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
+
+&lt;p&gt;いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。&lt;/p&gt;
+
+&lt;p&gt;なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い捨てられないかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
+
+&lt;p&gt;次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Imutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。&lt;/p&gt;
+
+&lt;p&gt;ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfugurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。&lt;/p&gt;
+
+&lt;p&gt;変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。&lt;/p&gt;
+
+&lt;p&gt;変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;優先事項や制約条件を洗い出す:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
+
+&lt;p&gt;アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;社内/プロジェクト標準&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;他レイヤでの優先ツール&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;規模&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。いっぽう、たとえば、1000台をひとつのツールの傘に入れずとも、100*10台にする設計ができないか、事前に考えておくと打ち手が増えます。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;チーム or ひとり&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Windows or Linux&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;　Azure ARMなどはじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。&lt;/p&gt;
+
+&lt;h2 id=&#34;マネージドサービス-機能を活用する:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
+
+&lt;p&gt;マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。&lt;/p&gt;
+
+&lt;p&gt;また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。&lt;/p&gt;
+
+&lt;p&gt;ですが、&lt;a href=&#34;http://torumakabe.github.io/post/arm_idempotent/&#34;&gt;以前のエントリ&lt;/a&gt;で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARMはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。&lt;/p&gt;
+
+&lt;p&gt;よってARMは、Immutableな環境で使う、もしくは、ChefなどのConfugurationツールと組み合わせて使うことを念頭に設計をします。&lt;/p&gt;
+
+&lt;p&gt;ARMでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARMテンプレートにはDSCやシェルを実行するエクステンションが使えるので、活用します。&lt;/p&gt;
+
+&lt;p&gt;また、Bootstrapping時点で、Confugurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。&lt;/p&gt;
+
+&lt;p&gt;以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。&lt;/p&gt;
+
+&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
+
+&lt;p&gt;具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f&#34;&gt;&amp;ldquo;Automating Deployment with Azure &amp;amp; Chef&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;ARMでBootstrapping&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VMを4つ作成、1つはLinux、他はWindows&lt;/li&gt;
+&lt;li&gt;ストレージ、ネットワークの作成&lt;/li&gt;
+&lt;li&gt;VMのストレージ、ネットワーク設定&lt;/li&gt;
+&lt;li&gt;OSの導入&lt;/li&gt;
+&lt;li&gt;ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)&lt;/li&gt;
+&lt;li&gt;他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)&lt;/li&gt;
+&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ChefでConfuguration&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;各ノードのChef bootstrap(言葉が混同しやすいので注意)&lt;/li&gt;
+&lt;li&gt;Chef Clientサービスの起動設定&lt;/li&gt;
+&lt;li&gt;DBサーバのDB領域ディスク作成、フォーマット&lt;/li&gt;
+&lt;li&gt;DBサーバへSQL Server 2014のインストール&lt;/li&gt;
+&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。&lt;/p&gt;
+
+&lt;p&gt;書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure ARM Templateによるデプロイと冪等性</title>
