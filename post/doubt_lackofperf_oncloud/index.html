@@ -229,11 +229,11 @@
 
 <h2 id="80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">80,000IOPSの規模感</h2>
 
-<p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
+<p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
 
-<p>一般的に企業で使われているディスクアレイに載っているHDDのIOPSは、1本あたりおおよそ200です。IOPSに影響する要素は回転数です。よく回る15,000rpm FC/SAS HDDでだいたいこのくらい。</p>
+<p>一般的に企業で使われているディスクアレイに載っているHDDのIOPSは、1本あたりおおよそ200です。IOPSに影響する要素は回転数で、よく回る15,000rpm FC/SAS HDDでだいたいこのくらい。</p>
 
-<p>なので80,000 / 200 = 400。よって80,000IOPSを達成しようとすると、HDDを400本並べないといけません。低くない値です。</p>
+<p>なので80,000 / 200 = 400。よって80,000IOPSを達成しようとすると、HDDを400本並べないといけません。小さくないです。</p>
 
 <p>もちろんディスクアレイにはキャッシュがあるので、キャッシュヒット次第でIOPSは変わります。ベンダが胸を張って公開している値も、キャッシュに当てまくった数字であることが多いです。ですが誠実な技術者は「水物」なキャッシュヒットを前提にサイジングしません。アプリがアレイを占有できて、扱うデータの量や中身に変化がない場合は別ですが、それはまれでしょう。ヒットしない最悪の場合を考慮するはずです。</p>
 
