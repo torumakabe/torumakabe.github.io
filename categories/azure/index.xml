@@ -6,8 +6,121 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 11 Jan 2016 00:20:30 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>クラウドは本当に性能不足なのか</title>
+      <link>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;具体的な数値で-正しい理解を:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;具体的な数値で、正しい理解を&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/&#34;&gt;&amp;ldquo;クラウドは性能不足、企業システムが重すぎる&amp;rdquo;&lt;/a&gt;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。&lt;/p&gt;
+
+&lt;p&gt;記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。&lt;/p&gt;
+
+&lt;p&gt;どんな技術、製品、サービスにも限界や制約はあります。具体的な数値や仕様で語らないと、そこから都市伝説が生まれます。&lt;/p&gt;
+
+&lt;p&gt;いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;シングルvmでどれだけ:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;シングルVMでどれだけ&lt;/h2&gt;
+
+&lt;p&gt;話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。&lt;/p&gt;
+
+&lt;p&gt;わたしは原理主義者ではないので「クラウドに載せたかったら、そのシステムを作り直せ」とは思いません。作りを大きく変えなくても載せられる、それでクラウドの特徴を活かして幸せになれるのであれば、それでいいです。もちろん最適化するにこしたことはありませんが。&lt;/p&gt;
+
+&lt;p&gt;となると、クラウド活用の検討を進めるか、あきらめるか、判断材料のひとつは「スケールアウトできなくても、性能足りるか?」です。&lt;/p&gt;
+
+&lt;p&gt;この場合、1サーバ、VMあたりの性能上限が制約です。なので、AzureのシングルVM性能が鍵になります。&lt;/p&gt;
+
+&lt;p&gt;では、Azureの仮想マシンの提供リソースを確認しましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/&#34;&gt;&amp;ldquo;仮想マシンのサイズ&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。&lt;/p&gt;
+
+&lt;p&gt;企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Standard_GS5の主な仕様
+
+&lt;ul&gt;
+&lt;li&gt;32仮想CPUコア&lt;/li&gt;
+&lt;li&gt;448GBメモリ&lt;/li&gt;
+&lt;li&gt;80,000IOPS&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。&lt;/p&gt;
+
+&lt;p&gt;なお、&lt;strong&gt;現時点で&lt;/strong&gt;まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。&lt;/p&gt;
+
+&lt;h2 id=&#34;32仮想cpuコアの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;32仮想CPUコアの規模感&lt;/h2&gt;
+
+&lt;p&gt;クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/#-3&#34;&gt;&amp;ldquo;パフォーマンスに関する考慮事項&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ACUはAzure内で相対評価をする場合にはいいのですが、「じゃあAzureの外からシステムもってきたとき、実際どのくらいさばけるのよ。いま持ってる/買えるサーバ製品でいうと、どのくらいよ」という問いには向きません。&lt;/p&gt;
+
+&lt;p&gt;クラウドや仮想化に関わらず、アプリの作りと処理するデータ、ハードの組み合わせで性能は変わります。動かしてみるのが一番です。せっかくイニシャルコストのかからないクラウドです。試しましょう。でもその前に、試す価値があるか判断しなければいけない。なにかしらの参考値が欲しい。予算と組織で動いてますから。わかります。&lt;/p&gt;
+
+&lt;p&gt;では例をあげましょう。&lt;strong&gt;俺のベンチマーク&lt;/strong&gt;を出したいところですが、「それじゃない」と突っ込まれそうです。ここはぐっと我慢して、企業でよく使われているERP、SAPのSAP SDベンチマークにしましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/appbm_cloud.epx&#34;&gt;&amp;ldquo;SAP Standard Application Benchmarks in Cloud Environments&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/index.epx&#34;&gt;&amp;ldquo;SAP Standard Application Benchmarks&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。&lt;/p&gt;
+
+&lt;p&gt;比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。&lt;/p&gt;
+
+&lt;p&gt;|               |&lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C91D3C5AFFF9A4689C82EA97027CDF4A42858AD1610A3F732&#34;&gt;DELL R720&lt;/a&gt; |&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/assets/Cert15038.pdf&#34;&gt;Azure VM GS5&lt;/a&gt; | &lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7CFDB9CAEA540B6F601993E4359AB45BEF7ED0949D1BFF155D&#34;&gt;NEC R120f-2M&lt;/a&gt; | &lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C14B03FD143D20C6C90E8F6DEAA4E15F8090BA77A6249E1D0&#34;&gt;FUJITSU RX4770 M2&lt;/a&gt;  |
+ |:&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|
+ |Date|&lt;sup&gt;2012&lt;/sup&gt;&amp;frasl;&lt;sub&gt;4&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;9&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;|
+ | CPU Type |Intel Xeon Processor E5-2690| Intel Xeon Processor E5-2698B v3 | Intel Xeon Processor E5-2699 v3 | Intel Xeon Processor E7-8890 v3 |
+ | CPU Sockets |2 | 2 | 2 | 4 |
+ | CPU Cores|16 | 32 (Virtual) | 36 | 72 |
+ | SD Benchmark Users |6,500| 7,600 | 14,440 | 29,750 |
+ | SAPS |35,970| 41,670 | 79,880 | 162,500 |&lt;/p&gt;
+
+&lt;p&gt;3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。&lt;/p&gt;
+
+&lt;p&gt;なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/appbm_cloud.epx&#34;&gt;3-Tierベンチマーク&lt;/a&gt;で確認できます。&lt;a href=&#34;http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx&#34;&gt;Azure上で247,880SAPS&lt;/a&gt;出たそうです。&lt;/p&gt;
+
+&lt;h2 id=&#34;80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;80,000IOPSの規模感&lt;/h2&gt;
+
+&lt;p&gt;IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。GS5では&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/&#34;&gt;Premium Storage&lt;/a&gt;を接続し、VMあたり最大80,000IOPSを提供します。&lt;/p&gt;
+
+&lt;p&gt;一般的に企業で使われているディスクアレイに載っているHDDのIOPSは、1本あたりおおよそ200です。IOPSに影響する要素は回転数です。よく回る15,000rpm FC/SAS HDDでだいたいこのくらい。&lt;/p&gt;
+
+&lt;p&gt;なので80,000 / 200 = 400。よって80,000IOPSを達成しようとすると、HDDを400本並べないといけません。低くない値です。&lt;/p&gt;
+
+&lt;p&gt;もちろんディスクアレイにはキャッシュがあるので、キャッシュヒット次第でIOPSは変わります。ベンダが胸を張って公開している値も、キャッシュに当てまくった数字であることが多いです。ですが誠実な技術者は「水物」なキャッシュヒットを前提にサイジングしません。アプリがアレイを占有できて、扱うデータの量や中身に変化がない場合は別ですが、それはまれでしょう。ヒットしない最悪の場合を考慮するはずです。&lt;/p&gt;
+
+&lt;p&gt;なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。&lt;/p&gt;
+
+&lt;p&gt;## 結論&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり&lt;/li&gt;
+&lt;li&gt;メモリが448GB以上必要であれば難しい&lt;/li&gt;
+&lt;li&gt;サーバあたり80,000IOPS以上必要であれば難しい、でも本当にサーバあたりそれだけ必要か精査すべき&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ちょっと前までオンプレ案件も担当していましたが、ここ数年は2ソケットサーバ案件中心、ときどき、4ソケット以上で興奮。という感覚です。みなさんはいかがでしょう。データはないのでご参考まで。&lt;/p&gt;
+
+&lt;p&gt;なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;&amp;ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>

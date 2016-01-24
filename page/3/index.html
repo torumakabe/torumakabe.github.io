@@ -68,6 +68,152 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">14 Sep 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/openstack-tools/" class="post-title">OpenStackのツール環境をImmutableに整える</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h3 id="タイトルは釣りです:06c978f415868c5d089a8460c0068f0d">タイトルは釣りです</h3>
+
+<p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
+
+<h3 id="なぜ必要か:06c978f415868c5d089a8460c0068f0d">なぜ必要か?</h3>
+
+<p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
+
+<h3 id="やりたいこと:06c978f415868c5d089a8460c0068f0d">やりたいこと</h3>
+
+<ul>
+<li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
+<li>Windows、Macどちらでも同様の環境にしたい</li>
+<li>相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収</li>
+<li>Windows、Mac環境を汚さない、また、汚されない</li>
+<li>コマンド2、3発程度で、気軽に作って消せる</li>
+<li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
+</ul>
+
+<h3 id="方針:06c978f415868c5d089a8460c0068f0d">方針</h3>
+
+<ul>
+<li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
+<li>VagrantでWindows/Macの違いを吸収する</li>
+<li>VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う</li>
+<li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
+</ul>
+
+<h3 id="前提条件:06c978f415868c5d089a8460c0068f0d">前提条件</h3>
+
+<ul>
+<li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
+<li>OSX 10.9.4 &amp; VirtualBox 4.3.16</li>
+<li>Vagrant 1.6.5  (VMware用ライセンス買いました)</li>
+<li>ひとまずOpenStack CLIを使えるところまで作る</li>
+</ul>
+
+<h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
+
+<p><script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script></p>
+
+<p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
+
+<ul>
+<li>VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの<a href="https://github.com/opscode/bento">Bento</a>で、事前にboxファイルを作ってます。ubuntu14.04としました。</li>
+<li>実行ディレクトリにprovision.shを置きます。</li>
+<li>provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。</li>
+<li>実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。</li>
+
+<li><p>hostsファイルには以下のようにlocalhostを定義します。</p>
+
+<p>[localhost]<br />
+127.0.0.1 ansible_connection=local</p></li>
+</ul>
+
+<h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
+
+<p><script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script></p>
+
+<p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
+
+<h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
+
+<p><script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script></p>
+
+<ul>
+<li><p>varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。</p>
+
+<p>OS_TENANT_NAME: your_tenant_name<br />
+OS_USERNAME: your_username<br />
+&hellip;.</p></li>
+</ul>
+
+<p>という感じで並べてください。.bashrcに追加されます。
+- タイムゾーンをAsia/Tokyoにします。
+- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
+
+<h3 id="windowsでの実行例:06c978f415868c5d089a8460c0068f0d">Windowsでの実行例</h3>
+
+<p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
+
+<pre><code>PS C:\Users\hoge&gt; vagrant up
+Bringing machine 'default' up with 'vmware_workstation' provider...
+==&gt; default: Cloning VMware VM: 'opscode-ubuntu1404'. This can take some time...
+(snip)
+==&gt; default: TASK: [install OpenStack CLIs] ************************************************
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-neutronclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-novaclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-cinderclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-keystoneclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-swiftclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-keystoneclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-glanceclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-troveclient)
+==&gt; default: changed: [127.0.0.1] =&gt; (item=python-designateclient)
+==&gt; default:
+==&gt; default: PLAY RECAP ********************************************************************
+==&gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
+</code></pre>
+
+<p>うまく動いたようです。</p>
+
+<pre><code>PS C:\Users\hoge&gt; vagrant ssh
+cygwin warning:
+  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
+  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
+  CYGWIN environment variable option &quot;nodosfilewarning&quot; turns off this warning.
+  Consult the user's guide for more details about POSIX paths:
+    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
+</code></pre>
+
+<p>vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。</p>
+
+<pre><code>vagrant@vagrant:~$ nova list
++----+------+--------+------------+-------------+----------+
+| ID | Name | Status | Task State | Power State | Networks |
++----+------+--------+------------+-------------+----------+
++----+------+--------+------------+-------------+----------+
+</code></pre>
+
+<p>いきなりnovaコマンド使えます。</p>
+
+<p>なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">06 Sep 2014, 00:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -306,48 +452,6 @@ test.txt
 <li><a href="http://www.slideshare.net/ToruMakabe/openstack-32905609">OpenStack超入門シリーズ いまさら聞けない Swiftの使い方</a></li>
 <li><a href="http://www.slideshare.net/ToruMakabe/openstack-neutron">OpenStack超入門シリーズ いまさら聞けない Neutronの使い方</a></li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">13 Apr 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/cloud-vacancy/" class="post-title">うちのクラウド、空いてます</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="無限なんてあり得ない:541a755ba62f6cb5bf4c824c3fbd2582">無限なんてあり得ない</h3>
-
-<p>「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウドサービスのうたい文句、けっこう目にします。</p>
-
-<p>そのいっぽうで、「1000台のサーバーを1時間だけ使って、料金は数万円で済みました」という事例をアピールしているサービスの、別ユーザーが「この前、数10台のサーバー追加を依頼したら、在庫切れって言われてねぇ」と言っていたり。</p>
-
-<p>クラウドコンピューティングの概念は雲かもしれませんが、その向こうには物理リソースがあるわけで、無限というのは、残念ながら無理があります。</p>
-
-<p>空いているときもあれば、空いていない時もあります。また、事業者によって、キャパシティプランニングのスタンスは違います。規模も違います。</p>
-
-<h3 id="空き状況を公開すると面白いかも知れない:541a755ba62f6cb5bf4c824c3fbd2582">空き状況を公開すると面白いかも知れない</h3>
-
-<p>駐車場の空き状況がわかる街があります。便利です。最近はWebでレストランの空きがわかる<a href="http://www.opentable.jp/default.aspx">サービス</a>もあります。これまた便利。</p>
-
-<p>また、震災以降、電力の需給状況が可視化されました。どのくらい余裕があるか、を意識できるようになっています。便利という話ではないですが、リソースの空きを意識して生活している、身近な例ではないでしょうか。</p>
-
-<p>そこで、クラウドサービスでも、リソースの空き状況を公開すると面白いのになぁ、と思うのです。でもわたしは、そのようなサービスを見たことがありません。</p>
-
-<p>ユーザーがそのサービスを判断する情報になりますし、電力事業者間で電力をやりとりしているように、事業者間でリソースを融通するような、新しい仕組みにつながる気もします。</p>
-
-<p>ビジネス上、難しいことは重々承知で書いています。でも、クラウドサービスが本当に「ユーティリティ」を目指すのなら、いつか問われる課題ではないかと。</p>
-
-<p>みなさんは、どう思われますか?</p>
 
                     </div>
                 </section>

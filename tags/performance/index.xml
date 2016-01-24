@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Cloud on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/cloud/</link>
-    <description>Recent content in Cloud on re-imagine</description>
+    <title>Performance on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/performance/</link>
+    <description>Recent content in Performance on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate>
-    <atom:link href="http://torumakabe.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://torumakabe.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
@@ -119,80 +119,6 @@
 &lt;p&gt;なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;&amp;ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>うちのクラウド、空いてます</title>
-      <link>http://torumakabe.github.io/post/cloud-vacancy/</link>
-      <pubDate>Sun, 13 Apr 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/cloud-vacancy/</guid>
-      <description>
-
-&lt;h3 id=&#34;無限なんてあり得ない:541a755ba62f6cb5bf4c824c3fbd2582&#34;&gt;無限なんてあり得ない&lt;/h3&gt;
-
-&lt;p&gt;「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウドサービスのうたい文句、けっこう目にします。&lt;/p&gt;
-
-&lt;p&gt;そのいっぽうで、「1000台のサーバーを1時間だけ使って、料金は数万円で済みました」という事例をアピールしているサービスの、別ユーザーが「この前、数10台のサーバー追加を依頼したら、在庫切れって言われてねぇ」と言っていたり。&lt;/p&gt;
-
-&lt;p&gt;クラウドコンピューティングの概念は雲かもしれませんが、その向こうには物理リソースがあるわけで、無限というのは、残念ながら無理があります。&lt;/p&gt;
-
-&lt;p&gt;空いているときもあれば、空いていない時もあります。また、事業者によって、キャパシティプランニングのスタンスは違います。規模も違います。&lt;/p&gt;
-
-&lt;h3 id=&#34;空き状況を公開すると面白いかも知れない:541a755ba62f6cb5bf4c824c3fbd2582&#34;&gt;空き状況を公開すると面白いかも知れない&lt;/h3&gt;
-
-&lt;p&gt;駐車場の空き状況がわかる街があります。便利です。最近はWebでレストランの空きがわかる&lt;a href=&#34;http://www.opentable.jp/default.aspx&#34;&gt;サービス&lt;/a&gt;もあります。これまた便利。&lt;/p&gt;
-
-&lt;p&gt;また、震災以降、電力の需給状況が可視化されました。どのくらい余裕があるか、を意識できるようになっています。便利という話ではないですが、リソースの空きを意識して生活している、身近な例ではないでしょうか。&lt;/p&gt;
-
-&lt;p&gt;そこで、クラウドサービスでも、リソースの空き状況を公開すると面白いのになぁ、と思うのです。でもわたしは、そのようなサービスを見たことがありません。&lt;/p&gt;
-
-&lt;p&gt;ユーザーがそのサービスを判断する情報になりますし、電力事業者間で電力をやりとりしているように、事業者間でリソースを融通するような、新しい仕組みにつながる気もします。&lt;/p&gt;
-
-&lt;p&gt;ビジネス上、難しいことは重々承知で書いています。でも、クラウドサービスが本当に「ユーティリティ」を目指すのなら、いつか問われる課題ではないかと。&lt;/p&gt;
-
-&lt;p&gt;みなさんは、どう思われますか?&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>クラウド = 発電所?</title>
-      <link>http://torumakabe.github.io/post/cloud-and-power/</link>
-      <pubDate>Sun, 16 Mar 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/cloud-and-power/</guid>
-      <description>
-
-&lt;h3 id=&#34;思考停止してないだろうか:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;思考停止してないだろうか&lt;/h3&gt;
-
-&lt;p&gt;クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。&lt;/p&gt;
-
-&lt;p&gt;でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。&lt;/p&gt;
-
-&lt;h3 id=&#34;本当に発電は大規模発電所任せ:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;本当に発電は大規模発電所任せ?&lt;/h3&gt;
-
-&lt;p&gt;最近CMでよく見ますが、&lt;a href=&#34;http://home.tokyo-gas.co.jp/enefarm_special/index.html&#34;&gt;エネファーム&lt;/a&gt;ってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。&lt;/p&gt;
-
-&lt;p&gt;戸別の発電は、将来的には燃料電池など新しい技術も使われて、さらに普及するんじゃないでしょうか。使う人の近くで、その使い方に合わせて発電した方が、合理的ですものね。&lt;/p&gt;
-
-&lt;h3 id=&#34;オンプレit基盤は無くなる:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;オンプレIT基盤は無くなる?&lt;/h3&gt;
-
-&lt;p&gt;で、クラウドの話です。オンプレミスのIT基盤は無くなって、全部クラウドに移ってしまうのでしょうか。でも、もしその考えが「発電所のように」という根拠であれば、「従来の」という前提が要ります。なぜなら、発電の仕組みも進化しているので。エネファームのように。&lt;/p&gt;
-
-&lt;p&gt;ネットワーク遅延を考えれば、処理する場所の近くにデータがあったほうがいいですよね。利用者みんなが、クラウドが動くデータセンターの近くにいるわけではないので。&lt;/p&gt;
-
-&lt;p&gt;また、発電所は、ピークに合わせて設備投資をしています。いっぽうで、いざというとき、あなたの契約しているクラウドは、契約者全員が使えるだけの能力を供給できるでしょうか。ピークに合わせて設備投資しているでしょうか。そもそもピークをどう定義しているでしょうか。災害時にそれを期待した利用者の需要で、パンクしないでしょうか。&lt;/p&gt;
-
-&lt;h3 id=&#34;そのインフラ知識は捨てないほうがいい:ccfe815dc571bca9bf1ffdfcb6992c5f&#34;&gt;そのインフラ知識は捨てないほうがいい&lt;/h3&gt;
-
-&lt;p&gt;発電の世界で燃料電池が期待されているように、ITの世界でも不揮発性メモリなど、その使い方が大きく変わるイノベーションの種が研究開発されています。普段は電源を切っておいて、処理するときだけ瞬時に起動、処理、また停止するようなコンピュータ。家とかオフィスに置きたくないですか。性能的にも経済的にもリスク管理的にも、合理的かもしれませんよ。&lt;/p&gt;
-
-&lt;p&gt;そして、その設備ではリソースが足りない、読めない、あまり使わないものはクラウドに置き、動かせばいいのではないかと思います。あと、クラウドのほうが、いいものをすぐに使える場合。SaaSとか。&lt;/p&gt;
-
-&lt;p&gt;「未来はどっちだ」という白か黒かの議論をして、どちらかと心中する必要はありません。どっちも使えばいいです。かっこいい言い方をすると、ハイブリッドです。&lt;/p&gt;
-
-&lt;p&gt;なので、「クラウド時代に自分で基盤作ることなんてなくなるから、インフラの知識はもう要らないよね」とか言って、せっかく身につけたハードウェア、ITインフラの知識は、捨てるどころか磨いた方がいいですよ。知識は荷物になりません、あなたを守る懐刀。&lt;/p&gt;
 </description>
     </item>
     
