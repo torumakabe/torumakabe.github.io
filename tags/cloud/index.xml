@@ -81,14 +81,67 @@
 
 &lt;p&gt;比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。&lt;/p&gt;
 
-&lt;p&gt;|               |&lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C91D3C5AFFF9A4689C82EA97027CDF4A42858AD1610A3F732&#34;&gt;DELL R720&lt;/a&gt; |&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/assets/Cert15038.pdf&#34;&gt;Azure VM GS5&lt;/a&gt; | &lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7CFDB9CAEA540B6F601993E4359AB45BEF7ED0949D1BFF155D&#34;&gt;NEC R120f-2M&lt;/a&gt; | &lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C14B03FD143D20C6C90E8F6DEAA4E15F8090BA77A6249E1D0&#34;&gt;FUJITSU RX4770 M2&lt;/a&gt;  |
- |:&amp;mdash;&amp;mdash;&amp;mdash;&amp;ndash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|:&amp;mdash;&amp;mdash;&amp;mdash;&amp;mdash;|
- |Date|&lt;sup&gt;2012&lt;/sup&gt;&amp;frasl;&lt;sub&gt;4&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;9&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;|&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;|
- | CPU Type |Intel Xeon Processor E5-2690| Intel Xeon Processor E5-2698B v3 | Intel Xeon Processor E5-2699 v3 | Intel Xeon Processor E7-8890 v3 |
- | CPU Sockets |2 | 2 | 2 | 4 |
- | CPU Cores|16 | 32 (Virtual) | 36 | 72 |
- | SD Benchmark Users |6,500| 7,600 | 14,440 | 29,750 |
- | SAPS |35,970| 41,670 | 79,880 | 162,500 |&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C91D3C5AFFF9A4689C82EA97027CDF4A42858AD1610A3F732&#34;&gt;DELL R720&lt;/a&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/assets/Cert15038.pdf&#34;&gt;Azure VM GS5&lt;/a&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7CFDB9CAEA540B6F601993E4359AB45BEF7ED0949D1BFF155D&#34;&gt;NEC R120f-2M&lt;/a&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;a href=&#34;http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C14B03FD143D20C6C90E8F6DEAA4E15F8090BA77A6249E1D0&#34;&gt;FUJITSU RX4770 M2&lt;/a&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;Date&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;sup&gt;2012&lt;/sup&gt;&amp;frasl;&lt;sub&gt;4&lt;/sub&gt;&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;9&lt;/sub&gt;&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;sup&gt;2015&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;CPU Type&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Intel Xeon Processor E5-2690&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Intel Xeon Processor E5-2698B v3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Intel Xeon Processor E5-2699 v3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Intel Xeon Processor E7-8890 v3&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;CPU Sockets&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;CPU Cores&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;16&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;32 (Virtual)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;36&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;72&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;SD Benchmark Users&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;6,500&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;7,600&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;14,440&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;29,750&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;SAPS&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;35,970&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;41,670&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;79,880&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;162,500&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 &lt;p&gt;3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。&lt;/p&gt;
 
@@ -106,7 +159,7 @@
 
 &lt;p&gt;なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。&lt;/p&gt;
 
-&lt;p&gt;## 結論&lt;/p&gt;
+&lt;h2 id=&#34;結論:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;結論&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり&lt;/li&gt;
