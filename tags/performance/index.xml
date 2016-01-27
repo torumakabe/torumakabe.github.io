@@ -118,7 +118,7 @@
 &lt;li&gt;LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを&lt;/li&gt;
 &lt;li&gt;物理障害対策はAzureに任せる (3コピー)&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;MDのChunkをデフォルトの512KBから64KBに変更する&lt;/li&gt;
+&lt;li&gt;MDのChunkをデフォルトの512KBから64KBに変更する (ここは結果によって調整)&lt;/li&gt;
 &lt;li&gt;Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする&lt;/li&gt;
 &lt;/ul&gt;
 
