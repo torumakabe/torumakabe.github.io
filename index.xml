@@ -6,8 +6,157 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Linux on AzureでDisk IO性能を確保する方法</title>
+      <link>http://torumakabe.github.io/post/striping_linuxonazure/</link>
+      <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
+      <description>
+
+&lt;h2 id=&#34;俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
+
+&lt;p&gt;前半はポエムです。おそらくこのエントリたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。&lt;/p&gt;
+
+&lt;p&gt;クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。&lt;/p&gt;
+
+&lt;p&gt;ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する
+
+&lt;ul&gt;
+&lt;li&gt;やみくもに調べものしないように&lt;/li&gt;
+&lt;li&gt;経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ベンダの公式資料を確認する
+
+&lt;ul&gt;
+&lt;li&gt;「この使い方を推奨/サポートしています」と明記されていれば安心&lt;/li&gt;
+&lt;li&gt;でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない&lt;/li&gt;
+&lt;li&gt;不明確なら早めに問い合わせる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ベンダが運営しているコミュニティ上の情報を確認する
+
+&lt;ul&gt;
+&lt;li&gt;ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;コミュニティや有識者の情報を確認する
+
+&lt;ul&gt;
+&lt;li&gt;OSSでは特に&lt;/li&gt;
+&lt;li&gt;専門性を感じるサイト、人はリストしておく&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;動かす
+
+&lt;ul&gt;
+&lt;li&gt;やっぱり動かしてみないと&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;提案する
+
+&lt;ul&gt;
+&lt;li&gt;リスクがあれば明示します&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;問題なければ実績になる、問題があればリカバリする
+
+&lt;ul&gt;
+&lt;li&gt;提案しっぱなしにせずフォローすることで、自信とパターンが増える&lt;/li&gt;
+&lt;li&gt;次の案件で活きる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;いまのわたしの課題は４、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。&lt;/p&gt;
+
+&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
+
+&lt;p&gt;さて今回の主題です。&lt;/p&gt;
+
+&lt;p&gt;結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。&lt;/p&gt;
+
+&lt;p&gt;Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。&lt;/p&gt;
+
+&lt;p&gt;サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。&lt;/p&gt;
+
+&lt;p&gt;Linuxで使える代表的なストライプ実装は、LVMとMD。&lt;/p&gt;
+
+&lt;p&gt;ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。&lt;/p&gt;
+
+&lt;p&gt;前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-configure-raid/&#34;&gt;&amp;ldquo;Configure Software RAID on Linux&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/#premium-storage&#34;&gt;&amp;ldquo;Premium Storage: Azure 仮想マシン ワークロード向けの高パフォーマンス ストレージ&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://blogs.msdn.com/b/igorpag/archive/2014/10/23/azure-storage-secrets-and-linux-i-o-optimizations.aspx&#34;&gt;&amp;ldquo;Azure Storage secrets and Linux I/O optimizations&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;得られた情報の中で大事なのは、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメントで
+
+&lt;ul&gt;
+&lt;li&gt;LVMではなくMDを使った構成例が紹介されている&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;マイクロソフトがホストするブログ(MSDN)で、エキスパートが
+
+&lt;ul&gt;
+&lt;li&gt;LVMと比較したうえで、MDをすすめている&lt;/li&gt;
+&lt;li&gt;MDのChunkサイズについて推奨値を紹介している&lt;/li&gt;
+&lt;li&gt;そのほか、ファイルシステムやスケジューラに関する有益な情報あり&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;なるほど。わたしのこの時点での方針はこうです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;LVMを使う必然性はないため、MDに絞る
+
+&lt;ul&gt;
+&lt;li&gt;LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを&lt;/li&gt;
+&lt;li&gt;物理障害対策はAzureに任せる (3コピー)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;MDのChunkをデフォルトの512KBから64KBに変更する&lt;/li&gt;
+&lt;li&gt;Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上記シナリオで、ディスク当たり5,000IOPS、ストライプ数に比例した性能が実際出れば提案価値あり、ということになります。
+ですが、ズバリな実績値が見つからない。ダラダラ探すのは時間の無駄。これは自分でやるしかない。&lt;/p&gt;
+
+&lt;p&gt;構成手順は前述のリンク先にありますが、ポイントを抜き出します。OS=Ubuntu、ファイルシステム=ext4の場合です。&lt;/p&gt;
+
+&lt;p&gt;MDでストライプを作る際、チャンクを64KBに変更します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo mdadm --create /dev/md127 --level 0 --raid-devices 2  /dev/sdc1 /dev/sdd1 -c 64k
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;マウント時にバリアを無効にします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo mount /dev/md127 /mnt -o barrier=0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下、Premium Storage(P30)をMDで2つ束ねたストライプにfioを実行した結果です。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;100% Random Read&lt;/li&gt;
+&lt;li&gt;キャッシュを無効にするため、Premium StorageのキャッシュはNone、fio側もdirect=1&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ブロックサイズは小さめの値が欲しかったので、1K&lt;/p&gt;
+
+&lt;p&gt;randread: (g=0): rw=randread, bs=1K-1K/1K-1K/1K-1K, ioengine=libaio, iodepth=32
+fio-2.1.3
+Starting 1 process&lt;/p&gt;
+
+&lt;p&gt;randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
+  read : io=102400KB, bw=9912.9KB/s, iops=9912, runt= 10330msec
+[snip]&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;2本束ねて9,912IOPS。1本あたり5,000IOPS。ほぼ期待値。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
@@ -1385,26 +1534,6 @@ test.txt
 &lt;p&gt;フォルダ同期も効いてますね。んー、楽ちん。&lt;/p&gt;
 
 &lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OpenStack超入門シリーズ 初期3部作完結</title>
-      <link>http://torumakabe.github.io/post/OpenStack-3primer/</link>
-      <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/OpenStack-3primer/</guid>
-      <description>
-
-&lt;h3 id=&#34;よく聞かれることをまとめました:05fdcc29da710e097e2f23b56c9852e1&#34;&gt;よく聞かれることをまとめました&lt;/h3&gt;
-
-&lt;p&gt;ひとまず、初期3部作完結。また書くかもしれません。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-nova&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-32905609&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Swiftの使い方&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://www.slideshare.net/ToruMakabe/openstack-neutron&#34;&gt;OpenStack超入門シリーズ いまさら聞けない Neutronの使い方&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     

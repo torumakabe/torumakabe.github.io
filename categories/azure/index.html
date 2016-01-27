@@ -68,6 +68,167 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">27 Jan 2016, 00:19</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/striping_linuxonazure/" class="post-title">Linux on AzureでDisk IO性能を確保する方法</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
+
+<p>前半はポエムです。おそらくこのエントリたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。</p>
+
+<p>クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。</p>
+
+<p>ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。</p>
+
+<ol>
+<li>構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する
+
+<ul>
+<li>やみくもに調べものしないように</li>
+<li>経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い</li>
+</ul></li>
+<li>ベンダの公式資料を確認する
+
+<ul>
+<li>「この使い方を推奨/サポートしています」と明記されていれば安心</li>
+<li>でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない</li>
+<li>不明確なら早めに問い合わせる</li>
+</ul></li>
+<li>ベンダが運営しているコミュニティ上の情報を確認する
+
+<ul>
+<li>ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある</li>
+</ul></li>
+<li>コミュニティや有識者の情報を確認する
+
+<ul>
+<li>OSSでは特に</li>
+<li>専門性を感じるサイト、人はリストしておく</li>
+</ul></li>
+<li>動かす
+
+<ul>
+<li>やっぱり動かしてみないと</li>
+</ul></li>
+<li>提案する
+
+<ul>
+<li>リスクがあれば明示します</li>
+</ul></li>
+<li>問題なければ実績になる、問題があればリカバリする
+
+<ul>
+<li>提案しっぱなしにせずフォローすることで、自信とパターンが増える</li>
+<li>次の案件で活きる</li>
+</ul></li>
+</ol>
+
+<p>いまのわたしの課題は４、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。</p>
+
+<h2 id="linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400">Linux on AzureでDisk IO性能を確保する方法</h2>
+
+<p>さて今回の主題です。</p>
+
+<p>結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。</p>
+
+<p>Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。</p>
+
+<p>サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。</p>
+
+<p>Linuxで使える代表的なストライプ実装は、LVMとMD。</p>
+
+<p>ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。</p>
+
+<p>前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。</p>
+
+<p><a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-configure-raid/">&ldquo;Configure Software RAID on Linux&rdquo;</a></p>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/#premium-storage">&ldquo;Premium Storage: Azure 仮想マシン ワークロード向けの高パフォーマンス ストレージ&rdquo;</a></p>
+
+<p><a href="http://blogs.msdn.com/b/igorpag/archive/2014/10/23/azure-storage-secrets-and-linux-i-o-optimizations.aspx">&ldquo;Azure Storage secrets and Linux I/O optimizations&rdquo;</a></p>
+
+<p>得られた情報の中で大事なのは、</p>
+
+<ul>
+<li>公式ドキュメントで
+
+<ul>
+<li>LVMではなくMDを使った構成例が紹介されている</li>
+</ul></li>
+<li>マイクロソフトがホストするブログ(MSDN)で、エキスパートが
+
+<ul>
+<li>LVMと比較したうえで、MDをすすめている</li>
+<li>MDのChunkサイズについて推奨値を紹介している</li>
+<li>そのほか、ファイルシステムやスケジューラに関する有益な情報あり</li>
+</ul></li>
+</ul>
+
+<p>なるほど。わたしのこの時点での方針はこうです。</p>
+
+<ul>
+<li>LVMを使う必然性はないため、MDに絞る
+
+<ul>
+<li>LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを</li>
+<li>物理障害対策はAzureに任せる (3コピー)</li>
+</ul></li>
+<li>MDのChunkをデフォルトの512KBから64KBに変更する</li>
+<li>Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする</li>
+</ul>
+
+<p>上記シナリオで、ディスク当たり5,000IOPS、ストライプ数に比例した性能が実際出れば提案価値あり、ということになります。
+ですが、ズバリな実績値が見つからない。ダラダラ探すのは時間の無駄。これは自分でやるしかない。</p>
+
+<p>構成手順は前述のリンク先にありますが、ポイントを抜き出します。OS=Ubuntu、ファイルシステム=ext4の場合です。</p>
+
+<p>MDでストライプを作る際、チャンクを64KBに変更します。</p>
+
+<pre><code>sudo mdadm --create /dev/md127 --level 0 --raid-devices 2  /dev/sdc1 /dev/sdd1 -c 64k
+</code></pre>
+
+<p>マウント時にバリアを無効にします。</p>
+
+<pre><code>sudo mount /dev/md127 /mnt -o barrier=0
+</code></pre>
+
+<p>以下、Premium Storage(P30)をMDで2つ束ねたストライプにfioを実行した結果です。</p>
+
+<ul>
+<li>100% Random Read</li>
+<li>キャッシュを無効にするため、Premium StorageのキャッシュはNone、fio側もdirect=1</li>
+
+<li><p>ブロックサイズは小さめの値が欲しかったので、1K</p>
+
+<p>randread: (g=0): rw=randread, bs=1K-1K/1K-1K/1K-1K, ioengine=libaio, iodepth=32
+fio-2.1.3
+Starting 1 process</p>
+
+<p>randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
+  read : io=102400KB, bw=9912.9KB/s, iops=9912, runt= 10330msec
+[snip]</p></li>
+</ul>
+
+<p>2本束ねて9,912IOPS。1本あたり5,000IOPS。ほぼ期待値。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">24 Jan 2016, 00:19</h1>
                 <section class="post">
                     <header class="post-header">
@@ -836,68 +997,20 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">05 Nov 2015, 15:40</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_docker_extension/" class="post-title">Azure Docker VM Extensionを使う3つの理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66">まずはじめに</h2>
-
-<p>先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。</p>
-
-<p>もちろん、技術者個人として、中立的に、公開できるネタを書きます。</p>
-
-<p>AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。</p>
-
-<p>なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。</p>
-
-<h2 id="azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66">Azure Docker VM Extension を使う3つの理由</h2>
-
-<p>さて、今回は話題沸騰のDocker関連のネタ、<a href="https://github.com/Azure/azure-docker-extension">Azure Docker VM Extension</a>について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。</p>
-
-<p>このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。</p>
-
-<p>ずばり、答えはGithubの<a href="https://github.com/Azure/azure-docker-extension">README</a>にまとまっています。この拡張機能のうれしさは、</p>
-
-<ol>
-<li>Docker EngineのStable最新版をインストールしてくれる</li>
-<li>Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
-
-<ul>
-<li>ポートマッピング、認証まわり、Docker Registoryサーバの定義など</li>
-</ul></li>
-<li>Docker Composeのパラメータを渡すことができる (オプション)</li>
-</ol>
-
-<p>以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。</p>
-
-<p>Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。</p>
-
-<p>ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。</p>
-
-<p>Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。</p>
-
-<p>なお、このDocker拡張、ARM属性で言うpublisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 2</span>
+    
+      <a href="/categories/azure/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    
+  </nav>
+</div>
+
 
             <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
