@@ -141,7 +141,7 @@
 
 &lt;ul&gt;
 &lt;li&gt;100% Random Read&lt;/li&gt;
-&lt;li&gt;キャッシュを無効にするため、Premium StorageのキャッシュはNone、fio側もdirect=1&lt;/li&gt;
+&lt;li&gt;キャッシュ効果のないデータをとるため、Premium StorageのキャッシュはNone、fio側もdirect=1&lt;/li&gt;
 &lt;li&gt;ブロックサイズは小さめの値が欲しかったので、1K&lt;/li&gt;
 &lt;/ul&gt;
 
