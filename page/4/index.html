@@ -68,6 +68,107 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">05 May 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/vagrant-hpcloud/" class="post-title">Vagrant HP Public Cloud Pluginを試す</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h3 id="みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183">みんな大好きHashiCorp</h3>
+
+<p>クラウド界隈のデベロッパーから熱く注目されているHashiCorp。<a href="http://www.packer.io/">Packer</a>、<a href="http://www.serfdom.io/">Serf</a>、<a href="http://www.consul.io/">Consul</a>と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は<a href="http://www.vagrantup.com/">Vagrant</a>でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。</p>
+
+<p>VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。</p>
+
+<h3 id="前提条件:eaab8f236553d8374ac2c6f2b8524183">前提条件</h3>
+
+<ul>
+<li>Vagrant 1.5.4</li>
+<li>vagrant-hp 0.1.4</li>
+<li>HP Public Cloud (2014/5/5)</li>
+</ul>
+
+<h3 id="プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183">プラグインのインストールと前準備</h3>
+
+<p><a href="https://github.com/mohitsethi/vagrant-hp">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
+
+<h3 id="ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183">ではVagrantfileを見てみましょう</h3>
+
+<p><script type="text/javascript" src="http://gist.github.com/25a33c679492676bb626.js"></script></p>
+
+<p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、<a href="https://github.com/mohitsethi/vagrant-hp">Github</a>の説明には若干のトラップがありますのでご注意を。</p>
+
+<ul>
+<li>イメージにUbuntu 14.04 LTSを使う例です。</li>
+<li>Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。</li>
+<li>Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。</li>
+<li>Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。</li>
+<li>ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。</li>
+</ul>
+
+<h3 id="それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183">それではさっそくvagrant up</h3>
+
+<pre><code>$ vagrant up --provider=hp
+Bringing machine 'default' up with 'hp' provider...
+WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
+==&gt; default: Warning! The HP provider doesn't support any of the Vagrant
+==&gt; default: high-level network configurations (`config.vm.network`). They
+==&gt; default: will be silently ignored.
+==&gt; default: Finding flavor for server...
+==&gt; default: Finding image for server...
+==&gt; default: Finding floating-ip...
+==&gt; default: Launching a server with the following settings...
+==&gt; default:  -- Flavor: standard.xsmall
+==&gt; default:  -- Image: Ubuntu Server 14.04 LTS (amd64 20140416.1) - Partner Image
+==&gt; default:  -- Name: hogehoge
+==&gt; default:  -- Key-name: your_keypair_name
+==&gt; default:  -- Security Groups: [&quot;default&quot;, &quot;http&quot;]
+==&gt; default: Finding network...
+==&gt; default: Waiting for the server to be built...
+==&gt; default: Waiting for SSH to become available...
+==&gt; default: Machine is booted and ready for use!
+==&gt; default: Rsyncing folder: /your_path/data/ =&gt; /vagrant/data
+</code></pre>
+
+<p>できたっぽい。&ndash;provider=hpを忘れずに。</p>
+
+<h3 id="間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183">間髪入れずにvagrant ssh</h3>
+
+<pre><code>$ vagrant ssh
+WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
+Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
+
+* Documentation:  https://help.ubuntu.com/
+
+System information disabled due to load higher than 1.0
+
+Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+0 packages can be updated.
+0 updates are security updates.
+
+
+ubuntu@hogehoge:~$ ls /vagrant/data
+test.txt
+</code></pre>
+
+<p>フォルダ同期も効いてますね。んー、楽ちん。</p>
+
+<p>それではお楽しみ下さい。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">01 May 2014, 00:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -314,54 +415,6 @@ Date: Sun, 23 Mar 2014 01:44:27 GMT
 <p>参考情報
 - <a href="http://docs.openstack.org/developer/swift/overview_large_objects.html">Swift Documentaion &ndash; Large Object Support</a>
 - <a href="https://docs.hpcloud.com/api/object-storage/#large_objects-jumplink-span">HP Cloud Object Storage API Reference</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">16 Mar 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/cloud-and-power/" class="post-title">クラウド = 発電所?</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="思考停止してないだろうか:ccfe815dc571bca9bf1ffdfcb6992c5f">思考停止してないだろうか</h3>
-
-<p>クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。</p>
-
-<p>でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。</p>
-
-<h3 id="本当に発電は大規模発電所任せ:ccfe815dc571bca9bf1ffdfcb6992c5f">本当に発電は大規模発電所任せ?</h3>
-
-<p>最近CMでよく見ますが、<a href="http://home.tokyo-gas.co.jp/enefarm_special/index.html">エネファーム</a>ってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。</p>
-
-<p>戸別の発電は、将来的には燃料電池など新しい技術も使われて、さらに普及するんじゃないでしょうか。使う人の近くで、その使い方に合わせて発電した方が、合理的ですものね。</p>
-
-<h3 id="オンプレit基盤は無くなる:ccfe815dc571bca9bf1ffdfcb6992c5f">オンプレIT基盤は無くなる?</h3>
-
-<p>で、クラウドの話です。オンプレミスのIT基盤は無くなって、全部クラウドに移ってしまうのでしょうか。でも、もしその考えが「発電所のように」という根拠であれば、「従来の」という前提が要ります。なぜなら、発電の仕組みも進化しているので。エネファームのように。</p>
-
-<p>ネットワーク遅延を考えれば、処理する場所の近くにデータがあったほうがいいですよね。利用者みんなが、クラウドが動くデータセンターの近くにいるわけではないので。</p>
-
-<p>また、発電所は、ピークに合わせて設備投資をしています。いっぽうで、いざというとき、あなたの契約しているクラウドは、契約者全員が使えるだけの能力を供給できるでしょうか。ピークに合わせて設備投資しているでしょうか。そもそもピークをどう定義しているでしょうか。災害時にそれを期待した利用者の需要で、パンクしないでしょうか。</p>
-
-<h3 id="そのインフラ知識は捨てないほうがいい:ccfe815dc571bca9bf1ffdfcb6992c5f">そのインフラ知識は捨てないほうがいい</h3>
-
-<p>発電の世界で燃料電池が期待されているように、ITの世界でも不揮発性メモリなど、その使い方が大きく変わるイノベーションの種が研究開発されています。普段は電源を切っておいて、処理するときだけ瞬時に起動、処理、また停止するようなコンピュータ。家とかオフィスに置きたくないですか。性能的にも経済的にもリスク管理的にも、合理的かもしれませんよ。</p>
-
-<p>そして、その設備ではリソースが足りない、読めない、あまり使わないものはクラウドに置き、動かせばいいのではないかと思います。あと、クラウドのほうが、いいものをすぐに使える場合。SaaSとか。</p>
-
-<p>「未来はどっちだ」という白か黒かの議論をして、どちらかと心中する必要はありません。どっちも使えばいいです。かっこいい言い方をすると、ハイブリッドです。</p>
-
-<p>なので、「クラウド時代に自分で基盤作ることなんてなくなるから、インフラの知識はもう要らないよね」とか言って、せっかく身につけたハードウェア、ITインフラの知識は、捨てるどころか磨いた方がいいですよ。知識は荷物になりません、あなたを守る懐刀。</p>
 
                     </div>
                 </section>

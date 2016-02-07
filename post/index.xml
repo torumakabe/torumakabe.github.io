@@ -6,8 +6,125 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 07 Feb 2016 17:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Linux on Azureでファイル共有する方法</title>
+      <link>http://torumakabe.github.io/post/fileshare_linuxonazure/</link>
+      <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <description>
+
+&lt;h2 id=&#34;ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba&#34;&gt;ファイル共有、あまりおすすめしないです&lt;/h2&gt;
+
+&lt;p&gt;いきなりタイトルを否定しました。ロック。&lt;/p&gt;
+
+&lt;p&gt;さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。&lt;/p&gt;
+
+&lt;p&gt;ですが&lt;strong&gt;個人的には&lt;/strong&gt;あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。&lt;/p&gt;
+
+&lt;p&gt;でも、全否定はしません。アプリの作りを変えられないケースもあるかと思います。&lt;/p&gt;
+
+&lt;p&gt;そこで、もしAzureでファイル共有が必要であれば、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/&#34;&gt;Azure File Storage&lt;/a&gt;を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。&lt;/p&gt;
+
+&lt;p&gt;対応プロトコルは、SMB2.&lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;3&lt;/sub&gt;.0。LinuxからはNFSじゃなくSMBでつついてください。&lt;/p&gt;
+
+&lt;p&gt;使い方は公式ドキュメントを。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares&#34;&gt;&amp;ldquo;Azure Storage での Azure CLI の使用&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/&#34;&gt;&amp;ldquo;Linux で Azure File Storage を使用する方法&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;もうちょっと情報欲しいですね。補足のためにわたしも流します。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba&#34;&gt;Azure CLIでストレージアカウントを作成し、ファイル共有を設定&lt;/h2&gt;
+
+&lt;p&gt;ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account create tomakabefspoc -l &amp;quot;Japan East&amp;quot; --type LRS -g fspoc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account connectionstring show tomakabefspoc -g fspoc
+info:    Executing command storage account connectionstring show
++ Getting storage account keys
+data:    connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==
+info:    storage account connectionstring show command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;shareを作成します。share名はfspocshareとしました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage share create -a tomakabefspoc -k qwertyuiopasdfghjklzxcvbnm== fspocshare
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;エンドポイントを確認しておきましょう。VMからのマウントの際に必要です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account show tomakabefspoc -g fspoc
+[snip]
+data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;linux-2vmで共有:fa176ff87dca43c3d098f48095435bba&#34;&gt;Linux * 2VMで共有&lt;/h2&gt;
+
+&lt;p&gt;Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/&#34;&gt;Marketplace提供のUbuntu14.04LTS&lt;/a&gt;であれば、すでに入ってるはずです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo apt-get install cifs-utils
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;マウントポイントを作り、マウントします。接続先の指定はエンドポイント+share名で。usernameはストレージアカウント名。パスワードはストレージアカウントのキーです。
+パーミッションは要件に合わせてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo mkdir -p /mnt/fspoc
+fspocvm01:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;マウント完了。確認用のファイルを作っておきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ echo &amp;quot;test&amp;quot; &amp;gt; /mnt/fspoc/test.txt
+fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2台目のVMでも同様のマウント作業を。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ sudo apt-get install cifs-utils
+fspocvm02:~$ sudo mkdir -p /mnt/fspoc
+fspocvm02:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;1台目で作ったファイルが見えますね。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ ls /mnt/fspoc
+test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ファイルをいじりましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ echo &amp;quot;onemoretest&amp;quot; &amp;gt;&amp;gt; /mnt/fspoc/test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;1台目から確認。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ご利用は計画的に:fa176ff87dca43c3d098f48095435bba&#34;&gt;ご利用は計画的に&lt;/h2&gt;
+
+&lt;p&gt;2016/2月時点でAzure File Storageは最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、&lt;a href=&#34;https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/&#34;&gt;Lustre&lt;/a&gt;など別の共有方法を検討してください。&lt;/p&gt;
+
+&lt;p&gt;なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
@@ -1443,99 +1560,6 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 &lt;p&gt;デモや新機能の試用くらいであればこれで十分ですね。&lt;br /&gt;
 著者に感謝。わたしは買いました。 &amp;ndash; &lt;a href=&#34;http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/&#34;&gt;OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Vagrant HP Public Cloud Pluginを試す</title>
-      <link>http://torumakabe.github.io/post/vagrant-hpcloud/</link>
-      <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/vagrant-hpcloud/</guid>
-      <description>
-
-&lt;h3 id=&#34;みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;みんな大好きHashiCorp&lt;/h3&gt;
-
-&lt;p&gt;クラウド界隈のデベロッパーから熱く注目されているHashiCorp。&lt;a href=&#34;http://www.packer.io/&#34;&gt;Packer&lt;/a&gt;、&lt;a href=&#34;http://www.serfdom.io/&#34;&gt;Serf&lt;/a&gt;、&lt;a href=&#34;http://www.consul.io/&#34;&gt;Consul&lt;/a&gt;と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。&lt;/p&gt;
-
-&lt;p&gt;VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。&lt;/p&gt;
-
-&lt;h3 id=&#34;前提条件:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
-&lt;li&gt;vagrant-hp 0.1.4&lt;/li&gt;
-&lt;li&gt;HP Public Cloud (2014/5/5)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/25a33c679492676bb626.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;の説明には若干のトラップがありますのでご注意を。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;イメージにUbuntu 14.04 LTSを使う例です。&lt;/li&gt;
-&lt;li&gt;Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。&lt;/li&gt;
-&lt;li&gt;Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。&lt;/li&gt;
-&lt;li&gt;Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。&lt;/li&gt;
-&lt;li&gt;ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;それではさっそくvagrant up&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant up --provider=hp
-Bringing machine &#39;default&#39; up with &#39;hp&#39; provider...
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-==&amp;gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant
-==&amp;gt; default: high-level network configurations (`config.vm.network`). They
-==&amp;gt; default: will be silently ignored.
-==&amp;gt; default: Finding flavor for server...
-==&amp;gt; default: Finding image for server...
-==&amp;gt; default: Finding floating-ip...
-==&amp;gt; default: Launching a server with the following settings...
-==&amp;gt; default:  -- Flavor: standard.xsmall
-==&amp;gt; default:  -- Image: Ubuntu Server 14.04 LTS (amd64 20140416.1) - Partner Image
-==&amp;gt; default:  -- Name: hogehoge
-==&amp;gt; default:  -- Key-name: your_keypair_name
-==&amp;gt; default:  -- Security Groups: [&amp;quot;default&amp;quot;, &amp;quot;http&amp;quot;]
-==&amp;gt; default: Finding network...
-==&amp;gt; default: Waiting for the server to be built...
-==&amp;gt; default: Waiting for SSH to become available...
-==&amp;gt; default: Machine is booted and ready for use!
-==&amp;gt; default: Rsyncing folder: /your_path/data/ =&amp;gt; /vagrant/data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できたっぽい。&amp;ndash;provider=hpを忘れずに。&lt;/p&gt;
-
-&lt;h3 id=&#34;間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;間髪入れずにvagrant ssh&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant ssh
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
-* Documentation:  https://help.ubuntu.com/
-
-System information disabled due to load higher than 1.0
-
-Get cloud support with Ubuntu Advantage Cloud Guest:
-    http://www.ubuntu.com/business/services/cloud
-
-0 packages can be updated.
-0 updates are security updates.
-
-
-ubuntu@hogehoge:~$ ls /vagrant/data
-test.txt
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;フォルダ同期も効いてますね。んー、楽ちん。&lt;/p&gt;
-
-&lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
 </description>
     </item>
     

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Fileshare on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/fileshare/</link>
+    <description>Recent content in Fileshare on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 07 Feb 2016 17:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/fileshare/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Linux on Azureでファイル共有する方法</title>
+      <link>http://torumakabe.github.io/post/fileshare_linuxonazure/</link>
+      <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <description>
+
+&lt;h2 id=&#34;ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba&#34;&gt;ファイル共有、あまりおすすめしないです&lt;/h2&gt;
+
+&lt;p&gt;いきなりタイトルを否定しました。ロック。&lt;/p&gt;
+
+&lt;p&gt;さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。&lt;/p&gt;
+
+&lt;p&gt;ですが&lt;strong&gt;個人的には&lt;/strong&gt;あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。&lt;/p&gt;
+
+&lt;p&gt;でも、全否定はしません。アプリの作りを変えられないケースもあるかと思います。&lt;/p&gt;
+
+&lt;p&gt;そこで、もしAzureでファイル共有が必要であれば、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/&#34;&gt;Azure File Storage&lt;/a&gt;を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。&lt;/p&gt;
+
+&lt;p&gt;対応プロトコルは、SMB2.&lt;sup&gt;1&lt;/sup&gt;&amp;frasl;&lt;sub&gt;3&lt;/sub&gt;.0。LinuxからはNFSじゃなくSMBでつついてください。&lt;/p&gt;
+
+&lt;p&gt;使い方は公式ドキュメントを。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares&#34;&gt;&amp;ldquo;Azure Storage での Azure CLI の使用&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/&#34;&gt;&amp;ldquo;Linux で Azure File Storage を使用する方法&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;もうちょっと情報欲しいですね。補足のためにわたしも流します。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba&#34;&gt;Azure CLIでストレージアカウントを作成し、ファイル共有を設定&lt;/h2&gt;
+
+&lt;p&gt;ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account create tomakabefspoc -l &amp;quot;Japan East&amp;quot; --type LRS -g fspoc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account connectionstring show tomakabefspoc -g fspoc
+info:    Executing command storage account connectionstring show
++ Getting storage account keys
+data:    connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==
+info:    storage account connectionstring show command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;shareを作成します。share名はfspocshareとしました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage share create -a tomakabefspoc -k qwertyuiopasdfghjklzxcvbnm== fspocshare
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;エンドポイントを確認しておきましょう。VMからのマウントの際に必要です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;local$ azure storage account show tomakabefspoc -g fspoc
+[snip]
+data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;linux-2vmで共有:fa176ff87dca43c3d098f48095435bba&#34;&gt;Linux * 2VMで共有&lt;/h2&gt;
+
+&lt;p&gt;Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/&#34;&gt;Marketplace提供のUbuntu14.04LTS&lt;/a&gt;であれば、すでに入ってるはずです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo apt-get install cifs-utils
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;マウントポイントを作り、マウントします。接続先の指定はエンドポイント+share名で。usernameはストレージアカウント名。パスワードはストレージアカウントのキーです。
+パーミッションは要件に合わせてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo mkdir -p /mnt/fspoc
+fspocvm01:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;マウント完了。確認用のファイルを作っておきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ echo &amp;quot;test&amp;quot; &amp;gt; /mnt/fspoc/test.txt
+fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2台目のVMでも同様のマウント作業を。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ sudo apt-get install cifs-utils
+fspocvm02:~$ sudo mkdir -p /mnt/fspoc
+fspocvm02:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;1台目で作ったファイルが見えますね。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ ls /mnt/fspoc
+test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ファイルをいじりましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm02:~$ echo &amp;quot;onemoretest&amp;quot; &amp;gt;&amp;gt; /mnt/fspoc/test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;1台目から確認。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ご利用は計画的に:fa176ff87dca43c3d098f48095435bba&#34;&gt;ご利用は計画的に&lt;/h2&gt;
+
+&lt;p&gt;2016/2月時点でAzure File Storageは最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、&lt;a href=&#34;https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/&#34;&gt;Lustre&lt;/a&gt;など別の共有方法を検討してください。&lt;/p&gt;
+
+&lt;p&gt;なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
