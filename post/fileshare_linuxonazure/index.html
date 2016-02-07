@@ -109,7 +109,7 @@
 
 <p>そこで、もしAzureでファイル共有が必要であれば、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/">Azure File Storage</a>を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。</p>
 
-<p>対応プロトコルは、SMB2.<sup>1</sup>&frasl;<sub>3</sub>.0。LinuxからはNFSじゃなくSMBでつついてください。</p>
+<p>対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。</p>
 
 <p>使い方は公式ドキュメントを。</p>
 
@@ -149,7 +149,7 @@ data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 
 <h2 id="linux-2vmで共有:fa176ff87dca43c3d098f48095435bba">Linux * 2VMで共有</h2>
 
-<p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供のUbuntu14.04LTS</a>であれば、すでに入ってるはずです。</p>
+<p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
 
 <pre><code>fspocvm01:~$ sudo apt-get install cifs-utils
 </code></pre>
