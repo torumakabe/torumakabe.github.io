@@ -101,12 +101,12 @@
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th align=&#34;right&#34;&gt;(  No ))&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;(  OS  )&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;(  接続  )&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;(  クライアント  )&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;(  並行数  )&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;(  転送時間(秒) )&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;実行No&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;クライアントOS&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;ネットワーク接続タイプ&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;クライアントソフトウェア&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;並行数&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;転送時間(秒)&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 
@@ -187,7 +187,7 @@
 &lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;50.10&lt;/td&gt;
 &lt;/tr&gt;
@@ -250,7 +250,7 @@
 &lt;td align=&#34;right&#34;&gt;16&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;54.63&lt;/td&gt;
 &lt;/tr&gt;
@@ -286,7 +286,7 @@
 &lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Mac OS X&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;58.20&lt;/td&gt;
 &lt;/tr&gt;
