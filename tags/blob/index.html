@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blob &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Blob &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Blob &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">07 Feb 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azureblobupload_perf/" class="post-title">Azure Blob Upload ツール別ベンチマーク</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c">同じ目的を達成できるツールがたくさん</h2>
+
+<p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
+
+<p>端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。</p>
+
+<p>そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。</p>
+
+<p>で、大事なのは並列度。ブロックBlobはブロックを並列に転送する方式がとれるため、ツールが並列転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。</p>
+
+<p>なので、どのツールがおすすめ?と聞かれても、なかなかズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
+
+<h2 id="環境と測定方式:2c3afc565a3430f70519d9c56354717c">環境と測定方式</h2>
+
+<p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
+
+<p>環境は以下の通り。</p>
+
+<ul>
+<li>Windows端末
+
+<ul>
+<li>Surface Pro 4 Core i7/16GB Memory/802.11ac</li>
+<li>1Gbps Ethernet (USB経由)</li>
+<li>Windows 10 (1511)</li>
+</ul></li>
+<li>Mac端末
+
+<ul>
+<li>Macbook 12inch Core M/8GB Memory/802.11ac</li>
+<li>USB-C&hellip; 有線テストは省きます</li>
+<li>El Capitan</li>
+</ul></li>
+<li>Wi-Fiアクセスポイント/端末間帯域
+
+<ul>
+<li>100~200Mbpsでつながっています</li>
+</ul></li>
+<li>Azureデータセンタまでの接続
+
+<ul>
+<li>日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続</li>
+<li>よってWAN側の遅延、帯域ともに条件がいい</li>
+</ul></li>
+<li>対象ツール
+
+<ul>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/">AzCopy v5.0.0.27</a> (Windowsのみ)</li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/">Azure CLI v0.9.15</a></li>
+<li><a href="http://storageexplorer.com/">Azure Storage Explorer - Cross Platform GUI v0.7</a></li>
+</ul></li>
+<li>転送ファイル
+
+<ul>
+<li>Ubuntu 15.10 ISOイメージ (647MBytes)</li>
+</ul></li>
+</ul>
+
+<p>そして測定方式。</p>
+
+<p>AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが並列度指定です。デフォルトの並列度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。</p>
+
+<pre><code>Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
+</code></pre>
+
+<p>Azure CLIも同様にMeasure-Commandで。&ndash;concurrenttaskcountで並列度を指定できますが、<a href="https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js">ソース</a>を確認したところ、並列度のデフォルトは5です。&rdquo;StorageUtil.threadsInOperation = 5;&ldquo;ですね。</p>
+
+<pre><code>Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
+</code></pre>
+
+<p>残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。</p>
+
+<pre><code>time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
+</code></pre>
+
+<p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
+
+<h2 id="結果:2c3afc565a3430f70519d9c56354717c">結果</h2>
+
+<p>並列度上げても伸びないな、というタイミングまで上げます。</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">No</th>
+<th align="left">OS</th>
+<th align="left">接続</th>
+<th align="left">クライアント</th>
+<th align="right">並行数</th>
+<th align="right">転送時間(秒)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">1</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">AzCopy</td>
+<td align="right">(default:32)</td>
+<td align="right">9.62</td>
+</tr>
+
+<tr>
+<td align="right">2</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">AzCopy</td>
+<td align="right">5</td>
+<td align="right">12.28</td>
+</tr>
+
+<tr>
+<td align="right">3</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">AzCopy</td>
+<td align="right">10</td>
+<td align="right">10.83</td>
+</tr>
+
+<tr>
+<td align="right">4</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">AzCopy</td>
+<td align="right">20</td>
+<td align="right">10.43</td>
+</tr>
+
+<tr>
+<td align="right">5</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">49.92</td>
+</tr>
+
+<tr>
+<td align="right">6</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">29.47</td>
+</tr>
+
+<tr>
+<td align="right">7</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">21.05</td>
+</tr>
+
+<tr>
+<td align="right">8</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">Azure CLI</td>
+<td align="right">40</td>
+<td align="right">20.12</td>
+</tr>
+
+<tr>
+<td align="right">9</td>
+<td align="left">Windows 10</td>
+<td align="left">1Gbps Ethernet</td>
+<td align="left">Azure Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">50.10</td>
+</tr>
+
+<tr>
+<td align="right">10</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">AzCopy</td>
+<td align="right">(default:32)</td>
+<td align="right">74.87</td>
+</tr>
+
+<tr>
+<td align="right">11</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">AzCopy</td>
+<td align="right">5</td>
+<td align="right">53.32</td>
+</tr>
+
+<tr>
+<td align="right">12</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">AzCopy</td>
+<td align="right">10</td>
+<td align="right">58.85</td>
+</tr>
+
+<tr>
+<td align="right">13</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">57.23</td>
+</tr>
+
+<tr>
+<td align="right">14</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">50.71</td>
+</tr>
+
+<tr>
+<td align="right">15</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">54.37</td>
+</tr>
+
+<tr>
+<td align="right">16</td>
+<td align="left">Windows 10</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">54.63</td>
+</tr>
+
+<tr>
+<td align="right">17</td>
+<td align="left">Mac OS X</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">40.86</td>
+</tr>
+
+<tr>
+<td align="right">18</td>
+<td align="left">Mac OS X</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">33.97</td>
+</tr>
+
+<tr>
+<td align="right">19</td>
+<td align="left">Mac OS X</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">58.57</td>
+</tr>
+
+<tr>
+<td align="right">20</td>
+<td align="left">Mac OS X</td>
+<td align="left">802.11ac</td>
+<td align="left">Azure Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">58.20</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="考察:2c3afc565a3430f70519d9c56354717c">考察</h2>
+
+<ul>
+<li>有線AzCopy早い。単純計算で67MByte/s(480Mbps)出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>
+<li>並列度は大きく性能に影響します。
+
+<ul>
+<li>並列度が高すぎてもだめ
+
+<ul>
+<li>無線AzCopyのデフォルト(並列度32)が並列度10、20より時間がかかっていることからわかる</li>
+</ul></li>
+<li>デフォルトで遅いからといってあきらめず、並列度変えて試してみましょう</li>
+<li>SDK使って自分で作る時も同じ。並列度パラメータを意識してください
+
+<ul>
+<li>.NET: BlobRequestOptions</li>
+<li>Java/Android: BlobRequestOptions.setConcurrentRequestCount()</li>
+<li>Node.js: parallelOperationThreadCount</li>
+<li>C++: blob_request_options::set_parallelism_factor</li>
+</ul></li>
+</ul></li>
+<li>Azure CLIよりAzCopyが早い。
+
+<ul>
+<li>.NETで最適化できているから合点</li>
+<li>Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い</li>
+<li>でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる</li>
+<li>No.18の結果は無線状態がよかったと想定</li>
+</ul></li>
+<li>Azure Storage Explorer Cross Platform GUIは、現時点で並列度変えられないので性能面では不利。でも直観的なので、使い分け。</li>
+</ul>
+
+<p>WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な並列度が変わってくるはずです。</p>
+
+<p>でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

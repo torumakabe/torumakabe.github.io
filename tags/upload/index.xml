@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Upload on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/upload/</link>
+    <description>Recent content in Upload on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 07 Feb 2016 17:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/upload/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Blob Upload ツール別ベンチマーク</title>
+      <link>http://torumakabe.github.io/post/azureblobupload_perf/</link>
+      <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
+      <description>
+
+&lt;h2 id=&#34;同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c&#34;&gt;同じ目的を達成できるツールがたくさん&lt;/h2&gt;
+
+&lt;p&gt;やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。&lt;/p&gt;
+
+&lt;p&gt;端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。&lt;/p&gt;
+
+&lt;p&gt;そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。&lt;/p&gt;
+
+&lt;p&gt;で、大事なのは並列度。ブロックBlobはブロックを並列に転送する方式がとれるため、ツールが並列転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。&lt;/p&gt;
+
+&lt;p&gt;なので、どのツールがおすすめ?と聞かれても、なかなかズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。&lt;/p&gt;
+
+&lt;h2 id=&#34;環境と測定方式:2c3afc565a3430f70519d9c56354717c&#34;&gt;環境と測定方式&lt;/h2&gt;
+
+&lt;p&gt;おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。&lt;/p&gt;
+
+&lt;p&gt;環境は以下の通り。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Windows端末
+
+&lt;ul&gt;
+&lt;li&gt;Surface Pro 4 Core i7/16GB Memory/802.11ac&lt;/li&gt;
+&lt;li&gt;1Gbps Ethernet (USB経由)&lt;/li&gt;
+&lt;li&gt;Windows 10 (1511)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Mac端末
+
+&lt;ul&gt;
+&lt;li&gt;Macbook 12inch Core M/8GB Memory/802.11ac&lt;/li&gt;
+&lt;li&gt;USB-C&amp;hellip; 有線テストは省きます&lt;/li&gt;
+&lt;li&gt;El Capitan&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Wi-Fiアクセスポイント/端末間帯域
+
+&lt;ul&gt;
+&lt;li&gt;100~200Mbpsでつながっています&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azureデータセンタまでの接続
+
+&lt;ul&gt;
+&lt;li&gt;日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続&lt;/li&gt;
+&lt;li&gt;よってWAN側の遅延、帯域ともに条件がいい&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;対象ツール
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/&#34;&gt;AzCopy v5.0.0.27&lt;/a&gt; (Windowsのみ)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/&#34;&gt;Azure CLI v0.9.15&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://storageexplorer.com/&#34;&gt;Azure Storage Explorer - Cross Platform GUI v0.7&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;転送ファイル
+
+&lt;ul&gt;
+&lt;li&gt;Ubuntu 15.10 ISOイメージ (647MBytes)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;そして測定方式。&lt;/p&gt;
+
+&lt;p&gt;AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが並列度指定です。デフォルトの並列度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Azure CLIも同様にMeasure-Commandで。&amp;ndash;concurrenttaskcountで並列度を指定できますが、&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js&#34;&gt;ソース&lt;/a&gt;を確認したところ、並列度のデフォルトは5です。&amp;rdquo;StorageUtil.threadsInOperation = 5;&amp;ldquo;ですね。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。&lt;/p&gt;
+
+&lt;h2 id=&#34;結果:2c3afc565a3430f70519d9c56354717c&#34;&gt;結果&lt;/h2&gt;
+
+&lt;p&gt;並列度上げても伸びないな、というタイミングまで上げます。&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;right&#34;&gt;No&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;OS&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;接続&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;クライアント&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;並行数&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;転送時間(秒)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;(default:32)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9.62&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;12.28&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10.83&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10.43&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;49.92&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;29.47&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;7&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;21.05&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;8&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;40&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20.12&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1Gbps Ethernet&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;50.10&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;(default:32)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;74.87&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;11&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;53.32&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;12&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;AzCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.85&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;13&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;57.23&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;14&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;50.71&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;15&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54.37&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;16&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Windows 10&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;54.63&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;17&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mac OS X&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;40.86&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mac OS X&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;33.97&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;19&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mac OS X&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure CLI&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.57&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Mac OS X&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;802.11ac&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Azure Storage Explorer&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;58.20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;考察:2c3afc565a3430f70519d9c56354717c&#34;&gt;考察&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;有線AzCopy早い。単純計算で67MByte/s(480Mbps)出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。&lt;/li&gt;
+&lt;li&gt;並列度は大きく性能に影響します。
+
+&lt;ul&gt;
+&lt;li&gt;並列度が高すぎてもだめ
+
+&lt;ul&gt;
+&lt;li&gt;無線AzCopyのデフォルト(並列度32)が並列度10、20より時間がかかっていることからわかる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;デフォルトで遅いからといってあきらめず、並列度変えて試してみましょう&lt;/li&gt;
+&lt;li&gt;SDK使って自分で作る時も同じ。並列度パラメータを意識してください
+
+&lt;ul&gt;
+&lt;li&gt;.NET: BlobRequestOptions&lt;/li&gt;
+&lt;li&gt;Java/Android: BlobRequestOptions.setConcurrentRequestCount()&lt;/li&gt;
+&lt;li&gt;Node.js: parallelOperationThreadCount&lt;/li&gt;
+&lt;li&gt;C++: blob_request_options::set_parallelism_factor&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azure CLIよりAzCopyが早い。
+
+&lt;ul&gt;
+&lt;li&gt;.NETで最適化できているから合点&lt;/li&gt;
+&lt;li&gt;Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い&lt;/li&gt;
+&lt;li&gt;でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる&lt;/li&gt;
+&lt;li&gt;No.18の結果は無線状態がよかったと想定&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azure Storage Explorer Cross Platform GUIは、現時点で並列度変えられないので性能面では不利。でも直観的なので、使い分け。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な並列度が変わってくるはずです。&lt;/p&gt;
+
+&lt;p&gt;でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
