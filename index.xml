@@ -6,8 +6,79 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 11 Feb 2016 12:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 15 Feb 2016 17:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure DDoS対策ことはじめ</title>
+      <link>http://torumakabe.github.io/post/azure_ddosprotection/</link>
+      <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_ddosprotection/</guid>
+      <description>
+
+&lt;h2 id=&#34;すこぶるfaq:4a620049922b1b54512a25b34ba773c5&#34;&gt;すこぶるFAQ&lt;/h2&gt;
+
+&lt;p&gt;攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。&lt;/p&gt;
+
+&lt;h2 id=&#34;公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5&#34;&gt;公式ホワイトペーパー&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf&#34;&gt;Microsoft Azure Network Security Whitepaper V3&lt;/a&gt;が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。&lt;/p&gt;
+
+&lt;p&gt;今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。&lt;/p&gt;
+
+&lt;h3 id=&#34;2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5&#34;&gt;2.2 Security Management and Threat Defense - Protecting against DDoS&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MicrosoftはDDoSを防ぐ仕組み提供しており、Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
+
+&lt;h2 id=&#34;azureがやってくれること:4a620049922b1b54512a25b34ba773c5&#34;&gt;Azureがやってくれること&lt;/h2&gt;
+
+&lt;p&gt;では、具体的に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、IDS/IPSがその中心です。SYN Cookieやレート制限、コネクション制限などのテクニックを使います。&lt;/p&gt;
+
+&lt;h2 id=&#34;お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5&#34;&gt;お客様対応が必要なこと&lt;/h2&gt;
+
+&lt;p&gt;ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下のような対処が有効です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;Running multiple VM instances behind a load-balanced Public IP address.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのIDS/IPSで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃など。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot; Web Server add-ons that protect against certain DoS attacks.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが&lt;a href=&#34;http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx&#34;&gt;ここ&lt;/a&gt;が参考になります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。&lt;/p&gt;
+
+&lt;h2 id=&#34;ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5&#34;&gt;ホワイトペーパーに加えて&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/cdn/&#34;&gt;CDN&lt;/a&gt;も有効ですので検討ください。2段構えでの負荷分散、防御ができます。CDNは常に揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。&lt;/p&gt;
+
+&lt;p&gt;最後に。攻撃されている感があれば、カスタマーサポートまで。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
@@ -1786,59 +1857,6 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 &lt;p&gt;いきなりnovaコマンド使えます。&lt;/p&gt;
 
 &lt;p&gt;なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>http://torumakabe.github.io/post/vagrant-openstack/</link>
-      <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
-      <description>
-
-&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
-
-&lt;p&gt;これまでHP Public Cloudむけの&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;は、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;vagrant-hp plug-in&lt;/a&gt;を&lt;a href=&#34;http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/&#34;&gt;使って&lt;/a&gt;ました。でも最近、より汎用的で開発が活発な&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;vagrant-openstack-plugin&lt;/a&gt;へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。&lt;/p&gt;
-
-&lt;p&gt;多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。&lt;/p&gt;
-
-&lt;p&gt;さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。&lt;/p&gt;
-
-&lt;h3 id=&#34;前提条件:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.6.3&lt;/li&gt;
-&lt;li&gt;vagrant-openstack-plugin 0.8.0&lt;/li&gt;
-&lt;li&gt;HP Public Cloud (2014/9/6)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;フレーバーとイメージ名は正規表現で指定できます。&lt;/li&gt;
-&lt;li&gt;OpenStack CLI群と同じ環境変数を使ってます。&lt;/li&gt;
-&lt;li&gt;Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;で、ふつーに動きます。乗り換え決定です。&lt;/p&gt;
-
-&lt;h3 id=&#34;スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;スナップショット便利&lt;/h3&gt;
-
-&lt;p&gt;vagrant-hpでは使えなかったはず。こいつは便利だ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant openstack snapshot -n lab01_snap
-==&amp;gt; default: This server instance is snapshoting!
-==&amp;gt; default: Snapshot is ok
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

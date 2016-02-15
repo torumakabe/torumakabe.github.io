@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Securty &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Securty &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Securty &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">15 Feb 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_ddosprotection/" class="post-title">Azure DDoS対策ことはじめ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="すこぶるfaq:4a620049922b1b54512a25b34ba773c5">すこぶるFAQ</h2>
+
+<p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
+
+<h2 id="公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5">公式ホワイトペーパー</h2>
+
+<p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
+
+<p>今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。</p>
+
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+
+<pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
+</code></pre>
+
+<p>MicrosoftはDDoSを防ぐ仕組み提供しており、Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
+
+<h2 id="azureがやってくれること:4a620049922b1b54512a25b34ba773c5">Azureがやってくれること</h2>
+
+<p>では、具体的に。</p>
+
+<pre><code>&quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&quot;
+</code></pre>
+
+<p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、IDS/IPSがその中心です。SYN Cookieやレート制限、コネクション制限などのテクニックを使います。</p>
+
+<h2 id="お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5">お客様対応が必要なこと</h2>
+
+<p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
+
+<pre><code>&quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&quot;
+</code></pre>
+
+<p>以下のような対処が有効です。</p>
+
+<pre><code>&quot;Running multiple VM instances behind a load-balanced Public IP address.&quot;
+</code></pre>
+
+<p>攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのIDS/IPSで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。</p>
+
+<pre><code>&quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&quot;
+</code></pre>
+
+<p>WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃など。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。</p>
+
+<pre><code>&quot; Web Server add-ons that protect against certain DoS attacks.&quot;
+</code></pre>
+
+<p>Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが<a href="http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx">ここ</a>が参考になります。</p>
+
+<pre><code>&quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&quot;
+</code></pre>
+
+<p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
+
+<h2 id="ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5">ホワイトペーパーに加えて</h2>
+
+<p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。CDNは常に揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。</p>
+
+<p>最後に。攻撃されている感があれば、カスタマーサポートまで。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
