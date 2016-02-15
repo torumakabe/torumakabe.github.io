@@ -32,7 +32,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;MicrosoftはDDoSを防ぐ仕組み提供しており、Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
+&lt;p&gt;MicrosoftはDDoSを防ぐ仕組みを提供しており、Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
 
 &lt;h2 id=&#34;azureがやってくれること:4a620049922b1b54512a25b34ba773c5&#34;&gt;Azureがやってくれること&lt;/h2&gt;
 
