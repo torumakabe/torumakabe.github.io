@@ -41,7 +41,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、IDS/IPSがその中心です。SYN Cookieやレート制限、コネクション制限などのテクニックを使います。&lt;/p&gt;
+&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、ファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使います。&lt;/p&gt;
 
 &lt;h2 id=&#34;お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5&#34;&gt;お客様対応が必要なこと&lt;/h2&gt;
 
@@ -55,7 +55,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;Running multiple VM instances behind a load-balanced Public IP address.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのIDS/IPSで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。&lt;/p&gt;
+&lt;p&gt;攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのDDoS防御システムで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
