@@ -32,7 +32,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;MicrosoftはDDoSを防ぐ仕組みを提供しており、Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
+&lt;p&gt;MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
 
 &lt;h2 id=&#34;azureがやってくれること:4a620049922b1b54512a25b34ba773c5&#34;&gt;Azureがやってくれること&lt;/h2&gt;
 
@@ -41,7 +41,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、ファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使います。&lt;/p&gt;
+&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。&lt;/p&gt;
 
 &lt;h2 id=&#34;お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5&#34;&gt;お客様対応が必要なこと&lt;/h2&gt;
 
@@ -60,7 +60,7 @@
 &lt;pre&gt;&lt;code&gt;&amp;quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃など。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。&lt;/p&gt;
+&lt;p&gt;WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃などです。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;quot; Web Server add-ons that protect against certain DoS attacks.&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
