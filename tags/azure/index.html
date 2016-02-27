@@ -68,6 +68,171 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">27 Feb 2016, 12:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_tf_arm_sp/" class="post-title">TerraformをAzure ARMで使う時の認証</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="高まってまいりました:dfc3556fff242cb82e1ca9532877c49b">高まってまいりました</h2>
+
+<p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
+
+<p>Terraformのマイナーバージョンアップのたびに、<a href="https://www.terraform.io/docs/providers/azurerm/index.html">Azure Resource Manager Providerのリソース</a>が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。</p>
+
+<p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
+
+<h2 id="client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b">client_id/client_secret って何よ</h2>
+
+<p>以下がARM向けのProvider設定です。</p>
+
+<pre><code># Configure the Azure Resource Manager Provider
+provider &quot;azurerm&quot; {
+  subscription_id = &quot;...&quot;
+  client_id       = &quot;...&quot;
+  client_secret   = &quot;...&quot;
+  tenant_id       = &quot;...&quot;
+}
+</code></pre>
+
+<p>subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、*client_id/client_secret って何よ*。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。</p>
+
+<h2 id="サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b">サービスプリンシパルを使おう</h2>
+
+<p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/#--azure-cli">&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;</a></p>
+
+<p>以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</p>
+
+<p>まずは、Terraformをアプリとして登録します。&ndash;identifier-urisはユニークにしなければいけません。</p>
+
+<pre><code>$ azure ad app create --name &quot;My Terraform&quot; --home-page &quot;http://tftest.makabe.info&quot; --identifier-uris &quot;http://tftest.makabe.info&quot; --password pAssw0rd%
+info:    Executing command ad app create
++ Creating application My Terraform
+data:    AppId:                   AppId-AppId-AppId-AppId-AppId
+data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
+data:    DisplayName:             My Terraform
+data:    IdentifierUris:          0=http://tftest.makabe.me
+data:    ReplyUrls:
+data:    AvailableToOtherTenants:  False
+data:    AppPermissions:
+data:                             claimValue:  user_impersonation
+data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
+data:                             directAccessGrantTypes:
+data:                             displayName:  Access My Terraform
+data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
+data:                             isDisabled:
+data:                             origin:  Application
+data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
+data:                             resourceScopeType:  Personal
+data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
+data:                             userConsentDisplayName:  Access My Terraform
+data:                             lang:
+info:    ad app create command OK
+</code></pre>
+
+<p>次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。</p>
+
+<pre><code>$ azure ad sp create AppId-AppId-AppId-AppId-AppId
+info:    Executing command ad sp create
++ Creating service principal for application AppId-AppId-AppId-AppId-AppId
+data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
+data:    Display Name:            My Terraform
+data:    Service Principal Names:
+data:                             AppId-AppId-AppId-AppId-AppId
+data:                             http://tftest.makabe.me
+info:    ad sp create command OK
+</code></pre>
+
+<p>サービスプリンシパルの役割を設定します。&ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。</p>
+
+<p>この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。</p>
+
+<pre><code>$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
+info:    Executing command role assignment create
++ Finding role with specified name
+/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
+data:    RoleDefinitionName   : Contributor
+data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
+data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
+data:    Display Name         : My Terraform
+data:    SignInName           :
+data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
+data:    ObjectType           : ServicePrincipal
+data:
++
+info:    role assignment create command OK
+</code></pre>
+
+<p>サービスプリンシパルまわりの設定は以上です。</p>
+
+<p>テナントIDを確認しておきましょう。</p>
+
+<pre><code>$ azure account list --json
+[
+  {
+    &quot;id&quot;: &quot;SubId-SubId-SubId-SubId-SubId&quot;,
+    &quot;name&quot;: &quot;Your Subscription Name&quot;,
+    &quot;user&quot;: {
+      &quot;name&quot;: &quot;abc@microsoft.com&quot;,
+      &quot;type&quot;: &quot;user&quot;
+    },
+    &quot;tenantId&quot;: &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;,
+    &quot;state&quot;: &quot;Enabled&quot;,
+    &quot;isDefault&quot;: true,
+    &quot;registeredProviders&quot;: [],
+    &quot;environmentName&quot;: &quot;AzureCloud&quot;
+  }
+]
+</code></pre>
+
+<p>これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。</p>
+
+<pre><code># Configure the Azure Resource Manager Provider
+provider &quot;azurerm&quot; {
+  subscription_id = &quot;SubId-SubId-SubId-SubId-SubId&quot;
+  client_id       = &quot;AppId-AppId-AppId-AppId-AppId&quot;
+  client_secret   = &quot;pAssw0rd%&quot;
+  tenant_id       = &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;
+}
+
+# Create a resource group
+resource &quot;azurerm_resource_group&quot; &quot;test&quot; {
+    name     = &quot;test&quot;
+    location = &quot;Japan West&quot;
+}
+</code></pre>
+
+<p>appy。もちろんplanしましたよ。</p>
+
+<pre><code>$ terraform apply
+azurerm_resource_group.test: Creating...
+  location: &quot;&quot; =&gt; &quot;japanwest&quot;
+  name:     &quot;&quot; =&gt; &quot;test&quot;
+azurerm_resource_group.test: Creation complete
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
+</code></pre>
+
+<p>これで、ARM認証難民がうまれませんように。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">15 Feb 2016, 17:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -776,184 +941,6 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 </code></pre>
 
 <p>2本束ねて9,912IOPS。1本あたりほぼ5,000IOPS。ほぼ期待値。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">24 Jan 2016, 00:19</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/doubt_lackofperf_oncloud/" class="post-title">クラウドは本当に性能不足なのか</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p><strong>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。</strong></p>
-
-<h2 id="具体的な数値で-正しい理解を:d3d20b8a9dfb8ebe2c80e0d21980dbd3">具体的な数値で、正しい理解を</h2>
-
-<p><a href="http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/">&ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;</a>という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。</p>
-
-<p>記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。</p>
-
-<p>どんな技術、製品、サービスにも限界や制約はあります。具体的な数値や仕様で語らないと、そこから都市伝説が生まれます。</p>
-
-<p>いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。</p>
-
-<h2 id="シングルvmでどれだけ:d3d20b8a9dfb8ebe2c80e0d21980dbd3">シングルVMでどれだけ</h2>
-
-<p>話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。</p>
-
-<p>わたしは原理主義者ではないので「クラウドに載せたかったら、そのシステムを作り直せ」とは思いません。作りを大きく変えなくても載せられる、それでクラウドの特徴を活かして幸せになれるのであれば、それでいいです。もちろん最適化するにこしたことはありませんが。</p>
-
-<p>となると、クラウド活用の検討を進めるか、あきらめるか、判断材料のひとつは「スケールアウトできなくても、性能足りるか?」です。</p>
-
-<p>この場合、1サーバ、VMあたりの性能上限が制約です。なので、AzureのシングルVM性能が鍵になります。</p>
-
-<p>では、Azureの仮想マシンの提供リソースを確認しましょう。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/">&ldquo;仮想マシンのサイズ&rdquo;</a></p>
-
-<p>ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。</p>
-
-<p>企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。</p>
-
-<ul>
-<li>Standard_GS5の主な仕様
-
-<ul>
-<li>32仮想CPUコア</li>
-<li>448GBメモリ</li>
-<li>80,000IOPS</li>
-</ul></li>
-</ul>
-
-<p>メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。</p>
-
-<p>なお、<strong>現時点で</strong>まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。</p>
-
-<h2 id="32仮想cpuコアの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">32仮想CPUコアの規模感</h2>
-
-<p>クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/#-3">&ldquo;パフォーマンスに関する考慮事項&rdquo;</a></p>
-
-<p>ACUはAzure内で相対評価をする場合にはいいのですが、「じゃあAzureの外からシステムもってきたとき、実際どのくらいさばけるのよ。いま持ってる/買えるサーバ製品でいうと、どのくらいよ」という問いには向きません。</p>
-
-<p>クラウドや仮想化に関わらず、アプリの作りと処理するデータ、ハードの組み合わせで性能は変わります。動かしてみるのが一番です。せっかくイニシャルコストのかからないクラウドです。試しましょう。でもその前に、試す価値があるか判断しなければいけない。なにかしらの参考値が欲しい。予算と組織で動いてますから。わかります。</p>
-
-<p>では例をあげましょう。<strong>俺のベンチマーク</strong>を出したいところですが、「それじゃない」と突っ込まれそうです。ここはぐっと我慢して、企業でよく使われているERP、SAPのSAP SDベンチマークにしましょう。</p>
-
-<p><a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">&ldquo;SAP Standard Application Benchmarks in Cloud Environments&rdquo;</a></p>
-
-<p><a href="http://global.sap.com/campaigns/benchmark/index.epx">&ldquo;SAP Standard Application Benchmarks&rdquo;</a></p>
-
-<p>SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。</p>
-
-<p>比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。</p>
-
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C91D3C5AFFF9A4689C82EA97027CDF4A42858AD1610A3F732">DELL R720</a></th>
-<th align="left"><a href="http://global.sap.com/campaigns/benchmark/assets/Cert15038.pdf">Azure VM GS5</a></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7CFDB9CAEA540B6F601993E4359AB45BEF7ED0949D1BFF155D">NEC R120f-2M</a></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C14B03FD143D20C6C90E8F6DEAA4E15F8090BA77A6249E1D0">FUJITSU RX4770 M2</a></th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Date</td>
-<td align="left"><sup>2012</sup>&frasl;<sub>4</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>9</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>7</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>7</sub></td>
-</tr>
-
-<tr>
-<td align="left">CPU Type</td>
-<td align="left">Intel Xeon Processor E5-2690</td>
-<td align="left">Intel Xeon Processor E5-2698B v3</td>
-<td align="left">Intel Xeon Processor E5-2699 v3</td>
-<td align="left">Intel Xeon Processor E7-8890 v3</td>
-</tr>
-
-<tr>
-<td align="left">CPU Sockets</td>
-<td align="left">2</td>
-<td align="left">2</td>
-<td align="left">2</td>
-<td align="left">4</td>
-</tr>
-
-<tr>
-<td align="left">CPU Cores</td>
-<td align="left">16</td>
-<td align="left">32 (Virtual)</td>
-<td align="left">36</td>
-<td align="left">72</td>
-</tr>
-
-<tr>
-<td align="left">SD Benchmark Users</td>
-<td align="left">6,500</td>
-<td align="left">7,600</td>
-<td align="left">14,440</td>
-<td align="left">29,750</td>
-</tr>
-
-<tr>
-<td align="left">SAPS</td>
-<td align="left">35,970</td>
-<td align="left">41,670</td>
-<td align="left">79,880</td>
-<td align="left">162,500</td>
-</tr>
-</tbody>
-</table>
-
-<p>3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。</p>
-
-<p>なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は<a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">3-Tierベンチマーク</a>で確認できます。<a href="http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx">Azure上で247,880SAPS</a>出たそうです。</p>
-
-<h2 id="80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">80,000IOPSの規模感</h2>
-
-<p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
-
-<p>一般的に企業で使われているディスクアレイに載っているHDDのIOPSは、1本あたりおおよそ200です。IOPSに影響する要素は回転数で、よく回る15,000rpm FC/SAS HDDでだいたいこのくらい。</p>
-
-<p>なので80,000 / 200 = 400。よって80,000IOPSを達成しようとすると、HDDを400本並べないといけません。小さくないです。</p>
-
-<p>もちろんディスクアレイにはキャッシュがあるので、キャッシュヒット次第でIOPSは変わります。ベンダが胸を張って公開している値も、キャッシュに当てまくった数字であることが多いです。ですが誠実な技術者は「水物」なキャッシュヒットを前提にサイジングしません。アプリがアレイを占有できて、扱うデータの量や中身に変化がない場合は別ですが、それはまれでしょう。ヒットしない最悪の場合を考慮するはずです。</p>
-
-<p>なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。</p>
-
-<h2 id="結論:d3d20b8a9dfb8ebe2c80e0d21980dbd3">結論</h2>
-
-<ul>
-<li>Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり</li>
-<li>メモリが448GB以上必要であれば難しい</li>
-<li>サーバあたり80,000IOPS以上必要であれば難しい、でも本当にサーバあたりそれだけ必要か精査すべき</li>
-</ul>
-
-<p>ちょっと前までオンプレ案件も担当していましたが、ここ数年は2ソケットサーバ案件中心、ときどき、4ソケット以上で興奮。という感覚です。みなさんはいかがでしょう。データはないのでご参考まで。</p>
-
-<p>なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">&ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&rdquo;</a></p>
 
                     </div>
                 </section>

@@ -6,8 +6,161 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 15 Feb 2016 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 27 Feb 2016 12:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>TerraformをAzure ARMで使う時の認証</title>
+      <link>http://torumakabe.github.io/post/azure_tf_arm_sp/</link>
+      <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <description>
+
+&lt;h2 id=&#34;高まってまいりました:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;高まってまいりました&lt;/h2&gt;
+
+&lt;p&gt;全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。&lt;/p&gt;
+
+&lt;p&gt;Terraformのマイナーバージョンアップのたびに、&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/index.html&#34;&gt;Azure Resource Manager Providerのリソース&lt;/a&gt;が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。&lt;/p&gt;
+
+&lt;p&gt;そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。&lt;/p&gt;
+
+&lt;h2 id=&#34;client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
+
+&lt;p&gt;以下がARM向けのProvider設定です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
+provider &amp;quot;azurerm&amp;quot; {
+  subscription_id = &amp;quot;...&amp;quot;
+  client_id       = &amp;quot;...&amp;quot;
+  client_secret   = &amp;quot;...&amp;quot;
+  tenant_id       = &amp;quot;...&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、*client_id/client_secret って何よ*。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。&lt;/p&gt;
+
+&lt;h2 id=&#34;サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
+
+&lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/#--azure-cli&#34;&gt;&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。&lt;/p&gt;
+
+&lt;p&gt;まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisはユニークにしなければいけません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure ad app create --name &amp;quot;My Terraform&amp;quot; --home-page &amp;quot;http://tftest.makabe.info&amp;quot; --identifier-uris &amp;quot;http://tftest.makabe.info&amp;quot; --password pAssw0rd%
+info:    Executing command ad app create
++ Creating application My Terraform
+data:    AppId:                   AppId-AppId-AppId-AppId-AppId
+data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
+data:    DisplayName:             My Terraform
+data:    IdentifierUris:          0=http://tftest.makabe.me
+data:    ReplyUrls:
+data:    AvailableToOtherTenants:  False
+data:    AppPermissions:
+data:                             claimValue:  user_impersonation
+data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
+data:                             directAccessGrantTypes:
+data:                             displayName:  Access My Terraform
+data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
+data:                             isDisabled:
+data:                             origin:  Application
+data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
+data:                             resourceScopeType:  Personal
+data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
+data:                             userConsentDisplayName:  Access My Terraform
+data:                             lang:
+info:    ad app create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure ad sp create AppId-AppId-AppId-AppId-AppId
+info:    Executing command ad sp create
++ Creating service principal for application AppId-AppId-AppId-AppId-AppId
+data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
+data:    Display Name:            My Terraform
+data:    Service Principal Names:
+data:                             AppId-AppId-AppId-AppId-AppId
+data:                             http://tftest.makabe.me
+info:    ad sp create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスプリンシパルの役割を設定します。&amp;ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。&lt;/p&gt;
+
+&lt;p&gt;この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
+info:    Executing command role assignment create
++ Finding role with specified name
+/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
+data:    RoleDefinitionName   : Contributor
+data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
+data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
+data:    Display Name         : My Terraform
+data:    SignInName           :
+data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
+data:    ObjectType           : ServicePrincipal
+data:
++
+info:    role assignment create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスプリンシパルまわりの設定は以上です。&lt;/p&gt;
+
+&lt;p&gt;テナントIDを確認しておきましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure account list --json
+[
+  {
+    &amp;quot;id&amp;quot;: &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;,
+    &amp;quot;name&amp;quot;: &amp;quot;Your Subscription Name&amp;quot;,
+    &amp;quot;user&amp;quot;: {
+      &amp;quot;name&amp;quot;: &amp;quot;abc@microsoft.com&amp;quot;,
+      &amp;quot;type&amp;quot;: &amp;quot;user&amp;quot;
+    },
+    &amp;quot;tenantId&amp;quot;: &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;,
+    &amp;quot;state&amp;quot;: &amp;quot;Enabled&amp;quot;,
+    &amp;quot;isDefault&amp;quot;: true,
+    &amp;quot;registeredProviders&amp;quot;: [],
+    &amp;quot;environmentName&amp;quot;: &amp;quot;AzureCloud&amp;quot;
+  }
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
+provider &amp;quot;azurerm&amp;quot; {
+  subscription_id = &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;
+  client_id       = &amp;quot;AppId-AppId-AppId-AppId-AppId&amp;quot;
+  client_secret   = &amp;quot;pAssw0rd%&amp;quot;
+  tenant_id       = &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;
+}
+
+# Create a resource group
+resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;test&amp;quot; {
+    name     = &amp;quot;test&amp;quot;
+    location = &amp;quot;Japan West&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;appy。もちろんplanしましたよ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform apply
+azurerm_resource_group.test: Creating...
+  location: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;japanwest&amp;quot;
+  name:     &amp;quot;&amp;quot; =&amp;gt; &amp;quot;test&amp;quot;
+azurerm_resource_group.test: Creation complete
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで、ARM認証難民がうまれませんように。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure DDoS対策ことはじめ</title>
@@ -1721,144 +1874,6 @@ The state of your infrastructure has been saved to the path below. This state is
 &lt;p&gt;*Trove*です。若さと期待の大きさを込めてキャスティングしました。というか&lt;a href=&#34;http://www.publickey1.jp/blog/14/paasdbaasapaas12amazonidc_japan.html&#34;&gt;これ&lt;/a&gt;を見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。&lt;/p&gt;
 
 &lt;p&gt;2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OpenStackのツール環境をImmutableに整える</title>
-      <link>http://torumakabe.github.io/post/openstack-tools/</link>
-      <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
-      <description>
-
-&lt;h3 id=&#34;タイトルは釣りです:06c978f415868c5d089a8460c0068f0d&#34;&gt;タイトルは釣りです&lt;/h3&gt;
-
-&lt;p&gt;すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;なぜ必要か:06c978f415868c5d089a8460c0068f0d&#34;&gt;なぜ必要か?&lt;/h3&gt;
-
-&lt;p&gt;いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。&lt;/p&gt;
-
-&lt;h3 id=&#34;やりたいこと:06c978f415868c5d089a8460c0068f0d&#34;&gt;やりたいこと&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい&lt;/li&gt;
-&lt;li&gt;Windows、Macどちらでも同様の環境にしたい&lt;/li&gt;
-&lt;li&gt;相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収&lt;/li&gt;
-&lt;li&gt;Windows、Mac環境を汚さない、また、汚されない&lt;/li&gt;
-&lt;li&gt;コマンド2、3発程度で、気軽に作って消せる&lt;/li&gt;
-&lt;li&gt;VMできたらすぐログイン、即OpenStack CLIが使える&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;方針:06c978f415868c5d089a8460c0068f0d&#34;&gt;方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る&lt;/li&gt;
-&lt;li&gt;VagrantでWindows/Macの違いを吸収する&lt;/li&gt;
-&lt;li&gt;VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う&lt;/li&gt;
-&lt;li&gt;構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;前提条件:06c978f415868c5d089a8460c0068f0d&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows 8.1 &amp;amp; VMware Worksation 10.0.3&lt;/li&gt;
-&lt;li&gt;OSX 10.9.4 &amp;amp; VirtualBox 4.3.16&lt;/li&gt;
-&lt;li&gt;Vagrant 1.6.5  (VMware用ライセンス買いました)&lt;/li&gt;
-&lt;li&gt;ひとまずOpenStack CLIを使えるところまで作る&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの&lt;a href=&#34;https://github.com/opscode/bento&#34;&gt;Bento&lt;/a&gt;で、事前にboxファイルを作ってます。ubuntu14.04としました。&lt;/li&gt;
-&lt;li&gt;実行ディレクトリにprovision.shを置きます。&lt;/li&gt;
-&lt;li&gt;provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。&lt;/li&gt;
-&lt;li&gt;実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;hostsファイルには以下のようにlocalhostを定義します。&lt;/p&gt;
-
-&lt;p&gt;[localhost]&lt;br /&gt;
-127.0.0.1 ansible_connection=local&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
-
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
-
-&lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
-
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;
-
-&lt;p&gt;OS_TENANT_NAME: your_tenant_name&lt;br /&gt;
-OS_USERNAME: your_username&lt;br /&gt;
-&amp;hellip;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;という感じで並べてください。.bashrcに追加されます。
-- タイムゾーンをAsia/Tokyoにします。
-- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。&lt;/p&gt;
-
-&lt;h3 id=&#34;windowsでの実行例:06c978f415868c5d089a8460c0068f0d&#34;&gt;Windowsでの実行例&lt;/h3&gt;
-
-&lt;p&gt;Vagrant &amp;amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant up
-Bringing machine &#39;default&#39; up with &#39;vmware_workstation&#39; provider...
-==&amp;gt; default: Cloning VMware VM: &#39;opscode-ubuntu1404&#39;. This can take some time...
-(snip)
-==&amp;gt; default: TASK: [install OpenStack CLIs] ************************************************
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-neutronclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-novaclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-cinderclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-swiftclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-glanceclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-troveclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-designateclient)
-==&amp;gt; default:
-==&amp;gt; default: PLAY RECAP ********************************************************************
-==&amp;gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;うまく動いたようです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant ssh
-cygwin warning:
-  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
-  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
-  CYGWIN environment variable option &amp;quot;nodosfilewarning&amp;quot; turns off this warning.
-  Consult the user&#39;s guide for more details about POSIX paths:
-    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant@vagrant:~$ nova list
-+----+------+--------+------------+-------------+----------+
-| ID | Name | Status | Task State | Power State | Networks |
-+----+------+--------+------------+-------------+----------+
-+----+------+--------+------------+-------------+----------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いきなりnovaコマンド使えます。&lt;/p&gt;
-
-&lt;p&gt;なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。&lt;/p&gt;
 </description>
     </item>
     
