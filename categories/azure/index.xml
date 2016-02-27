@@ -48,7 +48,7 @@ provider &amp;quot;azurerm&amp;quot; {
 
 &lt;p&gt;以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。&lt;/p&gt;
 
-&lt;p&gt;まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisはユニークにしなければいけません。&lt;/p&gt;
+&lt;p&gt;まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&amp;ndash;passwordはclient_secretになるので、おぼえておきましょう。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ azure ad app create --name &amp;quot;My Terraform&amp;quot; --home-page &amp;quot;http://tftest.makabe.info&amp;quot; --identifier-uris &amp;quot;http://tftest.makabe.info&amp;quot; --password pAssw0rd%
 info:    Executing command ad app create
@@ -158,7 +158,7 @@ azurerm_resource_group.test: Creation complete
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;これで、ARM認証難民がうまれませんように。&lt;/p&gt;
+&lt;p&gt;これで、ARM認証難民がうまれなくなりますように。&lt;/p&gt;
 </description>
     </item>
     
