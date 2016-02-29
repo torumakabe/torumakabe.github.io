@@ -40,11 +40,18 @@ provider &amp;quot;azurerm&amp;quot; {
 
 &lt;p&gt;subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、&lt;strong&gt;client_id/client_secret って何よ&lt;/strong&gt;。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。&lt;/p&gt;
 
+&lt;pre&gt;&lt;code&gt;&amp;quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;おっとそういうことか。OAuth。&lt;/p&gt;
+
 &lt;h2 id=&#34;サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
 
 &lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/#--azure-cli&#34;&gt;&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/&#34;&gt;&amp;ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。&lt;/p&gt;
 
