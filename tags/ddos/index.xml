@@ -27,6 +27,8 @@
 
 &lt;p&gt;今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。&lt;/p&gt;
 
+&lt;p&gt;&lt;strong&gt;2016//3/4 追記 &lt;a href=&#34;http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf&#34;&gt;日本語訳&lt;/a&gt;がありました&lt;/strong&gt;&lt;/p&gt;
+
 &lt;h3 id=&#34;2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5&#34;&gt;2.2 Security Management and Threat Defense - Protecting against DDoS&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
