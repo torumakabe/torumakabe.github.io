@@ -6,8 +6,200 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 27 Feb 2016 12:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 09 Mar 2016 16:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Terraform &amp; Azure デプロイ設計4原則</title>
+      <link>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <description>
+
+&lt;h2 id=&#34;情報がありそうでない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;情報がありそうでない&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
+
+&lt;p&gt;今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。&lt;/p&gt;
+
+&lt;p&gt;なお、考え方は他のクラウドやデプロイツールでも応用できるかと。&lt;/p&gt;
+
+&lt;h2 id=&#34;4原則:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4原則&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;セキュリティファースト&lt;/li&gt;
+&lt;li&gt;手順書をなくそう&lt;/li&gt;
+&lt;li&gt;分割境界にこだわりすぎない&lt;/li&gt;
+&lt;li&gt;早すぎる最適化は悪&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;なお、サンプルのTerraformファイル群を、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;Githubに置いて&lt;/a&gt;おきました。&lt;/p&gt;
+
+&lt;p&gt;今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.
+├── .gitignore
+├── main.tf
+├── availability_set
+│   ├── avset_backend.tf
+│   ├── avset_frontend.tf
+│   └── variables.tf
+├── network
+│   ├── sg_backend.tf
+│   ├── sg_frontend.tf
+│   ├── variables.tf
+│   └── vnets.tf
+├── storage
+│   ├── storage_backend.tf
+│   ├── storage_frontend.tf
+│   └── variables.tf
+└── terraform.tfvars
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。&lt;/p&gt;
+
+&lt;h2 id=&#34;1-セキュリティファースト:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
+
+&lt;p&gt;セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;認証情報は変数指定し、設定ファイルから読み込む&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない&lt;/li&gt;
+&lt;li&gt;terraform.tfvarsなどにまとめて書く&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Gitなら.gitignoreに指定する&lt;/li&gt;
+&lt;li&gt;.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
+
+&lt;ul&gt;
+&lt;li&gt;チームで使う場合はファイルに書かず、Consulなどのリモートバックエンドを使うと思いますが、念のため&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;RBACで必要最小限の権限を付与する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう&lt;/li&gt;
+&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ネットワークセキュリティグループはサブネットに指定しておく&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;個々のVMの管理者に任せず、サブネットで絞っておきましょう
+
+&lt;ul&gt;
+&lt;li&gt;VMはアドホックに作られるケースが多く、ルーズになりがちです&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
+
+&lt;ul&gt;
+&lt;li&gt;フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)&lt;/li&gt;
+&lt;li&gt;バックの受信はフロントサブネットからのみ許可&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;2-手順書をなくそう:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
+
+&lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
+
+&lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
+
+&lt;h2 id=&#34;3-分割境界にこだわりすぎない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
+
+&lt;p&gt;TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。&lt;/p&gt;
+
+&lt;p&gt;グルーピング、分割する目的は、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;main.tfの肥大化を防止し、コードの見通しを良くする&lt;/li&gt;
+&lt;li&gt;再利用しやすくする&lt;/li&gt;
+&lt;li&gt;責任範囲を明確化し、オーナー意識を醸成する&lt;/li&gt;
+&lt;li&gt;権限とコードを一致させる&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。&lt;/p&gt;
+
+&lt;p&gt;以下が分割単位、境界ポリシーの例です。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;リソースタイプで分割する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サンプルはその例
+
+&lt;ul&gt;
+&lt;li&gt;ネットワーク、ストレージ、VM Availability Setで分割&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;直観的&lt;/li&gt;
+&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;組織単位で分割する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4&#34;&gt;コンウェイの法則&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;リソースタイプ = 組織 という場合もある
+
+&lt;ul&gt;
+&lt;li&gt;ネットワーク管理者が別グループ、など&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;地理的に分割する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リージョンやロケーションで分割&lt;/li&gt;
+&lt;li&gt;リソースタイプと組み合わせる手もある
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;静的なリソースと動的なリソースを分ける&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;変化の頻度で分ける
+
+&lt;ul&gt;
+&lt;li&gt;ネットワークが頻繁に変わることはまれ&lt;/li&gt;
+&lt;li&gt;VMは増減が激しい&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;動的なリソースは対象から外す、別手段とする手も&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。&lt;/p&gt;
+
+&lt;h2 id=&#34;4-早すぎる最適化は悪:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
+
+&lt;p&gt;最適化できる人 = その道のエキスパート です。使い始めたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。&lt;/p&gt;
+
+&lt;p&gt;なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。&lt;/p&gt;
+
+&lt;p&gt;ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。&lt;/p&gt;
+
+&lt;p&gt;そして、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リファクタリングできるなら、する&lt;/li&gt;
+&lt;li&gt;リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす&lt;/li&gt;
+&lt;li&gt;はじめに作った人へマサカリを投げない&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;完璧を求めずにいきましょう。&lt;/p&gt;
+
+&lt;p&gt;でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
@@ -1824,65 +2016,6 @@ The state of your infrastructure has been saved to the path below. This state is
 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。&lt;/p&gt;
 
 &lt;p&gt;メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>ハンサムOpenStack</title>
-      <link>http://torumakabe.github.io/post/handsome-openstack/</link>
-      <pubDate>Sat, 06 Dec 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/handsome-openstack/</guid>
-      <description>
-
-&lt;p&gt;このエントリーは、&lt;a href=&#34;http://www.adventar.org/calendars/602&#34;&gt;OpenStack (2枚目) Advent Calendar 2014&lt;/a&gt;の6夜目担当作品です。&lt;/p&gt;
-
-&lt;h3 id=&#34;出オチ:69265e72de8632f3d558928e3a79ce26&#34;&gt;出オチ&lt;/h3&gt;
-
-&lt;p&gt;OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。&lt;/p&gt;
-
-&lt;p&gt;こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。&lt;/p&gt;
-
-&lt;h3 id=&#34;そもそも2枚目とは:69265e72de8632f3d558928e3a79ce26&#34;&gt;そもそも2枚目とは&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;「二枚目」という用語は、歌舞伎用語をもとに、江戸時代に生まれた。歌舞伎の看板は、通常は8枚から成っていた。一枚目の看板は「書き出し」と言われ、主役の名が書かれ、二枚目の看板には若い色男の役者の名が書かれることになっていた。また、三枚目の看板には道化役の名が書かれることになっていた。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://ja.wikipedia.org/wiki/%E4%BA%8C%E6%9E%9A%E7%9B%AE&#34;&gt;「二枚目」（2013年5月28日 (火) 02:17 UTCの版）『ウィキペディア日本語版』&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;8枚あるらしいぞ-いじってみよう:69265e72de8632f3d558928e3a79ce26&#34;&gt;8枚あるらしいぞ いじってみよう&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;一枚目：主役：そのまま主役。「一枚看板」という用法もある。&lt;br /&gt;
-&lt;em&gt;Novaですね。主役です。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;二枚目：色男：優男で色事担当&lt;br /&gt;
-&lt;em&gt;これはあとにとっておきましょう。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;三枚目：道化：お笑い担当&lt;br /&gt;
-&lt;em&gt;Glanceですね。何も変なことしてないのにネタにされる。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;四枚目：中軸：中堅役者　まとめ役&lt;br /&gt;
-&lt;em&gt;Cinderでしょうか。主役のNovaを活かす名脇役。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;五枚目：敵役：一般的な敵役&lt;br /&gt;
-&lt;em&gt;Heatかな。はじめのCloudFormation形式ってのが気に入らなかった。HOTが出てきたので許す。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;六枚目：実敵：憎めない善要素のある敵役&lt;br /&gt;
-&lt;em&gt;Ceilometerです。重いです。絶賛チューニング中です。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕&lt;br /&gt;
-&lt;em&gt;Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなかったのよきっと。これから良くなるよ。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;八枚目：座長：元締め&lt;br /&gt;
-&lt;em&gt;Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;じゃあ二枚目は:69265e72de8632f3d558928e3a79ce26&#34;&gt;じゃあ二枚目は?&lt;/h3&gt;
-
-&lt;p&gt;*Trove*です。若さと期待の大きさを込めてキャスティングしました。というか&lt;a href=&#34;http://www.publickey1.jp/blog/14/paasdbaasapaas12amazonidc_japan.html&#34;&gt;これ&lt;/a&gt;を見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。&lt;/p&gt;
-
-&lt;p&gt;2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。&lt;/p&gt;
 </description>
     </item>
     

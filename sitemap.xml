@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2016-02-27T12:30:00+09:00</lastmod>
+    <lastmod>2016-03-09T16:30:00+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</loc>
+    <lastmod>2016-03-09T16:30:00+09:00</lastmod>
   </url>
   
   <url>
