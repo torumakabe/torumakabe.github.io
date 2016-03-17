@@ -6,8 +6,101 @@
     <description>Recent content in Arm on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 09 Mar 2016 16:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
+      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <description>
+
+&lt;h2 id=&#34;いつの間に:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;いつの間に&lt;/h2&gt;
+
+&lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
+
+&lt;h2 id=&#34;ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
+
+&lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
+
+&lt;h3 id=&#34;前準備:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;前準備&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
+&lt;li&gt;認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。&lt;/li&gt;
+&lt;li&gt;Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
+
+&lt;ul&gt;
+&lt;li&gt;Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;サンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;サンプル&lt;/h3&gt;
+
+&lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;variables&amp;quot;: {
+    &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot;
+  },
+  &amp;quot;builders&amp;quot;: [{
+    &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;,
+
+    &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;,
+    &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;,
+    &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;,
+    &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;,
+    &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;,
+    &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;,
+
+    &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;,
+    &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;,
+
+    &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;,
+    &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;,
+    &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;,
+
+    &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;,
+    &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot;
+  }],
+  &amp;quot;provisioners&amp;quot;: [{
+    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
+      &amp;quot;scripts&amp;quot;: [
+        &amp;quot;../script/ubuntu/provision.sh&amp;quot;
+    ]
+  },
+  {
+    &amp;quot;type&amp;quot;: &amp;quot;ansible-local&amp;quot;,
+    &amp;quot;playbook_file&amp;quot;: &amp;quot;../ansible/baseimage.yml&amp;quot;,
+    &amp;quot;inventory_file&amp;quot;: &amp;quot;../ansible/hosts&amp;quot;,
+    &amp;quot;role_paths&amp;quot;: [
+      &amp;quot;../ansible/roles/baseimage&amp;quot;
+    ]
+  },
+  {
+    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
+      &amp;quot;scripts&amp;quot;: [
+        &amp;quot;../script/ubuntu/deprovision.sh&amp;quot;
+    ]
+  }]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
+
+&lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>

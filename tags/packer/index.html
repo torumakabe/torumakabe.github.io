@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packer &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Packer &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Packer &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">17 Mar 2016, 23:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/" class="post-title">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
+
+<p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
+
+<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
+
+<p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
+
+<p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
+
+<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
+
+<ul>
+<li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
+<li>認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。</li>
+<li>Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
+
+<ul>
+<li>Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。</li>
+</ul></li>
+<li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
+</ul>
+
+<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
+
+<p>ubuntu.jsonはこんな感じです。</p>
+
+<pre><code>{
+  &quot;variables&quot;: {
+    &quot;client_id&quot;: &quot;&quot;,
+    &quot;client_secret&quot;: &quot;&quot;,
+    &quot;resource_group&quot;: &quot;&quot;,
+    &quot;storage_account&quot;: &quot;&quot;,
+    &quot;subscription_id&quot;: &quot;&quot;,
+    &quot;tenant_id&quot;: &quot;&quot;
+  },
+  &quot;builders&quot;: [{
+    &quot;type&quot;: &quot;azure-arm&quot;,
+
+    &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;,
+    &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;,
+    &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;,
+    &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;,
+    &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;,
+    &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;,
+
+    &quot;capture_container_name&quot;: &quot;images&quot;,
+    &quot;capture_name_prefix&quot;: &quot;packer&quot;,
+
+    &quot;image_publisher&quot;: &quot;Canonical&quot;,
+    &quot;image_offer&quot;: &quot;UbuntuServer&quot;,
+    &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;,
+
+    &quot;location&quot;: &quot;Japan West&quot;,
+    &quot;vm_size&quot;: &quot;Standard_D1&quot;
+  }],
+  &quot;provisioners&quot;: [{
+    &quot;type&quot;: &quot;shell&quot;,
+      &quot;scripts&quot;: [
+        &quot;../script/ubuntu/provision.sh&quot;
+    ]
+  },
+  {
+    &quot;type&quot;: &quot;ansible-local&quot;,
+    &quot;playbook_file&quot;: &quot;../ansible/baseimage.yml&quot;,
+    &quot;inventory_file&quot;: &quot;../ansible/hosts&quot;,
+    &quot;role_paths&quot;: [
+      &quot;../ansible/roles/baseimage&quot;
+    ]
+  },
+  {
+    &quot;type&quot;: &quot;shell&quot;,
+      &quot;scripts&quot;: [
+        &quot;../script/ubuntu/deprovision.sh&quot;
+    ]
+  }]
+}
+</code></pre>
+
+<p>waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Github</a>でご確認を。</p>
+
+<p>これで手順書&amp;目視&amp;指差し確認でイメージ作るのを、やめられそうですね。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

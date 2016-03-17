@@ -6,8 +6,101 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 09 Mar 2016 16:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
+      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <description>
+
+&lt;h2 id=&#34;いつの間に:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;いつの間に&lt;/h2&gt;
+
+&lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
+
+&lt;h2 id=&#34;ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
+
+&lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
+
+&lt;h3 id=&#34;前準備:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;前準備&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
+&lt;li&gt;認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。&lt;/li&gt;
+&lt;li&gt;Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
+
+&lt;ul&gt;
+&lt;li&gt;Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;サンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;サンプル&lt;/h3&gt;
+
+&lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;variables&amp;quot;: {
+    &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot;
+  },
+  &amp;quot;builders&amp;quot;: [{
+    &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;,
+
+    &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;,
+    &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;,
+    &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;,
+    &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;,
+    &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;,
+    &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;,
+
+    &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;,
+    &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;,
+
+    &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;,
+    &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;,
+    &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;,
+
+    &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;,
+    &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot;
+  }],
+  &amp;quot;provisioners&amp;quot;: [{
+    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
+      &amp;quot;scripts&amp;quot;: [
+        &amp;quot;../script/ubuntu/provision.sh&amp;quot;
+    ]
+  },
+  {
+    &amp;quot;type&amp;quot;: &amp;quot;ansible-local&amp;quot;,
+    &amp;quot;playbook_file&amp;quot;: &amp;quot;../ansible/baseimage.yml&amp;quot;,
+    &amp;quot;inventory_file&amp;quot;: &amp;quot;../ansible/hosts&amp;quot;,
+    &amp;quot;role_paths&amp;quot;: [
+      &amp;quot;../ansible/roles/baseimage&amp;quot;
+    ]
+  },
+  {
+    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
+      &amp;quot;scripts&amp;quot;: [
+        &amp;quot;../script/ubuntu/deprovision.sh&amp;quot;
+    ]
+  }]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
+
+&lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
@@ -1963,59 +2056,6 @@ The state of your infrastructure has been saved to the path below. This state is
 &lt;p&gt;年末年始休暇のお楽しみが増えましたね。&lt;/p&gt;
 
 &lt;p&gt;これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp;amp; 良いお年を。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OpenStackと長期バージョン固定</title>
-      <link>http://torumakabe.github.io/post/longtermsupport/</link>
-      <pubDate>Tue, 09 Dec 2014 00:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/longtermsupport/</guid>
-      <description>
-
-&lt;p&gt;このエントリーは、&lt;a href=&#34;http://www.adventar.org/calendars/602&#34;&gt;OpenStack (2枚目) Advent Calendar 2014&lt;/a&gt;の9夜目担当作品です。&lt;/p&gt;
-
-&lt;h3 id=&#34;ソフトウェア-バージョン-サポート:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;ソフトウェア、バージョン、サポート&lt;/h3&gt;
-
-&lt;p&gt;たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。&lt;/p&gt;
-
-&lt;h3 id=&#34;進化著しいソフト-openstackでは:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;進化著しいソフト、OpenStackでは&lt;/h3&gt;
-
-&lt;p&gt;OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして&lt;a href=&#34;https://wiki.openstack.org/wiki/Releases&#34;&gt;公式サイト&lt;/a&gt;を見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。&lt;/p&gt;
-
-&lt;h3 id=&#34;でも-長期バージョン固定するとどうなるか:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;でも、長期バージョン固定するとどうなるか&lt;/h3&gt;
-
-&lt;p&gt;では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。&lt;/p&gt;
-
-&lt;p&gt;[とあるクラウド その1]&lt;br /&gt;
-- (Dev)  今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。&lt;br /&gt;
-- (Ops) あー、うちの環境Jよ。&lt;br /&gt;
-- (Dev) そうすか。じゃあ他のにするわ。&lt;/p&gt;
-
-&lt;p&gt;使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。&lt;/p&gt;
-
-&lt;p&gt;[とあるクラウド その2]&lt;br /&gt;
-- (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!!&lt;br /&gt;
-- (Dev) おーいいね。決定。3年のんびりするわ。&lt;br /&gt;
-〜3年後〜&lt;br /&gt;
-- (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!!&lt;br /&gt;
-- (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。&lt;/p&gt;
-
-&lt;p&gt;リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。&lt;/p&gt;
-
-&lt;h3 id=&#34;アップデートの仕組みに投資したほうが建設的と思う:e4bf6752a3e6bdd894e5fbbe3136fda0&#34;&gt;アップデートの仕組みに投資したほうが建設的と思う&lt;/h3&gt;
-
-&lt;p&gt;もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。&lt;/p&gt;
-
-&lt;p&gt;それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。&lt;/p&gt;
-
-&lt;p&gt;最後に、&lt;a href=&#34;http://superuser.openstack.org/articles/openstack-user-survey-insights-november-2014&#34;&gt;最新のOpenStack User Survey&lt;/a&gt;を紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。&lt;/p&gt;
-
-&lt;p&gt;OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&amp;rdquo;Ability to innovate&amp;rdquo;なんですよね。
-あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。&lt;/p&gt;
-
-&lt;p&gt;メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。&lt;/p&gt;
 </description>
     </item>
     
