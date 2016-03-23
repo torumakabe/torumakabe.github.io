@@ -39,7 +39,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。&lt;/p&gt;
+&lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。&lt;/p&gt;
 
 &lt;h2 id=&#34;背景:41e5563e03314499a86e746f2fbd113b&#34;&gt;背景&lt;/h2&gt;
 
