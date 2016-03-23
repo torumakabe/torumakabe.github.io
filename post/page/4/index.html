@@ -68,6 +68,69 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">12 Dec 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/monasca/" class="post-title">君はOpenStack Monascaを知っているか</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<p>このエントリーは、<a href="http://www.adventar.org/calendars/602">OpenStack (2枚目) Advent Calendar 2014</a>の12夜目担当作品です。</p>
+
+<h3 id="monitoring-as-a-service:a2dc20a10b2175cd92893d87c6bb4e06">Monitoring as a Service</h3>
+
+<p>監視をサービスとして提供するって、どういうことでしょうか。</p>
+
+<p>[Monitoring]<br />
+従来の監視。担当者が事前に監視項目を定義する。静的。</p>
+
+<p>[Monitoring as a Service]
+監視機能をサービスとして提供する。不特定多数のユーザーが、自分の監視したい測定項目を定義し、自分の好きなタイミングでチェックする。GUIはもちろん、APIでデータ取得できる。動的。</p>
+
+<p>まあ、AWSのCloudWatchみたいなものです。先に言うべきでしたね、すいません。</p>
+
+<p>このMonitoring as a Service、技術的なハードルは結構高いんです。刻々と上がってくるイベントをさばき、蓄積し、APIをバシバシ叩くユーザーリクエストに応えなきゃいけない。監視というと裏方のイメージがありますが、これは、対価をいただくに値する、立派なサービスです。</p>
+
+<p>そこでOpenStackのMonitoring as a Service事情はどうでしょうか。一見、それを実現できそうなCeilometerがあります。ただ、もともとCeilomerは課金のための利用情報収集をする、という生まれなので、マルチテナントで、ユーザーが自らメトリックを定義し、チェックするという使い方に向いていません。ユーザー向けというより、管理者向けなんです。</p>
+
+<p>そこで<a href="https://wiki.openstack.org/wiki/Monasca">Monasca</a>の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。</p>
+
+<p>では、アーキテクチャーを見てみましょう。<br />
+<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" />
+</p>
+
+<p>ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。</p>
+
+<p>と思っていたら。</p>
+
+<p>なんと、<a href="https://github.com/stackforge/monasca-vagrant">Monasca-Vagrant</a>なんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。</p>
+
+<h3 id="気をつけること:a2dc20a10b2175cd92893d87c6bb4e06">気をつけること</h3>
+
+<ul>
+<li>動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。</li>
+<li>Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。</li>
+<li>git cloneしたディレクトリ直下にansibleのrequirementファイルが置かれるので、そこで作業</li>
+<li>vagrant upで2つのVM、devstackとmini-monが作られる、ここは時間と帯域がいるので、スタバな人は要注意</li>
+</ul>
+
+<p>気をつけるのはこれくらいです。レッツトライ。</p>
+
+<p>年末年始休暇のお楽しみが増えましたね。</p>
+
+<p>これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp; 良いお年を。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">09 Dec 2014, 00:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -399,58 +462,6 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 ==&gt; default: This server instance is snapshoting!
 ==&gt; default: Snapshot is ok
 </code></pre>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">06 May 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/vagrant-icehouse/" class="post-title">いま最も楽にIcehouse環境を作る方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322">あえて言おう、これは甘えであると</h3>
-
-<p>現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。</p>
-
-<p>では始めましょう。<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">OpenStack Cloud Computing Cookbook</a>の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。</p>
-
-<h3 id="ほんと-これだけ:bf1ea282536d85f1cef895a583837322">ほんと、これだけ</h3>
-
-<ol>
-<li>Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">このページ</a>で確認</li>
-<li>$ vagrant plugin install vagrant-cachier</li>
-<li>$ git clone <a href="https://github.com/OpenStackCookbook/OpenStackCookbook.git">https://github.com/OpenStackCookbook/OpenStackCookbook.git</a></li>
-<li>$ cd OpenStackCookbook</li>
-<li>$ git checkout icehouse</li>
-<li>$ vagrant up</li>
-<li>何度か管理者パスワードを入力</li>
-<li>$ vagrant ssh controller</li>
-<li>$ . /vagrant/openrc</li>
-<li>$/vagrant/demo.sh</li>
-</ol>
-
-<p>以上。Horizonコンソールは <a href="http://172.16.0.200/">http://172.16.0.200/</a> から。</p>
-
-<h3 id="この環境だと30分でできた:bf1ea282536d85f1cef895a583837322">この環境だと30分でできた</h3>
-
-<ul>
-<li>Vagrant 1.5.4</li>
-<li>VirtualBox 4.3.10</li>
-<li>Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB</li>
-</ul>
-
-<p>デモや新機能の試用くらいであればこれで十分ですね。<br />
-著者に感謝。わたしは買いました。 &ndash; <a href="http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/">OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)</a></p>
 
                     </div>
                 </section>

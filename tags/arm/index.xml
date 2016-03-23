@@ -6,8 +6,78 @@
     <description>Recent content in Arm on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 23 Mar 2016 13:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure &amp; Terraform エラーコード429の対処法</title>
+      <link>http://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <description>
+
+&lt;h2 id=&#34;terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
+
+&lt;p&gt;2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。待っていた人も多いのではないでしょうか。&lt;/p&gt;
+
+&lt;p&gt;追って&lt;a href=&#34;https://www.hashicorp.com/partners.html#sipart&#34;&gt;Hashicorp認定パートナー&lt;/a&gt;のクリエーションラインさんから導入・サポートサービスが&lt;a href=&#34;http://www.creationline.com/lab/13268&#34;&gt;アナウンス&lt;/a&gt;されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。&lt;/p&gt;
+
+&lt;h2 id=&#34;エラーコード429:41e5563e03314499a86e746f2fbd113b&#34;&gt;エラーコード429&lt;/h2&gt;
+
+&lt;p&gt;さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Error applying plan:
+
+1 error(s) occurred:
+azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;autorestがステータスコード429をキャッチしました。&lt;a href=&#34;https://tools.ietf.org/html/rfc6585#section-4&#34;&gt;RFC上で429は&lt;/a&gt;&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。&lt;/p&gt;
+
+&lt;h2 id=&#34;対処法:41e5563e03314499a86e746f2fbd113b&#34;&gt;対処法&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。&lt;/p&gt;
+
+&lt;h2 id=&#34;背景:41e5563e03314499a86e746f2fbd113b&#34;&gt;背景&lt;/h2&gt;
+
+&lt;p&gt;エラーになった背景ですが、2つの可能性があります。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;APIリクエスト数上限に達した&lt;/li&gt;
+&lt;li&gt;リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b&#34;&gt;1.APIリクエスト数上限に達した&lt;/h3&gt;
+
+&lt;p&gt;Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;Azure サブスクリプションとサービスの制限、クォータ、制約&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Terraformは扱うリソースごとにAPIをコールするので、数が多いとこの上限にひっかかる可能性があります。&lt;/p&gt;
+
+&lt;p&gt;長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。&lt;/p&gt;
+
+&lt;p&gt;ひとまずプロダクトの方針は確認したいので、Issueに質問を&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5704&#34;&gt;あげておきました&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b&#34;&gt;2.リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
+
+&lt;p&gt;Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。&lt;/p&gt;
+
+&lt;p&gt;わたしが経験したエラーの中に、こんなものがありました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。&lt;/p&gt;
+
+&lt;p&gt;Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして&lt;a href=&#34;https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429&#34;&gt;あがっています。&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
