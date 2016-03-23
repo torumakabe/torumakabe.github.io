@@ -50,7 +50,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b&#34;&gt;1.APIリクエスト数上限に達した&lt;/h3&gt;
+&lt;h3 id=&#34;1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
 
 &lt;p&gt;Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。&lt;/p&gt;
 
@@ -62,7 +62,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;ひとまずプロダクトの方針は確認したいので、Issueに質問を&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5704&#34;&gt;あげておきました&lt;/a&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b&#34;&gt;2.リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
+&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
 
 &lt;p&gt;Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。&lt;/p&gt;
 
@@ -73,7 +73,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。&lt;/p&gt;
 
-&lt;p&gt;Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして&lt;a href=&#34;https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429&#34;&gt;あがっています。&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして&lt;a href=&#34;https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429&#34;&gt;あがっています&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
 </description>
