@@ -56,7 +56,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;Azure サブスクリプションとサービスの制限、クォータ、制約&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;Terraformは扱うリソースごとにAPIをコールするので、数が多いとこの上限にひっかかる可能性があります。&lt;/p&gt;
+&lt;p&gt;Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。&lt;/p&gt;
 
 &lt;p&gt;長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。&lt;/p&gt;
 
