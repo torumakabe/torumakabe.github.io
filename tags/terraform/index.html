@@ -68,6 +68,138 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677">俺の屍を越えていけ</h2>
+
+<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
+
+<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
+
+<h2 id="この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677">この3つは触る前から意識しよう</h2>
+
+<ol>
+<li>ARMテンプレートリソースは分離して使う</li>
+<li>リソース競合したら依存関係を定義する</li>
+<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
+</ol>
+
+<h2 id="1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677">1. ARMテンプレートリソースは分離して使う</h2>
+
+<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
+
+<p>でも、現時点の実装では、おすすめしません。</p>
+
+<ul>
+<li>ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす
+避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</li>
+</ul>
+
+<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
+
+<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
+
+<ul>
+<li><p>タイムアウトしがち
+それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p></li>
+
+<li><p>せっかくのリソースグラフを活用できない
+Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p></li>
+
+<li><p>読みづらい
+Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p></li>
+</ul>
+
+<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
+
+<h2 id="2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677">2. リソース競合したら依存関係を定義する</h2>
+
+<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
+
+<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
+
+<pre><code>Error applying plan:
+
+1 error(s) occurred:
+azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
+
+
+Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
+</code></pre>
+
+<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
+
+<ul>
+<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
+<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
+</ul>
+
+<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため、「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフが作れないようです。</p>
+
+<p>その場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
+
+<pre><code># Create a frontend subnet
+# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
+resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
+    name = &quot;frontend&quot;
+    resource_group_name = &quot;${var.resource_group_name}&quot;
+    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
+    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
+    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
+    depends_on = [
+        &quot;azurerm_network_security_rule.fe_web80&quot;,
+        &quot;azurerm_network_security_rule.fe_web443&quot;,
+        &quot;azurerm_network_security_rule.fe_ssh&quot;
+    ]
+}
+</code></pre>
+
+<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
+
+<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
+
+<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
+
+<pre><code>os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
+        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
+    }
+}
+</code></pre>
+
+<p>が、エラーが返ってきます。</p>
+
+<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
+</code></pre>
+
+<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
+
+<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
+
+<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">23 Mar 2016, 13:00</h1>
                 <section class="post">
                     <header class="post-header">

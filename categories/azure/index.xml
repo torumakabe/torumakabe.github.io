@@ -6,8 +6,128 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 23 Mar 2016 13:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 25 Mar 2016 22:50:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
+      <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <description>
+
+&lt;h2 id=&#34;俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
+
+&lt;p&gt;今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。この週末お楽しみ、という人も多いかもしれません。&lt;/p&gt;
+
+&lt;p&gt;小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。&lt;/p&gt;
+
+&lt;h2 id=&#34;この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;ARMテンプレートリソースは分離して使う&lt;/li&gt;
+&lt;li&gt;リソース競合したら依存関係を定義する&lt;/li&gt;
+&lt;li&gt;公開鍵認証SSH指定でエラーが出ても驚かない&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
+
+&lt;p&gt;v0.6.14で、リソース&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html&#34;&gt;&amp;ldquo;azurerm_template_deployment&amp;rdquo;&lt;/a&gt;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。&lt;/p&gt;
+
+&lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす
+避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;タイムアウトしがち
+それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;せっかくのリソースグラフを活用できない
+Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp;amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;読みづらい
+Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
+
+&lt;p&gt;Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&lt;a href=&#34;https://www.terraform.io/intro/getting-started/dependencies.html&#34;&gt;&amp;ldquo;depends_on&amp;rdquo;&lt;/a&gt;で明示してあげましょう。&lt;/p&gt;
+
+&lt;p&gt;例えば、&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_429_workaround/&#34;&gt;以前のエントリ&lt;/a&gt;で紹介した下記の問題。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Error applying plan:
+
+1 error(s) occurred:
+azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
+
+
+Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい&lt;/li&gt;
+&lt;li&gt;セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため、「リソースを&lt;strong&gt;作成したら/存在したら&lt;/strong&gt;次にすすむ」というTerraformのグラフが作れないようです。&lt;/p&gt;
+
+&lt;p&gt;その場合、明示的に依存関係を&amp;rdquo;depends_on&amp;rdquo;で定義します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# Create a frontend subnet
+# &amp;quot;depends_on&amp;quot; arg is a workaround to avoid conflict with updating NSG rules 
+resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
+    name = &amp;quot;frontend&amp;quot;
+    resource_group_name = &amp;quot;${var.resource_group_name}&amp;quot;
+    virtual_network_name = &amp;quot;${azurerm_virtual_network.vnet1.name}&amp;quot;
+    address_prefix = &amp;quot;${var.vnet1_frontend_address_prefix}&amp;quot;
+    network_security_group_id = &amp;quot;${azurerm_network_security_group.frontend.id}&amp;quot;
+    depends_on = [
+        &amp;quot;azurerm_network_security_rule.fe_web80&amp;quot;,
+        &amp;quot;azurerm_network_security_rule.fe_web443&amp;quot;,
+        &amp;quot;azurerm_network_security_rule.fe_ssh&amp;quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。&lt;/p&gt;
+
+&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
+
+&lt;p&gt;TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;os_profile_linux_config {
+    disable_password_authentication = true
+    ssh_keys {
+        path = &amp;quot;/home/${var.adminuser}/.ssh/authorized_keys&amp;quot;
+        key_data = &amp;quot;${file(&amp;quot;/Users/you/.ssh/yourkey.pem&amp;quot;)}&amp;quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;が、エラーが返ってきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;amp;errors.errorString{s:&amp;quot;Invalid address to set: []string{\&amp;quot;os_profile_linux_config\&amp;quot;, \&amp;quot;12345678\&amp;quot;, \&amp;quot;ssh_keys\&amp;quot;}&amp;quot;}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。&lt;/p&gt;
+
+&lt;p&gt;妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5793&#34;&gt;Issueとして認識&lt;/a&gt;されていますので、修正を待ちましょう。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
