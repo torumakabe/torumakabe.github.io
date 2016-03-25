@@ -81,9 +81,9 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
 &lt;li&gt;セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを&lt;strong&gt;作成したら/存在したら&lt;/strong&gt;次にすすむ」というTerraformのグラフが作れないようです。&lt;/p&gt;
+&lt;p&gt;この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを&lt;strong&gt;作成したら/存在したら&lt;/strong&gt;次にすすむ」というTerraformのグラフでうまく表現できないようです。&lt;/p&gt;
 
-&lt;p&gt;その場合、明示的に依存関係を&amp;rdquo;depends_on&amp;rdquo;で定義します。&lt;/p&gt;
+&lt;p&gt;そのような場合、明示的に依存関係を&amp;rdquo;depends_on&amp;rdquo;で定義します。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;# Create a frontend subnet
 # &amp;quot;depends_on&amp;quot; arg is a workaround to avoid conflict with updating NSG rules 
