@@ -37,25 +37,25 @@
 
 &lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす
-避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
+
+&lt;p&gt;避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;タイムアウトしがち
-それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;&lt;/li&gt;
+&lt;h3 id=&#34;タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;タイムアウトしがち&lt;/h3&gt;
 
-&lt;li&gt;&lt;p&gt;せっかくのリソースグラフを活用できない
-Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp;amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;&lt;/li&gt;
+&lt;p&gt;それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;
 
-&lt;li&gt;&lt;p&gt;読みづらい
-Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;h3 id=&#34;せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
+
+&lt;p&gt;Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp;amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;
+
+&lt;h3 id=&#34;読みづらい:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;読みづらい&lt;/h3&gt;
+
+&lt;p&gt;Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;
 
 &lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
 
@@ -196,6 +196,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;p&gt;Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして&lt;a href=&#34;https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429&#34;&gt;あがっています&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;(2016/3/25 追記) 回避策を&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/&#34;&gt;別エントリ&lt;/a&gt;に書きました&lt;/strong&gt;&lt;/p&gt;
 </description>
     </item>
     

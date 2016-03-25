@@ -107,25 +107,25 @@
 
 <p>でも、現時点の実装では、おすすめしません。</p>
 
-<ul>
-<li>ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす
-避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</li>
-</ul>
+<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
+
+<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
 
 <p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
 
 <p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
 
-<ul>
-<li><p>タイムアウトしがち
-それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p></li>
+<h3 id="タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677">タイムアウトしがち</h3>
 
-<li><p>せっかくのリソースグラフを活用できない
-Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p></li>
+<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
 
-<li><p>読みづらい
-Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p></li>
-</ul>
+<h3 id="せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677">せっかくのリソースグラフを活用できない</h3>
+
+<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク plan &amp; deployできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
+
+<h3 id="読みづらい:9776a375b7d12db77e52b9c8d97b8677">読みづらい</h3>
+
+<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
 
 <p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
 
@@ -278,6 +278,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <p>Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして<a href="https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429">あがっています</a>。</p>
 
 <p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
+
+<p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
 
                     </div>
                 </section>
