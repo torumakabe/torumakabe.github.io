@@ -68,6 +68,70 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">27 Mar 2016, 20:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/bookreview_site_reliability_engineering/" class="post-title">書評: Site Reliability Engineering</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Book" href="http://torumakabe.github.io//categories/book">Book</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="英語だけどぜひ読んでほしい:85f39e44bed874d49c5c215a7c1e75f5">英語だけどぜひ読んでほしい</h2>
+
+<p><strong><a href="http://www.amazon.co.jp/Site-Reliability-Engineering-Production-Systems-ebook/dp/B01DCPXKZ6/ref=tmm_kin_swatch_0?_encoding=UTF8&amp;qid=1459069692&amp;sr=8-1">Site Reliability Engineering: How Google Runs Production Systems</a></strong></p>
+
+<p>参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。SREの情報は断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。</p>
+
+<p>共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。</p>
+
+<p>以下、印象に残ったこと。</p>
+
+<ul>
+<li><p>Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。</p></li>
+
+<li><p>インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするためにコードを書く。</p></li>
+
+<li><p>日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。</p></li>
+
+<li><p>アプリ/製品チームとSREチームは&rdquo;Error Budget&rdquo;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。</p></li>
+
+<li><p>インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。</p></li>
+
+<li><p>Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。</p></li>
+
+<li><p>SLA違反など、重大な障害では&rdquo;Postmortem(過激だが死体解剖)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。</p></li>
+
+<li><p>他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミレーションや演習、通信業の輻輳対策など。</p></li>
+</ul>
+
+<p>もう一回読んだら、また違う発見があるんじゃないかと。</p>
+
+<h2 id="自分ごととして読みたい:85f39e44bed874d49c5c215a7c1e75f5">自分ごととして読みたい</h2>
+
+<p>今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。</p>
+
+<p>DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。</p>
+
+<p>もちろん、Googleの圧倒的物量、成長スピードゆえのミッションと働き方である事は否定しません。でも、自分とは無関係、と無視するにはもったいないです。</p>
+
+<p>なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるのには、何か本質的な価値があるのではないでしょうか。</p>
+
+<p>オススメです。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
                 <section class="post">
                     <header class="post-header">
@@ -589,178 +653,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <p>完璧を求めずにいきましょう。</p>
 
 <p>でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">27 Feb 2016, 12:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_tf_arm_sp/" class="post-title">TerraformをAzure ARMで使う時の認証</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="高まってまいりました:dfc3556fff242cb82e1ca9532877c49b">高まってまいりました</h2>
-
-<p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
-
-<p>Terraformのマイナーバージョンアップのたびに、<a href="https://www.terraform.io/docs/providers/azurerm/index.html">Azure Resource Manager Providerのリソース</a>が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。</p>
-
-<p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
-
-<h2 id="client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b">client_id/client_secret って何よ</h2>
-
-<p>以下がARM向けのProvider設定です。</p>
-
-<pre><code># Configure the Azure Resource Manager Provider
-provider &quot;azurerm&quot; {
-  subscription_id = &quot;...&quot;
-  client_id       = &quot;...&quot;
-  client_secret   = &quot;...&quot;
-  tenant_id       = &quot;...&quot;
-}
-</code></pre>
-
-<p>subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、<strong>client_id/client_secret って何よ</strong>。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。</p>
-
-<pre><code>&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;
-</code></pre>
-
-<p>おっとそういうことか。OAuth。</p>
-
-<h2 id="サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b">サービスプリンシパルを使おう</h2>
-
-<p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/">&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;</a></p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;</a></p>
-
-<p>以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</p>
-
-<p>まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。</p>
-
-<pre><code>$ azure ad app create --name &quot;My Terraform&quot; --home-page &quot;http://tftest.makabe.info&quot; --identifier-uris &quot;http://tftest.makabe.info&quot; --password pAssw0rd%
-info:    Executing command ad app create
-+ Creating application My Terraform
-data:    AppId:                   AppId-AppId-AppId-AppId-AppId
-data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
-data:    DisplayName:             My Terraform
-data:    IdentifierUris:          0=http://tftest.makabe.info
-data:    ReplyUrls:
-data:    AvailableToOtherTenants:  False
-data:    AppPermissions:
-data:                             claimValue:  user_impersonation
-data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
-data:                             directAccessGrantTypes:
-data:                             displayName:  Access My Terraform
-data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
-data:                             isDisabled:
-data:                             origin:  Application
-data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
-data:                             resourceScopeType:  Personal
-data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
-data:                             userConsentDisplayName:  Access My Terraform
-data:                             lang:
-info:    ad app create command OK
-</code></pre>
-
-<p>次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。</p>
-
-<pre><code>$ azure ad sp create AppId-AppId-AppId-AppId-AppId
-info:    Executing command ad sp create
-+ Creating service principal for application AppId-AppId-AppId-AppId-AppId
-data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
-data:    Display Name:            My Terraform
-data:    Service Principal Names:
-data:                             AppId-AppId-AppId-AppId-AppId
-data:                             http://tftest.makabe.info
-info:    ad sp create command OK
-</code></pre>
-
-<p>サービスプリンシパルの役割を設定します。&ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。</p>
-
-<p>この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。</p>
-
-<pre><code>$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
-info:    Executing command role assignment create
-+ Finding role with specified name
-/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
-data:    RoleDefinitionName   : Contributor
-data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
-data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
-data:    Display Name         : My Terraform
-data:    SignInName           :
-data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
-data:    ObjectType           : ServicePrincipal
-data:
-+
-info:    role assignment create command OK
-</code></pre>
-
-<p>サービスプリンシパルまわりの設定は以上です。</p>
-
-<p>テナントIDを確認しておきましょう。</p>
-
-<pre><code>$ azure account list --json
-[
-  {
-    &quot;id&quot;: &quot;SubId-SubId-SubId-SubId-SubId&quot;,
-    &quot;name&quot;: &quot;Your Subscription Name&quot;,
-    &quot;user&quot;: {
-      &quot;name&quot;: &quot;abc@microsoft.com&quot;,
-      &quot;type&quot;: &quot;user&quot;
-    },
-    &quot;tenantId&quot;: &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;,
-    &quot;state&quot;: &quot;Enabled&quot;,
-    &quot;isDefault&quot;: true,
-    &quot;registeredProviders&quot;: [],
-    &quot;environmentName&quot;: &quot;AzureCloud&quot;
-  }
-]
-</code></pre>
-
-<p>これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。</p>
-
-<pre><code># Configure the Azure Resource Manager Provider
-provider &quot;azurerm&quot; {
-  subscription_id = &quot;SubId-SubId-SubId-SubId-SubId&quot;
-  client_id       = &quot;AppId-AppId-AppId-AppId-AppId&quot;
-  client_secret   = &quot;pAssw0rd%&quot;
-  tenant_id       = &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;
-}
-
-# Create a resource group
-resource &quot;azurerm_resource_group&quot; &quot;test&quot; {
-    name     = &quot;test&quot;
-    location = &quot;Japan West&quot;
-}
-</code></pre>
-
-<p>apply。もちろんplanしましたよ。</p>
-
-<pre><code>$ terraform apply
-azurerm_resource_group.test: Creating...
-  location: &quot;&quot; =&gt; &quot;japanwest&quot;
-  name:     &quot;&quot; =&gt; &quot;test&quot;
-azurerm_resource_group.test: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
-</code></pre>
-
-<p>これで、ARM認証難民がうまれなくなりますように。</p>
 
                     </div>
                 </section>

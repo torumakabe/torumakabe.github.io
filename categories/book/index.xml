@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Book on re-imagine</title>
+    <link>http://torumakabe.github.io/categories/book/</link>
+    <description>Recent content in Book on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 27 Mar 2016 20:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/categories/book/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>書評: Site Reliability Engineering</title>
+      <link>http://torumakabe.github.io/post/bookreview_site_reliability_engineering/</link>
+      <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/bookreview_site_reliability_engineering/</guid>
+      <description>
+
+&lt;h2 id=&#34;英語だけどぜひ読んでほしい:85f39e44bed874d49c5c215a7c1e75f5&#34;&gt;英語だけどぜひ読んでほしい&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;http://www.amazon.co.jp/Site-Reliability-Engineering-Production-Systems-ebook/dp/B01DCPXKZ6/ref=tmm_kin_swatch_0?_encoding=UTF8&amp;amp;qid=1459069692&amp;amp;sr=8-1&#34;&gt;Site Reliability Engineering: How Google Runs Production Systems&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。SREの情報は断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。&lt;/p&gt;
+
+&lt;p&gt;共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。&lt;/p&gt;
+
+&lt;p&gt;以下、印象に残ったこと。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするためにコードを書く。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;アプリ/製品チームとSREチームは&amp;rdquo;Error Budget&amp;rdquo;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;SLA違反など、重大な障害では&amp;rdquo;Postmortem(過激だが死体解剖)&amp;ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミレーションや演習、通信業の輻輳対策など。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;もう一回読んだら、また違う発見があるんじゃないかと。&lt;/p&gt;
+
+&lt;h2 id=&#34;自分ごととして読みたい:85f39e44bed874d49c5c215a7c1e75f5&#34;&gt;自分ごととして読みたい&lt;/h2&gt;
+
+&lt;p&gt;今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。&lt;/p&gt;
+
+&lt;p&gt;DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。&lt;/p&gt;
+
+&lt;p&gt;もちろん、Googleの圧倒的物量、成長スピードゆえのミッションと働き方である事は否定しません。でも、自分とは無関係、と無視するにはもったいないです。&lt;/p&gt;
+
+&lt;p&gt;なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるのには、何か本質的な価値があるのではないでしょうか。&lt;/p&gt;
+
+&lt;p&gt;オススメです。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
