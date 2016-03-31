@@ -386,7 +386,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;ul&gt;
 &lt;li&gt;フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)&lt;/li&gt;
-&lt;li&gt;バックの受信はフロントサブネットからのみ許可&lt;/li&gt;
+&lt;li&gt;バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
