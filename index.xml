@@ -6,8 +6,122 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 27 Mar 2016 20:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Wed, 06 Apr 2016 17:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
+      <link>http://torumakabe.github.io/post/azure_auditlog_alert/</link>
+      <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_auditlog_alert/</guid>
+      <description>
+
+&lt;h2 id=&#34;監査ログからアラートを上げられるようになります:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;監査ログからアラートを上げられるようになります&lt;/h2&gt;
+
+&lt;p&gt;Azureの監査ログからアラートを上げる機能のプレビューが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/&#34;&gt;はじまりました&lt;/a&gt;。これ、地味ですが便利な機能です。日々の運用に効きます。&lt;/p&gt;
+
+&lt;h2 id=&#34;どんな風に使えるか:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;どんな風に使えるか&lt;/h2&gt;
+
+&lt;p&gt;ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。&lt;/p&gt;
+
+&lt;p&gt;たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。&lt;/p&gt;
+
+&lt;p&gt;これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。&lt;/p&gt;
+
+&lt;p&gt;これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。&lt;/p&gt;
+
+&lt;h2 id=&#34;実装例:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;実装例&lt;/h2&gt;
+
+&lt;p&gt;例としてこんな仕組みを作ってみましょう。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;西日本リージョンのリソースグループ&amp;rdquo;dev&amp;rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行&lt;/li&gt;
+&lt;li&gt;WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する&lt;/li&gt;
+&lt;li&gt;OMSでログ分析&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;準備:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;準備&lt;/h2&gt;
+
+&lt;p&gt;以下の準備ができているか確認します。
+* Azure Automation向けADアプリ、サービスプリンシパル作成
+* サービスプリンシパルへのロール割り当て
+* Azure Automationのアカウント作成
+* Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録
+* Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得されているもの)
+* OMSワークスペースの作成&lt;/p&gt;
+
+&lt;p&gt;もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5&#34;&gt;勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-automation側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;Azure Automation側の仕掛け&lt;/h2&gt;
+
+&lt;p&gt;先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。&lt;/p&gt;
+
+&lt;p&gt;ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;param ( 
+    [object]$WebhookData          
+)
+
+if ($WebhookData -ne $null) {  
+    $WebhookName    =   $WebhookData.WebhookName
+    $WebhookBody    =   $WebhookData.RequestBody  
+    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody)
+
+    $AlertContext = [object]$WebhookBody.context
+
+    $SPAppID = Get-AutomationVariable -Name &#39;SPAppID&#39;
+    $Tenant = Get-AutomationVariable -Name &#39;TenantID&#39;
+    $OMSWorkspaceId = Get-AutomationVariable -Name &#39;OMSWorkspaceId&#39;
+    $OMSWorkspaceKey = Get-AutomationVariable -Name &#39;OMSWorkspaceKey&#39;
+    $CertificationName = Get-AutomationVariable -Name &#39;CertificationName&#39;
+    $Certificate = Get-AutomationCertificate -Name $CertificationName
+    $CertThumbprint = ($Certificate.Thumbprint).ToString()    
+
+    $null = Login-AzureRmAccount -ServicePrincipal -TenantId $Tenant -CertificateThumbprint $CertThumbprint -ApplicationId $SPAppID   
+
+    $resourceObj = Get-AzureRmResource -ResourceId $AlertContext.resourceId
+    $VM = Get-AzureRmVM -Name $resourceObj.Name -ResourceGroupName $resourceObj.ResourceGroupName
+
+    $Settings = @{&amp;quot;workspaceId&amp;quot; = &amp;quot;$OMSWorkspaceId&amp;quot;}
+    $ProtectedSettings = @{&amp;quot;workspaceKey&amp;quot; = &amp;quot;$OMSWorkspaceKey&amp;quot;}
+
+    if ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Linux&amp;quot;) {  
+        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;OmsAgentForLinux&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;OmsAgentForLinux&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
+    }
+    elseif ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Windows&amp;quot;)
+    {
+        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;MicrosoftMonitoringAgent&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;MicrosoftMonitoringAgent&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
+    }
+    else
+    {
+        Write-Error &amp;quot;Unknown OS Type.&amp;quot;
+    }
+}
+else 
+{
+    Write-Error &amp;quot;This runbook is meant to only be started from a webhook.&amp;quot; 
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h3&gt;
+
+&lt;p&gt;Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;PS C:\work&amp;gt; $actionEmail = New-AzureRmAlertRuleEmail -CustomEmail yourname@example.com
+
+PS C:\work&amp;gt; $actionWebhook = New-AzureRmAlertRuleWebhook -ServiceUri https://abcdefgh.azure-automation.net/webhooks?token=your_token
+
+PS C:\work&amp;gt; Add-AzureRmLogAlertRule -Name createdVM -Location &amp;quot;Japan West&amp;quot; -ResourceGroup dev -OperationName Microsoft.Compute/virtualMachines/write -Status Succeeded  -SubStatus Created -TargetResourceGroup dev -Actions $actionEmail,$actionWebhook
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上。これで&amp;rdquo;dev&amp;rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。&lt;/p&gt;
+
+&lt;p&gt;なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>書評: Site Reliability Engineering</title>
@@ -2081,54 +2195,6 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
 &lt;p&gt;まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。&lt;/p&gt;
 
 &lt;p&gt;OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Docker VM Extensionを使う3つの理由</title>
-      <link>http://torumakabe.github.io/post/azure_docker_extension/</link>
-      <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
-      <description>
-
-&lt;h2 id=&#34;まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;まずはじめに&lt;/h2&gt;
-
-&lt;p&gt;先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。&lt;/p&gt;
-
-&lt;p&gt;もちろん、技術者個人として、中立的に、公開できるネタを書きます。&lt;/p&gt;
-
-&lt;p&gt;AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。&lt;/p&gt;
-
-&lt;p&gt;なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;Azure Docker VM Extension を使う3つの理由&lt;/h2&gt;
-
-&lt;p&gt;さて、今回は話題沸騰のDocker関連のネタ、&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;Azure Docker VM Extension&lt;/a&gt;について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。&lt;/p&gt;
-
-&lt;p&gt;このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。&lt;/p&gt;
-
-&lt;p&gt;ずばり、答えはGithubの&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;README&lt;/a&gt;にまとまっています。この拡張機能のうれしさは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Docker EngineのStable最新版をインストールしてくれる&lt;/li&gt;
-&lt;li&gt;Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
-
-&lt;ul&gt;
-&lt;li&gt;ポートマッピング、認証まわり、Docker Registoryサーバの定義など&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Composeのパラメータを渡すことができる (オプション)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。&lt;/p&gt;
-
-&lt;p&gt;Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。&lt;/p&gt;
-
-&lt;p&gt;ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。&lt;/p&gt;
-
-&lt;p&gt;Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。&lt;/p&gt;
-
-&lt;p&gt;なお、このDocker拡張、ARM属性で言うpublisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。&lt;/p&gt;
 </description>
     </item>
     
