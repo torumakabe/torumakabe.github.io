@@ -50,7 +50,7 @@
 &lt;li&gt;サービスプリンシパルへのロール割り当て&lt;/li&gt;
 &lt;li&gt;Azure Automationのアカウント作成&lt;/li&gt;
 &lt;li&gt;Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録&lt;/li&gt;
-&lt;li&gt;Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得されているもの)&lt;/li&gt;
+&lt;li&gt;Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう)&lt;/li&gt;
 &lt;li&gt;OMSワークスペースの作成&lt;/li&gt;
 &lt;/ul&gt;
 
