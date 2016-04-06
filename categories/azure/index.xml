@@ -43,13 +43,16 @@
 
 &lt;h2 id=&#34;準備:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;準備&lt;/h2&gt;
 
-&lt;p&gt;以下の準備ができているか確認します。
-* Azure Automation向けADアプリ、サービスプリンシパル作成
-* サービスプリンシパルへのロール割り当て
-* Azure Automationのアカウント作成
-* Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録
-* Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得されているもの)
-* OMSワークスペースの作成&lt;/p&gt;
+&lt;p&gt;以下の準備ができているか確認します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Azure Automation向けADアプリ、サービスプリンシパル作成&lt;/li&gt;
+&lt;li&gt;サービスプリンシパルへのロール割り当て&lt;/li&gt;
+&lt;li&gt;Azure Automationのアカウント作成&lt;/li&gt;
+&lt;li&gt;Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録&lt;/li&gt;
+&lt;li&gt;Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得されているもの)&lt;/li&gt;
+&lt;li&gt;OMSワークスペースの作成&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。&lt;/p&gt;
 
