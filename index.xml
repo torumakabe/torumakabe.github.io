@@ -109,6 +109,10 @@ else
 }
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;Runbookができたら、Webhookを作ります。詳しくは&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/automation-webhooks/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;WebhookのURLを控えておいてください。&lt;/p&gt;
+
 &lt;h2 id=&#34;azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h2&gt;
 
 &lt;p&gt;Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。&lt;/p&gt;
