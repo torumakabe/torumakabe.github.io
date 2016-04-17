@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="AzureとDockerでDeep Learning(CNTK)環境をサク作する &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AzureとDockerでDeep Learning(CNTK)環境をサク作する &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_docker_cntk/" class="post-title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/azure_docker_cntk/" data-title="AzureとDockerでDeep Learning(CNTK)環境をサク作する" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/azure_docker_cntk/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/azure_docker_cntk/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463">気軽に作って壊せる環境を作る</h2>
+
+<p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
+
+<p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
+
+<h2 id="方針:7c419a069d08019c3093e0308a68c463">方針</h2>
+
+<ul>
+<li>インフラはAzure Resource Manager Templateでデプロイする
+
+<ul>
+<li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
+</ul></li>
+<li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
+
+<ul>
+<li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
+
+<ul>
+<li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
+</ul></li>
+<li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
+</ul></li>
+<li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
+
+<ul>
+<li>docker extensionでdocker engineを導入</li>
+<li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
+</ul></li>
+<li>VMにログインしたら即CNTKを使える、幸せ</li>
+</ul>
+
+<h2 id="使い方:7c419a069d08019c3093e0308a68c463">使い方</h2>
+
+<p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
+
+<p>リソースグループを作ります。</p>
+
+<pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
+</code></pre>
+
+<p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
+
+<ul>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
+
+<ul>
+<li>編集不要です</li>
+</ul></li>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
+
+<ul>
+<li>テンプレートに直で書かきたくないパラメータです</li>
+<li>fileUris、commandToExecute以外は、各々で</li>
+<li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください</li>
+</ul></li>
+</ul>
+
+<p>うし、デプロイ。</p>
+
+<pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
+</code></pre>
+
+<p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
+
+<p>docker engine入ってますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker -v
+Docker version 1.11.0, build 4dc5990
+</code></pre>
+
+<p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker images
+REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
+yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
+</code></pre>
+
+<p>問題なし。ではエンジョイ Deep Learning。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
+root@a1234bc5d67d:/cntk#
+</code></pre>
+
+<p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
+
+<h2 id="今後の展開:7c419a069d08019c3093e0308a68c463">今後の展開</h2>
+
+<p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
+
+<p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
+
+<p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

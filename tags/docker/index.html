@@ -68,6 +68,124 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_docker_cntk/" class="post-title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463">気軽に作って壊せる環境を作る</h2>
+
+<p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
+
+<p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
+
+<h2 id="方針:7c419a069d08019c3093e0308a68c463">方針</h2>
+
+<ul>
+<li>インフラはAzure Resource Manager Templateでデプロイする
+
+<ul>
+<li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
+</ul></li>
+<li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
+
+<ul>
+<li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
+
+<ul>
+<li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
+</ul></li>
+<li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
+</ul></li>
+<li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
+
+<ul>
+<li>docker extensionでdocker engineを導入</li>
+<li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
+</ul></li>
+<li>VMにログインしたら即CNTKを使える、幸せ</li>
+</ul>
+
+<h2 id="使い方:7c419a069d08019c3093e0308a68c463">使い方</h2>
+
+<p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
+
+<p>リソースグループを作ります。</p>
+
+<pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
+</code></pre>
+
+<p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
+
+<ul>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
+
+<ul>
+<li>編集不要です</li>
+</ul></li>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
+
+<ul>
+<li>テンプレートに直で書かきたくないパラメータです</li>
+<li>fileUris、commandToExecute以外は、各々で</li>
+<li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください</li>
+</ul></li>
+</ul>
+
+<p>うし、デプロイ。</p>
+
+<pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
+</code></pre>
+
+<p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
+
+<p>docker engine入ってますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker -v
+Docker version 1.11.0, build 4dc5990
+</code></pre>
+
+<p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker images
+REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
+yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
+</code></pre>
+
+<p>問題なし。ではエンジョイ Deep Learning。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
+root@a1234bc5d67d:/cntk#
+</code></pre>
+
+<p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
+
+<h2 id="今後の展開:7c419a069d08019c3093e0308a68c463">今後の展開</h2>
+
+<p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
+
+<p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
+
+<p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">19 Dec 2015, 00:01</h1>
                 <section class="post">
                     <header class="post-header">
