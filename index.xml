@@ -39,7 +39,7 @@
 &lt;ul&gt;
 &lt;li&gt;RHEL 7.2 on Azure&lt;/li&gt;
 &lt;li&gt;XFS &amp;amp; Ext4&lt;/li&gt;
-&lt;li&gt;10GbytesのPage Blobの上にファイルシステムを作成&lt;/li&gt;
+&lt;li&gt;10GBytesのPage Blobの上にファイルシステムを作成&lt;/li&gt;
 &lt;li&gt;mkfsはデフォルト&lt;/li&gt;
 &lt;li&gt;mountはデフォルトとdiscardオプションありの2パターン&lt;/li&gt;
 &lt;li&gt;MD、LVM構成にしない&lt;/li&gt;
@@ -50,7 +50,7 @@
 &lt;li&gt;ファイルシステム作成時&lt;/li&gt;
 &lt;li&gt;マウント時&lt;/li&gt;
 &lt;li&gt;約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)&lt;/li&gt;
-&lt;li&gt;5Gbytesのファイル削除時&lt;/li&gt;
+&lt;li&gt;5GBytesのファイル削除時&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
