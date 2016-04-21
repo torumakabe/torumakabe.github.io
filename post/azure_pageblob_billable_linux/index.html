@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Linux VMのディスク利用料節約Tips &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.14" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Azure Linux VMのディスク利用料節約Tips &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Linux VMのディスク利用料節約Tips &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" class="post-title">Azure Linux VMのディスク利用料節約Tips</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" data-title="Azure Linux VMのディスク利用料節約Tips" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd">定義領域全てが課金されるわけではありません</h2>
+
+<p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
+
+<p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
+
+<h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
+
+<p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
+
+<ul>
+<li>RHEL 7.2 on Azure</li>
+<li>XFS &amp; Ext4</li>
+<li>10GbytesのPage Blobの上にファイルシステムを作成</li>
+<li>mkfsはデフォルト</li>
+<li>mountはデフォルトとdiscardオプションありの2パターン</li>
+<li>MD、LVM構成にしない</li>
+<li>以下のタイミングで課金対象容量を確認
+
+<ul>
+<li>Page BlobのVMアタッチ時</li>
+<li>ファイルシステム作成時</li>
+<li>マウント時</li>
+<li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
+<li>5Gbytesのファイル削除時</li>
+</ul></li>
+</ul>
+
+<p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
+
+<pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
+
+$blobSizeInBytes = 124 + $Blob.Name.Length * 2
+
+$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
+while ($metadataEnumerator.MoveNext())
+{
+    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
+}
+
+$Blob.ICloudBlob.GetPageRanges() | 
+    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
+
+return $blobSizeInBytes
+</code></pre>
+
+<p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
+
+<h2 id="結果:73b15a413c7cb87e88f45a7aaba2eebd">結果</h2>
+
+<h3 id="xfs:73b15a413c7cb87e88f45a7aaba2eebd">XFS</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">10,710,029</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="ext4:73b15a413c7cb87e88f45a7aaba2eebd">Ext4</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">138,683,592</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">306,451,689</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">306,586,780</td>
+</tr>
+</tbody>
+</table>
+
+<p>この結果から、以下のことがわかります。</p>
+
+<ul>
+<li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
+<li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
+<li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
+
+<ul>
+<li>OSがディスクに&rdquo;消した&rdquo;と伝えないから</li>
+<li>discardオプションにてSCSI UNMAPがディスクに伝えられ、領域は解放される(課金対象容量も減る)</li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
+</ul></li>
+</ul>
+
+<p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

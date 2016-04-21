@@ -68,6 +68,180 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" class="post-title">Azure Linux VMのディスク利用料節約Tips</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd">定義領域全てが課金されるわけではありません</h2>
+
+<p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
+
+<p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
+
+<h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
+
+<p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
+
+<ul>
+<li>RHEL 7.2 on Azure</li>
+<li>XFS &amp; Ext4</li>
+<li>10GbytesのPage Blobの上にファイルシステムを作成</li>
+<li>mkfsはデフォルト</li>
+<li>mountはデフォルトとdiscardオプションありの2パターン</li>
+<li>MD、LVM構成にしない</li>
+<li>以下のタイミングで課金対象容量を確認
+
+<ul>
+<li>Page BlobのVMアタッチ時</li>
+<li>ファイルシステム作成時</li>
+<li>マウント時</li>
+<li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
+<li>5Gbytesのファイル削除時</li>
+</ul></li>
+</ul>
+
+<p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
+
+<pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
+
+$blobSizeInBytes = 124 + $Blob.Name.Length * 2
+
+$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
+while ($metadataEnumerator.MoveNext())
+{
+    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
+}
+
+$Blob.ICloudBlob.GetPageRanges() | 
+    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
+
+return $blobSizeInBytes
+</code></pre>
+
+<p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
+
+<h2 id="結果:73b15a413c7cb87e88f45a7aaba2eebd">結果</h2>
+
+<h3 id="xfs:73b15a413c7cb87e88f45a7aaba2eebd">XFS</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">10,710,029</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="ext4:73b15a413c7cb87e88f45a7aaba2eebd">Ext4</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">138,683,592</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">306,451,689</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">306,586,780</td>
+</tr>
+</tbody>
+</table>
+
+<p>この結果から、以下のことがわかります。</p>
+
+<ul>
+<li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
+<li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
+<li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
+
+<ul>
+<li>OSがディスクに&rdquo;消した&rdquo;と伝えないから</li>
+<li>discardオプションにてSCSI UNMAPがディスクに伝えられ、領域は解放される(課金対象容量も減る)</li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
+</ul></li>
+</ul>
+
+<p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -531,111 +705,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
 
 <p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">17 Mar 2016, 23:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/" class="post-title">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
-
-<p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
-
-<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
-
-<p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
-
-<p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
-
-<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
-
-<ul>
-<li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
-<li>認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。</li>
-<li>Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
-
-<ul>
-<li>Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。</li>
-</ul></li>
-<li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
-</ul>
-
-<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
-
-<p>ubuntu.jsonはこんな感じです。</p>
-
-<pre><code>{
-  &quot;variables&quot;: {
-    &quot;client_id&quot;: &quot;&quot;,
-    &quot;client_secret&quot;: &quot;&quot;,
-    &quot;resource_group&quot;: &quot;&quot;,
-    &quot;storage_account&quot;: &quot;&quot;,
-    &quot;subscription_id&quot;: &quot;&quot;,
-    &quot;tenant_id&quot;: &quot;&quot;
-  },
-  &quot;builders&quot;: [{
-    &quot;type&quot;: &quot;azure-arm&quot;,
-
-    &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;,
-    &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;,
-    &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;,
-    &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;,
-    &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;,
-    &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;,
-
-    &quot;capture_container_name&quot;: &quot;images&quot;,
-    &quot;capture_name_prefix&quot;: &quot;packer&quot;,
-
-    &quot;image_publisher&quot;: &quot;Canonical&quot;,
-    &quot;image_offer&quot;: &quot;UbuntuServer&quot;,
-    &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;,
-
-    &quot;location&quot;: &quot;Japan West&quot;,
-    &quot;vm_size&quot;: &quot;Standard_D1&quot;
-  }],
-  &quot;provisioners&quot;: [{
-    &quot;type&quot;: &quot;shell&quot;,
-      &quot;scripts&quot;: [
-        &quot;../script/ubuntu/provision.sh&quot;
-    ]
-  },
-  {
-    &quot;type&quot;: &quot;ansible-local&quot;,
-    &quot;playbook_file&quot;: &quot;../ansible/baseimage.yml&quot;,
-    &quot;inventory_file&quot;: &quot;../ansible/hosts&quot;,
-    &quot;role_paths&quot;: [
-      &quot;../ansible/roles/baseimage&quot;
-    ]
-  },
-  {
-    &quot;type&quot;: &quot;shell&quot;,
-      &quot;scripts&quot;: [
-        &quot;../script/ubuntu/deprovision.sh&quot;
-    ]
-  }]
-}
-</code></pre>
-
-<p>waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Github</a>でご確認を。</p>
-
-<p>これで手順書&amp;目視&amp;指差し確認でイメージ作るのを、やめられそうですね。</p>
 
                     </div>
                 </section>

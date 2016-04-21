@@ -6,8 +6,170 @@
     <description>Recent content in Linux on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 07 Feb 2016 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 21 Apr 2016 21:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Linux VMのディスク利用料節約Tips</title>
+      <link>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <description>
+
+&lt;h2 id=&#34;定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;定義領域全てが課金されるわけではありません&lt;/h2&gt;
+
+&lt;p&gt;AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/&#34;&gt;Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;書き込み方はOSやファイルシステム次第&lt;/h2&gt;
+
+&lt;p&gt;じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;RHEL 7.2 on Azure&lt;/li&gt;
+&lt;li&gt;XFS &amp;amp; Ext4&lt;/li&gt;
+&lt;li&gt;10GbytesのPage Blobの上にファイルシステムを作成&lt;/li&gt;
+&lt;li&gt;mkfsはデフォルト&lt;/li&gt;
+&lt;li&gt;mountはデフォルトとdiscardオプションありの2パターン&lt;/li&gt;
+&lt;li&gt;MD、LVM構成にしない&lt;/li&gt;
+&lt;li&gt;以下のタイミングで課金対象容量を確認
+
+&lt;ul&gt;
+&lt;li&gt;Page BlobのVMアタッチ時&lt;/li&gt;
+&lt;li&gt;ファイルシステム作成時&lt;/li&gt;
+&lt;li&gt;マウント時&lt;/li&gt;
+&lt;li&gt;約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)&lt;/li&gt;
+&lt;li&gt;5Gbytesのファイル削除時&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;課金対象容量は、以下のPowerShellで取得します。リファレンスは&lt;a href=&#34;https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
+
+$blobSizeInBytes = 124 + $Blob.Name.Length * 2
+
+$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
+while ($metadataEnumerator.MoveNext())
+{
+    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
+}
+
+$Blob.ICloudBlob.GetPageRanges() | 
+    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
+
+return $blobSizeInBytes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ストレージコンテキストの作り方は&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/&#34;&gt;ここ&lt;/a&gt;を参考にしてください。&lt;/p&gt;
+
+&lt;h2 id=&#34;結果:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;結果&lt;/h2&gt;
+
+&lt;h3 id=&#34;xfs:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;XFS&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10,710,029&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;ext4:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;Ext4&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;138,683,592&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;306,451,689&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;306,586,780&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;この結果から、以下のことがわかります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;10GBytesのBlobを作成しても、全てが課金対象ではない&lt;/li&gt;
+&lt;li&gt;当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる&lt;/li&gt;
+&lt;li&gt;discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
+
+&lt;ul&gt;
+&lt;li&gt;OSがディスクに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
+&lt;li&gt;discardオプションにてSCSI UNMAPがディスクに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
+&lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Linux on Azureでファイル共有する方法</title>
