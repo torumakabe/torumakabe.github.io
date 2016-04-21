@@ -91,6 +91,15 @@
 
 <p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
 
+<p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
+
+<pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
+
+空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
+</code></pre>
+
+<p>詳細な定義は、以下で。</p>
+
 <p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
 
 <h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
