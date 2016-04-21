@@ -161,8 +161,8 @@ return $blobSizeInBytes
 &lt;li&gt;discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
 
 &lt;ul&gt;
-&lt;li&gt;OSがディスクに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
-&lt;li&gt;discardオプションにてSCSI UNMAPがディスクに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
+&lt;li&gt;OSがPage Blobに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
+&lt;li&gt;discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
 &lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
