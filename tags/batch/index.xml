@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Batch on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/batch/</link>
+    <description>Recent content in Batch on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Fri, 29 Apr 2016 17:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/batch/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
+      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
+      <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
+      <description>
+
+&lt;h2 id=&#34;サーバレスって言ってみたかっただけじゃないです:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サーバレスって言ってみたかっただけじゃないです&lt;/h2&gt;
+
+&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
+
+&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいのは、「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+節約」でしょう。&lt;/p&gt;
+
+&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せない。なんか中途半端です。&lt;/p&gt;
+
+&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。&lt;/p&gt;
+
+&lt;h2 id=&#34;コンセプト:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;コンセプト&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;管理サーバーを作らない&lt;/li&gt;
+&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
+&lt;li&gt;ジョブ実行サーバーは必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
+&lt;li&gt;サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
+&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;サンプル:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サンプル&lt;/h2&gt;
+
+&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
+
+&lt;p&gt;ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.
+├── blob
+│   ├── application
+│   │   ├── starttask.sh
+│   │   └── task.sh
+│   ├── input
+│   │   └── the_star_spangled_banner.txt
+│   └── output
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;applicationコンテナーに、ジョブ実行サーバー(Pool)作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国家です。&lt;/p&gt;
+
+&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
+&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
+&lt;li&gt;ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
+&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
+&lt;li&gt;サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
+&lt;li&gt;サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/p&gt;
+
+&lt;p&gt;{
+&amp;ldquo;odata.metadata&amp;rdquo;:&amp;ldquo;&lt;a href=&#34;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;&#34;&gt;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;&lt;/a&gt;,
+&amp;ldquo;id&amp;rdquo;:&amp;ldquo;myjobschedule1&amp;rdquo;,
+&amp;ldquo;schedule&amp;rdquo;: {
+    &amp;ldquo;doNotRunUntil&amp;rdquo;:&amp;ldquo;2016-04-29T05:30:00.000Z&amp;rdquo;,
+    &amp;ldquo;recurrenceInterval&amp;rdquo;:&amp;ldquo;PT4H&amp;rdquo;
+},
+&amp;ldquo;jobSpecification&amp;rdquo;: {
+    &amp;ldquo;priority&amp;rdquo;:100,
+    &amp;ldquo;constraints&amp;rdquo;: {
+        &amp;ldquo;maxWallClockTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;,
+        &amp;ldquo;maxTaskRetryCount&amp;rdquo;:-1
+    },
+    &amp;ldquo;jobManagerTask&amp;rdquo;: {
+        &amp;ldquo;id&amp;rdquo;:&amp;ldquo;mytask1&amp;rdquo;,
+        &amp;ldquo;commandLine&amp;rdquo;:&amp;ldquo;/bin/bash -c &amp;lsquo;export LC_ALL=en_US.UTF-8; ./task.sh&amp;rsquo;&amp;ldquo;,
+        &amp;ldquo;resourceFiles&amp;rdquo;: [ {
+            &amp;ldquo;blobSource&amp;rdquo;:&amp;ldquo;yourbloburi&amp;amp;sas&amp;rdquo;,
+            &amp;ldquo;filePath&amp;rdquo;:&amp;ldquo;task.sh&amp;rdquo;
+        }],
+        &amp;ldquo;environmentSettings&amp;rdquo;: [ {
+            &amp;ldquo;name&amp;rdquo;:&amp;ldquo;VAR1&amp;rdquo;,
+            &amp;ldquo;value&amp;rdquo;:&amp;ldquo;hello&amp;rdquo;
+        } ],
+        &amp;ldquo;constraints&amp;rdquo;: {
+            &amp;ldquo;maxWallClockTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;,
+            &amp;ldquo;maxTaskRetryCount&amp;rdquo;:0,
+            &amp;ldquo;retentionTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;
+        },
+        &amp;ldquo;killJobOnCompletion&amp;rdquo;:false,
+        &amp;ldquo;runElevated&amp;rdquo;:true,
+        &amp;ldquo;runExclusive&amp;rdquo;:true
+        },
+        &amp;ldquo;poolInfo&amp;rdquo;: {
+            &amp;ldquo;autoPoolSpecification&amp;rdquo;: {
+                &amp;ldquo;autoPoolIdPrefix&amp;rdquo;:&amp;ldquo;mypool&amp;rdquo;,
+                &amp;ldquo;poolLifetimeOption&amp;rdquo;:&amp;ldquo;job&amp;rdquo;,
+                &amp;ldquo;pool&amp;rdquo;: {
+                    &amp;ldquo;vmSize&amp;rdquo;:&amp;ldquo;STANDARD_D1&amp;rdquo;,
+                    &amp;ldquo;virtualMachineConfiguration&amp;rdquo;: {
+                        &amp;ldquo;imageReference&amp;rdquo;: {
+                        &amp;ldquo;publisher&amp;rdquo;:&amp;ldquo;Canonical&amp;rdquo;,
+                        &amp;ldquo;offer&amp;rdquo;:&amp;ldquo;UbuntuServer&amp;rdquo;,
+                        &amp;ldquo;sku&amp;rdquo;:&amp;ldquo;14.04.4-LTS&amp;rdquo;,
+                        &amp;ldquo;version&amp;rdquo;:&amp;ldquo;latest&amp;rdquo;
+                        },
+                        &amp;ldquo;nodeAgentSKUId&amp;rdquo;:&amp;ldquo;batch.node.ubuntu 14.04&amp;rdquo;
+                    },
+                    &amp;ldquo;resizeTimeout&amp;rdquo;:&amp;ldquo;PT15M&amp;rdquo;,
+                    &amp;ldquo;targetDedicated&amp;rdquo;:1,
+                    &amp;ldquo;maxTasksPerNode&amp;rdquo;:1,
+                    &amp;ldquo;taskSchedulingPolicy&amp;rdquo;: {
+                        &amp;ldquo;nodeFillType&amp;rdquo;:&amp;ldquo;Spread&amp;rdquo;
+                    },
+                    &amp;ldquo;enableAutoScale&amp;rdquo;:false,
+                    &amp;ldquo;enableInterNodeCommunication&amp;rdquo;:false,
+                    &amp;ldquo;startTask&amp;rdquo;: {
+                        &amp;ldquo;commandLine&amp;rdquo;:&amp;ldquo;/bin/bash -c &amp;lsquo;export LC_ALL=en_US.UTF-8; ./starttask.sh&amp;rsquo;&amp;ldquo;,
+                        &amp;ldquo;resourceFiles&amp;rdquo;: [ {
+                        &amp;ldquo;blobSource&amp;rdquo;:&amp;ldquo;yourbloburi&amp;amp;sas&amp;rdquo;,
+                        &amp;ldquo;filePath&amp;rdquo;:&amp;ldquo;starttask.sh&amp;rdquo;
+                        } ],
+                        &amp;ldquo;environmentSettings&amp;rdquo;: [ {
+                        &amp;ldquo;name&amp;rdquo;:&amp;ldquo;VAR2&amp;rdquo;,
+                        &amp;ldquo;value&amp;rdquo;:&amp;ldquo;Chao&amp;rdquo;
+                        } ],
+                        &amp;ldquo;runElevated&amp;rdquo;:true,
+                        &amp;ldquo;waitForSuccess&amp;rdquo;:true
+                    },
+                    &amp;ldquo;metadata&amp;rdquo;: [ {
+                        &amp;ldquo;name&amp;rdquo;:&amp;ldquo;myproperty&amp;rdquo;,
+                        &amp;ldquo;value&amp;rdquo;:&amp;ldquo;myvalue&amp;rdquo;
+                    } ]
+                }
+            }
+        }
+     }
+}&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;他にも面白そうなパラメータがありますね。またの機会に。&lt;/p&gt;
+
+&lt;p&gt;ではスケジュールジョブをAzure Batchに送り込みます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上です。あとはAzureにお任せです。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
+
+&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchはオートスケールなど、バッチ処理に特化した機能を提供していることも特長です。うまく使い分けてください。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

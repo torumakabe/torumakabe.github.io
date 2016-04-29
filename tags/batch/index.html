@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.15" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Batch &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Batch &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">29 Apr 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_batch_docker/" class="post-title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="サーバレスって言ってみたかっただけじゃないです:1e958ca6820e4dcff939a22a84382ed3">サーバレスって言ってみたかっただけじゃないです</h2>
+
+<p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
+
+<p>クラウドでバッチを走らせる時にチャレンジしたいのは、「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+節約」でしょう。</p>
+
+<p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せない。なんか中途半端です。</p>
+
+<p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。</p>
+
+<h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
+
+<ul>
+<li>管理サーバーを作らない</li>
+<li>Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される</li>
+<li>ジョブ実行サーバーは必要な時に作成され、処理が終わったら削除される</li>
+<li>サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
+<li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
+</ul>
+
+<h2 id="サンプル:1e958ca6820e4dcff939a22a84382ed3">サンプル</h2>
+
+<p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
+
+<h3 id="バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置</h3>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
+
+<p>ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。</p>
+
+<pre><code>.
+├── blob
+│   ├── application
+│   │   ├── starttask.sh
+│   │   └── task.sh
+│   ├── input
+│   │   └── the_star_spangled_banner.txt
+│   └── output
+</code></pre>
+
+<p>applicationコンテナーに、ジョブ実行サーバー(Pool)作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。</p>
+
+<ul>
+<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh">starttask.sh</a> - docker engineをインストールします</li>
+<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
+</ul>
+
+<p>また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国家です。</p>
+
+<p>さて、いよいよジョブをJSONで定義します。詳細は<a href="https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;MSPPError=-2147217396">公式ドキュメント</a>を確認してください。ポイントだけまとめます。</p>
+
+<ul>
+<li>2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil</li>
+<li>4時間ごとに実行する - schedule/recurrenceInterval</li>
+<li>ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption</li>
+<li>ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine</li>
+<li>サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
+<li>サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
+
+<li><p>サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</p>
+
+<p>{
+&ldquo;odata.metadata&rdquo;:&ldquo;<a href="https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;">https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;</a>,
+&ldquo;id&rdquo;:&ldquo;myjobschedule1&rdquo;,
+&ldquo;schedule&rdquo;: {
+    &ldquo;doNotRunUntil&rdquo;:&ldquo;2016-04-29T05:30:00.000Z&rdquo;,
+    &ldquo;recurrenceInterval&rdquo;:&ldquo;PT4H&rdquo;
+},
+&ldquo;jobSpecification&rdquo;: {
+    &ldquo;priority&rdquo;:100,
+    &ldquo;constraints&rdquo;: {
+        &ldquo;maxWallClockTime&rdquo;:&ldquo;PT1H&rdquo;,
+        &ldquo;maxTaskRetryCount&rdquo;:-1
+    },
+    &ldquo;jobManagerTask&rdquo;: {
+        &ldquo;id&rdquo;:&ldquo;mytask1&rdquo;,
+        &ldquo;commandLine&rdquo;:&ldquo;/bin/bash -c &lsquo;export LC_ALL=en_US.UTF-8; ./task.sh&rsquo;&ldquo;,
+        &ldquo;resourceFiles&rdquo;: [ {
+            &ldquo;blobSource&rdquo;:&ldquo;yourbloburi&amp;sas&rdquo;,
+            &ldquo;filePath&rdquo;:&ldquo;task.sh&rdquo;
+        }],
+        &ldquo;environmentSettings&rdquo;: [ {
+            &ldquo;name&rdquo;:&ldquo;VAR1&rdquo;,
+            &ldquo;value&rdquo;:&ldquo;hello&rdquo;
+        } ],
+        &ldquo;constraints&rdquo;: {
+            &ldquo;maxWallClockTime&rdquo;:&ldquo;PT1H&rdquo;,
+            &ldquo;maxTaskRetryCount&rdquo;:0,
+            &ldquo;retentionTime&rdquo;:&ldquo;PT1H&rdquo;
+        },
+        &ldquo;killJobOnCompletion&rdquo;:false,
+        &ldquo;runElevated&rdquo;:true,
+        &ldquo;runExclusive&rdquo;:true
+        },
+        &ldquo;poolInfo&rdquo;: {
+            &ldquo;autoPoolSpecification&rdquo;: {
+                &ldquo;autoPoolIdPrefix&rdquo;:&ldquo;mypool&rdquo;,
+                &ldquo;poolLifetimeOption&rdquo;:&ldquo;job&rdquo;,
+                &ldquo;pool&rdquo;: {
+                    &ldquo;vmSize&rdquo;:&ldquo;STANDARD_D1&rdquo;,
+                    &ldquo;virtualMachineConfiguration&rdquo;: {
+                        &ldquo;imageReference&rdquo;: {
+                        &ldquo;publisher&rdquo;:&ldquo;Canonical&rdquo;,
+                        &ldquo;offer&rdquo;:&ldquo;UbuntuServer&rdquo;,
+                        &ldquo;sku&rdquo;:&ldquo;14.04.4-LTS&rdquo;,
+                        &ldquo;version&rdquo;:&ldquo;latest&rdquo;
+                        },
+                        &ldquo;nodeAgentSKUId&rdquo;:&ldquo;batch.node.ubuntu 14.04&rdquo;
+                    },
+                    &ldquo;resizeTimeout&rdquo;:&ldquo;PT15M&rdquo;,
+                    &ldquo;targetDedicated&rdquo;:1,
+                    &ldquo;maxTasksPerNode&rdquo;:1,
+                    &ldquo;taskSchedulingPolicy&rdquo;: {
+                        &ldquo;nodeFillType&rdquo;:&ldquo;Spread&rdquo;
+                    },
+                    &ldquo;enableAutoScale&rdquo;:false,
+                    &ldquo;enableInterNodeCommunication&rdquo;:false,
+                    &ldquo;startTask&rdquo;: {
+                        &ldquo;commandLine&rdquo;:&ldquo;/bin/bash -c &lsquo;export LC_ALL=en_US.UTF-8; ./starttask.sh&rsquo;&ldquo;,
+                        &ldquo;resourceFiles&rdquo;: [ {
+                        &ldquo;blobSource&rdquo;:&ldquo;yourbloburi&amp;sas&rdquo;,
+                        &ldquo;filePath&rdquo;:&ldquo;starttask.sh&rdquo;
+                        } ],
+                        &ldquo;environmentSettings&rdquo;: [ {
+                        &ldquo;name&rdquo;:&ldquo;VAR2&rdquo;,
+                        &ldquo;value&rdquo;:&ldquo;Chao&rdquo;
+                        } ],
+                        &ldquo;runElevated&rdquo;:true,
+                        &ldquo;waitForSuccess&rdquo;:true
+                    },
+                    &ldquo;metadata&rdquo;: [ {
+                        &ldquo;name&rdquo;:&ldquo;myproperty&rdquo;,
+                        &ldquo;value&rdquo;:&ldquo;myvalue&rdquo;
+                    } ]
+                }
+            }
+        }
+     }
+}</p></li>
+</ul>
+
+<p>他にも面白そうなパラメータがありますね。またの機会に。</p>
+
+<p>ではスケジュールジョブをAzure Batchに送り込みます。</p>
+
+<pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
+</code></pre>
+
+<p>以上です。あとはAzureにお任せです。</p>
+
+<h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
+
+<p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchはオートスケールなど、バッチ処理に特化した機能を提供していることも特長です。うまく使い分けてください。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

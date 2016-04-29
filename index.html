@@ -68,6 +68,183 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">29 Apr 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_batch_docker/" class="post-title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="サーバレスって言ってみたかっただけじゃないです:1e958ca6820e4dcff939a22a84382ed3">サーバレスって言ってみたかっただけじゃないです</h2>
+
+<p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
+
+<p>クラウドでバッチを走らせる時にチャレンジしたいのは、「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+節約」でしょう。</p>
+
+<p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せない。なんか中途半端です。</p>
+
+<p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。</p>
+
+<h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
+
+<ul>
+<li>管理サーバーを作らない</li>
+<li>Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される</li>
+<li>ジョブ実行サーバーは必要な時に作成され、処理が終わったら削除される</li>
+<li>サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
+<li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
+</ul>
+
+<h2 id="サンプル:1e958ca6820e4dcff939a22a84382ed3">サンプル</h2>
+
+<p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
+
+<h3 id="バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置</h3>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
+
+<p>ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。</p>
+
+<pre><code>.
+├── blob
+│   ├── application
+│   │   ├── starttask.sh
+│   │   └── task.sh
+│   ├── input
+│   │   └── the_star_spangled_banner.txt
+│   └── output
+</code></pre>
+
+<p>applicationコンテナーに、ジョブ実行サーバー(Pool)作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。</p>
+
+<ul>
+<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh">starttask.sh</a> - docker engineをインストールします</li>
+<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
+</ul>
+
+<p>また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国家です。</p>
+
+<p>さて、いよいよジョブをJSONで定義します。詳細は<a href="https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;MSPPError=-2147217396">公式ドキュメント</a>を確認してください。ポイントだけまとめます。</p>
+
+<ul>
+<li>2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil</li>
+<li>4時間ごとに実行する - schedule/recurrenceInterval</li>
+<li>ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption</li>
+<li>ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine</li>
+<li>サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
+<li>サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
+
+<li><p>サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</p>
+
+<p>{
+&ldquo;odata.metadata&rdquo;:&ldquo;<a href="https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;">https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;</a>,
+&ldquo;id&rdquo;:&ldquo;myjobschedule1&rdquo;,
+&ldquo;schedule&rdquo;: {
+    &ldquo;doNotRunUntil&rdquo;:&ldquo;2016-04-29T05:30:00.000Z&rdquo;,
+    &ldquo;recurrenceInterval&rdquo;:&ldquo;PT4H&rdquo;
+},
+&ldquo;jobSpecification&rdquo;: {
+    &ldquo;priority&rdquo;:100,
+    &ldquo;constraints&rdquo;: {
+        &ldquo;maxWallClockTime&rdquo;:&ldquo;PT1H&rdquo;,
+        &ldquo;maxTaskRetryCount&rdquo;:-1
+    },
+    &ldquo;jobManagerTask&rdquo;: {
+        &ldquo;id&rdquo;:&ldquo;mytask1&rdquo;,
+        &ldquo;commandLine&rdquo;:&ldquo;/bin/bash -c &lsquo;export LC_ALL=en_US.UTF-8; ./task.sh&rsquo;&ldquo;,
+        &ldquo;resourceFiles&rdquo;: [ {
+            &ldquo;blobSource&rdquo;:&ldquo;yourbloburi&amp;sas&rdquo;,
+            &ldquo;filePath&rdquo;:&ldquo;task.sh&rdquo;
+        }],
+        &ldquo;environmentSettings&rdquo;: [ {
+            &ldquo;name&rdquo;:&ldquo;VAR1&rdquo;,
+            &ldquo;value&rdquo;:&ldquo;hello&rdquo;
+        } ],
+        &ldquo;constraints&rdquo;: {
+            &ldquo;maxWallClockTime&rdquo;:&ldquo;PT1H&rdquo;,
+            &ldquo;maxTaskRetryCount&rdquo;:0,
+            &ldquo;retentionTime&rdquo;:&ldquo;PT1H&rdquo;
+        },
+        &ldquo;killJobOnCompletion&rdquo;:false,
+        &ldquo;runElevated&rdquo;:true,
+        &ldquo;runExclusive&rdquo;:true
+        },
+        &ldquo;poolInfo&rdquo;: {
+            &ldquo;autoPoolSpecification&rdquo;: {
+                &ldquo;autoPoolIdPrefix&rdquo;:&ldquo;mypool&rdquo;,
+                &ldquo;poolLifetimeOption&rdquo;:&ldquo;job&rdquo;,
+                &ldquo;pool&rdquo;: {
+                    &ldquo;vmSize&rdquo;:&ldquo;STANDARD_D1&rdquo;,
+                    &ldquo;virtualMachineConfiguration&rdquo;: {
+                        &ldquo;imageReference&rdquo;: {
+                        &ldquo;publisher&rdquo;:&ldquo;Canonical&rdquo;,
+                        &ldquo;offer&rdquo;:&ldquo;UbuntuServer&rdquo;,
+                        &ldquo;sku&rdquo;:&ldquo;14.04.4-LTS&rdquo;,
+                        &ldquo;version&rdquo;:&ldquo;latest&rdquo;
+                        },
+                        &ldquo;nodeAgentSKUId&rdquo;:&ldquo;batch.node.ubuntu 14.04&rdquo;
+                    },
+                    &ldquo;resizeTimeout&rdquo;:&ldquo;PT15M&rdquo;,
+                    &ldquo;targetDedicated&rdquo;:1,
+                    &ldquo;maxTasksPerNode&rdquo;:1,
+                    &ldquo;taskSchedulingPolicy&rdquo;: {
+                        &ldquo;nodeFillType&rdquo;:&ldquo;Spread&rdquo;
+                    },
+                    &ldquo;enableAutoScale&rdquo;:false,
+                    &ldquo;enableInterNodeCommunication&rdquo;:false,
+                    &ldquo;startTask&rdquo;: {
+                        &ldquo;commandLine&rdquo;:&ldquo;/bin/bash -c &lsquo;export LC_ALL=en_US.UTF-8; ./starttask.sh&rsquo;&ldquo;,
+                        &ldquo;resourceFiles&rdquo;: [ {
+                        &ldquo;blobSource&rdquo;:&ldquo;yourbloburi&amp;sas&rdquo;,
+                        &ldquo;filePath&rdquo;:&ldquo;starttask.sh&rdquo;
+                        } ],
+                        &ldquo;environmentSettings&rdquo;: [ {
+                        &ldquo;name&rdquo;:&ldquo;VAR2&rdquo;,
+                        &ldquo;value&rdquo;:&ldquo;Chao&rdquo;
+                        } ],
+                        &ldquo;runElevated&rdquo;:true,
+                        &ldquo;waitForSuccess&rdquo;:true
+                    },
+                    &ldquo;metadata&rdquo;: [ {
+                        &ldquo;name&rdquo;:&ldquo;myproperty&rdquo;,
+                        &ldquo;value&rdquo;:&ldquo;myvalue&rdquo;
+                    } ]
+                }
+            }
+        }
+     }
+}</p></li>
+</ul>
+
+<p>他にも面白そうなパラメータがありますね。またの機会に。</p>
+
+<p>ではスケジュールジョブをAzure Batchに送り込みます。</p>
+
+<pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
+</code></pre>
+
+<p>以上です。あとはAzureにお任せです。</p>
+
+<h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
+
+<p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchはオートスケールなど、バッチ処理に特化した機能を提供していることも特長です。うまく使い分けてください。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -562,138 +739,6 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
 <p>なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるということは、そこに何か本質的な価値があるのではないでしょうか。</p>
 
 <p>オススメです。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677">俺の屍を越えていけ</h2>
-
-<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
-
-<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
-
-<h2 id="この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677">この3つは触る前から意識しよう</h2>
-
-<ol>
-<li>ARMテンプレートリソースは分離して使う</li>
-<li>リソース競合したら依存関係を定義する</li>
-<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
-</ol>
-
-<h2 id="1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677">1. ARMテンプレートリソースは分離して使う</h2>
-
-<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
-
-<p>でも、現時点の実装では、おすすめしません。</p>
-
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
-
-<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
-
-<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
-
-<h3 id="タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677">タイムアウトしがち</h3>
-
-<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
-
-<h3 id="せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677">せっかくのリソースグラフを活用できない</h3>
-
-<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
-
-<h3 id="読みづらい:9776a375b7d12db77e52b9c8d97b8677">読みづらい</h3>
-
-<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
-
-<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
-
-<h2 id="2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677">2. リソース競合したら依存関係を定義する</h2>
-
-<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
-
-<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
-
-<ul>
-<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
-<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
-</ul>
-
-<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフでうまく表現できないようです。</p>
-
-<p>そのような場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
-
-<pre><code># Create a frontend subnet
-# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
-    name = &quot;frontend&quot;
-    resource_group_name = &quot;${var.resource_group_name}&quot;
-    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
-    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
-    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
-    depends_on = [
-        &quot;azurerm_network_security_rule.fe_web80&quot;,
-        &quot;azurerm_network_security_rule.fe_web443&quot;,
-        &quot;azurerm_network_security_rule.fe_ssh&quot;
-    ]
-}
-</code></pre>
-
-<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
-
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
-
-<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
-
-<pre><code>os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
-        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
-    }
-}
-</code></pre>
-
-<p>が、エラーが返ってきます。</p>
-
-<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
-</code></pre>
-
-<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
-
-<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
-
-<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
 
                     </div>
                 </section>

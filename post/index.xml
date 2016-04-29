@@ -6,8 +6,173 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 21 Apr 2016 21:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 29 Apr 2016 17:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
+      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
+      <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
+      <description>
+
+&lt;h2 id=&#34;サーバレスって言ってみたかっただけじゃないです:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サーバレスって言ってみたかっただけじゃないです&lt;/h2&gt;
+
+&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
+
+&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいのは、「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+節約」でしょう。&lt;/p&gt;
+
+&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せない。なんか中途半端です。&lt;/p&gt;
+
+&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。&lt;/p&gt;
+
+&lt;h2 id=&#34;コンセプト:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;コンセプト&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;管理サーバーを作らない&lt;/li&gt;
+&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
+&lt;li&gt;ジョブ実行サーバーは必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
+&lt;li&gt;サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
+&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;サンプル:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サンプル&lt;/h2&gt;
+
+&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
+
+&lt;p&gt;ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;.
+├── blob
+│   ├── application
+│   │   ├── starttask.sh
+│   │   └── task.sh
+│   ├── input
+│   │   └── the_star_spangled_banner.txt
+│   └── output
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;applicationコンテナーに、ジョブ実行サーバー(Pool)作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国家です。&lt;/p&gt;
+
+&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
+&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
+&lt;li&gt;ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
+&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
+&lt;li&gt;サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
+&lt;li&gt;サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/p&gt;
+
+&lt;p&gt;{
+&amp;ldquo;odata.metadata&amp;rdquo;:&amp;ldquo;&lt;a href=&#34;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;&#34;&gt;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;&lt;/a&gt;,
+&amp;ldquo;id&amp;rdquo;:&amp;ldquo;myjobschedule1&amp;rdquo;,
+&amp;ldquo;schedule&amp;rdquo;: {
+    &amp;ldquo;doNotRunUntil&amp;rdquo;:&amp;ldquo;2016-04-29T05:30:00.000Z&amp;rdquo;,
+    &amp;ldquo;recurrenceInterval&amp;rdquo;:&amp;ldquo;PT4H&amp;rdquo;
+},
+&amp;ldquo;jobSpecification&amp;rdquo;: {
+    &amp;ldquo;priority&amp;rdquo;:100,
+    &amp;ldquo;constraints&amp;rdquo;: {
+        &amp;ldquo;maxWallClockTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;,
+        &amp;ldquo;maxTaskRetryCount&amp;rdquo;:-1
+    },
+    &amp;ldquo;jobManagerTask&amp;rdquo;: {
+        &amp;ldquo;id&amp;rdquo;:&amp;ldquo;mytask1&amp;rdquo;,
+        &amp;ldquo;commandLine&amp;rdquo;:&amp;ldquo;/bin/bash -c &amp;lsquo;export LC_ALL=en_US.UTF-8; ./task.sh&amp;rsquo;&amp;ldquo;,
+        &amp;ldquo;resourceFiles&amp;rdquo;: [ {
+            &amp;ldquo;blobSource&amp;rdquo;:&amp;ldquo;yourbloburi&amp;amp;sas&amp;rdquo;,
+            &amp;ldquo;filePath&amp;rdquo;:&amp;ldquo;task.sh&amp;rdquo;
+        }],
+        &amp;ldquo;environmentSettings&amp;rdquo;: [ {
+            &amp;ldquo;name&amp;rdquo;:&amp;ldquo;VAR1&amp;rdquo;,
+            &amp;ldquo;value&amp;rdquo;:&amp;ldquo;hello&amp;rdquo;
+        } ],
+        &amp;ldquo;constraints&amp;rdquo;: {
+            &amp;ldquo;maxWallClockTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;,
+            &amp;ldquo;maxTaskRetryCount&amp;rdquo;:0,
+            &amp;ldquo;retentionTime&amp;rdquo;:&amp;ldquo;PT1H&amp;rdquo;
+        },
+        &amp;ldquo;killJobOnCompletion&amp;rdquo;:false,
+        &amp;ldquo;runElevated&amp;rdquo;:true,
+        &amp;ldquo;runExclusive&amp;rdquo;:true
+        },
+        &amp;ldquo;poolInfo&amp;rdquo;: {
+            &amp;ldquo;autoPoolSpecification&amp;rdquo;: {
+                &amp;ldquo;autoPoolIdPrefix&amp;rdquo;:&amp;ldquo;mypool&amp;rdquo;,
+                &amp;ldquo;poolLifetimeOption&amp;rdquo;:&amp;ldquo;job&amp;rdquo;,
+                &amp;ldquo;pool&amp;rdquo;: {
+                    &amp;ldquo;vmSize&amp;rdquo;:&amp;ldquo;STANDARD_D1&amp;rdquo;,
+                    &amp;ldquo;virtualMachineConfiguration&amp;rdquo;: {
+                        &amp;ldquo;imageReference&amp;rdquo;: {
+                        &amp;ldquo;publisher&amp;rdquo;:&amp;ldquo;Canonical&amp;rdquo;,
+                        &amp;ldquo;offer&amp;rdquo;:&amp;ldquo;UbuntuServer&amp;rdquo;,
+                        &amp;ldquo;sku&amp;rdquo;:&amp;ldquo;14.04.4-LTS&amp;rdquo;,
+                        &amp;ldquo;version&amp;rdquo;:&amp;ldquo;latest&amp;rdquo;
+                        },
+                        &amp;ldquo;nodeAgentSKUId&amp;rdquo;:&amp;ldquo;batch.node.ubuntu 14.04&amp;rdquo;
+                    },
+                    &amp;ldquo;resizeTimeout&amp;rdquo;:&amp;ldquo;PT15M&amp;rdquo;,
+                    &amp;ldquo;targetDedicated&amp;rdquo;:1,
+                    &amp;ldquo;maxTasksPerNode&amp;rdquo;:1,
+                    &amp;ldquo;taskSchedulingPolicy&amp;rdquo;: {
+                        &amp;ldquo;nodeFillType&amp;rdquo;:&amp;ldquo;Spread&amp;rdquo;
+                    },
+                    &amp;ldquo;enableAutoScale&amp;rdquo;:false,
+                    &amp;ldquo;enableInterNodeCommunication&amp;rdquo;:false,
+                    &amp;ldquo;startTask&amp;rdquo;: {
+                        &amp;ldquo;commandLine&amp;rdquo;:&amp;ldquo;/bin/bash -c &amp;lsquo;export LC_ALL=en_US.UTF-8; ./starttask.sh&amp;rsquo;&amp;ldquo;,
+                        &amp;ldquo;resourceFiles&amp;rdquo;: [ {
+                        &amp;ldquo;blobSource&amp;rdquo;:&amp;ldquo;yourbloburi&amp;amp;sas&amp;rdquo;,
+                        &amp;ldquo;filePath&amp;rdquo;:&amp;ldquo;starttask.sh&amp;rdquo;
+                        } ],
+                        &amp;ldquo;environmentSettings&amp;rdquo;: [ {
+                        &amp;ldquo;name&amp;rdquo;:&amp;ldquo;VAR2&amp;rdquo;,
+                        &amp;ldquo;value&amp;rdquo;:&amp;ldquo;Chao&amp;rdquo;
+                        } ],
+                        &amp;ldquo;runElevated&amp;rdquo;:true,
+                        &amp;ldquo;waitForSuccess&amp;rdquo;:true
+                    },
+                    &amp;ldquo;metadata&amp;rdquo;: [ {
+                        &amp;ldquo;name&amp;rdquo;:&amp;ldquo;myproperty&amp;rdquo;,
+                        &amp;ldquo;value&amp;rdquo;:&amp;ldquo;myvalue&amp;rdquo;
+                    } ]
+                }
+            }
+        }
+     }
+}&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;他にも面白そうなパラメータがありますね。またの機会に。&lt;/p&gt;
+
+&lt;p&gt;ではスケジュールジョブをAzure Batchに送り込みます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上です。あとはAzureにお任せです。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
+
+&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchはオートスケールなど、バッチ処理に特化した機能を提供していることも特長です。うまく使い分けてください。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
@@ -1925,134 +2090,6 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 &lt;p&gt;なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;&amp;ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>http://torumakabe.github.io/post/azure_infradeployment_selection/</link>
-      <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
-      <description>
-
-&lt;h2 id=&#34;ケースバイケースだけど:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
-
-&lt;p&gt;Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。&lt;/p&gt;
-
-&lt;p&gt;特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。&lt;/p&gt;
-
-&lt;p&gt;なので「ケースバイケース。以上」とは、言いにくい。&lt;/p&gt;
-
-&lt;p&gt;私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。&lt;/p&gt;
-
-&lt;h2 id=&#34;書く前に前提など:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;書く前に前提など&lt;/h2&gt;
-
-&lt;p&gt;対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。&lt;/p&gt;
-
-&lt;p&gt;レイヤリングや用語は、 @gosukenator さんの&lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;&amp;ldquo;インフラ系技術の流れ&amp;rdquo;&lt;/a&gt;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。&lt;/p&gt;
-
-&lt;p&gt;では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
-
-&lt;p&gt;いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。&lt;/p&gt;
-
-&lt;p&gt;なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。&lt;/p&gt;
-
-&lt;h2 id=&#34;使い捨てられないかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
-
-&lt;p&gt;次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。&lt;/p&gt;
-
-&lt;p&gt;ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。&lt;/p&gt;
-
-&lt;p&gt;変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。&lt;/p&gt;
-
-&lt;p&gt;変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;優先事項や制約条件を洗い出す:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
-
-&lt;p&gt;アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;社内/プロジェクト標準&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;他レイヤでの優先ツール&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;規模&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;チーム or ひとり&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;Windows or Linux&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。&lt;/p&gt;
-
-&lt;h2 id=&#34;マネージドサービス-機能を活用する:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
-
-&lt;p&gt;マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。&lt;/p&gt;
-
-&lt;p&gt;また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。&lt;/p&gt;
-
-&lt;p&gt;ですが、&lt;a href=&#34;http://torumakabe.github.io/post/arm_idempotent/&#34;&gt;以前のエントリ&lt;/a&gt;で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。&lt;/p&gt;
-
-&lt;p&gt;よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。&lt;/p&gt;
-
-&lt;p&gt;ARM Templateでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARM TemplateにはDSCやシェルを実行するエクステンションが使えるので、活用します。&lt;/p&gt;
-
-&lt;p&gt;また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。&lt;/p&gt;
-
-&lt;p&gt;以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。&lt;/p&gt;
-
-&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
-
-&lt;p&gt;具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f&#34;&gt;&amp;ldquo;Automating Deployment with Azure &amp;amp; Chef&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;ARM TemplateでBootstrapping&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMを4つ作成、1つはLinux、他はWindows&lt;/li&gt;
-&lt;li&gt;ストレージ、ネットワークの作成&lt;/li&gt;
-&lt;li&gt;VMのストレージ、ネットワーク設定&lt;/li&gt;
-&lt;li&gt;OSの導入&lt;/li&gt;
-&lt;li&gt;ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ChefでConfiguration&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;各ノードのChef bootstrap(言葉が混同しやすいので注意)&lt;/li&gt;
-&lt;li&gt;Chef Clientサービスの起動設定&lt;/li&gt;
-&lt;li&gt;DBサーバのDB領域ディスク作成、フォーマット&lt;/li&gt;
-&lt;li&gt;DBサーバへSQL Server 2014のインストール&lt;/li&gt;
-&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。&lt;/p&gt;
-
-&lt;p&gt;書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。&lt;/p&gt;
 </description>
     </item>
     
