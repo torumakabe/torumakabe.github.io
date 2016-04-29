@@ -21,20 +21,20 @@
 
 &lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
 
-&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
 節約」でしょう。&lt;/p&gt;
 
-&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
+&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
 
-&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。&lt;/p&gt;
+&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
 
 &lt;h2 id=&#34;コンセプト:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;コンセプト&lt;/h2&gt;
 
 &lt;ul&gt;
-&lt;li&gt;管理サーバーを作らない&lt;/li&gt;
+&lt;li&gt;管理サーバを作らない&lt;/li&gt;
 &lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
-&lt;li&gt;ジョブ実行サーバー群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
-&lt;li&gt;サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
+&lt;li&gt;ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
+&lt;li&gt;サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
 &lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -42,11 +42,11 @@
 
 &lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置&lt;/h3&gt;
+&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
 
-&lt;p&gt;ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
+&lt;p&gt;ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;.
 ├── blob
@@ -58,27 +58,27 @@
 │   └── output
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;applicationコンテナーに、ジョブ実行サーバー作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
+&lt;p&gt;applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
+&lt;p&gt;また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
 
-&lt;p&gt;コンテナー、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
+&lt;p&gt;コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
 
 &lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
 &lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
-&lt;li&gt;ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
+&lt;li&gt;ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
 &lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
-&lt;li&gt;サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
-&lt;li&gt;サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
+&lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
+&lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
+&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;pre&gt;&lt;code&gt;  {

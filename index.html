@@ -91,20 +91,20 @@
 
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 
-<p>クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバー使う。待機時間は消しておいて、
+<p>クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
 節約」でしょう。</p>
 
-<p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバーを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバーは消せずに常時起動。なんか中途半端です。</p>
+<p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。</p>
 
-<p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバーレスバッチ処理。</p>
+<p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
 
 <h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
 
 <ul>
-<li>管理サーバーを作らない</li>
+<li>管理サーバを作らない</li>
 <li>Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される</li>
-<li>ジョブ実行サーバー群(Pool)は必要な時に作成され、処理が終わったら削除される</li>
-<li>サーバーの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
+<li>ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される</li>
+<li>サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
 <li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
 </ul>
 
@@ -112,11 +112,11 @@
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
 
-<h3 id="バッチアカウントとストレージアカウント-コンテナーの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナーの作成とアプリ、データの配置</h3>
+<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
 
-<p>ストレージアカウントに、Blobコンテナーを作ります。サンプルの構成は以下の通り。</p>
+<p>ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。</p>
 
 <pre><code>.
 ├── blob
@@ -128,27 +128,27 @@
 │   └── output
 </code></pre>
 
-<p>applicationコンテナーに、ジョブ実行サーバー作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。</p>
+<p>applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。</p>
 
 <ul>
 <li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh">starttask.sh</a> - docker engineをインストールします</li>
-<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
+<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
 </ul>
 
-<p>また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国歌です。</p>
+<p>また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。</p>
 
-<p>コンテナー、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。</p>
+<p>コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。</p>
 
 <p>さて、いよいよジョブをJSONで定義します。詳細は<a href="https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;MSPPError=-2147217396">公式ドキュメント</a>を確認してください。ポイントだけまとめます。</p>
 
 <ul>
 <li>2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil</li>
 <li>4時間ごとに実行する - schedule/recurrenceInterval</li>
-<li>ジョブ実行後にサーバープールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption</li>
+<li>ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption</li>
 <li>ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine</li>
-<li>サーバーはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
-<li>サーバー数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
-<li>サーバープール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
+<li>サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
+<li>サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
+<li>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
 </ul>
 
 <pre><code>  {
