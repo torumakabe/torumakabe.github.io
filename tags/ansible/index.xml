@@ -56,7 +56,7 @@
 
 &lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
 
@@ -74,13 +74,13 @@
 
 &lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
 
 &lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;

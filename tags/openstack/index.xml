@@ -209,7 +209,7 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
 
 &lt;h3 id=&#34;最小限の構成ファイル:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。&lt;/p&gt;
 
@@ -300,8 +300,7 @@ The state of your infrastructure has been saved to the path below. This state is
 &lt;p&gt;そこで&lt;a href=&#34;https://wiki.openstack.org/wiki/Monasca&#34;&gt;Monasca&lt;/a&gt;の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。&lt;/p&gt;
 
 &lt;p&gt;では、アーキテクチャーを見てみましょう。&lt;br /&gt;
-&lt;img src=&#34;https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png&#34; alt=&#34;MonascaArc&#34; /&gt;
-&lt;/p&gt;
+&lt;img src=&#34;https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png&#34; alt=&#34;MonascaArc&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。&lt;/p&gt;
 
@@ -485,7 +484,7 @@ The state of your infrastructure has been saved to the path below. This state is
 
 &lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
 
@@ -503,13 +502,13 @@ The state of your infrastructure has been saved to the path below. This state is
 
 &lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
 
 &lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;
@@ -606,7 +605,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 &lt;h3 id=&#34;ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
 

@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.15" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Posts &middot; re-imagine">
@@ -104,8 +104,7 @@
 <p>そこで<a href="https://wiki.openstack.org/wiki/Monasca">Monasca</a>の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。</p>
 
 <p>では、アーキテクチャーを見てみましょう。<br />
-<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" />
-</p>
+<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" /></p>
 
 <p>ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。</p>
 
@@ -313,7 +312,7 @@
 
 <h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
 
-<p><script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script></p>
+<script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
 
 <p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
 
@@ -331,13 +330,13 @@
 
 <h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
 
-<p><script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script></p>
+<script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
 
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
 
 <h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
 
-<p><script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script></p>
+<script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
 
 <ul>
 <li><p>varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。</p>
@@ -442,7 +441,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <h3 id="ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c">ではVagrantfileを見てみましょう</h3>
 
-<p><script type="text/javascript" src="http://gist.github.com/c9de20c61752864aca86.js"></script></p>
+<script type="text/javascript" src="http://gist.github.com/c9de20c61752864aca86.js"></script>
 
 <p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
 

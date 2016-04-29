@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.14" />
+    <meta name="generator" content="Hugo 0.15" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="君はOpenStack Monascaを知っているか &middot; re-imagine">
@@ -114,8 +114,7 @@
 <p>そこで<a href="https://wiki.openstack.org/wiki/Monasca">Monasca</a>の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。</p>
 
 <p>では、アーキテクチャーを見てみましょう。<br />
-<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" />
-</p>
+<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" /></p>
 
 <p>ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。</p>
 

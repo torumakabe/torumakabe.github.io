@@ -591,7 +591,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;h3 id=&#34;最小限の構成ファイル:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
 
-&lt;p&gt;&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;
+&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。&lt;/p&gt;
 
