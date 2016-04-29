@@ -67,6 +67,8 @@
 
 &lt;p&gt;また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
 
+&lt;p&gt;コンテナー、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
+
 &lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
 
 &lt;ul&gt;
