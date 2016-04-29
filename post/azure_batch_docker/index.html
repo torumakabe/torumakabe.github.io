@@ -145,7 +145,7 @@
 <li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナーを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
 </ul>
 
-<p>また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国家です。</p>
+<p>また、アプリにデータをわたすinputコンテナーと、実行結果を書き込むoutputコンテナーも作ります。サンプルのinputデータはアメリカ国歌です。</p>
 
 <p>さて、いよいよジョブをJSONで定義します。詳細は<a href="https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;MSPPError=-2147217396">公式ドキュメント</a>を確認してください。ポイントだけまとめます。</p>
 
@@ -246,7 +246,7 @@
 <pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
 </code></pre>
 
-<p>以上です。あとはAzureにお任せです。</p>
+<p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、はじめはシンプルに。</p>
 
 <h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
 
