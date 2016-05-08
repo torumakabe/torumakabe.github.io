@@ -46,6 +46,7 @@
 &lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
 &lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
+&lt;li&gt;拡張性はひとまず保留  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
