@@ -241,7 +241,7 @@ module.exports = function (context, req) {
 
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることが伝わったかと思います。&lt;/p&gt;
 
-&lt;p&gt;&lt;em&gt;なお、Botの外部公開には審査が必要とのことです&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
 </description>
     </item>
     
