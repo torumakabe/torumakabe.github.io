@@ -240,6 +240,8 @@ module.exports = function (context, req) {
 &lt;/ul&gt;
 
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることが伝わったかと思います。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;なお、Botの外部公開には審査が必要とのことです&lt;/em&gt;&lt;/p&gt;
 </description>
     </item>
     
