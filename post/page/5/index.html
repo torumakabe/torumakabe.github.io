@@ -68,6 +68,34 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">20 Sep 2015, 15:27</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/migrate-to-hugo/" class="post-title">Hugoへ移行</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Blog" href="http://torumakabe.github.io//categories/blog">Blog</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="jekyllからhugoへ移行:63d64c61b0a30fb30dcadfbaac2823c1">JekyllからHugoへ移行</h2>
+
+<p>サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。</p>
+
+<p>移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">04 Apr 2015, 00:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -362,152 +390,6 @@ The state of your infrastructure has been saved to the path below. This state is
 <p>*Trove*です。若さと期待の大きさを込めてキャスティングしました。というか<a href="http://www.publickey1.jp/blog/14/paasdbaasapaas12amazonidc_japan.html">これ</a>を見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。</p>
 
 <p>2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">14 Sep 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/openstack-tools/" class="post-title">OpenStackのツール環境をImmutableに整える</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="タイトルは釣りです:06c978f415868c5d089a8460c0068f0d">タイトルは釣りです</h3>
-
-<p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
-
-<h3 id="なぜ必要か:06c978f415868c5d089a8460c0068f0d">なぜ必要か?</h3>
-
-<p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
-
-<h3 id="やりたいこと:06c978f415868c5d089a8460c0068f0d">やりたいこと</h3>
-
-<ul>
-<li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
-<li>Windows、Macどちらでも同様の環境にしたい</li>
-<li>相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収</li>
-<li>Windows、Mac環境を汚さない、また、汚されない</li>
-<li>コマンド2、3発程度で、気軽に作って消せる</li>
-<li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
-</ul>
-
-<h3 id="方針:06c978f415868c5d089a8460c0068f0d">方針</h3>
-
-<ul>
-<li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
-<li>VagrantでWindows/Macの違いを吸収する</li>
-<li>VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う</li>
-<li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
-</ul>
-
-<h3 id="前提条件:06c978f415868c5d089a8460c0068f0d">前提条件</h3>
-
-<ul>
-<li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
-<li>OSX 10.9.4 &amp; VirtualBox 4.3.16</li>
-<li>Vagrant 1.6.5  (VMware用ライセンス買いました)</li>
-<li>ひとまずOpenStack CLIを使えるところまで作る</li>
-</ul>
-
-<h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
-
-<script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
-
-<p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
-
-<ul>
-<li>VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの<a href="https://github.com/opscode/bento">Bento</a>で、事前にboxファイルを作ってます。ubuntu14.04としました。</li>
-<li>実行ディレクトリにprovision.shを置きます。</li>
-<li>provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。</li>
-<li>実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。</li>
-
-<li><p>hostsファイルには以下のようにlocalhostを定義します。</p>
-
-<p>[localhost]<br />
-127.0.0.1 ansible_connection=local</p></li>
-</ul>
-
-<h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
-
-<script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
-
-<p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
-
-<h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
-
-<script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
-
-<ul>
-<li><p>varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。</p>
-
-<p>OS_TENANT_NAME: your_tenant_name<br />
-OS_USERNAME: your_username<br />
-&hellip;.</p></li>
-</ul>
-
-<p>という感じで並べてください。.bashrcに追加されます。
-- タイムゾーンをAsia/Tokyoにします。
-- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
-
-<h3 id="windowsでの実行例:06c978f415868c5d089a8460c0068f0d">Windowsでの実行例</h3>
-
-<p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
-
-<pre><code>PS C:\Users\hoge&gt; vagrant up
-Bringing machine 'default' up with 'vmware_workstation' provider...
-==&gt; default: Cloning VMware VM: 'opscode-ubuntu1404'. This can take some time...
-(snip)
-==&gt; default: TASK: [install OpenStack CLIs] ************************************************
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-neutronclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-novaclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-cinderclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-keystoneclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-swiftclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-keystoneclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-glanceclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-troveclient)
-==&gt; default: changed: [127.0.0.1] =&gt; (item=python-designateclient)
-==&gt; default:
-==&gt; default: PLAY RECAP ********************************************************************
-==&gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
-</code></pre>
-
-<p>うまく動いたようです。</p>
-
-<pre><code>PS C:\Users\hoge&gt; vagrant ssh
-cygwin warning:
-  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
-  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
-  CYGWIN environment variable option &quot;nodosfilewarning&quot; turns off this warning.
-  Consult the user's guide for more details about POSIX paths:
-    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
-</code></pre>
-
-<p>vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。</p>
-
-<pre><code>vagrant@vagrant:~$ nova list
-+----+------+--------+------------+-------------+----------+
-| ID | Name | Status | Task State | Power State | Networks |
-+----+------+--------+------------+-------------+----------+
-+----+------+--------+------------+-------------+----------+
-</code></pre>
-
-<p>いきなりnovaコマンド使えます。</p>
-
-<p>なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。</p>
 
                     </div>
                 </section>

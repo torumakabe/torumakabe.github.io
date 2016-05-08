@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functions &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.15" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Functions &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Functions &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">08 May 2016, 14:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_functions_fbmsgapi/" class="post-title">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e">まだ好みなんて聞いてないぜ</h2>
+
+<p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
+
+<p>Azure Functionsは、</p>
+
+<ol>
+<li>アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう</li>
+<li>利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表</li>
+<li>Azure内外機能との、容易なイベント連動。</li>
+</ol>
+
+<p>が特徴です。AWSのLambdaと似てるっちゃ似ています。</p>
+
+<p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
+
+<h3 id="基本方針:99ec2e7c4c63926799149ef94c45b73e">基本方針</h3>
+
+<ul>
+<li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
+<li>Facebook Messenger APIを使って、webhook連動する</li>
+<li>Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す</li>
+<li>ビールは<a href="http://beertaster.org/beerstyle/web/beerstyle_main_j.html">Craft Beer Association</a>の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す</li>
+<li>Botらしく、それらしい文末表現をランダムで返す</li>
+<li>好みとか文脈は全く聞かないぜSorry</li>
+<li>アプリはNodeで書く。C#のサンプルは増えてきたので</li>
+<li>静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う</li>
+<li>DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #<a href="https://gist.github.com/murdockcrc/12266f9d844be416a6a0">サンプル</a></li>
+<li>FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る</li>
+</ul>
+
+<p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
+
+<h2 id="必要な作業:99ec2e7c4c63926799149ef94c45b73e">必要な作業</h2>
+
+<p>以下が必要な作業の流れです。</p>
+
+<ul>
+<li>Azureで
+
+<ul>
+<li>Function Appの作成  #順番1</li>
+<li>Bot用Functionの作成 #順番2</li>
+<li>Facebook Messenger APIとの接続検証  #順番6</li>
+<li>Facebook Messenger API接続用Tokenの設定  #順番8</li>
+<li>DocumentDBのデータベース、コレクション作成、ドキュメント投入  #順番9</li>
+<li>DocumentDBのストアドプロシージャ作成  #順番10</li>
+<li>Function Appを書く  #順番11</li>
+<li>FunctionsのサイトにDocumentDB Node SDKを導入 #順番12</li>
+<li>Function AppのGithub連携設定  #順番13</li>
+<li>Function Appのデプロイ (GithubへのPush)  #順番14</li>
+</ul></li>
+<li>Facebookで
+
+<ul>
+<li>Facebook for Developersへの登録  #順番3</li>
+<li>Botをひも付けるFacebook Pageの作成  #順番4</li>
+<li>Bot用マイアプリの作成  #順番5</li>
+<li>Azure Functionsからのcallback URLを登録、接続検証  #順番6</li>
+<li>Azure Functions向けTokenを生成 #順番7</li>
+</ul></li>
+</ul>
+
+<p>アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。FUnction Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</p>
+
+<ul>
+<li>Function Appを書くまで、順番1〜2、5〜8は、<a href="http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/">こちらのブログエントリ</a>がとても参考になります。</li>
+<li>Facebook for Developersへの登録、順番3は、<a href="https://developers.facebook.com/">https://developers.facebook.com/</a> から。いきなり迷子の人は、<a href="http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8">こちら</a>も参考に。</li>
+<li>Facebook Pageの作成は、<a href="http://allabout.co.jp/gm/gc/387840/">ここ</a>を。Botで楽しむだけなら細かい設定は後回しでいいです。</li>
+<li>DocumentDBについては、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/">公式</a>を。
+
+<ul>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/">DBアカウント〜コレクション作成</a></li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/">ドキュメントインポート</a></li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/">ストアドプロシージャ</a></li>
+</ul></li>
+<li>FunctionsのサイトにDocumentDB Node SDKを導入する順番12は、<a href="http://tech.guitarrapc.com/entry/2016/04/05/043723">こちら</a>を。コンソールからnpm installできます。<br /></li>
+<li>Github連携設定、順番13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
+</ul>
+
+<h2 id="function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e">Function Appのサンプル</h2>
+
+<p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
+
+<p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
+
+<pre><code>D:\home\site\wwwroot
+├── fb-message-callback
+│   ├── TestOutput.json
+│   ├── function.json
+│   └── index.js  #これが今回のアプリ
+├── node_modules  #DocumentDB Node SDKが入っている
+├── host.json
+├── README.md
+</code></pre>
+
+<p>ではFunction Appの実体、index.jsを見てみましょう。</p>
+
+<pre><code>var https = require('https');
+var documentClient = require(&quot;documentdb&quot;).DocumentClient;
+const databaseUrl = &quot;dbs/&quot; + process.env.APPSETTING_DOCDB_DB_ID;
+
+var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &quot;masterKey&quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
+
+function sendTextMessage(sender, text, context) {
+  getDataFromDocDB().then(function (value) {
+    var msgAll = value[0].randomDocument.beer + &quot; &quot; + value[1].randomDocument.msg;
+    var postData = JSON.stringify({
+      recipient: sender,
+      message: {
+        &quot;attachment&quot;:{
+          &quot;type&quot;:&quot;template&quot;,
+          &quot;payload&quot;:{
+            &quot;template_type&quot;:&quot;button&quot;,
+            &quot;text&quot;:msgAll,
+            &quot;buttons&quot;:[
+              {
+                &quot;type&quot;:&quot;web_url&quot;,
+                &quot;url&quot;:value[0].randomDocument.url,
+                &quot;title&quot;:&quot;詳しく&quot;
+              }
+            ]
+          }
+        }
+      }
+    });
+    var req = https.request({
+      hostname: 'graph.facebook.com',
+      port: 443,
+      path: '/v2.6/me/messages',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.APPSETTING_FB_PAGE_TOKEN
+      }
+    });
+    req.write(postData);
+    req.end();
+  }).catch(function(err){
+    context.log(err);
+  });  
+}
+
+function getRandomDoc(sprocUrl){
+  return new Promise(function (resolve, reject) {
+    const sprocParams = {};
+    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
+      if (err) {
+        reject(err);
+      }
+      if (result) {
+        resolve(result);
+      }
+    });
+  });
+}
+
+var results = {
+  beer: function getBeer() {
+    var collectionUrl = databaseUrl + &quot;/colls/beer&quot;;
+    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  },
+  eom: function getEom() {
+    var collectionUrl = databaseUrl + &quot;/colls/eom&quot;;
+    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  }
+}
+
+function getDataFromDocDB() {
+  return Promise.all([results.beer(), results.eom()]);
+}
+
+module.exports = function (context, req) {
+  messaging_evts = req.body.entry[0].messaging;
+  for (i = 0; i &lt; messaging_evts.length; i++) {
+    evt = req.body.entry[0].messaging[i];
+    sender = evt.sender;
+    if (evt.message &amp;&amp; evt.message.text, context) {
+      sendTextMessage(sender, evt.message.text, context);
+    }
+  }
+  context.done();
+};
+</code></pre>
+
+<ul>
+<li>最下部のmodule.export以降のブロックで、webhookイベントを受け取ります</li>
+<li>それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
+
+<ul>
+<li>好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが</li>
+</ul></li>
+<li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
+
+<ul>
+<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;のスキーマはそれぞれこんな感じ</li>
+</ul></li>
+</ul>
+
+<pre><code>{
+  &quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
+  &quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
+  &quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
+}
+</code></pre>
+
+<pre><code>{
+  &quot;msg&quot;: &quot;はウマい&quot;,
+  &quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
+}
+</code></pre>
+
+<ul>
+<li>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</li>
+</ul>
+
+<p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることが伝わったかと思います。</p>
+
+<h2 id="動きに興味のある人は:99ec2e7c4c63926799149ef94c45b73e">動きに興味のある人は</h2>
+
+<p>Facebookで&rdquo;MakaBeer&rdquo;を検索し、メッセージ打ってみてください。検証用途なので、メンテナンス中は止めますし、いずれ消す可能性は大ですが。。。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

@@ -6,8 +6,246 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 29 Apr 2016 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 08 May 2016 14:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
+      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <description>
+
+&lt;h2 id=&#34;まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
+
+&lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
+
+&lt;p&gt;Azure Functionsは、&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう&lt;/li&gt;
+&lt;li&gt;利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表&lt;/li&gt;
+&lt;li&gt;Azure内外機能との、容易なイベント連動。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;が特徴です。AWSのLambdaと似てるっちゃ似ています。&lt;/p&gt;
+
+&lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
+
+&lt;h3 id=&#34;基本方針:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;基本方針&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
+&lt;li&gt;Facebook Messenger APIを使って、webhook連動する&lt;/li&gt;
+&lt;li&gt;Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す&lt;/li&gt;
+&lt;li&gt;ビールは&lt;a href=&#34;http://beertaster.org/beerstyle/web/beerstyle_main_j.html&#34;&gt;Craft Beer Association&lt;/a&gt;の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す&lt;/li&gt;
+&lt;li&gt;Botらしく、それらしい文末表現をランダムで返す&lt;/li&gt;
+&lt;li&gt;好みとか文脈は全く聞かないぜSorry&lt;/li&gt;
+&lt;li&gt;アプリはNodeで書く。C#のサンプルは増えてきたので&lt;/li&gt;
+&lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
+&lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
+
+&lt;h2 id=&#34;必要な作業:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;必要な作業&lt;/h2&gt;
+
+&lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Azureで
+
+&lt;ul&gt;
+&lt;li&gt;Function Appの作成  #順番1&lt;/li&gt;
+&lt;li&gt;Bot用Functionの作成 #順番2&lt;/li&gt;
+&lt;li&gt;Facebook Messenger APIとの接続検証  #順番6&lt;/li&gt;
+&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #順番8&lt;/li&gt;
+&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #順番9&lt;/li&gt;
+&lt;li&gt;DocumentDBのストアドプロシージャ作成  #順番10&lt;/li&gt;
+&lt;li&gt;Function Appを書く  #順番11&lt;/li&gt;
+&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #順番12&lt;/li&gt;
+&lt;li&gt;Function AppのGithub連携設定  #順番13&lt;/li&gt;
+&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #順番14&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Facebookで
+
+&lt;ul&gt;
+&lt;li&gt;Facebook for Developersへの登録  #順番3&lt;/li&gt;
+&lt;li&gt;Botをひも付けるFacebook Pageの作成  #順番4&lt;/li&gt;
+&lt;li&gt;Bot用マイアプリの作成  #順番5&lt;/li&gt;
+&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #順番6&lt;/li&gt;
+&lt;li&gt;Azure Functions向けTokenを生成 #順番7&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。FUnction Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Function Appを書くまで、順番1〜2、5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
+&lt;li&gt;Facebook for Developersへの登録、順番3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
+&lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
+&lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/&#34;&gt;DBアカウント〜コレクション作成&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する順番12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;Github連携設定、順番13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;Function Appのサンプル&lt;/h2&gt;
+
+&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\home\site\wwwroot
+├── fb-message-callback
+│   ├── TestOutput.json
+│   ├── function.json
+│   └── index.js  #これが今回のアプリ
+├── node_modules  #DocumentDB Node SDKが入っている
+├── host.json
+├── README.md
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
+var documentClient = require(&amp;quot;documentdb&amp;quot;).DocumentClient;
+const databaseUrl = &amp;quot;dbs/&amp;quot; + process.env.APPSETTING_DOCDB_DB_ID;
+
+var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &amp;quot;masterKey&amp;quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
+
+function sendTextMessage(sender, text, context) {
+  getDataFromDocDB().then(function (value) {
+    var msgAll = value[0].randomDocument.beer + &amp;quot; &amp;quot; + value[1].randomDocument.msg;
+    var postData = JSON.stringify({
+      recipient: sender,
+      message: {
+        &amp;quot;attachment&amp;quot;:{
+          &amp;quot;type&amp;quot;:&amp;quot;template&amp;quot;,
+          &amp;quot;payload&amp;quot;:{
+            &amp;quot;template_type&amp;quot;:&amp;quot;button&amp;quot;,
+            &amp;quot;text&amp;quot;:msgAll,
+            &amp;quot;buttons&amp;quot;:[
+              {
+                &amp;quot;type&amp;quot;:&amp;quot;web_url&amp;quot;,
+                &amp;quot;url&amp;quot;:value[0].randomDocument.url,
+                &amp;quot;title&amp;quot;:&amp;quot;詳しく&amp;quot;
+              }
+            ]
+          }
+        }
+      }
+    });
+    var req = https.request({
+      hostname: &#39;graph.facebook.com&#39;,
+      port: 443,
+      path: &#39;/v2.6/me/messages&#39;,
+      method: &#39;POST&#39;,
+      headers: {
+        &#39;Content-Type&#39;: &#39;application/json&#39;,
+        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
+      }
+    });
+    req.write(postData);
+    req.end();
+  }).catch(function(err){
+    context.log(err);
+  });  
+}
+
+function getRandomDoc(sprocUrl){
+  return new Promise(function (resolve, reject) {
+    const sprocParams = {};
+    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
+      if (err) {
+        reject(err);
+      }
+      if (result) {
+        resolve(result);
+      }
+    });
+  });
+}
+
+var results = {
+  beer: function getBeer() {
+    var collectionUrl = databaseUrl + &amp;quot;/colls/beer&amp;quot;;
+    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  },
+  eom: function getEom() {
+    var collectionUrl = databaseUrl + &amp;quot;/colls/eom&amp;quot;;
+    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  }
+}
+
+function getDataFromDocDB() {
+  return Promise.all([results.beer(), results.eom()]);
+}
+
+module.exports = function (context, req) {
+  messaging_evts = req.body.entry[0].messaging;
+  for (i = 0; i &amp;lt; messaging_evts.length; i++) {
+    evt = req.body.entry[0].messaging[i];
+    sender = evt.sender;
+    if (evt.message &amp;amp;&amp;amp; evt.message.text, context) {
+      sendTextMessage(sender, evt.message.text, context);
+    }
+  }
+  context.done();
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最下部のmodule.export以降のブロックで、webhookイベントを受け取ります&lt;/li&gt;
+&lt;li&gt;それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
+
+&lt;ul&gt;
+&lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
+
+&lt;ul&gt;
+&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;のスキーマはそれぞれこんな感じ&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
+  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
+  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
+  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることが伝わったかと思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;動きに興味のある人は:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;動きに興味のある人は&lt;/h2&gt;
+
+&lt;p&gt;Facebookで&amp;rdquo;MakaBeer&amp;rdquo;を検索し、メッセージ打ってみてください。検証用途なので、メンテナンス中は止めますし、いずれ消す可能性は大ですが。。。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
@@ -2042,134 +2280,6 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 &lt;p&gt;なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;&amp;ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>http://torumakabe.github.io/post/azure_infradeployment_selection/</link>
-      <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
-      <description>
-
-&lt;h2 id=&#34;ケースバイケースだけど:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
-
-&lt;p&gt;Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。&lt;/p&gt;
-
-&lt;p&gt;特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。&lt;/p&gt;
-
-&lt;p&gt;なので「ケースバイケース。以上」とは、言いにくい。&lt;/p&gt;
-
-&lt;p&gt;私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。&lt;/p&gt;
-
-&lt;h2 id=&#34;書く前に前提など:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;書く前に前提など&lt;/h2&gt;
-
-&lt;p&gt;対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。&lt;/p&gt;
-
-&lt;p&gt;レイヤリングや用語は、 @gosukenator さんの&lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;&amp;ldquo;インフラ系技術の流れ&amp;rdquo;&lt;/a&gt;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。&lt;/p&gt;
-
-&lt;p&gt;では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
-
-&lt;p&gt;いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。&lt;/p&gt;
-
-&lt;p&gt;なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。&lt;/p&gt;
-
-&lt;h2 id=&#34;使い捨てられないかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
-
-&lt;p&gt;次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。&lt;/p&gt;
-
-&lt;p&gt;ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。&lt;/p&gt;
-
-&lt;p&gt;変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。&lt;/p&gt;
-
-&lt;p&gt;変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;優先事項や制約条件を洗い出す:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
-
-&lt;p&gt;アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;社内/プロジェクト標準&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;他レイヤでの優先ツール&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;規模&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;チーム or ひとり&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;Windows or Linux&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。&lt;/p&gt;
-
-&lt;h2 id=&#34;マネージドサービス-機能を活用する:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
-
-&lt;p&gt;マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。&lt;/p&gt;
-
-&lt;p&gt;また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。&lt;/p&gt;
-
-&lt;p&gt;ですが、&lt;a href=&#34;http://torumakabe.github.io/post/arm_idempotent/&#34;&gt;以前のエントリ&lt;/a&gt;で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。&lt;/p&gt;
-
-&lt;p&gt;よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。&lt;/p&gt;
-
-&lt;p&gt;ARM Templateでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARM TemplateにはDSCやシェルを実行するエクステンションが使えるので、活用します。&lt;/p&gt;
-
-&lt;p&gt;また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。&lt;/p&gt;
-
-&lt;p&gt;以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。&lt;/p&gt;
-
-&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
-
-&lt;p&gt;具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f&#34;&gt;&amp;ldquo;Automating Deployment with Azure &amp;amp; Chef&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;ARM TemplateでBootstrapping&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMを4つ作成、1つはLinux、他はWindows&lt;/li&gt;
-&lt;li&gt;ストレージ、ネットワークの作成&lt;/li&gt;
-&lt;li&gt;VMのストレージ、ネットワーク設定&lt;/li&gt;
-&lt;li&gt;OSの導入&lt;/li&gt;
-&lt;li&gt;ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ChefでConfiguration&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;各ノードのChef bootstrap(言葉が混同しやすいので注意)&lt;/li&gt;
-&lt;li&gt;Chef Clientサービスの起動設定&lt;/li&gt;
-&lt;li&gt;DBサーバのDB領域ディスク作成、フォーマット&lt;/li&gt;
-&lt;li&gt;DBサーバへSQL Server 2014のインストール&lt;/li&gt;
-&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。&lt;/p&gt;
-
-&lt;p&gt;書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。&lt;/p&gt;
 </description>
     </item>
     
