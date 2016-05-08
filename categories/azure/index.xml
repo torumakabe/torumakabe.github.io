@@ -114,6 +114,8 @@
 ├── README.md
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。&lt;/p&gt;
+
 &lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
