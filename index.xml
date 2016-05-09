@@ -46,7 +46,7 @@
 &lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
 &lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
-&lt;li&gt;拡張性はひとまず保留  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;拡張性はひとまず目をつぶる  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
@@ -59,33 +59,33 @@
 &lt;li&gt;Azureで
 
 &lt;ul&gt;
-&lt;li&gt;Function Appの作成  #順番1&lt;/li&gt;
-&lt;li&gt;Bot用Functionの作成 #順番2&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIとの接続検証  #順番6&lt;/li&gt;
-&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #順番8&lt;/li&gt;
-&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #順番9&lt;/li&gt;
-&lt;li&gt;DocumentDBのストアドプロシージャ作成  #順番10&lt;/li&gt;
-&lt;li&gt;Function Appを書く  #順番11&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #順番12&lt;/li&gt;
-&lt;li&gt;Function AppのGithub連携設定  #順番13&lt;/li&gt;
-&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #順番14&lt;/li&gt;
+&lt;li&gt;Function Appの作成  #1&lt;/li&gt;
+&lt;li&gt;Bot用Functionの作成 #2&lt;/li&gt;
+&lt;li&gt;Facebook Messenger APIとの接続検証  #6&lt;/li&gt;
+&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #8&lt;/li&gt;
+&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9&lt;/li&gt;
+&lt;li&gt;DocumentDBのストアドプロシージャ作成  #10&lt;/li&gt;
+&lt;li&gt;Function Appを書く  #11&lt;/li&gt;
+&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #12&lt;/li&gt;
+&lt;li&gt;Function AppのGithub連携設定  #13&lt;/li&gt;
+&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #14&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;Facebookで
 
 &lt;ul&gt;
-&lt;li&gt;Facebook for Developersへの登録  #順番3&lt;/li&gt;
-&lt;li&gt;Botをひも付けるFacebook Pageの作成  #順番4&lt;/li&gt;
-&lt;li&gt;Bot用マイアプリの作成  #順番5&lt;/li&gt;
-&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #順番6&lt;/li&gt;
-&lt;li&gt;Azure Functions向けTokenを生成 #順番7&lt;/li&gt;
+&lt;li&gt;Facebook for Developersへの登録  #3&lt;/li&gt;
+&lt;li&gt;Botをひも付けるFacebook Pageの作成  #4&lt;/li&gt;
+&lt;li&gt;Bot用マイアプリの作成  #5&lt;/li&gt;
+&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #6&lt;/li&gt;
+&lt;li&gt;Azure Functions向けTokenを生成 #7&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Function Appを書くまで、順番1〜2、5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;li&gt;Facebook for Developersへの登録、順番3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
+&lt;li&gt;Function Appを書くまで、#1〜2、#5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
+&lt;li&gt;Facebook for Developersへの登録、#3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
 &lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
 &lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
 
@@ -94,8 +94,8 @@
 &lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する順番12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;Github連携設定、順番13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
+&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する#12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;Function Appのサンプル&lt;/h2&gt;
@@ -242,7 +242,7 @@ module.exports = function (context, req) {
 &lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることが伝わったかと思います。&lt;/p&gt;
+&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
 </description>
