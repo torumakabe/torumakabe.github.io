@@ -183,7 +183,7 @@ end
 &lt;pre&gt;&lt;code&gt;vagrant putty
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTerraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
+&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
 
 &lt;p&gt;あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら&lt;/p&gt;
 
