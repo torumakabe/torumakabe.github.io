@@ -10,7 +10,7 @@
     <atom:link href="http://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>VagranとDockerによるAzure向けOSS開発・管理端末のコード化</title>
+      <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
       <link>http://torumakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
