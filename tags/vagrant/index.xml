@@ -6,8 +6,218 @@
     <description>Recent content in Vagrant on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 14 Sep 2014 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 13 May 2016 18:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>VagranとDockerによるAzure向けOSS開発・管理端末のコード化</title>
+      <link>http://torumakabe.github.io/post/azure_osstools_iac/</link>
+      <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
+      <description>
+
+&lt;h2 id=&#34;端末だってコード化されたい:4b51bf5da7c597406600f164b7d91579&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
+
+&lt;p&gt;Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。&lt;/p&gt;
+
+&lt;h2 id=&#34;解決したい課題:4b51bf5da7c597406600f164b7d91579&#34;&gt;解決したい課題&lt;/h2&gt;
+
+&lt;p&gt;こんな悩みを解決します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい&lt;/li&gt;
+&lt;li&gt;WindowsもMacも使っているので、どちらでも同じ環境を作りたい&lt;/li&gt;
+&lt;li&gt;サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー&lt;/li&gt;
+&lt;li&gt;2016年にもなって長いコードをVimとかEmacsで書きたくない&lt;/li&gt;
+&lt;li&gt;Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい&lt;/li&gt;
+&lt;li&gt;仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい&lt;/li&gt;
+&lt;li&gt;Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか)&lt;/li&gt;
+&lt;li&gt;でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい&lt;/li&gt;
+&lt;li&gt;新メンバーがチームに入るたび、セットアップが大変&lt;/li&gt;
+&lt;li&gt;不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変&lt;/li&gt;
+&lt;li&gt;毎度作業のどこかが抜ける、漏れる、間違う 人間だもの&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;やり口:4b51bf5da7c597406600f164b7d91579&#34;&gt;やり口&lt;/h2&gt;
+
+&lt;p&gt;VagrantとDockerで解決します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る&lt;/li&gt;
+&lt;li&gt;Vagrantでセットアップを自動化する&lt;/li&gt;
+&lt;li&gt;Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する&lt;/li&gt;
+&lt;li&gt;Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する&lt;/li&gt;
+&lt;li&gt;公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る&lt;/li&gt;
+&lt;li&gt;Windows/MacのいまどきなIDEなりエディタを使えるようにする&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;セットアップ概要:4b51bf5da7c597406600f164b7d91579&#34;&gt;セットアップ概要&lt;/h2&gt;
+
+&lt;p&gt;簡単す。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Virtualboxを&lt;a href=&#34;https://www.virtualbox.org/&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Vagrantを&lt;a href=&#34;https://www.vagrantup.com/downloads.html&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Vagrant Putty Plugin(vagrant-multi-putty)を&lt;a href=&#34;https://github.com/nickryand/vagrant-multi-putty&#34;&gt;インストール&lt;/a&gt; #Windowsのみ。Puttyは別途入れてください&lt;/li&gt;
+&lt;li&gt;作業フォルダを作り、Vagrant ファイルを書く&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;サンプル解説:4b51bf5da7c597406600f164b7d91579&#34;&gt;サンプル解説&lt;/h2&gt;
+
+&lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
+VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot;
+
+$bootstrap=&amp;lt;&amp;lt;SCRIPT
+
+#Common tools
+sudo apt-get update
+sudo apt-get -y install wget unzip jq
+
+#Docker Engine
+sudo apt-get -y install apt-transport-https ca-certificates
+sudo apt-get -y install linux-image-extra-$(uname -r)
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+sudo sh -c &amp;quot;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &amp;gt; /etc/apt/sources.list.d/docker.list&amp;quot;
+sudo apt-get update
+sudo apt-get -y purge lxc-docker
+sudo apt-cache policy docker-engine
+sudo apt-get -y install docker-engine=1.11.1-0~trusty
+sudo gpasswd -a vagrant docker
+sudo service docker restart
+
+#Docker Machine
+sudo sh -c &amp;quot;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &amp;gt;/usr/local/bin/docker-machine &amp;amp;&amp;amp; chmod +x /usr/local/bin/docker-machine&amp;quot;
+
+#Azure CLI
+echo &amp;quot;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
+
+#Terraform
+echo &amp;quot;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
+
+#Packer
+echo &amp;quot;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
+
+#nodebrew
+curl -L git.io/nodebrew | perl - setup
+echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &amp;gt;&amp;gt; $HOME/.bashrc
+$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
+$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
+
+#Python3
+wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
+
+SCRIPT
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Every Vagrant virtual environment requires a box to build off of.
+
+  config.vm.box = &amp;quot;ubuntu/trusty64&amp;quot;
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+
+  config.vm.network &amp;quot;private_network&amp;quot;, ip: &amp;quot;192.168.33.10&amp;quot;
+
+  config.vm.provider &amp;quot;virtualbox&amp;quot; do |vb|
+     vb.customize [&amp;quot;modifyvm&amp;quot;, :id, &amp;quot;--memory&amp;quot;, &amp;quot;2048&amp;quot;]
+  end
+
+  config.vm.provision :shell, inline: $bootstrap, privileged: false
+
+end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;$bootstrap=&amp;lt;&amp;lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。&lt;/p&gt;
+
+&lt;h3 id=&#34;common-tools:4b51bf5da7c597406600f164b7d91579&#34;&gt;Common tools&lt;/h3&gt;
+
+&lt;p&gt;一般的なツールをaptでインストールします。wgetとかjqとか。&lt;/p&gt;
+
+&lt;h3 id=&#34;docker-engine-machine:4b51bf5da7c597406600f164b7d91579&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
+
+&lt;p&gt;この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。&lt;/p&gt;
+
+&lt;h3 id=&#34;azure-cli:4b51bf5da7c597406600f164b7d91579&#34;&gt;Azure CLI&lt;/h3&gt;
+
+&lt;p&gt;インストールせずに&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/&#34;&gt;MS公式のDockerイメージ&lt;/a&gt;を引っ張ります。なのでalias設定だけ。
+-v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
+また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&amp;ndash;rmで消します。&lt;/p&gt;
+
+&lt;h3 id=&#34;terraform-packer:4b51bf5da7c597406600f164b7d91579&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
+
+&lt;p&gt;Azure CLIと同様です。Hashicorpが&lt;a href=&#34;https://hub.docker.com/u/hashicorp/&#34;&gt;公式イメージ&lt;/a&gt;を提供しているので、それを活用します。
+方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
+-v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。&lt;/p&gt;
+
+&lt;p&gt;なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。&lt;/p&gt;
+
+&lt;h3 id=&#34;nodebrew:4b51bf5da7c597406600f164b7d91579&#34;&gt;nodebrew&lt;/h3&gt;
+
+&lt;p&gt;nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。&lt;/p&gt;
+
+&lt;h3 id=&#34;python3:4b51bf5da7c597406600f164b7d91579&#34;&gt;Python3&lt;/h3&gt;
+
+&lt;p&gt;Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。&lt;/p&gt;
+
+&lt;p&gt;みなさん他にもいろいろあるでしょう。シェルなのでお好みで。&lt;/p&gt;
+
+&lt;p&gt;さて、ここまでがプロビジョニング時の処理です。以降の&amp;rdquo;Vagrant.configure～&amp;rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。&lt;/p&gt;
+
+&lt;h2 id=&#34;どれだけ楽か:4b51bf5da7c597406600f164b7d91579&#34;&gt;どれだけ楽か&lt;/h2&gt;
+
+&lt;p&gt;では、環境を作ってみましょう。Vagrantfileがあるフォルダで&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vagrant up
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;仮想マシンが作成されます。初回はプロビジョニング処理も走ります。&lt;/p&gt;
+
+&lt;p&gt;できましたか。できたら、&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vagrant putty
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTerraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
+
+&lt;p&gt;あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vagrant destroy
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。&lt;/p&gt;
+
+&lt;p&gt;なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。&lt;/p&gt;
+
+&lt;p&gt;わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。&lt;/p&gt;
+
+&lt;p&gt;ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。&lt;/p&gt;
+
+&lt;p&gt;また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう&lt;/li&gt;
+&lt;li&gt;サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
+
+&lt;ul&gt;
+&lt;li&gt;(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない:4b51bf5da7c597406600f164b7d91579&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
+
+&lt;p&gt;「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。&lt;/p&gt;
+
+&lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
+
+&lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>
