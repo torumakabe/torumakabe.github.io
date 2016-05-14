@@ -63,6 +63,8 @@
 &lt;li&gt;作業フォルダを作り、Vagrant ファイルを書く&lt;/li&gt;
 &lt;/ol&gt;
 
+&lt;p&gt;もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。&lt;/p&gt;
+
 &lt;h2 id=&#34;サンプル解説:4b51bf5da7c597406600f164b7d91579&#34;&gt;サンプル解説&lt;/h2&gt;
 
 &lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
