@@ -6,8 +6,140 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 13 May 2016 18:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 21 May 2016 11:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure X-Plat CLIでResource Policyを設定する</title>
+      <link>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</link>
+      <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062&#34;&gt;Azure X-Plat CLIのリリースサイクル&lt;/h2&gt;
+
+&lt;p&gt;OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases&#34;&gt;月次&lt;/a&gt;です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。&lt;/p&gt;
+
+&lt;p&gt;たとえば、今回のテーマであるResource Policy。GA直後に公開された&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ドキュメント&lt;/a&gt;に、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。&lt;/p&gt;
+
+&lt;p&gt;機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。&lt;/p&gt;
+
+&lt;h2 id=&#34;ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーによるアクセス管理&lt;/h2&gt;
+
+&lt;p&gt;さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい&lt;/li&gt;
+&lt;li&gt;日本国外リージョンのデータセンタを使えないようにしたい&lt;/li&gt;
+&lt;li&gt;Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい&lt;/li&gt;
+&lt;li&gt;開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;などなど。こういう課題にポリシーが効きます。&lt;/p&gt;
+
+&lt;p&gt;従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/role-based-access-built-in-roles/&#34;&gt;組み込みロールの一覧&lt;/a&gt;を眺めると、理解しやすいでしょう。&lt;/p&gt;
+
+&lt;p&gt;ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。&lt;/p&gt;
+
+&lt;p&gt;リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。&lt;/p&gt;
+
+&lt;h2 id=&#34;x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062&#34;&gt;X-Plat CLIでの定義方法&lt;/h2&gt;
+
+&lt;p&gt;2016/4リリースの&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016&#34;&gt;v0.9.20&lt;/a&gt;から、X-Plat CLIでもResource Policyを定義できます。&lt;/p&gt;
+
+&lt;p&gt;ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ポリシーを使用したリソース管理とアクセス制御&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;X-Plat CLI固有部分に絞って紹介します。&lt;/p&gt;
+
+&lt;h3 id=&#34;ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシー定義ファイルを作る&lt;/h3&gt;
+
+&lt;p&gt;CLIに直書きもできるようですが、人類には早すぎる気がします。ここではファイルに書きます。&lt;/p&gt;
+
+&lt;p&gt;例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;if&amp;quot;: {
+    &amp;quot;allOf&amp;quot;: [
+      {
+        &amp;quot;field&amp;quot;: &amp;quot;type&amp;quot;,
+        &amp;quot;equals&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot;
+      },
+      {
+        &amp;quot;not&amp;quot;: {
+          &amp;quot;field&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/sku.name&amp;quot;,
+          &amp;quot;in&amp;quot;: [ &amp;quot;Standard_D1_v2&amp;quot;, &amp;quot;Standard_D2_v2&amp;quot;,&amp;quot;Standard_D3_v2&amp;quot;, &amp;quot;Standard_D4_v2&amp;quot;, &amp;quot;Standard_D5_v2&amp;quot; ]
+        }
+      }
+    ]
+  },
+  &amp;quot;then&amp;quot;: {
+    &amp;quot;effect&amp;quot;: &amp;quot;deny&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;info:    Executing command policy definition create
++ Creating policy definition deny_vmsize
+data:    PolicyName:             deny_vmsize
+data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    PolicyType:             Custom
+data:    DisplayName:
+data:    Description:
+data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
+info:    policy definition create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;できたみたいです。&lt;/p&gt;
+
+&lt;h3 id=&#34;ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーをアサインする&lt;/h3&gt;
+
+&lt;p&gt;では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも&lt;a href=&#34;https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx&#34;&gt;指定可能&lt;/a&gt;です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;info:    Executing command policy assignment create
++ Creating policy assignment deny_vmsize_assignment
+data:    PolicyAssignmentName:     deny_vmsize_assignment
+data:    Type:                     Microsoft.Authorization/policyAssignments
+data:    DisplayName:
+data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    Scope:                    /subscriptions/mysubscription
+info:    policy assignment create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_G5
+info:    Executing command vm quick-create
+[...snip]
++ Creating VM &amp;quot;rppocvm&amp;quot;
+error:   The resource action &#39;Microsoft.Compute/virtualMachines/write&#39; is disallowed by one or more policies. Policy identifier(s): &#39;/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize&#39;.
+info:    Error information has been recorded to /root/.azure/azure.err
+error:   vm quick-create command failed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;拒否られました。&lt;/p&gt;
+
+&lt;p&gt;許可されているVMサイズだと。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_D1_v2
+info:    Executing command vm quick-create
+[...snip]
+info:    vm quick-create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;成功。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
@@ -2176,157 +2308,6 @@ onemoretest
 &lt;p&gt;2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、&lt;a href=&#34;https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/&#34;&gt;Lustre&lt;/a&gt;など別の共有方法を検討してください。&lt;/p&gt;
 
 &lt;p&gt;なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>http://torumakabe.github.io/post/striping_linuxonazure/</link>
-      <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
-      <description>
-
-&lt;h2 id=&#34;俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
-
-&lt;p&gt;前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。&lt;/p&gt;
-
-&lt;p&gt;クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。&lt;/p&gt;
-
-&lt;p&gt;ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する
-
-&lt;ul&gt;
-&lt;li&gt;やみくもに調べものしないように&lt;/li&gt;
-&lt;li&gt;経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベンダの公式資料を確認する
-
-&lt;ul&gt;
-&lt;li&gt;「この使い方を推奨/サポートしています」と明記されていれば安心&lt;/li&gt;
-&lt;li&gt;でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない&lt;/li&gt;
-&lt;li&gt;不明確なら早めに問い合わせる&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベンダが運営しているコミュニティ上の情報を確認する
-
-&lt;ul&gt;
-&lt;li&gt;ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;コミュニティや有識者の情報を確認する
-
-&lt;ul&gt;
-&lt;li&gt;OSSでは特に&lt;/li&gt;
-&lt;li&gt;専門性を感じるサイト、人はリストしておく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動かす
-
-&lt;ul&gt;
-&lt;li&gt;やっぱり動かしてみないと&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;提案する
-
-&lt;ul&gt;
-&lt;li&gt;リスクがあれば明示します&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;問題なければ実績になる、問題があればリカバリする
-
-&lt;ul&gt;
-&lt;li&gt;提案しっぱなしにせずフォローすることで、自信とパターンが増える&lt;/li&gt;
-&lt;li&gt;次の案件で活きる&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。&lt;/p&gt;
-
-&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
-
-&lt;p&gt;さて今回の主題です。&lt;/p&gt;
-
-&lt;p&gt;結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。&lt;/p&gt;
-
-&lt;p&gt;Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。&lt;/p&gt;
-
-&lt;p&gt;サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。&lt;/p&gt;
-
-&lt;p&gt;Linuxで使える代表的なストライプ実装は、LVMとMD。&lt;/p&gt;
-
-&lt;p&gt;ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。&lt;/p&gt;
-
-&lt;p&gt;前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-configure-raid/&#34;&gt;&amp;ldquo;Configure Software RAID on Linux&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/&#34;&gt;&amp;ldquo;Premium Storage: Azure 仮想マシン ワークロード向けの高パフォーマンス ストレージ&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://blogs.msdn.com/b/igorpag/archive/2014/10/23/azure-storage-secrets-and-linux-i-o-optimizations.aspx&#34;&gt;&amp;ldquo;Azure Storage secrets and Linux I/O optimizations&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;得られた情報の中で大事なのは、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;公式ドキュメントで
-
-&lt;ul&gt;
-&lt;li&gt;LVMではなくMDを使った構成例が紹介されている&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;マイクロソフトがホストするブログ(MSDN)で、エキスパートが
-
-&lt;ul&gt;
-&lt;li&gt;LVMと比較したうえで、MDをすすめている&lt;/li&gt;
-&lt;li&gt;MDのChunkサイズについて推奨値を紹介している&lt;/li&gt;
-&lt;li&gt;そのほか、ファイルシステムやスケジューラに関する有益な情報あり&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;なるほど。わたしのこの時点での方針はこうです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;LVMを使う必然性はないため、MDに絞る
-
-&lt;ul&gt;
-&lt;li&gt;LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを&lt;/li&gt;
-&lt;li&gt;物理障害対策はAzureに任せる (3コピー)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;MDのChunkをデフォルトの512KBから64KBに変更する (ここは結果によって調整)&lt;/li&gt;
-&lt;li&gt;Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;上記シナリオで、ディスク当たり5,000IOPS、ストライプ数に比例した性能が実際出れば提案価値あり、ということになります。
-ですが、ズバリな実績値が見つからない。ダラダラ探すのは時間の無駄。これは自分でやるしかない。&lt;/p&gt;
-
-&lt;p&gt;構成手順は前述のリンク先にありますが、ポイントを抜き出します。OS=Ubuntu、ファイルシステム=ext4の場合です。&lt;/p&gt;
-
-&lt;p&gt;MDでストライプを作る際、チャンクを64KBに変更します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo mdadm --create /dev/md127 --level 0 --raid-devices 2  /dev/sdc1 /dev/sdd1 -c 64k
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;マウント時にバリアを無効にします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo mount /dev/md127 /mnt -o barrier=0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;では、Premium Storage(P30)をMDで2つ束ねたストライプにfioを実行してみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;100% Random Read&lt;/li&gt;
-&lt;li&gt;キャッシュ効果のないデータをとるため、Premium StorageのキャッシュはNone、fio側もdirect=1&lt;/li&gt;
-&lt;li&gt;ブロックサイズは小さめの値が欲しかったので、1K&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;結果。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;randread: (g=0): rw=randread, bs=1K-1K/1K-1K/1K-1K, ioengine=libaio, iodepth=32
-fio-2.1.3
-Starting 1 process
-
-randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
-  read : io=102400KB, bw=9912.9KB/s, iops=9912, runt= 10330msec
-[snip]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2本束ねて9,912IOPS。1本あたりほぼ5,000IOPS。ほぼ期待値。&lt;/p&gt;
 </description>
     </item>
     

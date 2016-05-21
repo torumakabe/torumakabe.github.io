@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2016-05-13T18:00:00+09:00</lastmod>
+    <lastmod>2016-05-21T11:00:00+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</loc>
+    <lastmod>2016-05-21T11:00:00+09:00</lastmod>
   </url>
   
   <url>

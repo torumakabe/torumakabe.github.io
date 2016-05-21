@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Policy &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.15" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Resource Policy &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Resource Policy &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">21 May 2016, 11:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_cli_resourcepolicy/" class="post-title">Azure X-Plat CLIでResource Policyを設定する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062">Azure X-Plat CLIのリリースサイクル</h2>
+
+<p>OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ<a href="https://github.com/Azure/azure-xplat-cli/releases">月次</a>です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。</p>
+
+<p>たとえば、今回のテーマであるResource Policy。GA直後に公開された<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/">ドキュメント</a>に、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。</p>
+
+<p>機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。</p>
+
+<h2 id="ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062">ポリシーによるアクセス管理</h2>
+
+<p>さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。</p>
+
+<ul>
+<li>VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい</li>
+<li>日本国外リージョンのデータセンタを使えないようにしたい</li>
+<li>Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい</li>
+<li>開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい</li>
+</ul>
+
+<p>などなど。こういう課題にポリシーが効きます。</p>
+
+<p>従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。<a href="https://azure.microsoft.com/ja-jp/documentation/articles/role-based-access-built-in-roles/">組み込みロールの一覧</a>を眺めると、理解しやすいでしょう。</p>
+
+<p>ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。</p>
+
+<p>リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。</p>
+
+<h2 id="x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062">X-Plat CLIでの定義方法</h2>
+
+<p>2016/4リリースの<a href="https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016">v0.9.20</a>から、X-Plat CLIでもResource Policyを定義できます。</p>
+
+<p>ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。</p>
+
+<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/">ポリシーを使用したリソース管理とアクセス制御</a></strong></p>
+
+<p>X-Plat CLI固有部分に絞って紹介します。</p>
+
+<h3 id="ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062">ポリシー定義ファイルを作る</h3>
+
+<p>CLIに直書きもできるようですが、人類には早すぎる気がします。ここではファイルに書きます。</p>
+
+<p>例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。</p>
+
+<pre><code>{
+  &quot;if&quot;: {
+    &quot;allOf&quot;: [
+      {
+        &quot;field&quot;: &quot;type&quot;,
+        &quot;equals&quot;: &quot;Microsoft.Compute/virtualMachines&quot;
+      },
+      {
+        &quot;not&quot;: {
+          &quot;field&quot;: &quot;Microsoft.Compute/virtualMachines/sku.name&quot;,
+          &quot;in&quot;: [ &quot;Standard_D1_v2&quot;, &quot;Standard_D2_v2&quot;,&quot;Standard_D3_v2&quot;, &quot;Standard_D4_v2&quot;, &quot;Standard_D5_v2&quot; ]
+        }
+      }
+    ]
+  },
+  &quot;then&quot;: {
+    &quot;effect&quot;: &quot;deny&quot;
+  }
+}
+</code></pre>
+
+<p>policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</p>
+
+<pre><code>$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
+</code></pre>
+
+<pre><code>info:    Executing command policy definition create
++ Creating policy definition deny_vmsize
+data:    PolicyName:             deny_vmsize
+data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    PolicyType:             Custom
+data:    DisplayName:
+data:    Description:
+data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
+info:    policy definition create command OK
+</code></pre>
+
+<p>できたみたいです。</p>
+
+<h3 id="ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062">ポリシーをアサインする</h3>
+
+<p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
+
+<pre><code>$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+</code></pre>
+
+<pre><code>info:    Executing command policy assignment create
++ Creating policy assignment deny_vmsize_assignment
+data:    PolicyAssignmentName:     deny_vmsize_assignment
+data:    Type:                     Microsoft.Authorization/policyAssignments
+data:    DisplayName:
+data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    Scope:                    /subscriptions/mysubscription
+info:    policy assignment create command OK
+</code></pre>
+
+<p>割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。</p>
+
+<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_G5
+info:    Executing command vm quick-create
+[...snip]
++ Creating VM &quot;rppocvm&quot;
+error:   The resource action 'Microsoft.Compute/virtualMachines/write' is disallowed by one or more policies. Policy identifier(s): '/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize'.
+info:    Error information has been recorded to /root/.azure/azure.err
+error:   vm quick-create command failed
+</code></pre>
+
+<p>拒否られました。</p>
+
+<p>許可されているVMサイズだと。</p>
+
+<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_D1_v2
+info:    Executing command vm quick-create
+[...snip]
+info:    vm quick-create command OK
+</code></pre>
+
+<p>成功。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

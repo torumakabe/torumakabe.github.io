@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cli on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/cli/</link>
+    <description>Recent content in Cli on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 21 May 2016 11:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/cli/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure X-Plat CLIでResource Policyを設定する</title>
+      <link>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</link>
+      <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062&#34;&gt;Azure X-Plat CLIのリリースサイクル&lt;/h2&gt;
+
+&lt;p&gt;OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases&#34;&gt;月次&lt;/a&gt;です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。&lt;/p&gt;
+
+&lt;p&gt;たとえば、今回のテーマであるResource Policy。GA直後に公開された&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ドキュメント&lt;/a&gt;に、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。&lt;/p&gt;
+
+&lt;p&gt;機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。&lt;/p&gt;
+
+&lt;h2 id=&#34;ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーによるアクセス管理&lt;/h2&gt;
+
+&lt;p&gt;さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい&lt;/li&gt;
+&lt;li&gt;日本国外リージョンのデータセンタを使えないようにしたい&lt;/li&gt;
+&lt;li&gt;Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい&lt;/li&gt;
+&lt;li&gt;開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;などなど。こういう課題にポリシーが効きます。&lt;/p&gt;
+
+&lt;p&gt;従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/role-based-access-built-in-roles/&#34;&gt;組み込みロールの一覧&lt;/a&gt;を眺めると、理解しやすいでしょう。&lt;/p&gt;
+
+&lt;p&gt;ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。&lt;/p&gt;
+
+&lt;p&gt;リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。&lt;/p&gt;
+
+&lt;h2 id=&#34;x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062&#34;&gt;X-Plat CLIでの定義方法&lt;/h2&gt;
+
+&lt;p&gt;2016/4リリースの&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016&#34;&gt;v0.9.20&lt;/a&gt;から、X-Plat CLIでもResource Policyを定義できます。&lt;/p&gt;
+
+&lt;p&gt;ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ポリシーを使用したリソース管理とアクセス制御&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;X-Plat CLI固有部分に絞って紹介します。&lt;/p&gt;
+
+&lt;h3 id=&#34;ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシー定義ファイルを作る&lt;/h3&gt;
+
+&lt;p&gt;CLIに直書きもできるようですが、人類には早すぎる気がします。ここではファイルに書きます。&lt;/p&gt;
+
+&lt;p&gt;例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;if&amp;quot;: {
+    &amp;quot;allOf&amp;quot;: [
+      {
+        &amp;quot;field&amp;quot;: &amp;quot;type&amp;quot;,
+        &amp;quot;equals&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot;
+      },
+      {
+        &amp;quot;not&amp;quot;: {
+          &amp;quot;field&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/sku.name&amp;quot;,
+          &amp;quot;in&amp;quot;: [ &amp;quot;Standard_D1_v2&amp;quot;, &amp;quot;Standard_D2_v2&amp;quot;,&amp;quot;Standard_D3_v2&amp;quot;, &amp;quot;Standard_D4_v2&amp;quot;, &amp;quot;Standard_D5_v2&amp;quot; ]
+        }
+      }
+    ]
+  },
+  &amp;quot;then&amp;quot;: {
+    &amp;quot;effect&amp;quot;: &amp;quot;deny&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;info:    Executing command policy definition create
++ Creating policy definition deny_vmsize
+data:    PolicyName:             deny_vmsize
+data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    PolicyType:             Custom
+data:    DisplayName:
+data:    Description:
+data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
+info:    policy definition create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;できたみたいです。&lt;/p&gt;
+
+&lt;h3 id=&#34;ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーをアサインする&lt;/h3&gt;
+
+&lt;p&gt;では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも&lt;a href=&#34;https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx&#34;&gt;指定可能&lt;/a&gt;です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;info:    Executing command policy assignment create
++ Creating policy assignment deny_vmsize_assignment
+data:    PolicyAssignmentName:     deny_vmsize_assignment
+data:    Type:                     Microsoft.Authorization/policyAssignments
+data:    DisplayName:
+data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    Scope:                    /subscriptions/mysubscription
+info:    policy assignment create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_G5
+info:    Executing command vm quick-create
+[...snip]
++ Creating VM &amp;quot;rppocvm&amp;quot;
+error:   The resource action &#39;Microsoft.Compute/virtualMachines/write&#39; is disallowed by one or more policies. Policy identifier(s): &#39;/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize&#39;.
+info:    Error information has been recorded to /root/.azure/azure.err
+error:   vm quick-create command failed
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;拒否られました。&lt;/p&gt;
+
+&lt;p&gt;許可されているVMサイズだと。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_D1_v2
+info:    Executing command vm quick-create
+[...snip]
+info:    vm quick-create command OK
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;成功。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
