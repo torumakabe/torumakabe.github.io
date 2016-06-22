@@ -62,7 +62,7 @@
 
 &lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
 
-&lt;p&gt;PowerShellのプロファイルを編集します。エディタはなんでもいいですが、VS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
+&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; code $profile
 &lt;/code&gt;&lt;/pre&gt;
