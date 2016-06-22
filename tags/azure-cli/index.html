@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Cli &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.15" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Azure Cli &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Cli &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">22 Jun 2016, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/dockerforwin_azurecli/" class="post-title">Docker for WindowsでインストールレスAzure CLI環境を作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="舌の根の乾かぬ内に:07c5653d87682735481a0855219b8241">舌の根の乾かぬ内に</h2>
+
+<p><a href="http://torumakabe.github.io/post/azure_osstools_iac/">最近</a>、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。</p>
+
+<h2 id="動機:07c5653d87682735481a0855219b8241">動機</h2>
+
+<ul>
+<li>Docker for Windows(on Client Hyper-V)のベータが一般開放された</li>
+<li>Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい</li>
+<li>月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい</li>
+<li>作業端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい</li>
+<li>○○レスって言ってみたかった</li>
+</ul>
+
+<h2 id="やり口:07c5653d87682735481a0855219b8241">やり口</h2>
+
+<ul>
+<li>Docker for Windows (on Client Hyper-V)</li>
+<li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;azure_cli&rdquo; を作る</li>
+<li>&ldquo;azure_cli&rdquo;入力にてAzure CLIコンテナを起動</li>
+<li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
+</ul>
+
+<h2 id="作業の中身:07c5653d87682735481a0855219b8241">作業の中身</h2>
+
+<ul>
+<li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/">インストール</a>
+
+<ul>
+<li>64bit Windows 10 Pro/Enterprise/Education 1511以降に対応</li>
+<li>Hyper-Vの有効化を忘れずに</li>
+<li>Hyper-VとぶつかるVirtualBoxとはお別れです</li>
+<li>Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。</li>
+</ul></li>
+<li>PowerShell functionを作成
+
+<ul>
+<li>のちほど詳しく</li>
+</ul></li>
+</ul>
+
+<h2 id="powershellのfunctionを作る:07c5653d87682735481a0855219b8241">PowerShellのfunctionを作る</h2>
+
+<p>ここが作業のハイライト。</p>
+
+<p>PowerShellのプロファイルを編集します。エディタはなんでもいいですが、VS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
+
+<pre><code>PS C:\Workspace\dockereval\arm&gt; code $profile
+</code></pre>
+
+<p>こんなfunctionを作ります。</p>
+
+<pre><code>function azure_cli {
+   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data microsoft/azure-cli:latest
+}
+</code></pre>
+
+<ul>
+<li>エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので</li>
+<li>コンテナが溜まるのがいやなので、&ndash;rmで都度消します</li>
+<li>毎度 azure login しなくていいよう、トークンをホストの${HOME}/.azureに保管し、コンテナと -v オプションで共有します</li>
+<li>ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します</li>
+<li>コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
+</ul>
+
+<p>ではテスト。まずはホスト側のファイルを確認。</p>
+
+<pre><code>PS C:\Workspace\dockereval\arm&gt; ls
+
+
+    ディレクトリ: C:\Workspace\dockereval\arm
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       2016/06/22     11:21                subd
+-a----       2016/06/22     10:26           8783 azuredeploy.json
+-a----       2016/06/22     11:28            690 azuredeploy.parameters.json
+</code></pre>
+
+<p>いくつかのファイルとサブディレクトリがあります。</p>
+
+<p>コンテナを起動してみましょう。azure_cli functionを呼びます。</p>
+
+<pre><code>PS C:\Workspace\dockereval\arm&gt; azure_cli
+root@be41d3389a21:/data#
+</code></pre>
+
+<p>コンテナを起動し、入出力をつなぎました。</p>
+
+<p>ファイル共有できているか確認。</p>
+
+<pre><code>root@be41d3389a21:/data# ls
+azuredeploy.json  azuredeploy.parameters.json  subd
+</code></pre>
+
+<p>できてますね。</p>
+
+<p>azureコマンドが打てるか確認。</p>
+
+<pre><code>root@be41d3389a21:/data# azure -v
+0.10.1
+</code></pre>
+
+<p>しあわせ。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

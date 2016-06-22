@@ -68,6 +68,189 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" class="post-title">Azure Linux VMのディスク利用料節約Tips</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd">定義領域全てが課金されるわけではありません</h2>
+
+<p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
+
+<p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
+
+<pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
+
+空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
+</code></pre>
+
+<p>詳細な定義は、以下で。</p>
+
+<p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
+
+<h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
+
+<p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
+
+<ul>
+<li>RHEL 7.2 on Azure</li>
+<li>XFS &amp; Ext4</li>
+<li>10GBytesのPage Blobの上にファイルシステムを作成</li>
+<li>mkfsはデフォルト</li>
+<li>mountはデフォルトとdiscardオプションありの2パターン</li>
+<li>MD、LVM構成にしない</li>
+<li>以下のタイミングで課金対象容量を確認
+
+<ul>
+<li>Page BlobのVMアタッチ時</li>
+<li>ファイルシステム作成時</li>
+<li>マウント時</li>
+<li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
+<li>5GBytesのファイル削除時</li>
+</ul></li>
+</ul>
+
+<p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
+
+<pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
+
+$blobSizeInBytes = 124 + $Blob.Name.Length * 2
+
+$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
+while ($metadataEnumerator.MoveNext())
+{
+    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
+}
+
+$Blob.ICloudBlob.GetPageRanges() | 
+    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
+
+return $blobSizeInBytes
+</code></pre>
+
+<p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
+
+<h2 id="結果:73b15a413c7cb87e88f45a7aaba2eebd">結果</h2>
+
+<h3 id="xfs:73b15a413c7cb87e88f45a7aaba2eebd">XFS</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">10,791,949</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,253,590,051</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">10,710,029</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="ext4:73b15a413c7cb87e88f45a7aaba2eebd">Ext4</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">　確認タイミング　</th>
+<th align="right">　課金対象容量(Bytes)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">Page BlobのVMアタッチ時</td>
+<td align="right">960</td>
+</tr>
+
+<tr>
+<td align="left">ファイルシステム作成時</td>
+<td align="right">138,683,592</td>
+</tr>
+
+<tr>
+<td align="left">マウント時</td>
+<td align="right">306,451,689</td>
+</tr>
+
+<tr>
+<td align="left">5GBytesのデータ書き込み時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時</td>
+<td align="right">5,549,470,887</td>
+</tr>
+
+<tr>
+<td align="left">5Gbytesのファイル削除時 (discard)</td>
+<td align="right">306,586,780</td>
+</tr>
+</tbody>
+</table>
+
+<p>この結果から、以下のことがわかります。</p>
+
+<ul>
+<li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
+<li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
+<li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
+
+<ul>
+<li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
+<li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
+</ul></li>
+</ul>
+
+<p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -511,90 +694,6 @@ resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
 <p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
 
 <p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">23 Mar 2016, 13:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/" class="post-title">Azure &amp; Terraform エラーコード429の対処法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b">Terraformer増加に備えて</h2>
-
-<p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
-
-<p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
-
-<h2 id="エラーコード429:41e5563e03314499a86e746f2fbd113b">エラーコード429</h2>
-
-<p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-</code></pre>
-
-<p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
-
-<h2 id="対処法:41e5563e03314499a86e746f2fbd113b">対処法</h2>
-
-<p><strong>もう一度applyしてください</strong></p>
-
-<p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
-
-<h2 id="背景:41e5563e03314499a86e746f2fbd113b">背景</h2>
-
-<p>エラーになった背景ですが、2つの可能性があります。</p>
-
-<ol>
-<li>APIリクエスト数上限に達した</li>
-<li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
-</ol>
-
-<h3 id="1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b">1. APIリクエスト数上限に達した</h3>
-
-<p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">Azure サブスクリプションとサービスの制限、クォータ、制約</a></strong></p>
-
-<p>Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。</p>
-
-<p>長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。</p>
-
-<p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
-
-<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
-
-<p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
-
-<p>わたしが経験したエラーの中に、こんなものがありました。</p>
-
-<pre><code>Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。</p>
-
-<p>Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして<a href="https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429">あがっています</a>。</p>
-
-<p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
-
-<p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
 
                     </div>
                 </section>
