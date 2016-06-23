@@ -27,14 +27,14 @@
 &lt;li&gt;Docker for Windows(on Client Hyper-V)のベータが一般開放された&lt;/li&gt;
 &lt;li&gt;Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい&lt;/li&gt;
 &lt;li&gt;月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;作業端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
+&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
 &lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;やり口:07c5653d87682735481a0855219b8241&#34;&gt;やり口&lt;/h2&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Docker for Windows (on Client Hyper-V)&lt;/li&gt;
+&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
 &lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る&lt;/li&gt;
 &lt;li&gt;&amp;ldquo;azure_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
 &lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
@@ -50,6 +50,7 @@
 &lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
 &lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
 &lt;li&gt;Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。&lt;/li&gt;
+&lt;li&gt;共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;PowerShell functionを作成
 
@@ -77,7 +78,7 @@
 &lt;ul&gt;
 &lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
 &lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 azure login しなくていいよう、トークンをホストの${HOME}/.azureに保管し、コンテナと -v オプションで共有します&lt;/li&gt;
+&lt;li&gt;毎度 azure login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
 &lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
 &lt;li&gt;コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
 &lt;/ul&gt;
@@ -105,7 +106,7 @@ d-----       2016/06/22     11:21                subd
 root@be41d3389a21:/data#
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。&lt;/p&gt;
+&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。公式Azure CLIコンテナは&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/~/dockerfile/&#34;&gt;debianベース&lt;/a&gt;です。&lt;/p&gt;
 
 &lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
 
