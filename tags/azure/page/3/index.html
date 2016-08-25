@@ -68,6 +68,111 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">17 Mar 2016, 23:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/" class="post-title">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
+
+<p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
+
+<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
+
+<p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
+
+<p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
+
+<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
+
+<ul>
+<li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
+<li>認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。</li>
+<li>Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
+
+<ul>
+<li>Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。</li>
+</ul></li>
+<li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
+</ul>
+
+<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
+
+<p>ubuntu.jsonはこんな感じです。</p>
+
+<pre><code>{
+  &quot;variables&quot;: {
+    &quot;client_id&quot;: &quot;&quot;,
+    &quot;client_secret&quot;: &quot;&quot;,
+    &quot;resource_group&quot;: &quot;&quot;,
+    &quot;storage_account&quot;: &quot;&quot;,
+    &quot;subscription_id&quot;: &quot;&quot;,
+    &quot;tenant_id&quot;: &quot;&quot;
+  },
+  &quot;builders&quot;: [{
+    &quot;type&quot;: &quot;azure-arm&quot;,
+
+    &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;,
+    &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;,
+    &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;,
+    &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;,
+    &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;,
+    &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;,
+
+    &quot;capture_container_name&quot;: &quot;images&quot;,
+    &quot;capture_name_prefix&quot;: &quot;packer&quot;,
+
+    &quot;image_publisher&quot;: &quot;Canonical&quot;,
+    &quot;image_offer&quot;: &quot;UbuntuServer&quot;,
+    &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;,
+
+    &quot;location&quot;: &quot;Japan West&quot;,
+    &quot;vm_size&quot;: &quot;Standard_D1&quot;
+  }],
+  &quot;provisioners&quot;: [{
+    &quot;type&quot;: &quot;shell&quot;,
+      &quot;scripts&quot;: [
+        &quot;../script/ubuntu/provision.sh&quot;
+    ]
+  },
+  {
+    &quot;type&quot;: &quot;ansible-local&quot;,
+    &quot;playbook_file&quot;: &quot;../ansible/baseimage.yml&quot;,
+    &quot;inventory_file&quot;: &quot;../ansible/hosts&quot;,
+    &quot;role_paths&quot;: [
+      &quot;../ansible/roles/baseimage&quot;
+    ]
+  },
+  {
+    &quot;type&quot;: &quot;shell&quot;,
+      &quot;scripts&quot;: [
+        &quot;../script/ubuntu/deprovision.sh&quot;
+    ]
+  }]
+}
+</code></pre>
+
+<p>waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Github</a>でご確認を。</p>
+
+<p>これで手順書&amp;目視&amp;指差し確認でイメージ作るのを、やめられそうですね。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">09 Mar 2016, 16:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -862,135 +967,6 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 <p>WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な平行度が変わってくるはずです。</p>
 
 <p>でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">07 Feb 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/fileshare_linuxonazure/" class="post-title">Linux on Azureでファイル共有する方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba">ファイル共有、あまりおすすめしないです</h2>
-
-<p>いきなりタイトルを否定しました。ロック。</p>
-
-<p>さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。</p>
-
-<p>ですが<strong>個人的には</strong>あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。</p>
-
-<p>でも、否定はしません。アプリの作りを変えられないケースもあるかと思います。</p>
-
-<p>そこで、もしAzureでファイル共有が必要であれば、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/">Azure File Storage</a>を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。</p>
-
-<p>対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。</p>
-
-<p>使い方は公式ドキュメントを。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares">&ldquo;Azure Storage での Azure CLI の使用&rdquo;</a></p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/">&ldquo;Linux で Azure File Storage を使用する方法&rdquo;</a></p>
-
-<p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
-
-<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
-
-<p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
-
-<pre><code>local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc
-</code></pre>
-
-<p>ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。</p>
-
-<pre><code>local$ azure storage account connectionstring show tomakabefspoc -g fspoc
-info:    Executing command storage account connectionstring show
-+ Getting storage account keys
-data:    connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==
-info:    storage account connectionstring show command OK
-</code></pre>
-
-<p>shareを作成します。share名はfspocshareとしました。</p>
-
-<pre><code>local$ azure storage share create -a tomakabefspoc -k qwertyuiopasdfghjklzxcvbnm== fspocshare
-</code></pre>
-
-<p>エンドポイントを確認しておきましょう。VMからのマウントの際に必要です。</p>
-
-<pre><code>local$ azure storage account show tomakabefspoc -g fspoc
-[snip]
-data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
-</code></pre>
-
-<h2 id="linux-2vmで共有:fa176ff87dca43c3d098f48095435bba">Linux * 2VMで共有</h2>
-
-<p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
-
-<pre><code>fspocvm01:~$ sudo apt-get install cifs-utils
-</code></pre>
-
-<p>マウントポイントを作り、マウントします。接続先の指定はエンドポイント+share名で。usernameはストレージアカウント名。パスワードはストレージアカウントのキーです。
-パーミッションは要件に合わせてください。</p>
-
-<pre><code>fspocvm01:~$ sudo mkdir -p /mnt/fspoc
-fspocvm01:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
-</code></pre>
-
-<p>マウント完了。確認用のファイルを作っておきます。</p>
-
-<pre><code>fspocvm01:~$ echo &quot;test&quot; &gt; /mnt/fspoc/test.txt
-fspocvm01:~$ cat /mnt/fspoc/test.txt
-test
-</code></pre>
-
-<p>2台目のVMでも同様のマウント作業を。</p>
-
-<pre><code>fspocvm02:~$ sudo apt-get install cifs-utils
-fspocvm02:~$ sudo mkdir -p /mnt/fspoc
-fspocvm02:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
-</code></pre>
-
-<p>1台目で作ったファイルが見えますね。</p>
-
-<pre><code>fspocvm02:~$ ls /mnt/fspoc
-test.txt
-fspocvm02:~$ cat /mnt/fspoc/test.txt
-test
-</code></pre>
-
-<p>ファイルをいじりましょう。</p>
-
-<pre><code>fspocvm02:~$ echo &quot;onemoretest&quot; &gt;&gt; /mnt/fspoc/test.txt
-fspocvm02:~$ cat /mnt/fspoc/test.txt
-test
-onemoretest
-</code></pre>
-
-<p>1台目から確認。</p>
-
-<pre><code>fspocvm01:~$ cat /mnt/fspoc/test.txt
-test
-onemoretest
-</code></pre>
-
-<h2 id="ご利用は計画的に:fa176ff87dca43c3d098f48095435bba">ご利用は計画的に</h2>
-
-<p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
-
-<p>なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。</p>
 
                     </div>
                 </section>

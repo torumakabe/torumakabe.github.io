@@ -68,6 +68,93 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">25 Aug 2016, 16:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/oms_container_linux/" class="post-title">OMSでLinuxコンテナのログを分析する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283">OMS Container Solution for Linux プレビュー開始</h2>
+
+<p>OMS OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
+
+<p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
+
+<h2 id="何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283">何ができるか、とその特徴</h2>
+
+<ul>
+<li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
+
+<ul>
+<li>収集データの詳細 - <a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">Containers data collection details</a></li>
+</ul></li>
+<li>導入が楽ちん
+
+<ol>
+<li>OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる</li>
+<li>コンテナホストに直接OMS Agentを導入することもできる</li>
+</ol></li>
+</ul>
+
+<p>1がコンテナ的でいいですよね。実現イメージはこんな感じです。</p>
+
+<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" /></p>
+
+<p>これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。</p>
+
+<p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
+
+<h2 id="手順:494184e69e067c0e711200d6bf38d283">手順</h2>
+
+<ul>
+<li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
+
+<ul>
+<li>Azureのサブスクリプションを持っている場合、&rdquo;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
+</ul></li>
+<li>ソリューションギャラリーから、&rdquo;Containers&rdquo;を追加</li>
+<li>UbuntuにDockerを導入
+
+<ul>
+<li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
+<li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
+</ul></li>
+<li>OMSエージェントコンテナを導入
+
+<ul>
+<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
+</ul></li>
+</ul>
+
+<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
+</code></pre>
+
+<p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
+
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" /></p>
+
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" /></p>
+
+<p>なんと簡単じゃありませんか。詳細が気になるかたは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">こちら</a>から。</p>
+
+<p>なお、フィードバック<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">熱烈歓迎</a>だそうです。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">13 May 2016, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -765,68 +852,20 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">05 Nov 2015, 15:40</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_docker_extension/" class="post-title">Azure Docker VM Extensionを使う3つの理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66">まずはじめに</h2>
-
-<p>先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。</p>
-
-<p>もちろん、技術者個人として、中立的に、公開できるネタを書きます。</p>
-
-<p>AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。</p>
-
-<p>なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。</p>
-
-<h2 id="azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66">Azure Docker VM Extension を使う3つの理由</h2>
-
-<p>さて、今回は話題沸騰のDocker関連のネタ、<a href="https://github.com/Azure/azure-docker-extension">Azure Docker VM Extension</a>について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。</p>
-
-<p>このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。</p>
-
-<p>ずばり、答えはGithubの<a href="https://github.com/Azure/azure-docker-extension">README</a>にまとまっています。この拡張機能のうれしさは、</p>
-
-<ol>
-<li>Docker EngineのStable最新版をインストールしてくれる</li>
-<li>Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
-
-<ul>
-<li>ポートマッピング、認証まわり、Docker Registoryサーバの定義など</li>
-</ul></li>
-<li>Docker Composeのパラメータを渡すことができる (オプション)</li>
-</ol>
-
-<p>以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。</p>
-
-<p>Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。</p>
-
-<p>ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。</p>
-
-<p>Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。</p>
-
-<p>なお、このDocker拡張、ARM属性で言うpublisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 2</span>
+    
+      <a href="/tags/docker/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    
+  </nav>
+</div>
+
 
             <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">

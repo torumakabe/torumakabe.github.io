@@ -6,8 +6,83 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 22 Jun 2016 15:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>OMSでLinuxコンテナのログを分析する</title>
+      <link>http://torumakabe.github.io/post/oms_container_linux/</link>
+      <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
+      <description>
+
+&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
+
+&lt;p&gt;OMS OMS Container Solution for Linuxのプレビューが&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;はじまりました&lt;/a&gt;。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。&lt;/p&gt;
+
+&lt;p&gt;さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。&lt;/p&gt;
+
+&lt;h2 id=&#34;何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
+
+&lt;ul&gt;
+&lt;li&gt;収集データの詳細 - &lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details&#34;&gt;Containers data collection details&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;導入が楽ちん
+
+&lt;ol&gt;
+&lt;li&gt;OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる&lt;/li&gt;
+&lt;li&gt;コンテナホストに直接OMS Agentを導入することもできる&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;1がコンテナ的でいいですよね。実現イメージはこんな感じです。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png&#34; alt=&#34;OMS Agent Installation Type&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。&lt;/p&gt;
+
+&lt;p&gt;では試しに、1のやり口でUbuntuへ導入してみましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;手順:494184e69e067c0e711200d6bf38d283&#34;&gt;手順&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/&#34;&gt;参考&lt;/a&gt;)
+
+&lt;ul&gt;
+&lt;li&gt;Azureのサブスクリプションを持っている場合、&amp;rdquo;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure&#34;&gt;Microsoft Azure を使用した迅速なサインアップ&lt;/a&gt;&amp;ldquo;から読むと、話が早いです&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加&lt;/li&gt;
+&lt;li&gt;UbuntuにDockerを導入
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/installation/linux/ubuntulinux/&#34;&gt;参考&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;OMSエージェントコンテナを導入
+
+&lt;ul&gt;
+&lt;li&gt;先ほど入手したOMSのワークスペースIDとKeyを入れてください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&amp;quot;omsagent&amp;quot; --log-driver=none --restart=always microsoft/oms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上。これでOMSポータルからログ分析ができます。こんな感じで。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png&#34; alt=&#34;Dashboard1&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png&#34; alt=&#34;Dashboard2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
+
+&lt;p&gt;なお、フィードバック&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;熱烈歓迎&lt;/a&gt;だそうです。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI環境を作る</title>
@@ -1962,81 +2037,6 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;これで、ARM認証難民がうまれなくなりますように。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure DDoS対策ことはじめ</title>
-      <link>http://torumakabe.github.io/post/azure_ddosprotection/</link>
-      <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_ddosprotection/</guid>
-      <description>
-
-&lt;h2 id=&#34;すこぶるfaq:4a620049922b1b54512a25b34ba773c5&#34;&gt;すこぶるFAQ&lt;/h2&gt;
-
-&lt;p&gt;攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。&lt;/p&gt;
-
-&lt;h2 id=&#34;公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5&#34;&gt;公式ホワイトペーパー&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf&#34;&gt;Microsoft Azure Network Security Whitepaper V3&lt;/a&gt;が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。&lt;/p&gt;
-
-&lt;p&gt;今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2016//3/4 追記 &lt;a href=&#34;http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf&#34;&gt;日本語訳&lt;/a&gt;がありました&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5&#34;&gt;2.2 Security Management and Threat Defense - Protecting against DDoS&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
-
-&lt;h2 id=&#34;azureがやってくれること:4a620049922b1b54512a25b34ba773c5&#34;&gt;Azureがやってくれること&lt;/h2&gt;
-
-&lt;p&gt;では、具体的に。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。&lt;/p&gt;
-
-&lt;h2 id=&#34;お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5&#34;&gt;お客様対応が必要なこと&lt;/h2&gt;
-
-&lt;p&gt;ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以下のような対処が有効です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Running multiple VM instances behind a load-balanced Public IP address.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのDDoS防御システムで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃などです。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot; Web Server add-ons that protect against certain DoS attacks.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが&lt;a href=&#34;http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx&#34;&gt;ここ&lt;/a&gt;が参考になります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。&lt;/p&gt;
-
-&lt;h2 id=&#34;ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5&#34;&gt;ホワイトペーパーに加えて&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/cdn/&#34;&gt;CDN&lt;/a&gt;も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/&#34;&gt;提供される予定&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。&lt;/p&gt;
-
-&lt;p&gt;最後に。攻撃されている感があれば、カスタマーサポートまで。&lt;/p&gt;
 </description>
     </item>
     
