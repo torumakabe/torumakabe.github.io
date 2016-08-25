@@ -41,7 +41,7 @@
 
 &lt;p&gt;1がコンテナ的でいいですよね。実現イメージはこんな感じです。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png&#34; alt=&#34;OMS Agent Installation Type&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png&#34; alt=&#34;OMS Agent Installation Type&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。&lt;/p&gt;
 
@@ -74,9 +74,9 @@
 
 &lt;p&gt;以上。これでOMSポータルからログ分析ができます。こんな感じで。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png&#34; alt=&#34;Dashboard1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png&#34; alt=&#34;Dashboard1&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png&#34; alt=&#34;Dashboard2&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png&#34; alt=&#34;Dashboard2&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
 
