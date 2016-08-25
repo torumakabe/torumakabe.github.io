@@ -55,7 +55,7 @@
 &lt;ul&gt;
 &lt;li&gt;Azureのサブスクリプションを持っている場合、&amp;rdquo;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure&#34;&gt;Microsoft Azure を使用した迅速なサインアップ&lt;/a&gt;&amp;ldquo;から読むと、話が早いです&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加&lt;/li&gt;
+&lt;li&gt;OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加&lt;/li&gt;
 &lt;li&gt;UbuntuにDockerを導入
 
 &lt;ul&gt;
