@@ -6,8 +6,161 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 13 Sep 2016 17:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
+      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <description>
+
+&lt;h2 id=&#34;背景と動機:13f4070f39b47880df2f217875deb9f9&#34;&gt;背景と動機&lt;/h2&gt;
+
+&lt;p&gt;Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。&lt;/p&gt;
+
+&lt;p&gt;さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエスト最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。&lt;/li&gt;
+&lt;li&gt;Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(&lt;a href=&#34;https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx&#34;&gt;MS OMS&lt;/a&gt;、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。&lt;/li&gt;
+&lt;li&gt;でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。&lt;/li&gt;
+&lt;li&gt;Azureリソースの使用量データ取得が一例。Azureでは使用量データを&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/&#34;&gt;ポータルからダウンロード&lt;/a&gt;したり、&lt;a href=&#34;https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/&#34;&gt;Power BIで分析&lt;/a&gt;できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。&lt;/li&gt;
+&lt;li&gt;ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。&lt;/li&gt;
+&lt;li&gt;それAzure Functionsで出来るよ。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;方針:13f4070f39b47880df2f217875deb9f9&#34;&gt;方針&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Azure FunctionsのTimer Triggerを使って、日次で実行&lt;/li&gt;
+&lt;li&gt;Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み&lt;/li&gt;
+&lt;li&gt;Nodeで書く (C#のサンプルはたくさんあるので)&lt;/li&gt;
+&lt;li&gt;業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;quick-start:13f4070f39b47880df2f217875deb9f9&#34;&gt;Quick Start&lt;/h2&gt;
+
+&lt;h3 id=&#34;準備:13f4070f39b47880df2f217875deb9f9&#34;&gt;準備&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ところでAzure Funtionsって何よ、って人はまず&lt;a href=&#34;https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/&#34;&gt;いい資料1&lt;/a&gt;と&lt;a href=&#34;https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/&#34;&gt;いい資料2&lt;/a&gt;でざっと把握を&lt;/li&gt;
+&lt;li&gt;AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (&lt;a href=&#34;https://doc.co/66mYfB&#34;&gt;ここ&lt;/a&gt;とか&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;ここ&lt;/a&gt;を参考に)
+
+&lt;ul&gt;
+&lt;li&gt;後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください&lt;/li&gt;
+&lt;li&gt;権限はsubscriptionに対するreaderが妥当でしょう&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Githubのリポジトリを作成 (VSTSやBitbucketも使えます)&lt;/li&gt;
+&lt;li&gt;使用量データを貯めるストレージアカウントを作成
+
+&lt;ul&gt;
+&lt;li&gt;後ほど環境変数に設定するので、接続文字列を控えておいてください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;デプロイ:13f4070f39b47880df2f217875deb9f9&#34;&gt;デプロイ&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Function Appを作成
+
+&lt;ul&gt;
+&lt;li&gt;ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App&lt;/li&gt;
+&lt;li&gt;アプリ名は.azurewebsites.net空間でユニークになるように&lt;/li&gt;
+&lt;li&gt;App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行した分課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう&lt;/li&gt;
+&lt;li&gt;メモリは128MBあれば十分です&lt;/li&gt;
+&lt;li&gt;他のパラメータはお好みで&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;環境変数の設定
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定&lt;/li&gt;
+&lt;li&gt;先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;サンプルコードを取得
+
+&lt;ul&gt;
+&lt;li&gt;githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; &lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;AZFuncTimerTriggerSample&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;準備済みのGithubリポジトリにpush&lt;/li&gt;
+&lt;li&gt;リポジトリとFunction Appを同期
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ&lt;/li&gt;
+&lt;li&gt;Githubリポジトリとブランチを設定し、同期を待ちます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Nodeのモジュールをインストール
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/li&gt;
+&lt;li&gt;このディレクトリが、実行する関数、functionの単位です&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;これで、指定ストレージアカウントの&amp;rdquo;usagedata&amp;rdquo;コンテナに日次で使用量データファイルができます。&lt;/p&gt;
+
+&lt;h2 id=&#34;コード解説:13f4070f39b47880df2f217875deb9f9&#34;&gt;コード解説&lt;/h2&gt;
+
+&lt;p&gt;3つのファイルをデプロイしました。簡単な順に、ざっと解説します。&lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;コード&lt;/a&gt;を眺めながら読み進めてください。&lt;/p&gt;
+
+&lt;h3 id=&#34;package-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;package.json&lt;/h3&gt;
+
+&lt;p&gt;主となるコードファイルは後述の&amp;rdquo;index.js&amp;rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。&lt;/p&gt;
+
+&lt;h3 id=&#34;function-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;function.json&lt;/h3&gt;
+
+&lt;p&gt;Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&amp;rdquo;schedule&amp;rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;0 0 0 * * *&amp;rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。&lt;/p&gt;
+
+&lt;h2 id=&#34;index-js:13f4070f39b47880df2f217875deb9f9&#34;&gt;index.js&lt;/h2&gt;
+
+&lt;p&gt;メインロジックです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;先ほど設定した環境変数は、&amp;rdquo;process.env.HOGE&amp;rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。&lt;/li&gt;
+&lt;li&gt;日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。&lt;/li&gt;
+&lt;li&gt;0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx&#34;&gt;こちら&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。&lt;/li&gt;
+&lt;li&gt;最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。&lt;/li&gt;
+&lt;li&gt;ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
+
+&lt;ul&gt;
+&lt;li&gt;Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。&lt;/li&gt;
+&lt;li&gt;ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&amp;rdquo;YYYY-MM-DD_n.json&amp;rdquo;です。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;豆知識-node-on-azure-functions:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
+
+&lt;ul&gt;
+&lt;li&gt;NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です&lt;/li&gt;
+&lt;li&gt;Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを&lt;a href=&#34;https://github.com/Azure/azure-sdk-for-node/issues/1450&#34;&gt;サポートしていない&lt;/a&gt;ので、サポートされるまではcallbackで堅く書きましょう&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7&#34;&gt;サポートマトリックス&lt;/a&gt;を確認しましょう&lt;/li&gt;
+&lt;li&gt;なのでサンプルではOutput Binding使わずに書きました&lt;/li&gt;
+&lt;li&gt;Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;豆知識-azure-billing-api:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Azure Billing API)&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/&#34;&gt;Ratecard API&lt;/a&gt;を組み合わせてください&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;それでは、幸せな運用管理サーバレス生活を。&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
@@ -1985,81 +2138,6 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;これで、ARM認証難民がうまれなくなりますように。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure DDoS対策ことはじめ</title>
-      <link>http://torumakabe.github.io/post/azure_ddosprotection/</link>
-      <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_ddosprotection/</guid>
-      <description>
-
-&lt;h2 id=&#34;すこぶるfaq:4a620049922b1b54512a25b34ba773c5&#34;&gt;すこぶるFAQ&lt;/h2&gt;
-
-&lt;p&gt;攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。&lt;/p&gt;
-
-&lt;h2 id=&#34;公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5&#34;&gt;公式ホワイトペーパー&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf&#34;&gt;Microsoft Azure Network Security Whitepaper V3&lt;/a&gt;が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。&lt;/p&gt;
-
-&lt;p&gt;今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2016//3/4 追記 &lt;a href=&#34;http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf&#34;&gt;日本語訳&lt;/a&gt;がありました&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5&#34;&gt;2.2 Security Management and Threat Defense - Protecting against DDoS&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。&lt;/p&gt;
-
-&lt;h2 id=&#34;azureがやってくれること:4a620049922b1b54512a25b34ba773c5&#34;&gt;Azureがやってくれること&lt;/h2&gt;
-
-&lt;p&gt;では、具体的に。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。&lt;/p&gt;
-
-&lt;h2 id=&#34;お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5&#34;&gt;お客様対応が必要なこと&lt;/h2&gt;
-
-&lt;p&gt;ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以下のような対処が有効です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Running multiple VM instances behind a load-balanced Public IP address.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのDDoS防御システムで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃などです。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot; Web Server add-ons that protect against certain DoS attacks.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが&lt;a href=&#34;http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx&#34;&gt;ここ&lt;/a&gt;が参考になります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。&lt;/p&gt;
-
-&lt;h2 id=&#34;ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5&#34;&gt;ホワイトペーパーに加えて&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/cdn/&#34;&gt;CDN&lt;/a&gt;も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/&#34;&gt;提供される予定&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。&lt;/p&gt;
-
-&lt;p&gt;最後に。攻撃されている感があれば、カスタマーサポートまで。&lt;/p&gt;
 </description>
     </item>
     

@@ -6,8 +6,161 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 13 Sep 2016 17:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
+      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <description>
+
+&lt;h2 id=&#34;背景と動機:13f4070f39b47880df2f217875deb9f9&#34;&gt;背景と動機&lt;/h2&gt;
+
+&lt;p&gt;Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。&lt;/p&gt;
+
+&lt;p&gt;さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエスト最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。&lt;/li&gt;
+&lt;li&gt;Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(&lt;a href=&#34;https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx&#34;&gt;MS OMS&lt;/a&gt;、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。&lt;/li&gt;
+&lt;li&gt;でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。&lt;/li&gt;
+&lt;li&gt;Azureリソースの使用量データ取得が一例。Azureでは使用量データを&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/&#34;&gt;ポータルからダウンロード&lt;/a&gt;したり、&lt;a href=&#34;https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/&#34;&gt;Power BIで分析&lt;/a&gt;できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。&lt;/li&gt;
+&lt;li&gt;ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。&lt;/li&gt;
+&lt;li&gt;それAzure Functionsで出来るよ。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;方針:13f4070f39b47880df2f217875deb9f9&#34;&gt;方針&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Azure FunctionsのTimer Triggerを使って、日次で実行&lt;/li&gt;
+&lt;li&gt;Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み&lt;/li&gt;
+&lt;li&gt;Nodeで書く (C#のサンプルはたくさんあるので)&lt;/li&gt;
+&lt;li&gt;業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;quick-start:13f4070f39b47880df2f217875deb9f9&#34;&gt;Quick Start&lt;/h2&gt;
+
+&lt;h3 id=&#34;準備:13f4070f39b47880df2f217875deb9f9&#34;&gt;準備&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ところでAzure Funtionsって何よ、って人はまず&lt;a href=&#34;https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/&#34;&gt;いい資料1&lt;/a&gt;と&lt;a href=&#34;https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/&#34;&gt;いい資料2&lt;/a&gt;でざっと把握を&lt;/li&gt;
+&lt;li&gt;AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (&lt;a href=&#34;https://doc.co/66mYfB&#34;&gt;ここ&lt;/a&gt;とか&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;ここ&lt;/a&gt;を参考に)
+
+&lt;ul&gt;
+&lt;li&gt;後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください&lt;/li&gt;
+&lt;li&gt;権限はsubscriptionに対するreaderが妥当でしょう&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Githubのリポジトリを作成 (VSTSやBitbucketも使えます)&lt;/li&gt;
+&lt;li&gt;使用量データを貯めるストレージアカウントを作成
+
+&lt;ul&gt;
+&lt;li&gt;後ほど環境変数に設定するので、接続文字列を控えておいてください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;デプロイ:13f4070f39b47880df2f217875deb9f9&#34;&gt;デプロイ&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Function Appを作成
+
+&lt;ul&gt;
+&lt;li&gt;ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App&lt;/li&gt;
+&lt;li&gt;アプリ名は.azurewebsites.net空間でユニークになるように&lt;/li&gt;
+&lt;li&gt;App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行した分課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう&lt;/li&gt;
+&lt;li&gt;メモリは128MBあれば十分です&lt;/li&gt;
+&lt;li&gt;他のパラメータはお好みで&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;環境変数の設定
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定&lt;/li&gt;
+&lt;li&gt;先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;サンプルコードを取得
+
+&lt;ul&gt;
+&lt;li&gt;githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; &lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;AZFuncTimerTriggerSample&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;準備済みのGithubリポジトリにpush&lt;/li&gt;
+&lt;li&gt;リポジトリとFunction Appを同期
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ&lt;/li&gt;
+&lt;li&gt;Githubリポジトリとブランチを設定し、同期を待ちます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Nodeのモジュールをインストール
+
+&lt;ul&gt;
+&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/li&gt;
+&lt;li&gt;このディレクトリが、実行する関数、functionの単位です&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;これで、指定ストレージアカウントの&amp;rdquo;usagedata&amp;rdquo;コンテナに日次で使用量データファイルができます。&lt;/p&gt;
+
+&lt;h2 id=&#34;コード解説:13f4070f39b47880df2f217875deb9f9&#34;&gt;コード解説&lt;/h2&gt;
+
+&lt;p&gt;3つのファイルをデプロイしました。簡単な順に、ざっと解説します。&lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;コード&lt;/a&gt;を眺めながら読み進めてください。&lt;/p&gt;
+
+&lt;h3 id=&#34;package-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;package.json&lt;/h3&gt;
+
+&lt;p&gt;主となるコードファイルは後述の&amp;rdquo;index.js&amp;rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。&lt;/p&gt;
+
+&lt;h3 id=&#34;function-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;function.json&lt;/h3&gt;
+
+&lt;p&gt;Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&amp;rdquo;schedule&amp;rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。&lt;/p&gt;
+
+&lt;p&gt;&amp;ldquo;0 0 0 * * *&amp;rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。&lt;/p&gt;
+
+&lt;h2 id=&#34;index-js:13f4070f39b47880df2f217875deb9f9&#34;&gt;index.js&lt;/h2&gt;
+
+&lt;p&gt;メインロジックです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;先ほど設定した環境変数は、&amp;rdquo;process.env.HOGE&amp;rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。&lt;/li&gt;
+&lt;li&gt;日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。&lt;/li&gt;
+&lt;li&gt;0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx&#34;&gt;こちら&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。&lt;/li&gt;
+&lt;li&gt;最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。&lt;/li&gt;
+&lt;li&gt;ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
+
+&lt;ul&gt;
+&lt;li&gt;Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。&lt;/li&gt;
+&lt;li&gt;ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&amp;rdquo;YYYY-MM-DD_n.json&amp;rdquo;です。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;豆知識-node-on-azure-functions:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
+
+&lt;ul&gt;
+&lt;li&gt;NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です&lt;/li&gt;
+&lt;li&gt;Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを&lt;a href=&#34;https://github.com/Azure/azure-sdk-for-node/issues/1450&#34;&gt;サポートしていない&lt;/a&gt;ので、サポートされるまではcallbackで堅く書きましょう&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7&#34;&gt;サポートマトリックス&lt;/a&gt;を確認しましょう&lt;/li&gt;
+&lt;li&gt;なのでサンプルではOutput Binding使わずに書きました&lt;/li&gt;
+&lt;li&gt;Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;豆知識-azure-billing-api:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Azure Billing API)&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/&#34;&gt;Ratecard API&lt;/a&gt;を組み合わせてください&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;それでは、幸せな運用管理サーバレス生活を。&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
@@ -1943,329 +2096,6 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;p&gt;CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。&lt;/p&gt;
 
 &lt;p&gt;最後に。攻撃されている感があれば、カスタマーサポートまで。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>http://torumakabe.github.io/post/azureblobupload_perf/</link>
-      <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
-      <description>
-
-&lt;h2 id=&#34;同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c&#34;&gt;同じ目的を達成できるツールがたくさん&lt;/h2&gt;
-
-&lt;p&gt;やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。&lt;/p&gt;
-
-&lt;p&gt;端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。&lt;/p&gt;
-
-&lt;p&gt;そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。&lt;/p&gt;
-
-&lt;p&gt;で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。&lt;/p&gt;
-
-&lt;p&gt;なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。&lt;/p&gt;
-
-&lt;h2 id=&#34;環境と測定方式:2c3afc565a3430f70519d9c56354717c&#34;&gt;環境と測定方式&lt;/h2&gt;
-
-&lt;p&gt;おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。&lt;/p&gt;
-
-&lt;p&gt;環境は以下の通り。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows端末
-
-&lt;ul&gt;
-&lt;li&gt;Surface Pro 4 Core i7/16GB Memory/802.11ac&lt;/li&gt;
-&lt;li&gt;1Gbps Ethernet (USB経由)&lt;/li&gt;
-&lt;li&gt;Windows 10 (1511)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Mac端末
-
-&lt;ul&gt;
-&lt;li&gt;Macbook 12inch Core M/8GB Memory/802.11ac&lt;/li&gt;
-&lt;li&gt;USB-C&amp;hellip; 有線テストは省きます&lt;/li&gt;
-&lt;li&gt;El Capitan&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Wi-Fiアクセスポイント/端末間帯域
-
-&lt;ul&gt;
-&lt;li&gt;100~200Mbpsでつながっています&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Azureデータセンタまでの接続
-
-&lt;ul&gt;
-&lt;li&gt;日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続&lt;/li&gt;
-&lt;li&gt;よってWAN側の遅延、帯域ともに条件がいい&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;対象ツール
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/&#34;&gt;AzCopy v5.0.0.27&lt;/a&gt; (Windowsのみ)&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/&#34;&gt;Azure CLI v0.9.15&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://storageexplorer.com/&#34;&gt;Azure Storage Explorer - Cross Platform GUI v0.7&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;転送ファイル
-
-&lt;ul&gt;
-&lt;li&gt;Ubuntu 15.10 ISOイメージ (647MBytes)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;そして測定方式。&lt;/p&gt;
-
-&lt;p&gt;AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが平行度指定です。デフォルトの平行度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Azure CLIも同様にMeasure-Commandで。&amp;ndash;concurrenttaskcountで平行度を指定できますが、&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js&#34;&gt;ソース&lt;/a&gt;を確認したところ、平行度のデフォルトは5です。&amp;rdquo;StorageUtil.threadsInOperation = 5;&amp;ldquo;ですね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。&lt;/p&gt;
-
-&lt;h2 id=&#34;結果:2c3afc565a3430f70519d9c56354717c&#34;&gt;結果&lt;/h2&gt;
-
-&lt;p&gt;平行度上げても伸びないな、というタイミングまで上げます。&lt;/p&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;right&#34;&gt;　実行No　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　クライアントOS　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　ネットワーク接続　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　クライアント　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　並行数　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　転送時間(秒)　&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;(default:32)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;9.62&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;12.28&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10.83&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10.43&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;49.92&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;29.47&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;7&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;21.05&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;8&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;40&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;20.12&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;1Gbps Ethernet&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;50.10&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;(default:32)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;74.87&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;11&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;53.32&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;12&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;AzCopy&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;58.85&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;13&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;57.23&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;14&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;50.71&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;15&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;54.37&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;16&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Windows 10&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;54.63&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;17&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Mac OS X&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;(default:5)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;40.86&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;18&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Mac OS X&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;33.97&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;19&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Mac OS X&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Azure CLI&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;58.57&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;20&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Mac OS X&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;802.11ac&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Storage Explorer&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;58.20&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;h2 id=&#34;考察:2c3afc565a3430f70519d9c56354717c&#34;&gt;考察&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。&lt;/li&gt;
-&lt;li&gt;平行度は大きく性能に影響します。
-
-&lt;ul&gt;
-&lt;li&gt;平行度が高すぎてもだめ
-
-&lt;ul&gt;
-&lt;li&gt;無線AzCopyのデフォルト(平行度32)が平行度10、20より時間がかかっていることからわかる&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;デフォルトで遅いからといってあきらめず、平行度変えて試してみましょう&lt;/li&gt;
-&lt;li&gt;SDK使って自分で作る時も同じ。平行度パラメータを意識してください
-
-&lt;ul&gt;
-&lt;li&gt;.NET: BlobRequestOptions&lt;/li&gt;
-&lt;li&gt;Java/Android: BlobRequestOptions.setConcurrentRequestCount()&lt;/li&gt;
-&lt;li&gt;Node.js: parallelOperationThreadCount&lt;/li&gt;
-&lt;li&gt;C++: blob_request_options::set_parallelism_factor&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Azure CLIよりAzCopyが早い。
-
-&lt;ul&gt;
-&lt;li&gt;.NETで最適化できているから合点&lt;/li&gt;
-&lt;li&gt;Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い&lt;/li&gt;
-&lt;li&gt;でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる&lt;/li&gt;
-&lt;li&gt;No.18の結果は無線状態がよかったと想定&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Azure Storage Explorer Cross Platform GUIは、現時点で平行度変えられないので性能面では不利。でも直観的なので、使い分け。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な平行度が変わってくるはずです。&lt;/p&gt;
-
-&lt;p&gt;でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。&lt;/p&gt;
 </description>
     </item>
     
