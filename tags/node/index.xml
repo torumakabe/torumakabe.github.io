@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Node on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/node/</link>
+    <description>Recent content in Node on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Wed, 14 Sep 2016 15:00:00 +0900</lastBuildDate>
+    <atom:link href="http://torumakabe.github.io/tags/node/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Bash on WindowsでNode開発環境を作る</title>
+      <link>http://torumakabe.github.io/post/bashonwindows_nvm/</link>
+      <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/bashonwindows_nvm/</guid>
+      <description>
+
+&lt;h2 id=&#34;bash-on-windows-現時点での使いどころ:a32d2312b9ac4610e007379f05304450&#34;&gt;Bash on Windows 現時点での使いどころ&lt;/h2&gt;
+
+&lt;p&gt;Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。&lt;/p&gt;
+
+&lt;p&gt;たとえばNodeのバージョン管理。Windowsには&lt;a href=&#34;https://github.com/marcelklehr/nodist&#34;&gt;nodist&lt;/a&gt;がありますが、Linux/Macでは動きません。Linux/Macで使ってる&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;NVM&lt;/a&gt;がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。&lt;/p&gt;
+
+&lt;p&gt;最近、Azure FunnctionでNode v6.4.0が&lt;a href=&#34;https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/&#34;&gt;使えるようになった&lt;/a&gt;ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。&lt;/p&gt;
+
+&lt;h2 id=&#34;nvmのインストール:a32d2312b9ac4610e007379f05304450&#34;&gt;NVMのインストール&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Bash on Ubuntu on Windowsを入れます (&lt;a href=&#34;http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html&#34;&gt;参考&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Bash on Ubuntu on Windowsを起動します&lt;/li&gt;
+&lt;li&gt;build-essentialとlibssl-devを入れます&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo apt-get install build-essential checkinstall
+sudo apt-get install libssl-dev
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;インストールスクリプトを流します&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;バージョンアップを考慮し、インストールのつど&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;公式ページ&lt;/a&gt;を確認してください。&lt;/p&gt;
+
+&lt;p&gt;以上。&lt;/p&gt;
+
+&lt;h2 id=&#34;nvmの使い方:a32d2312b9ac4610e007379f05304450&#34;&gt;NVMの使い方&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;nvm install 6.4.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;指定のバージョンをインストールします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nvm use 6.4.0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使うバージョンを指定します。&lt;/p&gt;
+
+&lt;p&gt;簡単ですね。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd /mnt/c/your_work_directory
+node ./index.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;なんて感じで、書いたコードをテストしちゃってください。&lt;/p&gt;
+
+&lt;p&gt;なお、Visual Studio Code使いの人は&lt;a href=&#34;https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/&#34;&gt;統合ターミナルをBashにしておく&lt;/a&gt;と、さらに幸せになれます。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
