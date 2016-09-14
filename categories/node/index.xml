@@ -23,7 +23,7 @@
 
 &lt;p&gt;たとえばNodeのバージョン管理。Windowsには&lt;a href=&#34;https://github.com/marcelklehr/nodist&#34;&gt;nodist&lt;/a&gt;がありますが、Linux/Macでは動きません。Linux/Macで使ってる&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;NVM&lt;/a&gt;がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。&lt;/p&gt;
 
-&lt;p&gt;最近、Azure FunnctionでNode v6.4.0が&lt;a href=&#34;https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/&#34;&gt;使えるようになった&lt;/a&gt;ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。&lt;/p&gt;
+&lt;p&gt;最近、Azure FunctionsでNode v6.4.0が&lt;a href=&#34;https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/&#34;&gt;使えるようになった&lt;/a&gt;ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。&lt;/p&gt;
 
 &lt;h2 id=&#34;nvmのインストール:a32d2312b9ac4610e007379f05304450&#34;&gt;NVMのインストール&lt;/h2&gt;
 
