@@ -157,9 +157,10 @@ node ./index.js
 &lt;li&gt;Nodeのモジュールをインストール
 
 &lt;ul&gt;
-&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/li&gt;
-&lt;li&gt;このディレクトリが、実行する関数、functionの単位です&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;このディレクトリが、実行する関数、functionの単位です&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;deploy.cmd で自動的にインストールするよう変えました&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
