@@ -43,37 +43,47 @@
 
 &lt;h2 id=&#34;おおまかな流れ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;おおまかな流れ&lt;/h2&gt;
 
-&lt;p&gt;手順書はつらいのでポイントだけ。&lt;/p&gt;
+&lt;p&gt;手順書つらいのでポイントだけ。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;SlackのスラッシュコマンドとIncoming Webhookを作る
+&lt;li&gt;&lt;p&gt;SlackのSlash CommandとIncoming Webhookを作る&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;流れはSandino氏の&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;元ネタ&lt;/a&gt;と同じ&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM TemplateでFunction Appをデプロイ
-
-&lt;ul&gt;
-&lt;li&gt;Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます&lt;/li&gt;
-&lt;li&gt;パラメータファイルのサンプルは&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json&#34;&gt;sample.azuredeploy.parameters.json&lt;/a&gt;です、GUIでデプロイする場合も、パラメータの意味を理解するためにざっと読むと幸せになれると思います&lt;/li&gt;
-&lt;li&gt;Function AppのデプロイはGithubからCIするので、クローンしたリポジトリとブランチを指定してください&lt;/li&gt;
-&lt;li&gt;Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラーメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)&lt;/li&gt;
-&lt;li&gt;Azure Automationについては触れませんが、Slackから呼び出すRunbookを準備してください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;デプロイ後、スラッシュコマンドで呼び出すhttptrigger function(postJob)のtokenを変更
-
-&lt;ul&gt;
-&lt;li&gt;kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したスラッシュコマンドのtokenに書き換え&lt;/li&gt;
+&lt;li&gt;流れは氏の&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;元ネタ&lt;/a&gt;と同じ&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Slack スラッシュコマンドのリクエスト先URLを変更 (例: &lt;a href=&#34;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&#34;&gt;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Functionが動いたら、Slackの指定チャンネルでスラッシュコマンドが打てるようになる&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;ARM TemplateでFunction Appをデプロイ&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;/runbook [runbook名] [parm1] [parm2] [parm&amp;hellip;]&lt;/li&gt;
-&lt;li&gt;パラメータはrunbook次第&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;パラメータファイルのサンプルは&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json&#34;&gt;sample.azuredeploy.parameters.json&lt;/a&gt;です。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;作成済みのSlack関連パラメータを指定します&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Slack上で、Slash Commandのリクエスト先URLを変更 (例: &lt;a href=&#34;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&#34;&gt;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ファンクションが動いたら、Slackの指定チャンネルでSlash Commandが打てるようになる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;/runbook [runbook名] [parm1] [parm2] [parm&amp;hellip;]&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;パラメータはrunbook次第&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Runbookの進捗はIncoming Webhookでslackに通知される&lt;/p&gt;
@@ -86,14 +96,18 @@
 &lt;h2 id=&#34;よもやま話:3a5e8d97b60e50a739f033a761af1408&#34;&gt;よもやま話&lt;/h2&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Slackのスラッシュコマンドは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。
+&lt;li&gt;&lt;p&gt;SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;functionはTriggerされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。&lt;/li&gt;
-&lt;li&gt;FunctionsのWebコンソールログが30分で停止するので30分と誤解していたのですが、正しくは5分。ソースは&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;ここ&lt;/a&gt;。&lt;/li&gt;
-&lt;li&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/li&gt;
-&lt;li&gt;Functionに更新があった場合、リロードが走ります。リロード後も寝てしまうので、コード変更直後はタイムアウトしてしまうかもしれません。あせらずpingまで待ちましょう。&lt;/li&gt;
-&lt;li&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;ファンクションはトリガーされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azure FunctionsのWebコンソールログが無活動だと30分で停止するので、coldに入る条件も30分と誤解していたのですが、正しくは5分。ソースは&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
