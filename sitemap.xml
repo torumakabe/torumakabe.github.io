@@ -3,8 +3,13 @@
   
   <url>
     <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2016-09-14T15:00:00+09:00</lastmod>
+    <lastmod>2016-10-07T17:00:00+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/azure_chatops_onfunctions/</loc>
+    <lastmod>2016-10-07T17:00:00+09:00</lastmod>
   </url>
   
   <url>

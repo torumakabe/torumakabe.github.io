@@ -6,8 +6,98 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 14 Sep 2016 15:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>SlackとAzure FunctionsでChatOpsする</title>
+      <link>http://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
+
+&lt;p&gt;Azure上でChatOpsしたい、と相談をいただきました。&lt;/p&gt;
+
+&lt;p&gt;AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;サンプル&lt;/a&gt;があります。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png&#34; alt=&#34;Azure Runスラッシュ&#34; title=&#34;from fabriccontroller.net&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。&lt;/p&gt;
+
+&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;誰がいつ、どんな文脈でRunbookを実行したかを可視化する&lt;/li&gt;
+&lt;li&gt;CLIやAPIをRunbookで隠蔽し、おぼえることを減らす&lt;/li&gt;
+&lt;li&gt;CLIやAPIをRunbookで隠蔽し、できることを制限する&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;ブツ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;ブツ&lt;/h2&gt;
+
+&lt;p&gt;Githubに上げておきました。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample&#34;&gt;AZChatOpsSmaple&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;おおまかな流れ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;おおまかな流れ&lt;/h2&gt;
+
+&lt;p&gt;手順書はつらいのでポイントだけ。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;SlackのスラッシュコマンドとIncoming Webhookを作る
+
+&lt;ul&gt;
+&lt;li&gt;流れはSandino氏の&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;元ネタ&lt;/a&gt;と同じ&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ARM TemplateでFunction Appをデプロイ
+
+&lt;ul&gt;
+&lt;li&gt;Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます&lt;/li&gt;
+&lt;li&gt;パラメータファイルのサンプルは&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json&#34;&gt;sample.azuredeploy.parameters.json&lt;/a&gt;です、GUIでデプロイする場合も、パラメータの意味を理解するためにざっと読むと幸せになれると思います&lt;/li&gt;
+&lt;li&gt;Function AppのデプロイはGithubからCIするので、クローンしたリポジトリとブランチを指定してください&lt;/li&gt;
+&lt;li&gt;Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラーメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)&lt;/li&gt;
+&lt;li&gt;Azure Automationについては触れませんが、Slackから呼び出すRunbookを準備してください&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;デプロイ後、スラッシュコマンドで呼び出すhttptrigger function(postJob)のtokenを変更
+
+&lt;ul&gt;
+&lt;li&gt;kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したスラッシュコマンドのtokenに書き換え&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Slack スラッシュコマンドのリクエスト先URLを変更 (例: &lt;a href=&#34;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&#34;&gt;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Functionが動いたら、Slackの指定チャンネルでスラッシュコマンドが打てるようになる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;/runbook [runbook名] [parm1] [parm2] [parm&amp;hellip;]&lt;/li&gt;
+&lt;li&gt;パラメータはrunbook次第&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Runbookの進捗はIncoming Webhookでslackに通知される&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Runbookのステータスが変わったときに通知&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;よもやま話:3a5e8d97b60e50a739f033a761af1408&#34;&gt;よもやま話&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Slackのスラッシュコマンドは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。
+
+&lt;ul&gt;
+&lt;li&gt;functionはTriggerされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。&lt;/li&gt;
+&lt;li&gt;FunctionsのWebコンソールログが30分で停止するので30分と誤解していたのですが、正しくは5分。ソースは&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;ここ&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/li&gt;
+&lt;li&gt;Functionに更新があった場合、リロードが走ります。リロード後も寝てしまうので、コード変更直後はタイムアウトしてしまうかもしれません。あせらずpingまで待ちましょう。&lt;/li&gt;
+&lt;li&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Bash on WindowsでNode開発環境を作る</title>
@@ -1809,99 +1899,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;(2016/3/25 追記) 回避策を&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/&#34;&gt;別エントリ&lt;/a&gt;に書きました&lt;/strong&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
-      <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
-      <description>
-
-&lt;h2 id=&#34;いつの間に:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;いつの間に&lt;/h2&gt;
-
-&lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
-
-&lt;h2 id=&#34;ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
-
-&lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
-
-&lt;h3 id=&#34;前準備:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;前準備&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
-&lt;li&gt;認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。&lt;/li&gt;
-&lt;li&gt;Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
-
-&lt;ul&gt;
-&lt;li&gt;Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;サンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;サンプル&lt;/h3&gt;
-
-&lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;variables&amp;quot;: {
-    &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot;
-  },
-  &amp;quot;builders&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;,
-
-    &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;,
-    &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;,
-
-    &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;,
-    &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;,
-
-    &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;,
-    &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;,
-    &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;,
-
-    &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;,
-    &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot;
-  }],
-  &amp;quot;provisioners&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/provision.sh&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;ansible-local&amp;quot;,
-    &amp;quot;playbook_file&amp;quot;: &amp;quot;../ansible/baseimage.yml&amp;quot;,
-    &amp;quot;inventory_file&amp;quot;: &amp;quot;../ansible/hosts&amp;quot;,
-    &amp;quot;role_paths&amp;quot;: [
-      &amp;quot;../ansible/roles/baseimage&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/deprovision.sh&amp;quot;
-    ]
-  }]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
-
-&lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
 </description>
     </item>
     

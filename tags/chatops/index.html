@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatops &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.15" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Chatops &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Chatops &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">07 Oct 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_chatops_onfunctions/" class="post-title">SlackとAzure FunctionsでChatOpsする</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408">Azure Functionsでやってみよう</h2>
+
+<p>Azure上でChatOpsしたい、と相談をいただきました。</p>
+
+<p>AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">サンプル</a>があります。</p>
+
+<p><img src="http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png" alt="Azure Runスラッシュ" title="from fabriccontroller.net" /></p>
+
+<p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
+
+<h2 id="slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408">SlackからRunbookを実行できて、何がうれしいか</h2>
+
+<ul>
+<li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
+<li>CLIやAPIをRunbookで隠蔽し、おぼえることを減らす</li>
+<li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
+</ul>
+
+<h2 id="ブツ:3a5e8d97b60e50a739f033a761af1408">ブツ</h2>
+
+<p>Githubに上げておきました。</p>
+
+<p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSmaple</a></p>
+
+<h2 id="おおまかな流れ:3a5e8d97b60e50a739f033a761af1408">おおまかな流れ</h2>
+
+<p>手順書はつらいのでポイントだけ。</p>
+
+<ul>
+<li>SlackのスラッシュコマンドとIncoming Webhookを作る
+
+<ul>
+<li>流れはSandino氏の<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">元ネタ</a>と同じ</li>
+</ul></li>
+<li>ARM TemplateでFunction Appをデプロイ
+
+<ul>
+<li>Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます</li>
+<li>パラメータファイルのサンプルは<a href="https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json">sample.azuredeploy.parameters.json</a>です、GUIでデプロイする場合も、パラメータの意味を理解するためにざっと読むと幸せになれると思います</li>
+<li>Function AppのデプロイはGithubからCIするので、クローンしたリポジトリとブランチを指定してください</li>
+<li>Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラーメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)</li>
+<li>Azure Automationについては触れませんが、Slackから呼び出すRunbookを準備してください</li>
+</ul></li>
+<li>ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)<br /></li>
+<li>デプロイ後、スラッシュコマンドで呼び出すhttptrigger function(postJob)のtokenを変更
+
+<ul>
+<li>kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したスラッシュコマンドのtokenに書き換え</li>
+</ul></li>
+
+<li><p>Slack スラッシュコマンドのリクエスト先URLを変更 (例: <a href="https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken">https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken</a>)</p></li>
+
+<li><p>Functionが動いたら、Slackの指定チャンネルでスラッシュコマンドが打てるようになる</p>
+
+<ul>
+<li>/runbook [runbook名] [parm1] [parm2] [parm&hellip;]</li>
+<li>パラメータはrunbook次第</li>
+</ul></li>
+
+<li><p>Runbookの進捗はIncoming Webhookでslackに通知される</p>
+
+<ul>
+<li>Runbookのステータスが変わったときに通知</li>
+</ul></li>
+</ul>
+
+<h2 id="よもやま話:3a5e8d97b60e50a739f033a761af1408">よもやま話</h2>
+
+<ul>
+<li>Slackのスラッシュコマンドは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。
+
+<ul>
+<li>functionはTriggerされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。</li>
+<li>FunctionsのWebコンソールログが30分で停止するので30分と誤解していたのですが、正しくは5分。ソースは<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">ここ</a>。</li>
+<li>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</li>
+<li>Functionに更新があった場合、リロードが走ります。リロード後も寝てしまうので、コード変更直後はタイムアウトしてしまうかもしれません。あせらずpingまで待ちましょう。</li>
+<li>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</li>
+</ul></li>
+</ul>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
