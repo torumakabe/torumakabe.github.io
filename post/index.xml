@@ -61,6 +61,8 @@
 
 &lt;li&gt;&lt;p&gt;Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください&lt;/p&gt;&lt;/li&gt;
 
+&lt;li&gt;&lt;p&gt;GithubからのCIは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/app-service-deploy-complex-application-predictably/&#34;&gt;はじめてのケースを考慮し&lt;/a&gt;ARM Templateのリソースプロパティ&amp;rdquo;IsManualIntegration&amp;rdquo;をtrueにしています&lt;/p&gt;&lt;/li&gt;
+
 &lt;li&gt;&lt;p&gt;Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します&lt;/p&gt;&lt;/li&gt;
