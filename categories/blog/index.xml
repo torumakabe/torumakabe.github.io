@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/migrate-to-hugo/</guid>
       <description>
 
-&lt;h2 id=&#34;jekyllからhugoへ移行:63d64c61b0a30fb30dcadfbaac2823c1&#34;&gt;JekyllからHugoへ移行&lt;/h2&gt;
+&lt;h2 id=&#34;jekyllからhugoへ移行&#34;&gt;JekyllからHugoへ移行&lt;/h2&gt;
 
 &lt;p&gt;サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。&lt;/p&gt;
 

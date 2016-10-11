@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>
 
-&lt;h2 id=&#34;俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
+&lt;h2 id=&#34;俺の鉄板-ができるまで&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
 
 &lt;p&gt;前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。&lt;/p&gt;
 
@@ -64,13 +64,14 @@
 
 &lt;ul&gt;
 &lt;li&gt;提案しっぱなしにせずフォローすることで、自信とパターンが増える&lt;/li&gt;
-&lt;li&gt;次の案件で活きる&lt;/li&gt;
+&lt;li&gt;次の案件で活きる
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。&lt;/p&gt;
 
-&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
+&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
 
 &lt;p&gt;さて今回の主題です。&lt;/p&gt;
 

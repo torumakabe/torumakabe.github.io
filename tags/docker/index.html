@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Docker &middot; re-imagine">
@@ -87,13 +87,13 @@
                     <div class="post-description">
                         
 
-<h2 id="oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283">OMS Container Solution for Linux プレビュー開始</h2>
+<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
 
 <p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
 
 <p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
 
-<h2 id="何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283">何ができるか、とその特徴</h2>
+<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
 
 <ul>
 <li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
@@ -117,7 +117,7 @@
 
 <p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
 
-<h2 id="手順:494184e69e067c0e711200d6bf38d283">手順</h2>
+<h2 id="手順">手順</h2>
 
 <ul>
 <li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
@@ -174,11 +174,11 @@
                     <div class="post-description">
                         
 
-<h2 id="端末だってコード化されたい:4b51bf5da7c597406600f164b7d91579">端末だってコード化されたい</h2>
+<h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
 
 <p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
 
-<h2 id="解決したい課題:4b51bf5da7c597406600f164b7d91579">解決したい課題</h2>
+<h2 id="解決したい課題">解決したい課題</h2>
 
 <p>こんな悩みを解決します。</p>
 
@@ -196,7 +196,7 @@
 <li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
 </ul>
 
-<h2 id="やり口:4b51bf5da7c597406600f164b7d91579">やり口</h2>
+<h2 id="やり口">やり口</h2>
 
 <p>VagrantとDockerで解決します。</p>
 
@@ -209,7 +209,7 @@
 <li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
 </ul>
 
-<h2 id="セットアップ概要:4b51bf5da7c597406600f164b7d91579">セットアップ概要</h2>
+<h2 id="セットアップ概要">セットアップ概要</h2>
 
 <p>簡単す。</p>
 
@@ -222,7 +222,7 @@
 
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
 
-<h2 id="サンプル解説:4b51bf5da7c597406600f164b7d91579">サンプル解説</h2>
+<h2 id="サンプル解説">サンプル解説</h2>
 
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
 
@@ -294,21 +294,21 @@ end
 
 <p>$bootstrap=&lt;&lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
 
-<h3 id="common-tools:4b51bf5da7c597406600f164b7d91579">Common tools</h3>
+<h3 id="common-tools">Common tools</h3>
 
 <p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
 
-<h3 id="docker-engine-machine:4b51bf5da7c597406600f164b7d91579">Docker Engine &amp; Machine</h3>
+<h3 id="docker-engine-machine">Docker Engine &amp; Machine</h3>
 
 <p>この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。</p>
 
-<h3 id="azure-cli:4b51bf5da7c597406600f164b7d91579">Azure CLI</h3>
+<h3 id="azure-cli">Azure CLI</h3>
 
 <p>インストールせずに<a href="https://hub.docker.com/r/microsoft/azure-cli/">MS公式のDockerイメージ</a>を引っ張ります。なのでalias設定だけ。
 -v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
 また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&ndash;rmで消します。</p>
 
-<h3 id="terraform-packer:4b51bf5da7c597406600f164b7d91579">Terraform &amp; Packer</h3>
+<h3 id="terraform-packer">Terraform &amp; Packer</h3>
 
 <p>Azure CLIと同様です。Hashicorpが<a href="https://hub.docker.com/u/hashicorp/">公式イメージ</a>を提供しているので、それを活用します。
 方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
@@ -316,11 +316,11 @@ end
 
 <p>なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。</p>
 
-<h3 id="nodebrew:4b51bf5da7c597406600f164b7d91579">nodebrew</h3>
+<h3 id="nodebrew">nodebrew</h3>
 
 <p>nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。</p>
 
-<h3 id="python3:4b51bf5da7c597406600f164b7d91579">Python3</h3>
+<h3 id="python3">Python3</h3>
 
 <p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
 
@@ -328,7 +328,7 @@ end
 
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&rdquo;Vagrant.configure～&rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
 
-<h2 id="どれだけ楽か:4b51bf5da7c597406600f164b7d91579">どれだけ楽か</h2>
+<h2 id="どれだけ楽か">どれだけ楽か</h2>
 
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
 
@@ -368,7 +368,7 @@ end
 </ul></li>
 </ul>
 
-<h2 id="bash-on-windowsまで待つとか言わない:4b51bf5da7c597406600f164b7d91579">Bash on Windowsまで待つとか言わない</h2>
+<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
 
 <p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
 
@@ -398,7 +398,7 @@ end
                     <div class="post-description">
                         
 
-<h2 id="サーバレスって言いたいだけじゃないです:1e958ca6820e4dcff939a22a84382ed3">サーバレスって言いたいだけじゃないです</h2>
+<h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
 
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 
@@ -409,7 +409,7 @@ end
 
 <p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
 
-<h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
+<h2 id="コンセプト">コンセプト</h2>
 
 <ul>
 <li>管理サーバを作らない</li>
@@ -419,11 +419,11 @@ end
 <li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
 </ul>
 
-<h2 id="サンプル:1e958ca6820e4dcff939a22a84382ed3">サンプル</h2>
+<h2 id="サンプル">サンプル</h2>
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
 
-<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
+<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
 
@@ -553,7 +553,7 @@ end
 
 <p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。</p>
 
-<h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
+<h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 
@@ -579,13 +579,13 @@ end
                     <div class="post-description">
                         
 
-<h2 id="気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463">気軽に作って壊せる環境を作る</h2>
+<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
 
 <p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
 
 <p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
 
-<h2 id="方針:7c419a069d08019c3093e0308a68c463">方針</h2>
+<h2 id="方針">方針</h2>
 
 <ul>
 <li>インフラはAzure Resource Manager Templateでデプロイする
@@ -612,7 +612,7 @@ end
 <li>VMにログインしたら即CNTKを使える、幸せ</li>
 </ul>
 
-<h2 id="使い方:7c419a069d08019c3093e0308a68c463">使い方</h2>
+<h2 id="使い方">使い方</h2>
 
 <p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
 
@@ -635,7 +635,8 @@ end
 <li>テンプレートに直で書かきたくないパラメータです</li>
 <li>fileUris、commandToExecute以外は、各々で</li>
 <li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
+<br /></li>
 </ul></li>
 </ul>
 
@@ -667,7 +668,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
 
-<h2 id="今後の展開:7c419a069d08019c3093e0308a68c463">今後の展開</h2>
+<h2 id="今後の展開">今後の展開</h2>
 
 <p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
 
@@ -697,7 +698,7 @@ root@a1234bc5d67d:/cntk#
                     <div class="post-description">
                         
 
-<h2 id="どこいってもいじられる:9e7f40e1d4e6f185223966639b28e39a">どこいってもいじられる</h2>
+<h2 id="どこいってもいじられる">どこいってもいじられる</h2>
 
 <p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
 
@@ -705,7 +706,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
 
-<h2 id="乗るしかないこのdockerウェーブに:9e7f40e1d4e6f185223966639b28e39a">乗るしかないこのDockerウェーブに</h2>
+<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
 
 <p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
 
@@ -721,7 +722,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
 
-<h2 id="ローカル環境:9e7f40e1d4e6f185223966639b28e39a">ローカル環境</h2>
+<h2 id="ローカル環境">ローカル環境</h2>
 
 <ul>
 <li>Mac OS X (El Capitan)
@@ -734,7 +735,7 @@ root@a1234bc5d67d:/cntk#
 <p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
 また、Swarmのマスタはローカルに配置します。</p>
 
-<h2 id="いざ実行:9e7f40e1d4e6f185223966639b28e39a">いざ実行</h2>
+<h2 id="いざ実行">いざ実行</h2>
 
 <p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
 
@@ -835,7 +836,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
 
 <p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
 
-<h2 id="ツールから入るハイブリッドクラウドも-またよし:9e7f40e1d4e6f185223966639b28e39a">ツールから入るハイブリッドクラウドも、またよし</h2>
+<h2 id="ツールから入るハイブリッドクラウドも-またよし">ツールから入るハイブリッドクラウドも、またよし</h2>
 
 <p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
 

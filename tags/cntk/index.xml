@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
       <description>
 
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
+&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
 
 &lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
 
 &lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
 
-&lt;h2 id=&#34;方針:7c419a069d08019c3093e0308a68c463&#34;&gt;方針&lt;/h2&gt;
+&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
@@ -50,7 +50,7 @@
 &lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;使い方:7c419a069d08019c3093e0308a68c463&#34;&gt;使い方&lt;/h2&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
 &lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
 
@@ -73,7 +73,8 @@
 &lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
 &lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
 &lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください&lt;/li&gt;
+&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -105,7 +106,7 @@ root@a1234bc5d67d:/cntk#
 
 &lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
 
-&lt;h2 id=&#34;今後の展開:7c419a069d08019c3093e0308a68c463&#34;&gt;今後の展開&lt;/h2&gt;
+&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
 
 &lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
 

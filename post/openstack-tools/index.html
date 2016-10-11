@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="OpenStackのツール環境をImmutableに整える &middot; re-imagine">
@@ -93,15 +93,15 @@
                     <div class="post-description">
                         
 
-<h3 id="タイトルは釣りです:06c978f415868c5d089a8460c0068f0d">タイトルは釣りです</h3>
+<h3 id="タイトルは釣りです">タイトルは釣りです</h3>
 
 <p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
 
-<h3 id="なぜ必要か:06c978f415868c5d089a8460c0068f0d">なぜ必要か?</h3>
+<h3 id="なぜ必要か">なぜ必要か?</h3>
 
 <p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
 
-<h3 id="やりたいこと:06c978f415868c5d089a8460c0068f0d">やりたいこと</h3>
+<h3 id="やりたいこと">やりたいこと</h3>
 
 <ul>
 <li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
@@ -112,7 +112,7 @@
 <li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
 </ul>
 
-<h3 id="方針:06c978f415868c5d089a8460c0068f0d">方針</h3>
+<h3 id="方針">方針</h3>
 
 <ul>
 <li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
@@ -121,7 +121,7 @@
 <li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
 </ul>
 
-<h3 id="前提条件:06c978f415868c5d089a8460c0068f0d">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
@@ -130,7 +130,7 @@
 <li>ひとまずOpenStack CLIを使えるところまで作る</li>
 </ul>
 
-<h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
 
@@ -148,13 +148,13 @@
 127.0.0.1 ansible_connection=local</p></li>
 </ul>
 
-<h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
+<h4 id="provision-sh解説">provision.sh解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
 
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
 
-<h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
+<h4 id="playbook-site-yml-解説">playbook(site.yml)解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
 
@@ -170,7 +170,7 @@ OS_USERNAME: your_username<br />
 - タイムゾーンをAsia/Tokyoにします。
 - 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
 
-<h3 id="windowsでの実行例:06c978f415868c5d089a8460c0068f0d">Windowsでの実行例</h3>
+<h3 id="windowsでの実行例">Windowsでの実行例</h3>
 
 <p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
 

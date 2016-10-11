@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Automation &middot; re-imagine">
@@ -87,11 +87,11 @@
                     <div class="post-description">
                         
 
-<h2 id="監査ログからアラートを上げられるようになります:aafd9305d99be4ae8d2b9c3fb4887452">監査ログからアラートを上げられるようになります</h2>
+<h2 id="監査ログからアラートを上げられるようになります">監査ログからアラートを上げられるようになります</h2>
 
 <p>Azureの監査ログからアラートを上げる機能のプレビューが<a href="https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/">はじまりました</a>。これ、地味ですが便利な機能です。日々の運用に効きます。</p>
 
-<h2 id="どんな風に使えるか:aafd9305d99be4ae8d2b9c3fb4887452">どんな風に使えるか</h2>
+<h2 id="どんな風に使えるか">どんな風に使えるか</h2>
 
 <p>ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。</p>
 
@@ -101,7 +101,7 @@
 
 <p>これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。</p>
 
-<h2 id="実装例:aafd9305d99be4ae8d2b9c3fb4887452">実装例</h2>
+<h2 id="実装例">実装例</h2>
 
 <p>例としてこんな仕組みを作ってみましょう。</p>
 
@@ -111,7 +111,7 @@
 <li>OMSでログ分析</li>
 </ul>
 
-<h2 id="準備:aafd9305d99be4ae8d2b9c3fb4887452">準備</h2>
+<h2 id="準備">準備</h2>
 
 <p>以下の準備ができているか確認します。</p>
 
@@ -128,7 +128,7 @@
 
 <p><strong><a href="http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5">勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）</a></strong></p>
 
-<h2 id="azure-automation側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure Automation側の仕掛け</h2>
+<h2 id="azure-automation側の仕掛け">Azure Automation側の仕掛け</h2>
 
 <p>先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。</p>
 
@@ -183,7 +183,7 @@ else
 
 <p>WebhookのURLを控えておいてください。</p>
 
-<h2 id="azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure 監査ログアラート側の仕掛け</h2>
+<h2 id="azure-監査ログアラート側の仕掛け">Azure 監査ログアラート側の仕掛け</h2>
 
 <p>Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。</p>
 

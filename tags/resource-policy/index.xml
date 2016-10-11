@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
       <description>
 
-&lt;h2 id=&#34;azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062&#34;&gt;Azure X-Plat CLIのリリースサイクル&lt;/h2&gt;
+&lt;h2 id=&#34;azure-x-plat-cliのリリースサイクル&#34;&gt;Azure X-Plat CLIのリリースサイクル&lt;/h2&gt;
 
 &lt;p&gt;OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases&#34;&gt;月次&lt;/a&gt;です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。&lt;/p&gt;
 
@@ -25,7 +25,7 @@
 
 &lt;p&gt;機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。&lt;/p&gt;
 
-&lt;h2 id=&#34;ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーによるアクセス管理&lt;/h2&gt;
+&lt;h2 id=&#34;ポリシーによるアクセス管理&#34;&gt;ポリシーによるアクセス管理&lt;/h2&gt;
 
 &lt;p&gt;さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。&lt;/p&gt;
 
@@ -44,7 +44,7 @@
 
 &lt;p&gt;リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。&lt;/p&gt;
 
-&lt;h2 id=&#34;x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062&#34;&gt;X-Plat CLIでの定義方法&lt;/h2&gt;
+&lt;h2 id=&#34;x-plat-cliでの定義方法&#34;&gt;X-Plat CLIでの定義方法&lt;/h2&gt;
 
 &lt;p&gt;2016/4リリースの&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016&#34;&gt;v0.9.20&lt;/a&gt;から、X-Plat CLIでもResource Policyを定義できます。&lt;/p&gt;
 
@@ -54,7 +54,7 @@
 
 &lt;p&gt;X-Plat CLI固有部分に絞って紹介します。&lt;/p&gt;
 
-&lt;h3 id=&#34;ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシー定義ファイルを作る&lt;/h3&gt;
+&lt;h3 id=&#34;ポリシー定義ファイルを作る&#34;&gt;ポリシー定義ファイルを作る&lt;/h3&gt;
 
 &lt;p&gt;CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。&lt;/p&gt;
 
@@ -99,7 +99,7 @@ info:    policy definition create command OK
 
 &lt;p&gt;できたみたいです。&lt;/p&gt;
 
-&lt;h3 id=&#34;ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062&#34;&gt;ポリシーをアサインする&lt;/h3&gt;
+&lt;h3 id=&#34;ポリシーをアサインする&#34;&gt;ポリシーをアサインする&lt;/h3&gt;
 
 &lt;p&gt;では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも&lt;a href=&#34;https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx&#34;&gt;指定可能&lt;/a&gt;です。&lt;/p&gt;
 

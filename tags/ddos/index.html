@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Ddos &middot; re-imagine">
@@ -87,11 +87,11 @@
                     <div class="post-description">
                         
 
-<h2 id="すこぶるfaq:4a620049922b1b54512a25b34ba773c5">すこぶるFAQ</h2>
+<h2 id="すこぶるfaq">すこぶるFAQ</h2>
 
 <p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
 
-<h2 id="公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5">公式ホワイトペーパー</h2>
+<h2 id="公式ホワイトペーパー">公式ホワイトペーパー</h2>
 
 <p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
 
@@ -99,14 +99,14 @@
 
 <p><strong>2016//3/4 追記 <a href="http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf">日本語訳</a>がありました</strong></p>
 
-<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
 
 <pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
 </code></pre>
 
 <p>MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
 
-<h2 id="azureがやってくれること:4a620049922b1b54512a25b34ba773c5">Azureがやってくれること</h2>
+<h2 id="azureがやってくれること">Azureがやってくれること</h2>
 
 <p>では、具体的に。</p>
 
@@ -115,7 +115,7 @@
 
 <p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。</p>
 
-<h2 id="お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5">お客様対応が必要なこと</h2>
+<h2 id="お客様対応が必要なこと">お客様対応が必要なこと</h2>
 
 <p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
 
@@ -144,7 +144,7 @@
 
 <p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
 
-<h2 id="ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5">ホワイトペーパーに加えて</h2>
+<h2 id="ホワイトペーパーに加えて">ホワイトペーパーに加えて</h2>
 
 <p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後<a href="https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/">提供される予定</a>です。</p>
 

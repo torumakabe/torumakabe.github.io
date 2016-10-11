@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="re-imagine &middot; re-imagine">
@@ -83,13 +83,13 @@
                     <div class="post-description">
                         
 
-<h3 id="みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183">みんな大好きHashiCorp</h3>
+<h3 id="みんな大好きhashicorp">みんな大好きHashiCorp</h3>
 
 <p>クラウド界隈のデベロッパーから熱く注目されているHashiCorp。<a href="http://www.packer.io/">Packer</a>、<a href="http://www.serfdom.io/">Serf</a>、<a href="http://www.consul.io/">Consul</a>と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は<a href="http://www.vagrantup.com/">Vagrant</a>でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。</p>
 
 <p>VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。</p>
 
-<h3 id="前提条件:eaab8f236553d8374ac2c6f2b8524183">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Vagrant 1.5.4</li>
@@ -97,11 +97,11 @@
 <li>HP Public Cloud (2014/5/5)</li>
 </ul>
 
-<h3 id="プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183">プラグインのインストールと前準備</h3>
+<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
 
 <p><a href="https://github.com/mohitsethi/vagrant-hp">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
 
-<h3 id="ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/25a33c679492676bb626.js"></script>
 
@@ -115,7 +115,7 @@
 <li>ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。</li>
 </ul>
 
-<h3 id="それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183">それではさっそくvagrant up</h3>
+<h3 id="それではさっそくvagrant-up">それではさっそくvagrant up</h3>
 
 <pre><code>$ vagrant up --provider=hp
 Bringing machine 'default' up with 'hp' provider...
@@ -141,7 +141,7 @@ WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically lo
 
 <p>できたっぽい。&ndash;provider=hpを忘れずに。</p>
 
-<h3 id="間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183">間髪入れずにvagrant ssh</h3>
+<h3 id="間髪入れずにvagrant-ssh">間髪入れずにvagrant ssh</h3>
 
 <pre><code>$ vagrant ssh
 WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
@@ -184,7 +184,7 @@ test.txt
                     <div class="post-description">
                         
 
-<h3 id="よく聞かれることをまとめました:05fdcc29da710e097e2f23b56c9852e1">よく聞かれることをまとめました</h3>
+<h3 id="よく聞かれることをまとめました">よく聞かれることをまとめました</h3>
 
 <p>ひとまず、初期3部作完結。また書くかもしれません。</p>
 
@@ -212,7 +212,7 @@ test.txt
                     <div class="post-description">
                         
 
-<h3 id="無限なんてあり得ない:541a755ba62f6cb5bf4c824c3fbd2582">無限なんてあり得ない</h3>
+<h3 id="無限なんてあり得ない">無限なんてあり得ない</h3>
 
 <p>「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウドサービスのうたい文句、けっこう目にします。</p>
 
@@ -222,7 +222,7 @@ test.txt
 
 <p>空いているときもあれば、空いていない時もあります。また、事業者によって、キャパシティプランニングのスタンスは違います。規模も違います。</p>
 
-<h3 id="空き状況を公開すると面白いかも知れない:541a755ba62f6cb5bf4c824c3fbd2582">空き状況を公開すると面白いかも知れない</h3>
+<h3 id="空き状況を公開すると面白いかも知れない">空き状況を公開すると面白いかも知れない</h3>
 
 <p>駐車場の空き状況がわかる街があります。便利です。最近はWebでレストランの空きがわかる<a href="http://www.opentable.jp/default.aspx">サービス</a>もあります。これまた便利。</p>
 
@@ -254,11 +254,11 @@ test.txt
                     <div class="post-description">
                         
 
-<h3 id="基本的な質問が増えてきた:fec58f188036762a83cb33b4dfa34673">基本的な質問が増えてきた</h3>
+<h3 id="基本的な質問が増えてきた">基本的な質問が増えてきた</h3>
 
 <p>OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。</p>
 
-<h3 id="よく聞かれることはまとめておこう:fec58f188036762a83cb33b4dfa34673">よく聞かれることはまとめておこう</h3>
+<h3 id="よく聞かれることはまとめておこう">よく聞かれることはまとめておこう</h3>
 
 <p>もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。</p>
 
@@ -283,11 +283,11 @@ test.txt
                     <div class="post-description">
                         
 
-<h3 id="swiftへ-ファイルを分割してアップロードできる:a57d4690b9ff7b620d3e3f40a88fa609">Swiftへ、ファイルを分割してアップロードできる</h3>
+<h3 id="swiftへ-ファイルを分割してアップロードできる">Swiftへ、ファイルを分割してアップロードできる</h3>
 
 <p>今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。</p>
 
-<h3 id="アップロード形式は大きく3つ-そのまま-dlo-slo:a57d4690b9ff7b620d3e3f40a88fa609">アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO</h3>
+<h3 id="アップロード形式は大きく3つ-そのまま-dlo-slo">アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO</h3>
 
 <ol>
 <li>そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。</li>
@@ -295,7 +295,7 @@ test.txt
 <li>SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。</li>
 </ol>
 
-<h3 id="動きを見てみよう:a57d4690b9ff7b620d3e3f40a88fa609">動きを見てみよう</h3>
+<h3 id="動きを見てみよう">動きを見てみよう</h3>
 
 <p>環境は以下の通り。</p>
 
@@ -306,7 +306,7 @@ test.txt
 <li>約900MBあるubuntu desktopのisoファイルをアップロード</li>
 </ul>
 
-<h4 id="そのままアップロード:a57d4690b9ff7b620d3e3f40a88fa609">そのままアップロード</h4>
+<h4 id="そのままアップロード">そのままアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
@@ -335,7 +335,7 @@ Date: Sun, 23 Mar 2014 01:43:58 GMT
 
 <p>ヘッダはこんな感じ。</p>
 
-<h4 id="dlo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">DLO形式でアップロード</h4>
+<h4 id="dlo形式でアップロード">DLO形式でアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name dlo.iso --segment-size 104857600
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
@@ -374,7 +374,7 @@ Date: Sun, 23 Mar 2014 01:44:15 GMT
 
 <p>X-Object-Manifestという属性が、セグメント化したファイルの置き場所を指しています。</p>
 
-<h4 id="slo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">SLO形式でアップロード</h4>
+<h4 id="slo形式でアップロード">SLO形式でアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name slo.iso --segment-size 104857600 --use-slo
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;

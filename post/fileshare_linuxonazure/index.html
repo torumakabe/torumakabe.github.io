@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Linux on Azureでファイル共有する方法 &middot; re-imagine">
@@ -97,7 +97,7 @@
                     <div class="post-description">
                         
 
-<h2 id="ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba">ファイル共有、あまりおすすめしないです</h2>
+<h2 id="ファイル共有-あまりおすすめしないです">ファイル共有、あまりおすすめしないです</h2>
 
 <p>いきなりタイトルを否定しました。ロック。</p>
 
@@ -119,7 +119,7 @@
 
 <p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
 
-<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
+<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
 
 <p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
 
@@ -147,7 +147,7 @@ info:    storage account connectionstring show command OK
 data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 </code></pre>
 
-<h2 id="linux-2vmで共有:fa176ff87dca43c3d098f48095435bba">Linux * 2VMで共有</h2>
+<h2 id="linux-2vmで共有">Linux * 2VMで共有</h2>
 
 <p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
 
@@ -198,7 +198,7 @@ test
 onemoretest
 </code></pre>
 
-<h2 id="ご利用は計画的に:fa176ff87dca43c3d098f48095435bba">ご利用は計画的に</h2>
+<h2 id="ご利用は計画的に">ご利用は計画的に</h2>
 
 <p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
 

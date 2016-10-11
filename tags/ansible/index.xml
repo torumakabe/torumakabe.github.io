@@ -17,15 +17,15 @@
       <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
       <description>
 
-&lt;h3 id=&#34;タイトルは釣りです:06c978f415868c5d089a8460c0068f0d&#34;&gt;タイトルは釣りです&lt;/h3&gt;
+&lt;h3 id=&#34;タイトルは釣りです&#34;&gt;タイトルは釣りです&lt;/h3&gt;
 
 &lt;p&gt;すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。&lt;/p&gt;
 
-&lt;h3 id=&#34;なぜ必要か:06c978f415868c5d089a8460c0068f0d&#34;&gt;なぜ必要か?&lt;/h3&gt;
+&lt;h3 id=&#34;なぜ必要か&#34;&gt;なぜ必要か?&lt;/h3&gt;
 
 &lt;p&gt;いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。&lt;/p&gt;
 
-&lt;h3 id=&#34;やりたいこと:06c978f415868c5d089a8460c0068f0d&#34;&gt;やりたいこと&lt;/h3&gt;
+&lt;h3 id=&#34;やりたいこと&#34;&gt;やりたいこと&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい&lt;/li&gt;
@@ -36,7 +36,7 @@
 &lt;li&gt;VMできたらすぐログイン、即OpenStack CLIが使える&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;方針:06c978f415868c5d089a8460c0068f0d&#34;&gt;方針&lt;/h3&gt;
+&lt;h3 id=&#34;方針&#34;&gt;方針&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る&lt;/li&gt;
@@ -45,7 +45,7 @@
 &lt;li&gt;構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;前提条件:06c978f415868c5d089a8460c0068f0d&#34;&gt;前提条件&lt;/h3&gt;
+&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Windows 8.1 &amp;amp; VMware Worksation 10.0.3&lt;/li&gt;
@@ -54,7 +54,7 @@
 &lt;li&gt;ひとまずOpenStack CLIを使えるところまで作る&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;
 
@@ -72,13 +72,13 @@
 127.0.0.1 ansible_connection=local&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h4 id=&#34;provision-sh解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;provision.sh解説&lt;/h4&gt;
+&lt;h4 id=&#34;provision-sh解説&#34;&gt;provision.sh解説&lt;/h4&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
 
-&lt;h4 id=&#34;playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
+&lt;h4 id=&#34;playbook-site-yml-解説&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;
 
@@ -94,7 +94,7 @@ OS_USERNAME: your_username&lt;br /&gt;
 - タイムゾーンをAsia/Tokyoにします。
 - 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。&lt;/p&gt;
 
-&lt;h3 id=&#34;windowsでの実行例:06c978f415868c5d089a8460c0068f0d&#34;&gt;Windowsでの実行例&lt;/h3&gt;
+&lt;h3 id=&#34;windowsでの実行例&#34;&gt;Windowsでの実行例&lt;/h3&gt;
 
 &lt;p&gt;Vagrant &amp;amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。&lt;/p&gt;
 

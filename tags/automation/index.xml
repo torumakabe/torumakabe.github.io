@@ -17,11 +17,11 @@
       <guid>http://torumakabe.github.io/post/azure_auditlog_alert/</guid>
       <description>
 
-&lt;h2 id=&#34;監査ログからアラートを上げられるようになります:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;監査ログからアラートを上げられるようになります&lt;/h2&gt;
+&lt;h2 id=&#34;監査ログからアラートを上げられるようになります&#34;&gt;監査ログからアラートを上げられるようになります&lt;/h2&gt;
 
 &lt;p&gt;Azureの監査ログからアラートを上げる機能のプレビューが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/&#34;&gt;はじまりました&lt;/a&gt;。これ、地味ですが便利な機能です。日々の運用に効きます。&lt;/p&gt;
 
-&lt;h2 id=&#34;どんな風に使えるか:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;どんな風に使えるか&lt;/h2&gt;
+&lt;h2 id=&#34;どんな風に使えるか&#34;&gt;どんな風に使えるか&lt;/h2&gt;
 
 &lt;p&gt;ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。&lt;/p&gt;
 
@@ -31,7 +31,7 @@
 
 &lt;p&gt;これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。&lt;/p&gt;
 
-&lt;h2 id=&#34;実装例:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;実装例&lt;/h2&gt;
+&lt;h2 id=&#34;実装例&#34;&gt;実装例&lt;/h2&gt;
 
 &lt;p&gt;例としてこんな仕組みを作ってみましょう。&lt;/p&gt;
 
@@ -41,7 +41,7 @@
 &lt;li&gt;OMSでログ分析&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;準備:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;準備&lt;/h2&gt;
+&lt;h2 id=&#34;準備&#34;&gt;準備&lt;/h2&gt;
 
 &lt;p&gt;以下の準備ができているか確認します。&lt;/p&gt;
 
@@ -58,7 +58,7 @@
 
 &lt;p&gt;&lt;strong&gt;&lt;a href=&#34;http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5&#34;&gt;勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;azure-automation側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;Azure Automation側の仕掛け&lt;/h2&gt;
+&lt;h2 id=&#34;azure-automation側の仕掛け&#34;&gt;Azure Automation側の仕掛け&lt;/h2&gt;
 
 &lt;p&gt;先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。&lt;/p&gt;
 
@@ -113,7 +113,7 @@ else
 
 &lt;p&gt;WebhookのURLを控えておいてください。&lt;/p&gt;
 
-&lt;h2 id=&#34;azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h2&gt;
+&lt;h2 id=&#34;azure-監査ログアラート側の仕掛け&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h2&gt;
 
 &lt;p&gt;Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。&lt;/p&gt;
 

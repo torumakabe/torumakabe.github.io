@@ -17,11 +17,11 @@
       <guid>http://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
       <description>
 
-&lt;h2 id=&#34;舌の根の乾かぬ内に:07c5653d87682735481a0855219b8241&#34;&gt;舌の根の乾かぬ内に&lt;/h2&gt;
+&lt;h2 id=&#34;舌の根の乾かぬ内に&#34;&gt;舌の根の乾かぬ内に&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_osstools_iac/&#34;&gt;最近&lt;/a&gt;、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。&lt;/p&gt;
 
-&lt;h2 id=&#34;動機:07c5653d87682735481a0855219b8241&#34;&gt;動機&lt;/h2&gt;
+&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Docker for Windows(on Client Hyper-V)のベータが一般開放された&lt;/li&gt;
@@ -31,7 +31,7 @@
 &lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;やり口:07c5653d87682735481a0855219b8241&#34;&gt;やり口&lt;/h2&gt;
+&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
@@ -40,7 +40,7 @@
 &lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;作業の中身:07c5653d87682735481a0855219b8241&#34;&gt;作業の中身&lt;/h2&gt;
+&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/&#34;&gt;インストール&lt;/a&gt;
@@ -59,7 +59,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;powershellのfunctionを作る:07c5653d87682735481a0855219b8241&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
+&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
 
 &lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
 

@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="クラウドは本当に性能不足なのか &middot; re-imagine">
@@ -99,7 +99,7 @@
 
 <p><strong>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。</strong></p>
 
-<h2 id="具体的な数値で-正しい理解を:d3d20b8a9dfb8ebe2c80e0d21980dbd3">具体的な数値で、正しい理解を</h2>
+<h2 id="具体的な数値で-正しい理解を">具体的な数値で、正しい理解を</h2>
 
 <p><a href="http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/">&ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;</a>という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。</p>
 
@@ -109,7 +109,7 @@
 
 <p>いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。</p>
 
-<h2 id="シングルvmでどれだけ:d3d20b8a9dfb8ebe2c80e0d21980dbd3">シングルVMでどれだけ</h2>
+<h2 id="シングルvmでどれだけ">シングルVMでどれだけ</h2>
 
 <p>話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。</p>
 
@@ -141,7 +141,7 @@
 
 <p>なお、<strong>現時点で</strong>まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。</p>
 
-<h2 id="32仮想cpuコアの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">32仮想CPUコアの規模感</h2>
+<h2 id="32仮想cpuコアの規模感">32仮想CPUコアの規模感</h2>
 
 <p>クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。</p>
 
@@ -227,7 +227,7 @@
 
 <p>なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は<a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">3-Tierベンチマーク</a>で確認できます。<a href="http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx">Azure上で247,880SAPS</a>出たそうです。</p>
 
-<h2 id="80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">80,000IOPSの規模感</h2>
+<h2 id="80-000iopsの規模感">80,000IOPSの規模感</h2>
 
 <p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
 
@@ -239,7 +239,7 @@
 
 <p>なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。</p>
 
-<h2 id="結論:d3d20b8a9dfb8ebe2c80e0d21980dbd3">結論</h2>
+<h2 id="結論">結論</h2>
 
 <ul>
 <li>Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり</li>

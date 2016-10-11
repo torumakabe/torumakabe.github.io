@@ -17,17 +17,17 @@
       <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>
 
-&lt;h2 id=&#34;いつの間に:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;いつの間に&lt;/h2&gt;
+&lt;h2 id=&#34;いつの間に&#34;&gt;いつの間に&lt;/h2&gt;
 
 &lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
 
-&lt;h2 id=&#34;ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
+&lt;h2 id=&#34;ansible-localと組み合わせたサンプル&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
 
 &lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
 
-&lt;h3 id=&#34;前準備:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;前準備&lt;/h3&gt;
+&lt;h3 id=&#34;前準備&#34;&gt;前準備&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
@@ -40,7 +40,7 @@
 &lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;サンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;サンプル&lt;/h3&gt;
+&lt;h3 id=&#34;サンプル&#34;&gt;サンプル&lt;/h3&gt;
 
 &lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
 

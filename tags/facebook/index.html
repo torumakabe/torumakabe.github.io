@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Facebook &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e">まだ好みなんて聞いてないぜ</h2>
+<h2 id="まだ好みなんて聞いてないぜ">まだ好みなんて聞いてないぜ</h2>
 
 <p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
 
@@ -103,7 +103,7 @@
 
 <p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
 
-<h3 id="基本方針:99ec2e7c4c63926799149ef94c45b73e">基本方針</h3>
+<h3 id="基本方針">基本方針</h3>
 
 <ul>
 <li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
@@ -121,7 +121,7 @@
 
 <p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
 
-<h2 id="必要な作業:99ec2e7c4c63926799149ef94c45b73e">必要な作業</h2>
+<h2 id="必要な作業">必要な作業</h2>
 
 <p>以下が必要な作業の流れです。</p>
 
@@ -168,7 +168,7 @@
 <li>Github連携設定、#13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
 </ul>
 
-<h2 id="function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e">Function Appのサンプル</h2>
+<h2 id="function-appのサンプル">Function Appのサンプル</h2>
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
 
@@ -291,7 +291,8 @@ module.exports = function (context, req) {
 <li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
 
 <ul>
-<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ</li>
+<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ
+<br /></li>
 </ul></li>
 </ul>
 

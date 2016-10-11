@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure ARM Templateによるデプロイと冪等性 &middot; re-imagine">
@@ -97,13 +97,13 @@
                     <div class="post-description">
                         
 
-<h2 id="宣言的に-冪等に:7f9d18b141fe8baff11274b2e0ae3943">宣言的に、冪等に</h2>
+<h2 id="宣言的に-冪等に">宣言的に、冪等に</h2>
 
 <p>ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。</p>
 
 <p>さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。</p>
 
-<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview:7f9d18b141fe8baff11274b2e0ae3943"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
+<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
 
 <blockquote>
 <p>&ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;</p>
@@ -117,7 +117,7 @@
 
 <p>残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。</p>
 
-<h2 id="増分デプロイと完全デプロイ:7f9d18b141fe8baff11274b2e0ae3943">増分デプロイと完全デプロイ</h2>
+<h2 id="増分デプロイと完全デプロイ">増分デプロイと完全デプロイ</h2>
 
 <p>まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える<a href="https://github.com/Azure/azure-xplat-cli">クロスプラットフォームCLI</a>もあります。</p>
 
@@ -154,7 +154,7 @@
 
 <p>2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。</p>
 
-<h2 id="動きをつかむ:7f9d18b141fe8baff11274b2e0ae3943">動きをつかむ</h2>
+<h2 id="動きをつかむ">動きをつかむ</h2>
 
 <p>では動きを見ていきましょう。テンプレートはGithubに公開されている<a href="https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux">Very simple deployment of an Linux VM</a>を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を<a href="https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json">リンク先</a>でざっと確認してください。</p>
 
@@ -337,7 +337,7 @@ ProvisioningState : Succeeded
 
 <p>定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。</p>
 
-<h2 id="使い方:7f9d18b141fe8baff11274b2e0ae3943">使い方</h2>
+<h2 id="使い方">使い方</h2>
 
 <p>冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。</p>
 

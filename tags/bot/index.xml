@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>
 
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
+&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
 
 &lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
 
@@ -33,7 +33,7 @@
 
 &lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
 
-&lt;h3 id=&#34;基本方針:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;基本方針&lt;/h3&gt;
+&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
@@ -51,7 +51,7 @@
 
 &lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
 
-&lt;h2 id=&#34;必要な作業:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;必要な作業&lt;/h2&gt;
+&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
 
 &lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
 
@@ -98,7 +98,7 @@
 &lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;Function Appのサンプル&lt;/h2&gt;
+&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
 
 &lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
 
@@ -221,7 +221,8 @@ module.exports = function (context, req) {
 &lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
 
 &lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ&lt;/li&gt;
+&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 

@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="re-imagine &middot; re-imagine">
@@ -87,13 +87,13 @@
                     <div class="post-description">
                         
 
-<h2 id="気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463">気軽に作って壊せる環境を作る</h2>
+<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
 
 <p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
 
 <p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
 
-<h2 id="方針:7c419a069d08019c3093e0308a68c463">方針</h2>
+<h2 id="方針">方針</h2>
 
 <ul>
 <li>インフラはAzure Resource Manager Templateでデプロイする
@@ -120,7 +120,7 @@
 <li>VMにログインしたら即CNTKを使える、幸せ</li>
 </ul>
 
-<h2 id="使い方:7c419a069d08019c3093e0308a68c463">使い方</h2>
+<h2 id="使い方">使い方</h2>
 
 <p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
 
@@ -143,7 +143,8 @@
 <li>テンプレートに直で書かきたくないパラメータです</li>
 <li>fileUris、commandToExecute以外は、各々で</li>
 <li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
+<br /></li>
 </ul></li>
 </ul>
 
@@ -175,7 +176,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
 
-<h2 id="今後の展開:7c419a069d08019c3093e0308a68c463">今後の展開</h2>
+<h2 id="今後の展開">今後の展開</h2>
 
 <p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
 
@@ -205,11 +206,11 @@ root@a1234bc5d67d:/cntk#
                     <div class="post-description">
                         
 
-<h2 id="監査ログからアラートを上げられるようになります:aafd9305d99be4ae8d2b9c3fb4887452">監査ログからアラートを上げられるようになります</h2>
+<h2 id="監査ログからアラートを上げられるようになります">監査ログからアラートを上げられるようになります</h2>
 
 <p>Azureの監査ログからアラートを上げる機能のプレビューが<a href="https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/">はじまりました</a>。これ、地味ですが便利な機能です。日々の運用に効きます。</p>
 
-<h2 id="どんな風に使えるか:aafd9305d99be4ae8d2b9c3fb4887452">どんな風に使えるか</h2>
+<h2 id="どんな風に使えるか">どんな風に使えるか</h2>
 
 <p>ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。</p>
 
@@ -219,7 +220,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。</p>
 
-<h2 id="実装例:aafd9305d99be4ae8d2b9c3fb4887452">実装例</h2>
+<h2 id="実装例">実装例</h2>
 
 <p>例としてこんな仕組みを作ってみましょう。</p>
 
@@ -229,7 +230,7 @@ root@a1234bc5d67d:/cntk#
 <li>OMSでログ分析</li>
 </ul>
 
-<h2 id="準備:aafd9305d99be4ae8d2b9c3fb4887452">準備</h2>
+<h2 id="準備">準備</h2>
 
 <p>以下の準備ができているか確認します。</p>
 
@@ -246,7 +247,7 @@ root@a1234bc5d67d:/cntk#
 
 <p><strong><a href="http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5">勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）</a></strong></p>
 
-<h2 id="azure-automation側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure Automation側の仕掛け</h2>
+<h2 id="azure-automation側の仕掛け">Azure Automation側の仕掛け</h2>
 
 <p>先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。</p>
 
@@ -301,7 +302,7 @@ else
 
 <p>WebhookのURLを控えておいてください。</p>
 
-<h2 id="azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure 監査ログアラート側の仕掛け</h2>
+<h2 id="azure-監査ログアラート側の仕掛け">Azure 監査ログアラート側の仕掛け</h2>
 
 <p>Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。</p>
 
@@ -338,7 +339,7 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
                     <div class="post-description">
                         
 
-<h2 id="英語だけどぜひ読んでほしい:85f39e44bed874d49c5c215a7c1e75f5">英語だけどぜひ読んでほしい</h2>
+<h2 id="英語だけどぜひ読んでほしい">英語だけどぜひ読んでほしい</h2>
 
 <p><strong><a href="http://www.amazon.co.jp/Site-Reliability-Engineering-Production-Systems-ebook/dp/B01DCPXKZ6/ref=tmm_kin_swatch_0?_encoding=UTF8&amp;qid=1459069692&amp;sr=8-1">Site Reliability Engineering: How Google Runs Production Systems</a></strong></p>
 
@@ -368,7 +369,7 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
 
 <p>もう一回読んだら、また違う発見があるんじゃないかと。</p>
 
-<h2 id="自分ごととして読みたい:85f39e44bed874d49c5c215a7c1e75f5">自分ごととして読みたい</h2>
+<h2 id="自分ごととして読みたい">自分ごととして読みたい</h2>
 
 <p>今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。</p>
 
@@ -402,13 +403,13 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
                     <div class="post-description">
                         
 
-<h2 id="俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677">俺の屍を越えていけ</h2>
+<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
 
 <p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
 
 <p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
 
-<h2 id="この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677">この3つは触る前から意識しよう</h2>
+<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
 
 <ol>
 <li>ARMテンプレートリソースは分離して使う</li>
@@ -416,13 +417,13 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
 <li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
 </ol>
 
-<h2 id="1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677">1. ARMテンプレートリソースは分離して使う</h2>
+<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
 
 <p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
 
 <p>でも、現時点の実装では、おすすめしません。</p>
 
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
+<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
 
 <p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
 
@@ -430,21 +431,21 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
 
 <p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
 
-<h3 id="タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677">タイムアウトしがち</h3>
+<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
 
 <p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
 
-<h3 id="せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677">せっかくのリソースグラフを活用できない</h3>
+<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
 
 <p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
 
-<h3 id="読みづらい:9776a375b7d12db77e52b9c8d97b8677">読みづらい</h3>
+<h3 id="読みづらい">読みづらい</h3>
 
 <p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
 
 <p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
 
-<h2 id="2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677">2. リソース競合したら依存関係を定義する</h2>
+<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
 
 <p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
 
@@ -488,7 +489,7 @@ resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
 
 <p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
 
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
+<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
 
 <p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
 
@@ -534,13 +535,13 @@ resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
                     <div class="post-description">
                         
 
-<h2 id="terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b">Terraformer増加に備えて</h2>
+<h2 id="terraformer増加に備えて">Terraformer増加に備えて</h2>
 
 <p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
 
 <p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
 
-<h2 id="エラーコード429:41e5563e03314499a86e746f2fbd113b">エラーコード429</h2>
+<h2 id="エラーコード429">エラーコード429</h2>
 
 <p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
 
@@ -552,13 +553,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
 
-<h2 id="対処法:41e5563e03314499a86e746f2fbd113b">対処法</h2>
+<h2 id="対処法">対処法</h2>
 
 <p><strong>もう一度applyしてください</strong></p>
 
 <p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
 
-<h2 id="背景:41e5563e03314499a86e746f2fbd113b">背景</h2>
+<h2 id="背景">背景</h2>
 
 <p>エラーになった背景ですが、2つの可能性があります。</p>
 
@@ -567,7 +568,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
 </ol>
 
-<h3 id="1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b">1. APIリクエスト数上限に達した</h3>
+<h3 id="1-apiリクエスト数上限に達した">1. APIリクエスト数上限に達した</h3>
 
 <p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
 
@@ -579,7 +580,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
 
-<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
+<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
 
 <p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
 

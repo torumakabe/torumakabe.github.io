@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408">Azure Functionsでやってみよう</h2>
+<h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
 
 <p>Azure上でChatOpsしたい、と相談をいただきました。</p>
 
@@ -97,7 +97,7 @@
 
 <p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
 
-<h2 id="slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408">SlackからRunbookを実行できて、何がうれしいか</h2>
+<h2 id="slackからrunbookを実行できて-何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
 
 <ul>
 <li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
@@ -105,13 +105,13 @@
 <li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
 </ul>
 
-<h2 id="ブツ:3a5e8d97b60e50a739f033a761af1408">ブツ</h2>
+<h2 id="ブツ">ブツ</h2>
 
 <p>Githubに上げておきました。</p>
 
 <p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
 
-<h2 id="おおまかな流れ:3a5e8d97b60e50a739f033a761af1408">おおまかな流れ</h2>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
 
 <p>手順書つらいのでポイントだけ。</p>
 
@@ -165,7 +165,7 @@
 </ul></li>
 </ul>
 
-<h2 id="よもやま話:3a5e8d97b60e50a739f033a761af1408">よもやま話</h2>
+<h2 id="よもやま話">よもやま話</h2>
 
 <ul>
 <li><p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>
@@ -178,6 +178,8 @@
 <li><p>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</p></li>
 
 <li><p>ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。</p></li>
+
+<li><p>でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。</p></li>
 
 <li><p>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</p></li>
 </ul></li>
@@ -205,7 +207,7 @@
                     <div class="post-description">
                         
 
-<h2 id="背景と動機:13f4070f39b47880df2f217875deb9f9">背景と動機</h2>
+<h2 id="背景と動機">背景と動機</h2>
 
 <p>Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。</p>
 
@@ -220,7 +222,7 @@
 <li>それAzure Functionsで出来るよ。</li>
 </ul>
 
-<h2 id="方針:13f4070f39b47880df2f217875deb9f9">方針</h2>
+<h2 id="方針">方針</h2>
 
 <ul>
 <li>Azure FunctionsのTimer Triggerを使って、日次で実行</li>
@@ -229,9 +231,9 @@
 <li>業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)</li>
 </ul>
 
-<h2 id="quick-start:13f4070f39b47880df2f217875deb9f9">Quick Start</h2>
+<h2 id="quick-start">Quick Start</h2>
 
-<h3 id="準備:13f4070f39b47880df2f217875deb9f9">準備</h3>
+<h3 id="準備">準備</h3>
 
 <ul>
 <li>ところでAzure Funtionsって何よ、って人はまず<a href="https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/">いい資料1</a>と<a href="https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/">いい資料2</a>でざっと把握を</li>
@@ -249,7 +251,7 @@
 </ul></li>
 </ul>
 
-<h3 id="デプロイ:13f4070f39b47880df2f217875deb9f9">デプロイ</h3>
+<h3 id="デプロイ">デプロイ</h3>
 
 <ul>
 <li>Function Appを作成
@@ -291,21 +293,21 @@
 
 <p>これで、指定ストレージアカウントの&rdquo;usagedata&rdquo;コンテナに日次で使用量データファイルができます。</p>
 
-<h2 id="コード解説:13f4070f39b47880df2f217875deb9f9">コード解説</h2>
+<h2 id="コード解説">コード解説</h2>
 
 <p>3つのファイルをデプロイしました。簡単な順に、ざっと解説します。<a href="https://github.com/ToruMakabe/AZFuncTimerTriggerSample">コード</a>を眺めながら読み進めてください。</p>
 
-<h3 id="package-json:13f4070f39b47880df2f217875deb9f9">package.json</h3>
+<h3 id="package-json">package.json</h3>
 
 <p>主となるコードファイルは後述の&rdquo;index.js&rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。</p>
 
-<h3 id="function-json:13f4070f39b47880df2f217875deb9f9">function.json</h3>
+<h3 id="function-json">function.json</h3>
 
 <p>Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&rdquo;schedule&rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。</p>
 
 <p>&ldquo;0 0 0 * * *&rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。</p>
 
-<h3 id="index-js:13f4070f39b47880df2f217875deb9f9">index.js</h3>
+<h3 id="index-js">index.js</h3>
 
 <p>メインロジックです。</p>
 
@@ -323,7 +325,7 @@
 </ul></li>
 </ul>
 
-<h2 id="豆知識-node-on-azure-functions:13f4070f39b47880df2f217875deb9f9">豆知識 (Node on Azure Functions)</h2>
+<h2 id="豆知識-node-on-azure-functions">豆知識 (Node on Azure Functions)</h2>
 
 <ul>
 <li>通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
@@ -341,7 +343,7 @@
 </ul></li>
 </ul>
 
-<h2 id="豆知識-azure-usage-api:13f4070f39b47880df2f217875deb9f9">豆知識 (Azure Usage API)</h2>
+<h2 id="豆知識-azure-usage-api">豆知識 (Azure Usage API)</h2>
 
 <ul>
 <li>Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/">Ratecard API</a>を組み合わせてください</li>
@@ -371,13 +373,13 @@
                     <div class="post-description">
                         
 
-<h2 id="oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283">OMS Container Solution for Linux プレビュー開始</h2>
+<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
 
 <p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
 
 <p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
 
-<h2 id="何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283">何ができるか、とその特徴</h2>
+<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
 
 <ul>
 <li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
@@ -401,7 +403,7 @@
 
 <p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
 
-<h2 id="手順:494184e69e067c0e711200d6bf38d283">手順</h2>
+<h2 id="手順">手順</h2>
 
 <ul>
 <li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
@@ -458,7 +460,7 @@
                     <div class="post-description">
                         
 
-<h2 id="azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062">Azure X-Plat CLIのリリースサイクル</h2>
+<h2 id="azure-x-plat-cliのリリースサイクル">Azure X-Plat CLIのリリースサイクル</h2>
 
 <p>OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ<a href="https://github.com/Azure/azure-xplat-cli/releases">月次</a>です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。</p>
 
@@ -466,7 +468,7 @@
 
 <p>機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。</p>
 
-<h2 id="ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062">ポリシーによるアクセス管理</h2>
+<h2 id="ポリシーによるアクセス管理">ポリシーによるアクセス管理</h2>
 
 <p>さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。</p>
 
@@ -485,7 +487,7 @@
 
 <p>リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。</p>
 
-<h2 id="x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062">X-Plat CLIでの定義方法</h2>
+<h2 id="x-plat-cliでの定義方法">X-Plat CLIでの定義方法</h2>
 
 <p>2016/4リリースの<a href="https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016">v0.9.20</a>から、X-Plat CLIでもResource Policyを定義できます。</p>
 
@@ -495,7 +497,7 @@
 
 <p>X-Plat CLI固有部分に絞って紹介します。</p>
 
-<h3 id="ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062">ポリシー定義ファイルを作る</h3>
+<h3 id="ポリシー定義ファイルを作る">ポリシー定義ファイルを作る</h3>
 
 <p>CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。</p>
 
@@ -540,7 +542,7 @@ info:    policy definition create command OK
 
 <p>できたみたいです。</p>
 
-<h3 id="ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062">ポリシーをアサインする</h3>
+<h3 id="ポリシーをアサインする">ポリシーをアサインする</h3>
 
 <p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
 
@@ -602,11 +604,11 @@ info:    vm quick-create command OK
                     <div class="post-description">
                         
 
-<h2 id="端末だってコード化されたい:4b51bf5da7c597406600f164b7d91579">端末だってコード化されたい</h2>
+<h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
 
 <p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
 
-<h2 id="解決したい課題:4b51bf5da7c597406600f164b7d91579">解決したい課題</h2>
+<h2 id="解決したい課題">解決したい課題</h2>
 
 <p>こんな悩みを解決します。</p>
 
@@ -624,7 +626,7 @@ info:    vm quick-create command OK
 <li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
 </ul>
 
-<h2 id="やり口:4b51bf5da7c597406600f164b7d91579">やり口</h2>
+<h2 id="やり口">やり口</h2>
 
 <p>VagrantとDockerで解決します。</p>
 
@@ -637,7 +639,7 @@ info:    vm quick-create command OK
 <li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
 </ul>
 
-<h2 id="セットアップ概要:4b51bf5da7c597406600f164b7d91579">セットアップ概要</h2>
+<h2 id="セットアップ概要">セットアップ概要</h2>
 
 <p>簡単す。</p>
 
@@ -650,7 +652,7 @@ info:    vm quick-create command OK
 
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
 
-<h2 id="サンプル解説:4b51bf5da7c597406600f164b7d91579">サンプル解説</h2>
+<h2 id="サンプル解説">サンプル解説</h2>
 
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
 
@@ -722,21 +724,21 @@ end
 
 <p>$bootstrap=&lt;&lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
 
-<h3 id="common-tools:4b51bf5da7c597406600f164b7d91579">Common tools</h3>
+<h3 id="common-tools">Common tools</h3>
 
 <p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
 
-<h3 id="docker-engine-machine:4b51bf5da7c597406600f164b7d91579">Docker Engine &amp; Machine</h3>
+<h3 id="docker-engine-machine">Docker Engine &amp; Machine</h3>
 
 <p>この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。</p>
 
-<h3 id="azure-cli:4b51bf5da7c597406600f164b7d91579">Azure CLI</h3>
+<h3 id="azure-cli">Azure CLI</h3>
 
 <p>インストールせずに<a href="https://hub.docker.com/r/microsoft/azure-cli/">MS公式のDockerイメージ</a>を引っ張ります。なのでalias設定だけ。
 -v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
 また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&ndash;rmで消します。</p>
 
-<h3 id="terraform-packer:4b51bf5da7c597406600f164b7d91579">Terraform &amp; Packer</h3>
+<h3 id="terraform-packer">Terraform &amp; Packer</h3>
 
 <p>Azure CLIと同様です。Hashicorpが<a href="https://hub.docker.com/u/hashicorp/">公式イメージ</a>を提供しているので、それを活用します。
 方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
@@ -744,11 +746,11 @@ end
 
 <p>なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。</p>
 
-<h3 id="nodebrew:4b51bf5da7c597406600f164b7d91579">nodebrew</h3>
+<h3 id="nodebrew">nodebrew</h3>
 
 <p>nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。</p>
 
-<h3 id="python3:4b51bf5da7c597406600f164b7d91579">Python3</h3>
+<h3 id="python3">Python3</h3>
 
 <p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
 
@@ -756,7 +758,7 @@ end
 
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&rdquo;Vagrant.configure～&rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
 
-<h2 id="どれだけ楽か:4b51bf5da7c597406600f164b7d91579">どれだけ楽か</h2>
+<h2 id="どれだけ楽か">どれだけ楽か</h2>
 
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
 
@@ -796,7 +798,7 @@ end
 </ul></li>
 </ul>
 
-<h2 id="bash-on-windowsまで待つとか言わない:4b51bf5da7c597406600f164b7d91579">Bash on Windowsまで待つとか言わない</h2>
+<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
 
 <p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
 

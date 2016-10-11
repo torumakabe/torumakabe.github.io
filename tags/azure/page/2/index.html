@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e">まだ好みなんて聞いてないぜ</h2>
+<h2 id="まだ好みなんて聞いてないぜ">まだ好みなんて聞いてないぜ</h2>
 
 <p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
 
@@ -103,7 +103,7 @@
 
 <p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
 
-<h3 id="基本方針:99ec2e7c4c63926799149ef94c45b73e">基本方針</h3>
+<h3 id="基本方針">基本方針</h3>
 
 <ul>
 <li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
@@ -121,7 +121,7 @@
 
 <p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
 
-<h2 id="必要な作業:99ec2e7c4c63926799149ef94c45b73e">必要な作業</h2>
+<h2 id="必要な作業">必要な作業</h2>
 
 <p>以下が必要な作業の流れです。</p>
 
@@ -168,7 +168,7 @@
 <li>Github連携設定、#13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
 </ul>
 
-<h2 id="function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e">Function Appのサンプル</h2>
+<h2 id="function-appのサンプル">Function Appのサンプル</h2>
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
 
@@ -291,7 +291,8 @@ module.exports = function (context, req) {
 <li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
 
 <ul>
-<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ</li>
+<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ
+<br /></li>
 </ul></li>
 </ul>
 
@@ -338,7 +339,7 @@ module.exports = function (context, req) {
                     <div class="post-description">
                         
 
-<h2 id="サーバレスって言いたいだけじゃないです:1e958ca6820e4dcff939a22a84382ed3">サーバレスって言いたいだけじゃないです</h2>
+<h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
 
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 
@@ -349,7 +350,7 @@ module.exports = function (context, req) {
 
 <p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
 
-<h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
+<h2 id="コンセプト">コンセプト</h2>
 
 <ul>
 <li>管理サーバを作らない</li>
@@ -359,11 +360,11 @@ module.exports = function (context, req) {
 <li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
 </ul>
 
-<h2 id="サンプル:1e958ca6820e4dcff939a22a84382ed3">サンプル</h2>
+<h2 id="サンプル">サンプル</h2>
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
 
-<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
+<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
 
@@ -493,7 +494,7 @@ module.exports = function (context, req) {
 
 <p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。</p>
 
-<h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
+<h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 
@@ -519,7 +520,7 @@ module.exports = function (context, req) {
                     <div class="post-description">
                         
 
-<h2 id="定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd">定義領域全てが課金されるわけではありません</h2>
+<h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
 
 <p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
 
@@ -534,7 +535,7 @@ module.exports = function (context, req) {
 
 <p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
 
-<h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
+<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
 
 <p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
 
@@ -576,9 +577,9 @@ return $blobSizeInBytes
 
 <p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
 
-<h2 id="結果:73b15a413c7cb87e88f45a7aaba2eebd">結果</h2>
+<h2 id="結果">結果</h2>
 
-<h3 id="xfs:73b15a413c7cb87e88f45a7aaba2eebd">XFS</h3>
+<h3 id="xfs">XFS</h3>
 
 <table>
 <thead>
@@ -621,7 +622,7 @@ return $blobSizeInBytes
 </tbody>
 </table>
 
-<h3 id="ext4:73b15a413c7cb87e88f45a7aaba2eebd">Ext4</h3>
+<h3 id="ext4">Ext4</h3>
 
 <table>
 <thead>
@@ -674,7 +675,9 @@ return $blobSizeInBytes
 <ul>
 <li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
 <li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
-<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a>
+
+<br /></li>
 </ul></li>
 </ul>
 
@@ -702,13 +705,13 @@ return $blobSizeInBytes
                     <div class="post-description">
                         
 
-<h2 id="気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463">気軽に作って壊せる環境を作る</h2>
+<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
 
 <p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
 
 <p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
 
-<h2 id="方針:7c419a069d08019c3093e0308a68c463">方針</h2>
+<h2 id="方針">方針</h2>
 
 <ul>
 <li>インフラはAzure Resource Manager Templateでデプロイする
@@ -735,7 +738,7 @@ return $blobSizeInBytes
 <li>VMにログインしたら即CNTKを使える、幸せ</li>
 </ul>
 
-<h2 id="使い方:7c419a069d08019c3093e0308a68c463">使い方</h2>
+<h2 id="使い方">使い方</h2>
 
 <p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
 
@@ -758,7 +761,8 @@ return $blobSizeInBytes
 <li>テンプレートに直で書かきたくないパラメータです</li>
 <li>fileUris、commandToExecute以外は、各々で</li>
 <li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
+<br /></li>
 </ul></li>
 </ul>
 
@@ -790,7 +794,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
 
-<h2 id="今後の展開:7c419a069d08019c3093e0308a68c463">今後の展開</h2>
+<h2 id="今後の展開">今後の展開</h2>
 
 <p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
 
@@ -820,11 +824,11 @@ root@a1234bc5d67d:/cntk#
                     <div class="post-description">
                         
 
-<h2 id="監査ログからアラートを上げられるようになります:aafd9305d99be4ae8d2b9c3fb4887452">監査ログからアラートを上げられるようになります</h2>
+<h2 id="監査ログからアラートを上げられるようになります">監査ログからアラートを上げられるようになります</h2>
 
 <p>Azureの監査ログからアラートを上げる機能のプレビューが<a href="https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/">はじまりました</a>。これ、地味ですが便利な機能です。日々の運用に効きます。</p>
 
-<h2 id="どんな風に使えるか:aafd9305d99be4ae8d2b9c3fb4887452">どんな風に使えるか</h2>
+<h2 id="どんな風に使えるか">どんな風に使えるか</h2>
 
 <p>ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。</p>
 
@@ -834,7 +838,7 @@ root@a1234bc5d67d:/cntk#
 
 <p>これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。</p>
 
-<h2 id="実装例:aafd9305d99be4ae8d2b9c3fb4887452">実装例</h2>
+<h2 id="実装例">実装例</h2>
 
 <p>例としてこんな仕組みを作ってみましょう。</p>
 
@@ -844,7 +848,7 @@ root@a1234bc5d67d:/cntk#
 <li>OMSでログ分析</li>
 </ul>
 
-<h2 id="準備:aafd9305d99be4ae8d2b9c3fb4887452">準備</h2>
+<h2 id="準備">準備</h2>
 
 <p>以下の準備ができているか確認します。</p>
 
@@ -861,7 +865,7 @@ root@a1234bc5d67d:/cntk#
 
 <p><strong><a href="http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5">勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）</a></strong></p>
 
-<h2 id="azure-automation側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure Automation側の仕掛け</h2>
+<h2 id="azure-automation側の仕掛け">Azure Automation側の仕掛け</h2>
 
 <p>先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。</p>
 
@@ -916,7 +920,7 @@ else
 
 <p>WebhookのURLを控えておいてください。</p>
 
-<h2 id="azure-監査ログアラート側の仕掛け:aafd9305d99be4ae8d2b9c3fb4887452">Azure 監査ログアラート側の仕掛け</h2>
+<h2 id="azure-監査ログアラート側の仕掛け">Azure 監査ログアラート側の仕掛け</h2>
 
 <p>Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。</p>
 

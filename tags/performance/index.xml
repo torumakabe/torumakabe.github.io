@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>
 
-&lt;h2 id=&#34;俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
+&lt;h2 id=&#34;俺の鉄板-ができるまで&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
 
 &lt;p&gt;前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。&lt;/p&gt;
 
@@ -64,13 +64,14 @@
 
 &lt;ul&gt;
 &lt;li&gt;提案しっぱなしにせずフォローすることで、自信とパターンが増える&lt;/li&gt;
-&lt;li&gt;次の案件で活きる&lt;/li&gt;
+&lt;li&gt;次の案件で活きる
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。&lt;/p&gt;
 
-&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
+&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
 
 &lt;p&gt;さて今回の主題です。&lt;/p&gt;
 
@@ -170,7 +171,7 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 
 &lt;p&gt;&lt;strong&gt;このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。&lt;/strong&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;具体的な数値で-正しい理解を:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;具体的な数値で、正しい理解を&lt;/h2&gt;
+&lt;h2 id=&#34;具体的な数値で-正しい理解を&#34;&gt;具体的な数値で、正しい理解を&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/&#34;&gt;&amp;ldquo;クラウドは性能不足、企業システムが重すぎる&amp;rdquo;&lt;/a&gt;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。&lt;/p&gt;
 
@@ -180,7 +181,7 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 
 &lt;p&gt;いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。&lt;/p&gt;
 
-&lt;h2 id=&#34;シングルvmでどれだけ:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;シングルVMでどれだけ&lt;/h2&gt;
+&lt;h2 id=&#34;シングルvmでどれだけ&#34;&gt;シングルVMでどれだけ&lt;/h2&gt;
 
 &lt;p&gt;話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。&lt;/p&gt;
 
@@ -212,7 +213,7 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 
 &lt;p&gt;なお、&lt;strong&gt;現時点で&lt;/strong&gt;まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。&lt;/p&gt;
 
-&lt;h2 id=&#34;32仮想cpuコアの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;32仮想CPUコアの規模感&lt;/h2&gt;
+&lt;h2 id=&#34;32仮想cpuコアの規模感&#34;&gt;32仮想CPUコアの規模感&lt;/h2&gt;
 
 &lt;p&gt;クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。&lt;/p&gt;
 
@@ -298,7 +299,7 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 
 &lt;p&gt;なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は&lt;a href=&#34;http://global.sap.com/campaigns/benchmark/appbm_cloud.epx&#34;&gt;3-Tierベンチマーク&lt;/a&gt;で確認できます。&lt;a href=&#34;http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx&#34;&gt;Azure上で247,880SAPS&lt;/a&gt;出たそうです。&lt;/p&gt;
 
-&lt;h2 id=&#34;80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;80,000IOPSの規模感&lt;/h2&gt;
+&lt;h2 id=&#34;80-000iopsの規模感&#34;&gt;80,000IOPSの規模感&lt;/h2&gt;
 
 &lt;p&gt;IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/&#34;&gt;Premium Storage&lt;/a&gt;を接続し、VMあたり最大80,000IOPSを提供します。&lt;/p&gt;
 
@@ -310,7 +311,7 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 
 &lt;p&gt;なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。&lt;/p&gt;
 
-&lt;h2 id=&#34;結論:d3d20b8a9dfb8ebe2c80e0d21980dbd3&#34;&gt;結論&lt;/h2&gt;
+&lt;h2 id=&#34;結論&#34;&gt;結論&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり&lt;/li&gt;

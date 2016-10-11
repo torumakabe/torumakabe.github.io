@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="高まってまいりました:dfc3556fff242cb82e1ca9532877c49b">高まってまいりました</h2>
+<h2 id="高まってまいりました">高まってまいりました</h2>
 
 <p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
 
@@ -95,7 +95,7 @@
 
 <p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
 
-<h2 id="client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b">client_id/client_secret って何よ</h2>
+<h2 id="client-id-client-secret-って何よ">client_id/client_secret って何よ</h2>
 
 <p>以下がARM向けのProvider設定です。</p>
 
@@ -115,7 +115,7 @@ provider &quot;azurerm&quot; {
 
 <p>おっとそういうことか。OAuth。</p>
 
-<h2 id="サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b">サービスプリンシパルを使おう</h2>
+<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
 
 <p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
 
@@ -259,11 +259,11 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     <div class="post-description">
                         
 
-<h2 id="すこぶるfaq:4a620049922b1b54512a25b34ba773c5">すこぶるFAQ</h2>
+<h2 id="すこぶるfaq">すこぶるFAQ</h2>
 
 <p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
 
-<h2 id="公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5">公式ホワイトペーパー</h2>
+<h2 id="公式ホワイトペーパー">公式ホワイトペーパー</h2>
 
 <p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
 
@@ -271,14 +271,14 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p><strong>2016//3/4 追記 <a href="http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf">日本語訳</a>がありました</strong></p>
 
-<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
 
 <pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
 </code></pre>
 
 <p>MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
 
-<h2 id="azureがやってくれること:4a620049922b1b54512a25b34ba773c5">Azureがやってくれること</h2>
+<h2 id="azureがやってくれること">Azureがやってくれること</h2>
 
 <p>では、具体的に。</p>
 
@@ -287,7 +287,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。</p>
 
-<h2 id="お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5">お客様対応が必要なこと</h2>
+<h2 id="お客様対応が必要なこと">お客様対応が必要なこと</h2>
 
 <p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
 
@@ -316,7 +316,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
 
-<h2 id="ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5">ホワイトペーパーに加えて</h2>
+<h2 id="ホワイトペーパーに加えて">ホワイトペーパーに加えて</h2>
 
 <p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後<a href="https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/">提供される予定</a>です。</p>
 
@@ -346,7 +346,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     <div class="post-description">
                         
 
-<h2 id="同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c">同じ目的を達成できるツールがたくさん</h2>
+<h2 id="同じ目的を達成できるツールがたくさん">同じ目的を達成できるツールがたくさん</h2>
 
 <p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
 
@@ -358,7 +358,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
 
-<h2 id="環境と測定方式:2c3afc565a3430f70519d9c56354717c">環境と測定方式</h2>
+<h2 id="環境と測定方式">環境と測定方式</h2>
 
 <p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
 
@@ -423,7 +423,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
 
-<h2 id="結果:2c3afc565a3430f70519d9c56354717c">結果</h2>
+<h2 id="結果">結果</h2>
 
 <p>平行度上げても伸びないな、というタイミングまで上げます。</p>
 
@@ -622,7 +622,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 </tbody>
 </table>
 
-<h2 id="考察:2c3afc565a3430f70519d9c56354717c">考察</h2>
+<h2 id="考察">考察</h2>
 
 <ul>
 <li>有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>
@@ -681,7 +681,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     <div class="post-description">
                         
 
-<h2 id="ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba">ファイル共有、あまりおすすめしないです</h2>
+<h2 id="ファイル共有-あまりおすすめしないです">ファイル共有、あまりおすすめしないです</h2>
 
 <p>いきなりタイトルを否定しました。ロック。</p>
 
@@ -703,7 +703,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
 
-<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
+<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
 
 <p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
 
@@ -731,7 +731,7 @@ info:    storage account connectionstring show command OK
 data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 </code></pre>
 
-<h2 id="linux-2vmで共有:fa176ff87dca43c3d098f48095435bba">Linux * 2VMで共有</h2>
+<h2 id="linux-2vmで共有">Linux * 2VMで共有</h2>
 
 <p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
 
@@ -782,7 +782,7 @@ test
 onemoretest
 </code></pre>
 
-<h2 id="ご利用は計画的に:fa176ff87dca43c3d098f48095435bba">ご利用は計画的に</h2>
+<h2 id="ご利用は計画的に">ご利用は計画的に</h2>
 
 <p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
 
@@ -810,7 +810,7 @@ onemoretest
                     <div class="post-description">
                         
 
-<h2 id="俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
+<h2 id="俺の鉄板-ができるまで">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
 
 <p>前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。</p>
 
@@ -857,13 +857,14 @@ onemoretest
 
 <ul>
 <li>提案しっぱなしにせずフォローすることで、自信とパターンが増える</li>
-<li>次の案件で活きる</li>
+<li>次の案件で活きる
+<br /></li>
 </ul></li>
 </ol>
 
 <p>いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。</p>
 
-<h2 id="linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400">Linux on AzureでDisk IO性能を確保する方法</h2>
+<h2 id="linux-on-azureでdisk-io性能を確保する方法">Linux on AzureでDisk IO性能を確保する方法</h2>
 
 <p>さて今回の主題です。</p>
 

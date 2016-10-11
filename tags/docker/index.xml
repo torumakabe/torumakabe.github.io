@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
       <description>
 
-&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
+&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
 
 &lt;p&gt;OMS Container Solution for Linuxのプレビューが&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;はじまりました&lt;/a&gt;。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。&lt;/p&gt;
 
 &lt;p&gt;さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。&lt;/p&gt;
 
-&lt;h2 id=&#34;何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
+&lt;h2 id=&#34;何ができるか-とその特徴&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
@@ -47,7 +47,7 @@
 
 &lt;p&gt;では試しに、1のやり口でUbuntuへ導入してみましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;手順:494184e69e067c0e711200d6bf38d283&#34;&gt;手順&lt;/h2&gt;
+&lt;h2 id=&#34;手順&#34;&gt;手順&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/&#34;&gt;参考&lt;/a&gt;)
@@ -92,11 +92,11 @@
       <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
       <description>
 
-&lt;h2 id=&#34;端末だってコード化されたい:4b51bf5da7c597406600f164b7d91579&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
+&lt;h2 id=&#34;端末だってコード化されたい&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
 
 &lt;p&gt;Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。&lt;/p&gt;
 
-&lt;h2 id=&#34;解決したい課題:4b51bf5da7c597406600f164b7d91579&#34;&gt;解決したい課題&lt;/h2&gt;
+&lt;h2 id=&#34;解決したい課題&#34;&gt;解決したい課題&lt;/h2&gt;
 
 &lt;p&gt;こんな悩みを解決します。&lt;/p&gt;
 
@@ -114,7 +114,7 @@
 &lt;li&gt;毎度作業のどこかが抜ける、漏れる、間違う 人間だもの&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;やり口:4b51bf5da7c597406600f164b7d91579&#34;&gt;やり口&lt;/h2&gt;
+&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
 
 &lt;p&gt;VagrantとDockerで解決します。&lt;/p&gt;
 
@@ -127,7 +127,7 @@
 &lt;li&gt;Windows/MacのいまどきなIDEなりエディタを使えるようにする&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;セットアップ概要:4b51bf5da7c597406600f164b7d91579&#34;&gt;セットアップ概要&lt;/h2&gt;
+&lt;h2 id=&#34;セットアップ概要&#34;&gt;セットアップ概要&lt;/h2&gt;
 
 &lt;p&gt;簡単す。&lt;/p&gt;
 
@@ -140,7 +140,7 @@
 
 &lt;p&gt;もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。&lt;/p&gt;
 
-&lt;h2 id=&#34;サンプル解説:4b51bf5da7c597406600f164b7d91579&#34;&gt;サンプル解説&lt;/h2&gt;
+&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
 
 &lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
 
@@ -212,21 +212,21 @@ end
 
 &lt;p&gt;$bootstrap=&amp;lt;&amp;lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。&lt;/p&gt;
 
-&lt;h3 id=&#34;common-tools:4b51bf5da7c597406600f164b7d91579&#34;&gt;Common tools&lt;/h3&gt;
+&lt;h3 id=&#34;common-tools&#34;&gt;Common tools&lt;/h3&gt;
 
 &lt;p&gt;一般的なツールをaptでインストールします。wgetとかjqとか。&lt;/p&gt;
 
-&lt;h3 id=&#34;docker-engine-machine:4b51bf5da7c597406600f164b7d91579&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
+&lt;h3 id=&#34;docker-engine-machine&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
 
 &lt;p&gt;この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。&lt;/p&gt;
 
-&lt;h3 id=&#34;azure-cli:4b51bf5da7c597406600f164b7d91579&#34;&gt;Azure CLI&lt;/h3&gt;
+&lt;h3 id=&#34;azure-cli&#34;&gt;Azure CLI&lt;/h3&gt;
 
 &lt;p&gt;インストールせずに&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/&#34;&gt;MS公式のDockerイメージ&lt;/a&gt;を引っ張ります。なのでalias設定だけ。
 -v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
 また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&amp;ndash;rmで消します。&lt;/p&gt;
 
-&lt;h3 id=&#34;terraform-packer:4b51bf5da7c597406600f164b7d91579&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
+&lt;h3 id=&#34;terraform-packer&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
 
 &lt;p&gt;Azure CLIと同様です。Hashicorpが&lt;a href=&#34;https://hub.docker.com/u/hashicorp/&#34;&gt;公式イメージ&lt;/a&gt;を提供しているので、それを活用します。
 方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
@@ -234,11 +234,11 @@ end
 
 &lt;p&gt;なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。&lt;/p&gt;
 
-&lt;h3 id=&#34;nodebrew:4b51bf5da7c597406600f164b7d91579&#34;&gt;nodebrew&lt;/h3&gt;
+&lt;h3 id=&#34;nodebrew&#34;&gt;nodebrew&lt;/h3&gt;
 
 &lt;p&gt;nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。&lt;/p&gt;
 
-&lt;h3 id=&#34;python3:4b51bf5da7c597406600f164b7d91579&#34;&gt;Python3&lt;/h3&gt;
+&lt;h3 id=&#34;python3&#34;&gt;Python3&lt;/h3&gt;
 
 &lt;p&gt;Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。&lt;/p&gt;
 
@@ -246,7 +246,7 @@ end
 
 &lt;p&gt;さて、ここまでがプロビジョニング時の処理です。以降の&amp;rdquo;Vagrant.configure～&amp;rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。&lt;/p&gt;
 
-&lt;h2 id=&#34;どれだけ楽か:4b51bf5da7c597406600f164b7d91579&#34;&gt;どれだけ楽か&lt;/h2&gt;
+&lt;h2 id=&#34;どれだけ楽か&#34;&gt;どれだけ楽か&lt;/h2&gt;
 
 &lt;p&gt;では、環境を作ってみましょう。Vagrantfileがあるフォルダで&lt;/p&gt;
 
@@ -286,7 +286,7 @@ end
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない:4b51bf5da7c597406600f164b7d91579&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
+&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
 
 &lt;p&gt;「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。&lt;/p&gt;
 
@@ -304,7 +304,7 @@ end
       <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
       <description>
 
-&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
+&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
 
 &lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
 
@@ -315,7 +315,7 @@ end
 
 &lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
 
-&lt;h2 id=&#34;コンセプト:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;コンセプト&lt;/h2&gt;
+&lt;h2 id=&#34;コンセプト&#34;&gt;コンセプト&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;管理サーバを作らない&lt;/li&gt;
@@ -325,11 +325,11 @@ end
 &lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;サンプル:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;サンプル&lt;/h2&gt;
+&lt;h2 id=&#34;サンプル&#34;&gt;サンプル&lt;/h2&gt;
 
 &lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
+&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
 
@@ -459,7 +459,7 @@ end
 
 &lt;p&gt;以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
+&lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
 
 &lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
 </description>
@@ -473,13 +473,13 @@ end
       <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
       <description>
 
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る:7c419a069d08019c3093e0308a68c463&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
+&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
 
 &lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
 
 &lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
 
-&lt;h2 id=&#34;方針:7c419a069d08019c3093e0308a68c463&#34;&gt;方針&lt;/h2&gt;
+&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
@@ -506,7 +506,7 @@ end
 &lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;使い方:7c419a069d08019c3093e0308a68c463&#34;&gt;使い方&lt;/h2&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
 &lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
 
@@ -529,7 +529,8 @@ end
 &lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
 &lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
 &lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください&lt;/li&gt;
+&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -561,7 +562,7 @@ root@a1234bc5d67d:/cntk#
 
 &lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
 
-&lt;h2 id=&#34;今後の展開:7c419a069d08019c3093e0308a68c463&#34;&gt;今後の展開&lt;/h2&gt;
+&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
 
 &lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
 
@@ -579,7 +580,7 @@ root@a1234bc5d67d:/cntk#
       <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>
 
-&lt;h2 id=&#34;どこいってもいじられる:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;どこいってもいじられる&lt;/h2&gt;
+&lt;h2 id=&#34;どこいってもいじられる&#34;&gt;どこいってもいじられる&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://www.adventar.org/calendars/968&#34;&gt;OpenStack Advent Calendar 2015&lt;/a&gt; 参加作品、19夜目のエントリです。&lt;/p&gt;
 
@@ -587,7 +588,7 @@ root@a1234bc5d67d:/cntk#
 
 &lt;p&gt;さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;乗るしかないこのdockerウェーブに:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;乗るしかないこのDockerウェーブに&lt;/h2&gt;
+&lt;h2 id=&#34;乗るしかないこのdockerウェーブに&#34;&gt;乗るしかないこのDockerウェーブに&lt;/h2&gt;
 
 &lt;p&gt;どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。&lt;/p&gt;
 
@@ -603,7 +604,7 @@ root@a1234bc5d67d:/cntk#
 
 &lt;p&gt;今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は&lt;a href=&#34;http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration&#34;&gt;前佛さんの資料&lt;/a&gt;を参考にしてください。&lt;/p&gt;
 
-&lt;h2 id=&#34;ローカル環境:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;ローカル環境&lt;/h2&gt;
+&lt;h2 id=&#34;ローカル環境&#34;&gt;ローカル環境&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Mac OS X (El Capitan)
@@ -616,7 +617,7 @@ root@a1234bc5d67d:/cntk#
 &lt;p&gt;ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
 また、Swarmのマスタはローカルに配置します。&lt;/p&gt;
 
-&lt;h2 id=&#34;いざ実行:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;いざ実行&lt;/h2&gt;
+&lt;h2 id=&#34;いざ実行&#34;&gt;いざ実行&lt;/h2&gt;
 
 &lt;p&gt;まず、Docker Machineにクラウドの諸設定を食わせます。&lt;/p&gt;
 
@@ -717,7 +718,7 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
 
 &lt;p&gt;まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した&lt;a href=&#34;https://www.tutum.co/&#34;&gt;Tutum&lt;/a&gt;との関係、今後どう進化していくのか、注目です。&lt;/p&gt;
 
-&lt;h2 id=&#34;ツールから入るハイブリッドクラウドも-またよし:9e7f40e1d4e6f185223966639b28e39a&#34;&gt;ツールから入るハイブリッドクラウドも、またよし&lt;/h2&gt;
+&lt;h2 id=&#34;ツールから入るハイブリッドクラウドも-またよし&#34;&gt;ツールから入るハイブリッドクラウドも、またよし&lt;/h2&gt;
 
 &lt;p&gt;ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。&lt;/p&gt;
 
@@ -741,7 +742,7 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
       <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
       <description>
 
-&lt;h2 id=&#34;まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;まずはじめに&lt;/h2&gt;
+&lt;h2 id=&#34;まずはじめに&#34;&gt;まずはじめに&lt;/h2&gt;
 
 &lt;p&gt;先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。&lt;/p&gt;
 
@@ -751,7 +752,7 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
 
 &lt;p&gt;なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。&lt;/p&gt;
 
-&lt;h2 id=&#34;azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66&#34;&gt;Azure Docker VM Extension を使う3つの理由&lt;/h2&gt;
+&lt;h2 id=&#34;azure-docker-vm-extension-を使う3つの理由&#34;&gt;Azure Docker VM Extension を使う3つの理由&lt;/h2&gt;
 
 &lt;p&gt;さて、今回は話題沸騰のDocker関連のネタ、&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;Azure Docker VM Extension&lt;/a&gt;について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。&lt;/p&gt;
 

@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure X-Plat CLIでResource Policyを設定する &middot; re-imagine">
@@ -97,7 +97,7 @@
                     <div class="post-description">
                         
 
-<h2 id="azure-x-plat-cliのリリースサイクル:6386657500959cd2c6c4ed079ad7f062">Azure X-Plat CLIのリリースサイクル</h2>
+<h2 id="azure-x-plat-cliのリリースサイクル">Azure X-Plat CLIのリリースサイクル</h2>
 
 <p>OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ<a href="https://github.com/Azure/azure-xplat-cli/releases">月次</a>です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。</p>
 
@@ -105,7 +105,7 @@
 
 <p>機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。</p>
 
-<h2 id="ポリシーによるアクセス管理:6386657500959cd2c6c4ed079ad7f062">ポリシーによるアクセス管理</h2>
+<h2 id="ポリシーによるアクセス管理">ポリシーによるアクセス管理</h2>
 
 <p>さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。</p>
 
@@ -124,7 +124,7 @@
 
 <p>リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。</p>
 
-<h2 id="x-plat-cliでの定義方法:6386657500959cd2c6c4ed079ad7f062">X-Plat CLIでの定義方法</h2>
+<h2 id="x-plat-cliでの定義方法">X-Plat CLIでの定義方法</h2>
 
 <p>2016/4リリースの<a href="https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016">v0.9.20</a>から、X-Plat CLIでもResource Policyを定義できます。</p>
 
@@ -134,7 +134,7 @@
 
 <p>X-Plat CLI固有部分に絞って紹介します。</p>
 
-<h3 id="ポリシー定義ファイルを作る:6386657500959cd2c6c4ed079ad7f062">ポリシー定義ファイルを作る</h3>
+<h3 id="ポリシー定義ファイルを作る">ポリシー定義ファイルを作る</h3>
 
 <p>CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。</p>
 
@@ -179,7 +179,7 @@ info:    policy definition create command OK
 
 <p>できたみたいです。</p>
 
-<h3 id="ポリシーをアサインする:6386657500959cd2c6c4ed079ad7f062">ポリシーをアサインする</h3>
+<h3 id="ポリシーをアサインする">ポリシーをアサインする</h3>
 
 <p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
 

@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
       <description>
 
-&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始:494184e69e067c0e711200d6bf38d283&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
+&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
 
 &lt;p&gt;OMS Container Solution for Linuxのプレビューが&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;はじまりました&lt;/a&gt;。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。&lt;/p&gt;
 
 &lt;p&gt;さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。&lt;/p&gt;
 
-&lt;h2 id=&#34;何ができるか-とその特徴:494184e69e067c0e711200d6bf38d283&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
+&lt;h2 id=&#34;何ができるか-とその特徴&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
@@ -47,7 +47,7 @@
 
 &lt;p&gt;では試しに、1のやり口でUbuntuへ導入してみましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;手順:494184e69e067c0e711200d6bf38d283&#34;&gt;手順&lt;/h2&gt;
+&lt;h2 id=&#34;手順&#34;&gt;手順&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/&#34;&gt;参考&lt;/a&gt;)

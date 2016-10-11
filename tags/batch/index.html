@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Batch &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="サーバレスって言いたいだけじゃないです:1e958ca6820e4dcff939a22a84382ed3">サーバレスって言いたいだけじゃないです</h2>
+<h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
 
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 
@@ -98,7 +98,7 @@
 
 <p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
 
-<h2 id="コンセプト:1e958ca6820e4dcff939a22a84382ed3">コンセプト</h2>
+<h2 id="コンセプト">コンセプト</h2>
 
 <ul>
 <li>管理サーバを作らない</li>
@@ -108,11 +108,11 @@
 <li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
 </ul>
 
-<h2 id="サンプル:1e958ca6820e4dcff939a22a84382ed3">サンプル</h2>
+<h2 id="サンプル">サンプル</h2>
 
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
 
-<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置:1e958ca6820e4dcff939a22a84382ed3">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
+<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
 
@@ -242,7 +242,7 @@
 
 <p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。</p>
 
-<h2 id="azure-automationとの使い分け:1e958ca6820e4dcff939a22a84382ed3">Azure Automationとの使い分け</h2>
+<h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 

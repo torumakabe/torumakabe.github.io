@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>
 
-&lt;h2 id=&#34;俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
+&lt;h2 id=&#34;俺の屍を越えていけ&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
 
 &lt;p&gt;今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。この週末お楽しみ、という人も多いかもしれません。&lt;/p&gt;
 
 &lt;p&gt;小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。&lt;/p&gt;
 
-&lt;h2 id=&#34;この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
+&lt;h2 id=&#34;この3つは触る前から意識しよう&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;ARMテンプレートリソースは分離して使う&lt;/li&gt;
@@ -31,13 +31,13 @@
 &lt;li&gt;公開鍵認証SSH指定でエラーが出ても驚かない&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
+&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
 
 &lt;p&gt;v0.6.14で、リソース&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html&#34;&gt;&amp;ldquo;azurerm_template_deployment&amp;rdquo;&lt;/a&gt;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。&lt;/p&gt;
 
 &lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
 
-&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
+&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
 
 &lt;p&gt;避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/p&gt;
 
@@ -45,21 +45,21 @@
 
 &lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
 
-&lt;h3 id=&#34;タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;タイムアウトしがち&lt;/h3&gt;
+&lt;h3 id=&#34;タイムアウトしがち&#34;&gt;タイムアウトしがち&lt;/h3&gt;
 
 &lt;p&gt;それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;
 
-&lt;h3 id=&#34;せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
+&lt;h3 id=&#34;せっかくのリソースグラフを活用できない&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
 
 &lt;p&gt;Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;
 
-&lt;h3 id=&#34;読みづらい:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;読みづらい&lt;/h3&gt;
+&lt;h3 id=&#34;読みづらい&#34;&gt;読みづらい&lt;/h3&gt;
 
 &lt;p&gt;Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;
 
 &lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
 
-&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
+&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
 
 &lt;p&gt;Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&lt;a href=&#34;https://www.terraform.io/intro/getting-started/dependencies.html&#34;&gt;&amp;ldquo;depends_on&amp;rdquo;&lt;/a&gt;で明示してあげましょう。&lt;/p&gt;
 
@@ -103,7 +103,7 @@ resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
 
 &lt;p&gt;これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。&lt;/p&gt;
 
-&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
+&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
 
 &lt;p&gt;TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。&lt;/p&gt;
 
@@ -137,13 +137,13 @@ resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
       <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>
 
-&lt;h2 id=&#34;terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
+&lt;h2 id=&#34;terraformer増加に備えて&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
 
 &lt;p&gt;2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。待っていた人も多いのではないでしょうか。&lt;/p&gt;
 
 &lt;p&gt;追って&lt;a href=&#34;https://www.hashicorp.com/partners.html#sipart&#34;&gt;Hashicorp認定パートナー&lt;/a&gt;のクリエーションラインさんから導入・サポートサービスが&lt;a href=&#34;http://www.creationline.com/lab/13268&#34;&gt;アナウンス&lt;/a&gt;されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。&lt;/p&gt;
 
-&lt;h2 id=&#34;エラーコード429:41e5563e03314499a86e746f2fbd113b&#34;&gt;エラーコード429&lt;/h2&gt;
+&lt;h2 id=&#34;エラーコード429&#34;&gt;エラーコード429&lt;/h2&gt;
 
 &lt;p&gt;さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。&lt;/p&gt;
 
@@ -155,13 +155,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;autorestがステータスコード429をキャッチしました。&lt;a href=&#34;https://tools.ietf.org/html/rfc6585#section-4&#34;&gt;RFC上で429は&lt;/a&gt;&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。&lt;/p&gt;
 
-&lt;h2 id=&#34;対処法:41e5563e03314499a86e746f2fbd113b&#34;&gt;対処法&lt;/h2&gt;
+&lt;h2 id=&#34;対処法&#34;&gt;対処法&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。&lt;/p&gt;
 
-&lt;h2 id=&#34;背景:41e5563e03314499a86e746f2fbd113b&#34;&gt;背景&lt;/h2&gt;
+&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
 
 &lt;p&gt;エラーになった背景ですが、2つの可能性があります。&lt;/p&gt;
 
@@ -170,7 +170,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
+&lt;h3 id=&#34;1-apiリクエスト数上限に達した&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
 
 &lt;p&gt;Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。&lt;/p&gt;
 
@@ -182,7 +182,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;ひとまずプロダクトの方針は確認したいので、Issueに質問を&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5704&#34;&gt;あげておきました&lt;/a&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
+&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
 
 &lt;p&gt;Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。&lt;/p&gt;
 
@@ -209,7 +209,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>
 
-&lt;h2 id=&#34;情報がありそうでない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;情報がありそうでない&lt;/h2&gt;
+&lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
 
@@ -217,7 +217,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;なお、考え方は他のクラウドやデプロイツールでも応用できるかと。&lt;/p&gt;
 
-&lt;h2 id=&#34;4原則:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4原則&lt;/h2&gt;
+&lt;h2 id=&#34;4原則&#34;&gt;4原則&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;セキュリティファースト&lt;/li&gt;
@@ -251,7 +251,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。&lt;/p&gt;
 
-&lt;h2 id=&#34;1-セキュリティファースト:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
+&lt;h2 id=&#34;1-セキュリティファースト&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
 
 &lt;p&gt;セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。&lt;/p&gt;
 
@@ -278,7 +278,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;ul&gt;
 &lt;li&gt;Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう&lt;/li&gt;
-&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です&lt;/li&gt;
+&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ネットワークセキュリティグループはサブネットに指定しておく&lt;/p&gt;
@@ -298,13 +299,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;2-手順書をなくそう:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
+&lt;h2 id=&#34;2-手順書をなくそう&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
 
 &lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
 
 &lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
 
-&lt;h2 id=&#34;3-分割境界にこだわりすぎない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
+&lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
 
 &lt;p&gt;TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。&lt;/p&gt;
 
@@ -331,7 +332,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;ネットワーク、ストレージ、VM Availability Setで分割&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;直観的&lt;/li&gt;
-&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ&lt;/li&gt;
+&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;組織単位で分割する&lt;/p&gt;
@@ -352,7 +354,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;リソースタイプと組み合わせる手もある
 
 &lt;ul&gt;
-&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
@@ -365,13 +368,14 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;ネットワークが頻繁に変わることはまれ&lt;/li&gt;
 &lt;li&gt;VMは増減が激しい&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動的なリソースは対象から外す、別手段とする手も&lt;/li&gt;
+&lt;li&gt;動的なリソースは対象から外す、別手段とする手も
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。&lt;/p&gt;
 
-&lt;h2 id=&#34;4-早すぎる最適化は悪:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
+&lt;h2 id=&#34;4-早すぎる最適化は悪&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
 
 &lt;p&gt;最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。&lt;/p&gt;
 
@@ -401,7 +405,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>
 
-&lt;h2 id=&#34;高まってまいりました:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;高まってまいりました&lt;/h2&gt;
+&lt;h2 id=&#34;高まってまいりました&#34;&gt;高まってまいりました&lt;/h2&gt;
 
 &lt;p&gt;全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。&lt;/p&gt;
 
@@ -409,7 +413,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。&lt;/p&gt;
 
-&lt;h2 id=&#34;client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
+&lt;h2 id=&#34;client-id-client-secret-って何よ&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
 
 &lt;p&gt;以下がARM向けのProvider設定です。&lt;/p&gt;
 
@@ -429,7 +433,7 @@ provider &amp;quot;azurerm&amp;quot; {
 
 &lt;p&gt;おっとそういうことか。OAuth。&lt;/p&gt;
 
-&lt;h2 id=&#34;サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
+&lt;h2 id=&#34;サービスプリンシパルを使おう&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
 
 &lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
 
@@ -561,15 +565,15 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
       <guid>http://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>
 
-&lt;h3 id=&#34;terraform-0-4でopenstack-providerリリース:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;Terraform 0.4でOpenStack Providerリリース&lt;/h3&gt;
+&lt;h3 id=&#34;terraform-0-4でopenstack-providerリリース&#34;&gt;Terraform 0.4でOpenStack Providerリリース&lt;/h3&gt;
 
 &lt;p&gt;以前からOpenStack対応は表明されていたのですが、いよいよ&lt;a href=&#34;https://hashicorp.com/blog/terraform-0-4.html&#34;&gt;v0.4&lt;/a&gt;でリリースされました。&lt;/p&gt;
 
-&lt;h3 id=&#34;小さくはじめましょう:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;小さくはじめましょう&lt;/h3&gt;
+&lt;h3 id=&#34;小さくはじめましょう&#34;&gt;小さくはじめましょう&lt;/h3&gt;
 
 &lt;p&gt;この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。&lt;/p&gt;
 
-&lt;h3 id=&#34;テストした環境:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;テストした環境&lt;/h3&gt;
+&lt;h3 id=&#34;テストした環境&#34;&gt;テストした環境&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Terraform 0.4&lt;/li&gt;
@@ -577,7 +581,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;li&gt;HP Helion Public Cloud&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;openstackerのみだしなみ-環境変数:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;OpenStackerのみだしなみ、環境変数&lt;/h3&gt;
+&lt;h3 id=&#34;openstackerのみだしなみ-環境変数&#34;&gt;OpenStackerのみだしなみ、環境変数&lt;/h3&gt;
 
 &lt;p&gt;下記、環境変数はセットされてますよね。要確認。&lt;/p&gt;
 
@@ -589,13 +593,13 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;li&gt;OS_TENANT_NAME&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;最小限の構成ファイル:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
+&lt;h3 id=&#34;最小限の構成ファイル&#34;&gt;最小限の構成ファイル&lt;/h3&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/977209064bcfda66d085.js&#34;&gt;&lt;/script&gt;
 
 &lt;p&gt;これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。&lt;/p&gt;
 
-&lt;h3 id=&#34;さあ実行:5f9dbf3eb73e084c7453e28119859d69&#34;&gt;さあ実行&lt;/h3&gt;
+&lt;h3 id=&#34;さあ実行&#34;&gt;さあ実行&lt;/h3&gt;
 
 &lt;p&gt;まずはterraform planコマンドで、実行計画を確認します。&lt;/p&gt;
 

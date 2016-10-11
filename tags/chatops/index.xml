@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>
 
-&lt;h2 id=&#34;azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
+&lt;h2 id=&#34;azure-functionsでやってみよう&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
 
 &lt;p&gt;Azure上でChatOpsしたい、と相談をいただきました。&lt;/p&gt;
 
@@ -27,7 +27,7 @@
 
 &lt;p&gt;素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。&lt;/p&gt;
 
-&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
+&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;誰がいつ、どんな文脈でRunbookを実行したかを可視化する&lt;/li&gt;
@@ -35,13 +35,13 @@
 &lt;li&gt;CLIやAPIをRunbookで隠蔽し、できることを制限する&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;ブツ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;ブツ&lt;/h2&gt;
+&lt;h2 id=&#34;ブツ&#34;&gt;ブツ&lt;/h2&gt;
 
 &lt;p&gt;Githubに上げておきました。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample&#34;&gt;AZChatOpsSample&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;おおまかな流れ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;おおまかな流れ&lt;/h2&gt;
+&lt;h2 id=&#34;おおまかな流れ&#34;&gt;おおまかな流れ&lt;/h2&gt;
 
 &lt;p&gt;手順書つらいのでポイントだけ。&lt;/p&gt;
 
@@ -95,7 +95,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;よもやま話:3a5e8d97b60e50a739f033a761af1408&#34;&gt;よもやま話&lt;/h2&gt;
+&lt;h2 id=&#34;よもやま話&#34;&gt;よもやま話&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。&lt;/p&gt;
@@ -108,6 +108,8 @@
 &lt;li&gt;&lt;p&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;

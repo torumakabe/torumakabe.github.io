@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>
 
-&lt;h2 id=&#34;azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
+&lt;h2 id=&#34;azure-functionsでやってみよう&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
 
 &lt;p&gt;Azure上でChatOpsしたい、と相談をいただきました。&lt;/p&gt;
 
@@ -27,7 +27,7 @@
 
 &lt;p&gt;素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。&lt;/p&gt;
 
-&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
+&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;誰がいつ、どんな文脈でRunbookを実行したかを可視化する&lt;/li&gt;
@@ -35,13 +35,13 @@
 &lt;li&gt;CLIやAPIをRunbookで隠蔽し、できることを制限する&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;ブツ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;ブツ&lt;/h2&gt;
+&lt;h2 id=&#34;ブツ&#34;&gt;ブツ&lt;/h2&gt;
 
 &lt;p&gt;Githubに上げておきました。&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample&#34;&gt;AZChatOpsSample&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;おおまかな流れ:3a5e8d97b60e50a739f033a761af1408&#34;&gt;おおまかな流れ&lt;/h2&gt;
+&lt;h2 id=&#34;おおまかな流れ&#34;&gt;おおまかな流れ&lt;/h2&gt;
 
 &lt;p&gt;手順書つらいのでポイントだけ。&lt;/p&gt;
 
@@ -95,7 +95,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;よもやま話:3a5e8d97b60e50a739f033a761af1408&#34;&gt;よもやま話&lt;/h2&gt;
+&lt;h2 id=&#34;よもやま話&#34;&gt;よもやま話&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。&lt;/p&gt;
@@ -108,6 +108,8 @@
 &lt;li&gt;&lt;p&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
@@ -123,7 +125,7 @@
       <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>
 
-&lt;h2 id=&#34;背景と動機:13f4070f39b47880df2f217875deb9f9&#34;&gt;背景と動機&lt;/h2&gt;
+&lt;h2 id=&#34;背景と動機&#34;&gt;背景と動機&lt;/h2&gt;
 
 &lt;p&gt;Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。&lt;/p&gt;
 
@@ -138,7 +140,7 @@
 &lt;li&gt;それAzure Functionsで出来るよ。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;方針:13f4070f39b47880df2f217875deb9f9&#34;&gt;方針&lt;/h2&gt;
+&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Azure FunctionsのTimer Triggerを使って、日次で実行&lt;/li&gt;
@@ -147,9 +149,9 @@
 &lt;li&gt;業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;quick-start:13f4070f39b47880df2f217875deb9f9&#34;&gt;Quick Start&lt;/h2&gt;
+&lt;h2 id=&#34;quick-start&#34;&gt;Quick Start&lt;/h2&gt;
 
-&lt;h3 id=&#34;準備:13f4070f39b47880df2f217875deb9f9&#34;&gt;準備&lt;/h3&gt;
+&lt;h3 id=&#34;準備&#34;&gt;準備&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;ところでAzure Funtionsって何よ、って人はまず&lt;a href=&#34;https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/&#34;&gt;いい資料1&lt;/a&gt;と&lt;a href=&#34;https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/&#34;&gt;いい資料2&lt;/a&gt;でざっと把握を&lt;/li&gt;
@@ -167,7 +169,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;デプロイ:13f4070f39b47880df2f217875deb9f9&#34;&gt;デプロイ&lt;/h3&gt;
+&lt;h3 id=&#34;デプロイ&#34;&gt;デプロイ&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Function Appを作成
@@ -209,21 +211,21 @@
 
 &lt;p&gt;これで、指定ストレージアカウントの&amp;rdquo;usagedata&amp;rdquo;コンテナに日次で使用量データファイルができます。&lt;/p&gt;
 
-&lt;h2 id=&#34;コード解説:13f4070f39b47880df2f217875deb9f9&#34;&gt;コード解説&lt;/h2&gt;
+&lt;h2 id=&#34;コード解説&#34;&gt;コード解説&lt;/h2&gt;
 
 &lt;p&gt;3つのファイルをデプロイしました。簡単な順に、ざっと解説します。&lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;コード&lt;/a&gt;を眺めながら読み進めてください。&lt;/p&gt;
 
-&lt;h3 id=&#34;package-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;package.json&lt;/h3&gt;
+&lt;h3 id=&#34;package-json&#34;&gt;package.json&lt;/h3&gt;
 
 &lt;p&gt;主となるコードファイルは後述の&amp;rdquo;index.js&amp;rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。&lt;/p&gt;
 
-&lt;h3 id=&#34;function-json:13f4070f39b47880df2f217875deb9f9&#34;&gt;function.json&lt;/h3&gt;
+&lt;h3 id=&#34;function-json&#34;&gt;function.json&lt;/h3&gt;
 
 &lt;p&gt;Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&amp;rdquo;schedule&amp;rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。&lt;/p&gt;
 
 &lt;p&gt;&amp;ldquo;0 0 0 * * *&amp;rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。&lt;/p&gt;
 
-&lt;h3 id=&#34;index-js:13f4070f39b47880df2f217875deb9f9&#34;&gt;index.js&lt;/h3&gt;
+&lt;h3 id=&#34;index-js&#34;&gt;index.js&lt;/h3&gt;
 
 &lt;p&gt;メインロジックです。&lt;/p&gt;
 
@@ -241,7 +243,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;豆知識-node-on-azure-functions:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
+&lt;h2 id=&#34;豆知識-node-on-azure-functions&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
@@ -259,7 +261,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;豆知識-azure-usage-api:13f4070f39b47880df2f217875deb9f9&#34;&gt;豆知識 (Azure Usage API)&lt;/h2&gt;
+&lt;h2 id=&#34;豆知識-azure-usage-api&#34;&gt;豆知識 (Azure Usage API)&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/&#34;&gt;Ratecard API&lt;/a&gt;を組み合わせてください&lt;/li&gt;
@@ -277,7 +279,7 @@
       <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>
 
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
+&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
 
 &lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
 
@@ -293,7 +295,7 @@
 
 &lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
 
-&lt;h3 id=&#34;基本方針:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;基本方針&lt;/h3&gt;
+&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
@@ -311,7 +313,7 @@
 
 &lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
 
-&lt;h2 id=&#34;必要な作業:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;必要な作業&lt;/h2&gt;
+&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
 
 &lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
 
@@ -358,7 +360,7 @@
 &lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;function-appのサンプル:99ec2e7c4c63926799149ef94c45b73e&#34;&gt;Function Appのサンプル&lt;/h2&gt;
+&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
 
 &lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
 
@@ -481,7 +483,8 @@ module.exports = function (context, req) {
 &lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
 
 &lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ&lt;/li&gt;
+&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 

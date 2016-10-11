@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -87,13 +87,13 @@
                     <div class="post-description">
                         
 
-<h2 id="俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677">俺の屍を越えていけ</h2>
+<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
 
 <p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
 
 <p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
 
-<h2 id="この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677">この3つは触る前から意識しよう</h2>
+<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
 
 <ol>
 <li>ARMテンプレートリソースは分離して使う</li>
@@ -101,13 +101,13 @@
 <li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
 </ol>
 
-<h2 id="1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677">1. ARMテンプレートリソースは分離して使う</h2>
+<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
 
 <p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
 
 <p>でも、現時点の実装では、おすすめしません。</p>
 
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
+<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
 
 <p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
 
@@ -115,21 +115,21 @@
 
 <p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
 
-<h3 id="タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677">タイムアウトしがち</h3>
+<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
 
 <p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
 
-<h3 id="せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677">せっかくのリソースグラフを活用できない</h3>
+<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
 
 <p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
 
-<h3 id="読みづらい:9776a375b7d12db77e52b9c8d97b8677">読みづらい</h3>
+<h3 id="読みづらい">読みづらい</h3>
 
 <p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
 
 <p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
 
-<h2 id="2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677">2. リソース競合したら依存関係を定義する</h2>
+<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
 
 <p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
 
@@ -173,7 +173,7 @@ resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
 
 <p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
 
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
+<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
 
 <p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
 
@@ -219,13 +219,13 @@ resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
                     <div class="post-description">
                         
 
-<h2 id="terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b">Terraformer増加に備えて</h2>
+<h2 id="terraformer増加に備えて">Terraformer増加に備えて</h2>
 
 <p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
 
 <p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
 
-<h2 id="エラーコード429:41e5563e03314499a86e746f2fbd113b">エラーコード429</h2>
+<h2 id="エラーコード429">エラーコード429</h2>
 
 <p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
 
@@ -237,13 +237,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
 
-<h2 id="対処法:41e5563e03314499a86e746f2fbd113b">対処法</h2>
+<h2 id="対処法">対処法</h2>
 
 <p><strong>もう一度applyしてください</strong></p>
 
 <p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
 
-<h2 id="背景:41e5563e03314499a86e746f2fbd113b">背景</h2>
+<h2 id="背景">背景</h2>
 
 <p>エラーになった背景ですが、2つの可能性があります。</p>
 
@@ -252,7 +252,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
 </ol>
 
-<h3 id="1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b">1. APIリクエスト数上限に達した</h3>
+<h3 id="1-apiリクエスト数上限に達した">1. APIリクエスト数上限に達した</h3>
 
 <p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
 
@@ -264,7 +264,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
 
-<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
+<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
 
 <p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
 
@@ -303,17 +303,17 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
                     <div class="post-description">
                         
 
-<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
+<h2 id="いつの間に">いつの間に</h2>
 
 <p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
 
-<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
+<h2 id="ansible-localと組み合わせたサンプル">ansible_localと組み合わせたサンプル</h2>
 
 <p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
 
 <p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
 
-<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
+<h3 id="前準備">前準備</h3>
 
 <ul>
 <li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
@@ -326,7 +326,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
 </ul>
 
-<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
+<h3 id="サンプル">サンプル</h3>
 
 <p>ubuntu.jsonはこんな感じです。</p>
 
@@ -408,7 +408,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
                     <div class="post-description">
                         
 
-<h2 id="情報がありそうでない:d303628c574d6be5ce0911be72b7a9a0">情報がありそうでない</h2>
+<h2 id="情報がありそうでない">情報がありそうでない</h2>
 
 <p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
 
@@ -416,7 +416,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>なお、考え方は他のクラウドやデプロイツールでも応用できるかと。</p>
 
-<h2 id="4原則:d303628c574d6be5ce0911be72b7a9a0">4原則</h2>
+<h2 id="4原則">4原則</h2>
 
 <ol>
 <li>セキュリティファースト</li>
@@ -450,7 +450,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。</p>
 
-<h2 id="1-セキュリティファースト:d303628c574d6be5ce0911be72b7a9a0">1. セキュリティファースト</h2>
+<h2 id="1-セキュリティファースト">1. セキュリティファースト</h2>
 
 <p>セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。</p>
 
@@ -477,7 +477,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <ul>
 <li>Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう</li>
-<li>身内がリソースをうっかり壊したら、それは管理者の責任です</li>
+<li>身内がリソースをうっかり壊したら、それは管理者の責任です
+<br /></li>
 </ul></li>
 
 <li><p>ネットワークセキュリティグループはサブネットに指定しておく</p>
@@ -497,13 +498,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 </ul></li>
 </ul>
 
-<h2 id="2-手順書をなくそう:d303628c574d6be5ce0911be72b7a9a0">2. 手順書をなくそう</h2>
+<h2 id="2-手順書をなくそう">2. 手順書をなくそう</h2>
 
 <p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
 
 <p>ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。</p>
 
-<h2 id="3-分割境界にこだわりすぎない:d303628c574d6be5ce0911be72b7a9a0">3. 分割境界にこだわりすぎない</h2>
+<h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
 
 <p>TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。</p>
 
@@ -530,7 +531,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>ネットワーク、ストレージ、VM Availability Setで分割</li>
 </ul></li>
 <li>直観的</li>
-<li>デプロイに関わる人数が少ない間はこれがおすすめ</li>
+<li>デプロイに関わる人数が少ない間はこれがおすすめ
+<br /></li>
 </ul></li>
 
 <li><p>組織単位で分割する</p>
@@ -551,7 +553,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>リソースタイプと組み合わせる手もある
 
 <ul>
-<li>&ldquo;Network_JapanEast&rdquo;など</li>
+<li>&ldquo;Network_JapanEast&rdquo;など
+<br /></li>
 </ul></li>
 </ul></li>
 
@@ -564,13 +567,14 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <li>ネットワークが頻繁に変わることはまれ</li>
 <li>VMは増減が激しい</li>
 </ul></li>
-<li>動的なリソースは対象から外す、別手段とする手も</li>
+<li>動的なリソースは対象から外す、別手段とする手も
+<br /></li>
 </ul></li>
 </ul>
 
 <p>スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。</p>
 
-<h2 id="4-早すぎる最適化は悪:d303628c574d6be5ce0911be72b7a9a0">4. 早すぎる最適化は悪</h2>
+<h2 id="4-早すぎる最適化は悪">4. 早すぎる最適化は悪</h2>
 
 <p>最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。</p>
 
@@ -612,7 +616,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
                     <div class="post-description">
                         
 
-<h2 id="高まってまいりました:dfc3556fff242cb82e1ca9532877c49b">高まってまいりました</h2>
+<h2 id="高まってまいりました">高まってまいりました</h2>
 
 <p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
 
@@ -620,7 +624,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
 
-<h2 id="client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b">client_id/client_secret って何よ</h2>
+<h2 id="client-id-client-secret-って何よ">client_id/client_secret って何よ</h2>
 
 <p>以下がARM向けのProvider設定です。</p>
 
@@ -640,7 +644,7 @@ provider &quot;azurerm&quot; {
 
 <p>おっとそういうことか。OAuth。</p>
 
-<h2 id="サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b">サービスプリンシパルを使おう</h2>
+<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
 
 <p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
 

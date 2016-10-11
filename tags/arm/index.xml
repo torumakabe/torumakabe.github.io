@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>
 
-&lt;h2 id=&#34;俺の屍を越えていけ:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
+&lt;h2 id=&#34;俺の屍を越えていけ&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
 
 &lt;p&gt;今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。この週末お楽しみ、という人も多いかもしれません。&lt;/p&gt;
 
 &lt;p&gt;小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。&lt;/p&gt;
 
-&lt;h2 id=&#34;この3つは触る前から意識しよう:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
+&lt;h2 id=&#34;この3つは触る前から意識しよう&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;ARMテンプレートリソースは分離して使う&lt;/li&gt;
@@ -31,13 +31,13 @@
 &lt;li&gt;公開鍵認証SSH指定でエラーが出ても驚かない&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
+&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
 
 &lt;p&gt;v0.6.14で、リソース&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html&#34;&gt;&amp;ldquo;azurerm_template_deployment&amp;rdquo;&lt;/a&gt;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。&lt;/p&gt;
 
 &lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
 
-&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
+&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
 
 &lt;p&gt;避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/p&gt;
 
@@ -45,21 +45,21 @@
 
 &lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
 
-&lt;h3 id=&#34;タイムアウトしがち:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;タイムアウトしがち&lt;/h3&gt;
+&lt;h3 id=&#34;タイムアウトしがち&#34;&gt;タイムアウトしがち&lt;/h3&gt;
 
 &lt;p&gt;それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;
 
-&lt;h3 id=&#34;せっかくのリソースグラフを活用できない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
+&lt;h3 id=&#34;せっかくのリソースグラフを活用できない&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
 
 &lt;p&gt;Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;
 
-&lt;h3 id=&#34;読みづらい:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;読みづらい&lt;/h3&gt;
+&lt;h3 id=&#34;読みづらい&#34;&gt;読みづらい&lt;/h3&gt;
 
 &lt;p&gt;Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;
 
 &lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
 
-&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
+&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
 
 &lt;p&gt;Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&lt;a href=&#34;https://www.terraform.io/intro/getting-started/dependencies.html&#34;&gt;&amp;ldquo;depends_on&amp;rdquo;&lt;/a&gt;で明示してあげましょう。&lt;/p&gt;
 
@@ -103,7 +103,7 @@ resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
 
 &lt;p&gt;これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。&lt;/p&gt;
 
-&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない:9776a375b7d12db77e52b9c8d97b8677&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
+&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
 
 &lt;p&gt;TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。&lt;/p&gt;
 
@@ -137,13 +137,13 @@ resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
       <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>
 
-&lt;h2 id=&#34;terraformer増加に備えて:41e5563e03314499a86e746f2fbd113b&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
+&lt;h2 id=&#34;terraformer増加に備えて&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
 
 &lt;p&gt;2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。待っていた人も多いのではないでしょうか。&lt;/p&gt;
 
 &lt;p&gt;追って&lt;a href=&#34;https://www.hashicorp.com/partners.html#sipart&#34;&gt;Hashicorp認定パートナー&lt;/a&gt;のクリエーションラインさんから導入・サポートサービスが&lt;a href=&#34;http://www.creationline.com/lab/13268&#34;&gt;アナウンス&lt;/a&gt;されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。&lt;/p&gt;
 
-&lt;h2 id=&#34;エラーコード429:41e5563e03314499a86e746f2fbd113b&#34;&gt;エラーコード429&lt;/h2&gt;
+&lt;h2 id=&#34;エラーコード429&#34;&gt;エラーコード429&lt;/h2&gt;
 
 &lt;p&gt;さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。&lt;/p&gt;
 
@@ -155,13 +155,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;autorestがステータスコード429をキャッチしました。&lt;a href=&#34;https://tools.ietf.org/html/rfc6585#section-4&#34;&gt;RFC上で429は&lt;/a&gt;&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。&lt;/p&gt;
 
-&lt;h2 id=&#34;対処法:41e5563e03314499a86e746f2fbd113b&#34;&gt;対処法&lt;/h2&gt;
+&lt;h2 id=&#34;対処法&#34;&gt;対処法&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。&lt;/p&gt;
 
-&lt;h2 id=&#34;背景:41e5563e03314499a86e746f2fbd113b&#34;&gt;背景&lt;/h2&gt;
+&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
 
 &lt;p&gt;エラーになった背景ですが、2つの可能性があります。&lt;/p&gt;
 
@@ -170,7 +170,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&#34;1-apiリクエスト数上限に達した:41e5563e03314499a86e746f2fbd113b&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
+&lt;h3 id=&#34;1-apiリクエスト数上限に達した&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
 
 &lt;p&gt;Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。&lt;/p&gt;
 
@@ -182,7 +182,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;ひとまずプロダクトの方針は確認したいので、Issueに質問を&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5704&#34;&gt;あげておきました&lt;/a&gt;。&lt;/p&gt;
 
-&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した:41e5563e03314499a86e746f2fbd113b&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
+&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
 
 &lt;p&gt;Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。&lt;/p&gt;
 
@@ -209,17 +209,17 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>
 
-&lt;h2 id=&#34;いつの間に:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;いつの間に&lt;/h2&gt;
+&lt;h2 id=&#34;いつの間に&#34;&gt;いつの間に&lt;/h2&gt;
 
 &lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
 
-&lt;h2 id=&#34;ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
+&lt;h2 id=&#34;ansible-localと組み合わせたサンプル&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
 
 &lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
 
-&lt;h3 id=&#34;前準備:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;前準備&lt;/h3&gt;
+&lt;h3 id=&#34;前準備&#34;&gt;前準備&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
@@ -232,7 +232,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;サンプル:ebce8e7176cbf58fa7a5804522b325a3&#34;&gt;サンプル&lt;/h3&gt;
+&lt;h3 id=&#34;サンプル&#34;&gt;サンプル&lt;/h3&gt;
 
 &lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
 
@@ -302,7 +302,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>
 
-&lt;h2 id=&#34;情報がありそうでない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;情報がありそうでない&lt;/h2&gt;
+&lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
 
@@ -310,7 +310,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;なお、考え方は他のクラウドやデプロイツールでも応用できるかと。&lt;/p&gt;
 
-&lt;h2 id=&#34;4原則:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4原則&lt;/h2&gt;
+&lt;h2 id=&#34;4原則&#34;&gt;4原則&lt;/h2&gt;
 
 &lt;ol&gt;
 &lt;li&gt;セキュリティファースト&lt;/li&gt;
@@ -344,7 +344,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。&lt;/p&gt;
 
-&lt;h2 id=&#34;1-セキュリティファースト:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
+&lt;h2 id=&#34;1-セキュリティファースト&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
 
 &lt;p&gt;セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。&lt;/p&gt;
 
@@ -371,7 +371,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;ul&gt;
 &lt;li&gt;Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう&lt;/li&gt;
-&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です&lt;/li&gt;
+&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ネットワークセキュリティグループはサブネットに指定しておく&lt;/p&gt;
@@ -391,13 +392,13 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;2-手順書をなくそう:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
+&lt;h2 id=&#34;2-手順書をなくそう&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
 
 &lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
 
 &lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
 
-&lt;h2 id=&#34;3-分割境界にこだわりすぎない:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
+&lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
 
 &lt;p&gt;TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。&lt;/p&gt;
 
@@ -424,7 +425,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;ネットワーク、ストレージ、VM Availability Setで分割&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;直観的&lt;/li&gt;
-&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ&lt;/li&gt;
+&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;組織単位で分割する&lt;/p&gt;
@@ -445,7 +447,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;リソースタイプと組み合わせる手もある
 
 &lt;ul&gt;
-&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
@@ -458,13 +461,14 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;li&gt;ネットワークが頻繁に変わることはまれ&lt;/li&gt;
 &lt;li&gt;VMは増減が激しい&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動的なリソースは対象から外す、別手段とする手も&lt;/li&gt;
+&lt;li&gt;動的なリソースは対象から外す、別手段とする手も
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。&lt;/p&gt;
 
-&lt;h2 id=&#34;4-早すぎる最適化は悪:d303628c574d6be5ce0911be72b7a9a0&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
+&lt;h2 id=&#34;4-早すぎる最適化は悪&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
 
 &lt;p&gt;最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。&lt;/p&gt;
 
@@ -494,7 +498,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>
 
-&lt;h2 id=&#34;高まってまいりました:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;高まってまいりました&lt;/h2&gt;
+&lt;h2 id=&#34;高まってまいりました&#34;&gt;高まってまいりました&lt;/h2&gt;
 
 &lt;p&gt;全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。&lt;/p&gt;
 
@@ -502,7 +506,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。&lt;/p&gt;
 
-&lt;h2 id=&#34;client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
+&lt;h2 id=&#34;client-id-client-secret-って何よ&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
 
 &lt;p&gt;以下がARM向けのProvider設定です。&lt;/p&gt;
 
@@ -522,7 +526,7 @@ provider &amp;quot;azurerm&amp;quot; {
 
 &lt;p&gt;おっとそういうことか。OAuth。&lt;/p&gt;
 
-&lt;h2 id=&#34;サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
+&lt;h2 id=&#34;サービスプリンシパルを使おう&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
 
 &lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
 
@@ -654,7 +658,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
       <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
       <description>
 
-&lt;h2 id=&#34;ケースバイケースだけど:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
+&lt;h2 id=&#34;ケースバイケースだけど&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
 
 &lt;p&gt;Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。&lt;/p&gt;
 
@@ -664,7 +668,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。&lt;/p&gt;
 
-&lt;h2 id=&#34;書く前に前提など:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;書く前に前提など&lt;/h2&gt;
+&lt;h2 id=&#34;書く前に前提など&#34;&gt;書く前に前提など&lt;/h2&gt;
 
 &lt;p&gt;対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。&lt;/p&gt;
 
@@ -672,13 +676,13 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
+&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
 
 &lt;p&gt;いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。&lt;/p&gt;
 
 &lt;p&gt;なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。&lt;/p&gt;
 
-&lt;h2 id=&#34;使い捨てられないかを考える:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
+&lt;h2 id=&#34;使い捨てられないかを考える&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
 
 &lt;p&gt;次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。&lt;/p&gt;
 
@@ -688,7 +692,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;優先事項や制約条件を洗い出す:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
+&lt;h2 id=&#34;優先事項や制約条件を洗い出す&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
 
 &lt;p&gt;アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。&lt;/p&gt;
 
@@ -722,7 +726,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。&lt;/p&gt;
 
-&lt;h2 id=&#34;マネージドサービス-機能を活用する:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
+&lt;h2 id=&#34;マネージドサービス-機能を活用する&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
 
 &lt;p&gt;マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。&lt;/p&gt;
 
@@ -738,7 +742,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。&lt;/p&gt;
 
-&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ:d8f24c1ecd76ea2b63a3969342359091&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
+&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
 
 &lt;p&gt;具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。&lt;/p&gt;
 
@@ -754,7 +758,8 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;li&gt;OSの導入&lt;/li&gt;
 &lt;li&gt;ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)&lt;/li&gt;
 &lt;li&gt;他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)&lt;/li&gt;
+&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ChefでConfiguration&lt;/p&gt;
@@ -764,7 +769,8 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 &lt;li&gt;Chef Clientサービスの起動設定&lt;/li&gt;
 &lt;li&gt;DBサーバのDB領域ディスク作成、フォーマット&lt;/li&gt;
 &lt;li&gt;DBサーバへSQL Server 2014のインストール&lt;/li&gt;
-&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける&lt;/li&gt;
+&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -782,13 +788,13 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
       <guid>http://torumakabe.github.io/post/arm_idempotent/</guid>
       <description>
 
-&lt;h2 id=&#34;宣言的に-冪等に:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;宣言的に、冪等に&lt;/h2&gt;
+&lt;h2 id=&#34;宣言的に-冪等に&#34;&gt;宣言的に、冪等に&lt;/h2&gt;
 
 &lt;p&gt;ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。&lt;/p&gt;
 
 &lt;p&gt;さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。&lt;/p&gt;
 
-&lt;h3 id=&#34;azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/&#34;&gt;Azure リソース マネージャーの概要&lt;/a&gt;&lt;/h3&gt;
+&lt;h3 id=&#34;azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview&#34;&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/&#34;&gt;Azure リソース マネージャーの概要&lt;/a&gt;&lt;/h3&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&amp;ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&amp;rdquo;&lt;/p&gt;
@@ -802,7 +808,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;増分デプロイと完全デプロイ:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;増分デプロイと完全デプロイ&lt;/h2&gt;
+&lt;h2 id=&#34;増分デプロイと完全デプロイ&#34;&gt;増分デプロイと完全デプロイ&lt;/h2&gt;
 
 &lt;p&gt;まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli&#34;&gt;クロスプラットフォームCLI&lt;/a&gt;もあります。&lt;/p&gt;
 
@@ -839,7 +845,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 &lt;p&gt;2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;動きをつかむ:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;動きをつかむ&lt;/h2&gt;
+&lt;h2 id=&#34;動きをつかむ&#34;&gt;動きをつかむ&lt;/h2&gt;
 
 &lt;p&gt;では動きを見ていきましょう。テンプレートはGithubに公開されている&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux&#34;&gt;Very simple deployment of an Linux VM&lt;/a&gt;を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json&#34;&gt;リンク先&lt;/a&gt;でざっと確認してください。&lt;/p&gt;
 
@@ -1022,7 +1028,7 @@ ProvisioningState : Succeeded
 
 &lt;p&gt;定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。&lt;/p&gt;
 
-&lt;h2 id=&#34;使い方:7f9d18b141fe8baff11274b2e0ae3943&#34;&gt;使い方&lt;/h2&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
 &lt;p&gt;冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。&lt;/p&gt;
 

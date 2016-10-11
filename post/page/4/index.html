@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Posts &middot; re-imagine">
@@ -87,17 +87,17 @@
                     <div class="post-description">
                         
 
-<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
+<h2 id="いつの間に">いつの間に</h2>
 
 <p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
 
-<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
+<h2 id="ansible-localと組み合わせたサンプル">ansible_localと組み合わせたサンプル</h2>
 
 <p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
 
 <p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
 
-<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
+<h3 id="前準備">前準備</h3>
 
 <ul>
 <li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
@@ -110,7 +110,7 @@
 <li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
 </ul>
 
-<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
+<h3 id="サンプル">サンプル</h3>
 
 <p>ubuntu.jsonはこんな感じです。</p>
 
@@ -192,7 +192,7 @@
                     <div class="post-description">
                         
 
-<h2 id="情報がありそうでない:d303628c574d6be5ce0911be72b7a9a0">情報がありそうでない</h2>
+<h2 id="情報がありそうでない">情報がありそうでない</h2>
 
 <p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
 
@@ -200,7 +200,7 @@
 
 <p>なお、考え方は他のクラウドやデプロイツールでも応用できるかと。</p>
 
-<h2 id="4原則:d303628c574d6be5ce0911be72b7a9a0">4原則</h2>
+<h2 id="4原則">4原則</h2>
 
 <ol>
 <li>セキュリティファースト</li>
@@ -234,7 +234,7 @@
 
 <p>Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。</p>
 
-<h2 id="1-セキュリティファースト:d303628c574d6be5ce0911be72b7a9a0">1. セキュリティファースト</h2>
+<h2 id="1-セキュリティファースト">1. セキュリティファースト</h2>
 
 <p>セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。</p>
 
@@ -261,7 +261,8 @@
 
 <ul>
 <li>Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう</li>
-<li>身内がリソースをうっかり壊したら、それは管理者の責任です</li>
+<li>身内がリソースをうっかり壊したら、それは管理者の責任です
+<br /></li>
 </ul></li>
 
 <li><p>ネットワークセキュリティグループはサブネットに指定しておく</p>
@@ -281,13 +282,13 @@
 </ul></li>
 </ul>
 
-<h2 id="2-手順書をなくそう:d303628c574d6be5ce0911be72b7a9a0">2. 手順書をなくそう</h2>
+<h2 id="2-手順書をなくそう">2. 手順書をなくそう</h2>
 
 <p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
 
 <p>ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。</p>
 
-<h2 id="3-分割境界にこだわりすぎない:d303628c574d6be5ce0911be72b7a9a0">3. 分割境界にこだわりすぎない</h2>
+<h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
 
 <p>TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。</p>
 
@@ -314,7 +315,8 @@
 <li>ネットワーク、ストレージ、VM Availability Setで分割</li>
 </ul></li>
 <li>直観的</li>
-<li>デプロイに関わる人数が少ない間はこれがおすすめ</li>
+<li>デプロイに関わる人数が少ない間はこれがおすすめ
+<br /></li>
 </ul></li>
 
 <li><p>組織単位で分割する</p>
@@ -335,7 +337,8 @@
 <li>リソースタイプと組み合わせる手もある
 
 <ul>
-<li>&ldquo;Network_JapanEast&rdquo;など</li>
+<li>&ldquo;Network_JapanEast&rdquo;など
+<br /></li>
 </ul></li>
 </ul></li>
 
@@ -348,13 +351,14 @@
 <li>ネットワークが頻繁に変わることはまれ</li>
 <li>VMは増減が激しい</li>
 </ul></li>
-<li>動的なリソースは対象から外す、別手段とする手も</li>
+<li>動的なリソースは対象から外す、別手段とする手も
+<br /></li>
 </ul></li>
 </ul>
 
 <p>スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。</p>
 
-<h2 id="4-早すぎる最適化は悪:d303628c574d6be5ce0911be72b7a9a0">4. 早すぎる最適化は悪</h2>
+<h2 id="4-早すぎる最適化は悪">4. 早すぎる最適化は悪</h2>
 
 <p>最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。</p>
 
@@ -396,7 +400,7 @@
                     <div class="post-description">
                         
 
-<h2 id="高まってまいりました:dfc3556fff242cb82e1ca9532877c49b">高まってまいりました</h2>
+<h2 id="高まってまいりました">高まってまいりました</h2>
 
 <p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
 
@@ -404,7 +408,7 @@
 
 <p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
 
-<h2 id="client-id-client-secret-って何よ:dfc3556fff242cb82e1ca9532877c49b">client_id/client_secret って何よ</h2>
+<h2 id="client-id-client-secret-って何よ">client_id/client_secret って何よ</h2>
 
 <p>以下がARM向けのProvider設定です。</p>
 
@@ -424,7 +428,7 @@ provider &quot;azurerm&quot; {
 
 <p>おっとそういうことか。OAuth。</p>
 
-<h2 id="サービスプリンシパルを使おう:dfc3556fff242cb82e1ca9532877c49b">サービスプリンシパルを使おう</h2>
+<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
 
 <p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
 
@@ -568,11 +572,11 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     <div class="post-description">
                         
 
-<h2 id="すこぶるfaq:4a620049922b1b54512a25b34ba773c5">すこぶるFAQ</h2>
+<h2 id="すこぶるfaq">すこぶるFAQ</h2>
 
 <p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
 
-<h2 id="公式ホワイトペーパー:4a620049922b1b54512a25b34ba773c5">公式ホワイトペーパー</h2>
+<h2 id="公式ホワイトペーパー">公式ホワイトペーパー</h2>
 
 <p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
 
@@ -580,14 +584,14 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p><strong>2016//3/4 追記 <a href="http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf">日本語訳</a>がありました</strong></p>
 
-<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos:4a620049922b1b54512a25b34ba773c5">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
 
 <pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
 </code></pre>
 
 <p>MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
 
-<h2 id="azureがやってくれること:4a620049922b1b54512a25b34ba773c5">Azureがやってくれること</h2>
+<h2 id="azureがやってくれること">Azureがやってくれること</h2>
 
 <p>では、具体的に。</p>
 
@@ -596,7 +600,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。</p>
 
-<h2 id="お客様対応が必要なこと:4a620049922b1b54512a25b34ba773c5">お客様対応が必要なこと</h2>
+<h2 id="お客様対応が必要なこと">お客様対応が必要なこと</h2>
 
 <p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
 
@@ -625,7 +629,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
 
-<h2 id="ホワイトペーパーに加えて:4a620049922b1b54512a25b34ba773c5">ホワイトペーパーに加えて</h2>
+<h2 id="ホワイトペーパーに加えて">ホワイトペーパーに加えて</h2>
 
 <p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後<a href="https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/">提供される予定</a>です。</p>
 
@@ -655,7 +659,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     <div class="post-description">
                         
 
-<h2 id="同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c">同じ目的を達成できるツールがたくさん</h2>
+<h2 id="同じ目的を達成できるツールがたくさん">同じ目的を達成できるツールがたくさん</h2>
 
 <p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
 
@@ -667,7 +671,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
 
-<h2 id="環境と測定方式:2c3afc565a3430f70519d9c56354717c">環境と測定方式</h2>
+<h2 id="環境と測定方式">環境と測定方式</h2>
 
 <p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
 
@@ -732,7 +736,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 <p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
 
-<h2 id="結果:2c3afc565a3430f70519d9c56354717c">結果</h2>
+<h2 id="結果">結果</h2>
 
 <p>平行度上げても伸びないな、というタイミングまで上げます。</p>
 
@@ -931,7 +935,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 </tbody>
 </table>
 
-<h2 id="考察:2c3afc565a3430f70519d9c56354717c">考察</h2>
+<h2 id="考察">考察</h2>
 
 <ul>
 <li>有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>

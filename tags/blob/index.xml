@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>
 
-&lt;h2 id=&#34;定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;定義領域全てが課金されるわけではありません&lt;/h2&gt;
+&lt;h2 id=&#34;定義領域全てが課金されるわけではありません&#34;&gt;定義領域全てが課金されるわけではありません&lt;/h2&gt;
 
 &lt;p&gt;AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。&lt;/p&gt;
 
@@ -32,7 +32,7 @@
 
 &lt;p&gt;&lt;a href=&#34;https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/&#34;&gt;Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;書き込み方はOSやファイルシステム次第&lt;/h2&gt;
+&lt;h2 id=&#34;書き込み方はosやファイルシステム次第&#34;&gt;書き込み方はOSやファイルシステム次第&lt;/h2&gt;
 
 &lt;p&gt;じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。&lt;/p&gt;
 
@@ -74,9 +74,9 @@ return $blobSizeInBytes
 
 &lt;p&gt;ストレージコンテキストの作り方は&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/&#34;&gt;ここ&lt;/a&gt;を参考にしてください。&lt;/p&gt;
 
-&lt;h2 id=&#34;結果:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;結果&lt;/h2&gt;
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
 
-&lt;h3 id=&#34;xfs:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;XFS&lt;/h3&gt;
+&lt;h3 id=&#34;xfs&#34;&gt;XFS&lt;/h3&gt;
 
 &lt;table&gt;
 &lt;thead&gt;
@@ -119,7 +119,7 @@ return $blobSizeInBytes
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;h3 id=&#34;ext4:73b15a413c7cb87e88f45a7aaba2eebd&#34;&gt;Ext4&lt;/h3&gt;
+&lt;h3 id=&#34;ext4&#34;&gt;Ext4&lt;/h3&gt;
 
 &lt;table&gt;
 &lt;thead&gt;
@@ -172,7 +172,9 @@ return $blobSizeInBytes
 &lt;ul&gt;
 &lt;li&gt;OSがPage Blobに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
 &lt;li&gt;discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
-&lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;
+
+&lt;br /&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -188,7 +190,7 @@ return $blobSizeInBytes
       <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
       <description>
 
-&lt;h2 id=&#34;同じ目的を達成できるツールがたくさん:2c3afc565a3430f70519d9c56354717c&#34;&gt;同じ目的を達成できるツールがたくさん&lt;/h2&gt;
+&lt;h2 id=&#34;同じ目的を達成できるツールがたくさん&#34;&gt;同じ目的を達成できるツールがたくさん&lt;/h2&gt;
 
 &lt;p&gt;やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。&lt;/p&gt;
 
@@ -200,7 +202,7 @@ return $blobSizeInBytes
 
 &lt;p&gt;なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。&lt;/p&gt;
 
-&lt;h2 id=&#34;環境と測定方式:2c3afc565a3430f70519d9c56354717c&#34;&gt;環境と測定方式&lt;/h2&gt;
+&lt;h2 id=&#34;環境と測定方式&#34;&gt;環境と測定方式&lt;/h2&gt;
 
 &lt;p&gt;おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。&lt;/p&gt;
 
@@ -265,7 +267,7 @@ return $blobSizeInBytes
 
 &lt;p&gt;Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。&lt;/p&gt;
 
-&lt;h2 id=&#34;結果:2c3afc565a3430f70519d9c56354717c&#34;&gt;結果&lt;/h2&gt;
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
 
 &lt;p&gt;平行度上げても伸びないな、というタイミングまで上げます。&lt;/p&gt;
 
@@ -464,7 +466,7 @@ return $blobSizeInBytes
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;h2 id=&#34;考察:2c3afc565a3430f70519d9c56354717c&#34;&gt;考察&lt;/h2&gt;
+&lt;h2 id=&#34;考察&#34;&gt;考察&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。&lt;/li&gt;

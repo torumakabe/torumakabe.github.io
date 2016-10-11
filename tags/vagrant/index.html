@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Vagrant &middot; re-imagine">
@@ -87,11 +87,11 @@
                     <div class="post-description">
                         
 
-<h2 id="端末だってコード化されたい:4b51bf5da7c597406600f164b7d91579">端末だってコード化されたい</h2>
+<h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
 
 <p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
 
-<h2 id="解決したい課題:4b51bf5da7c597406600f164b7d91579">解決したい課題</h2>
+<h2 id="解決したい課題">解決したい課題</h2>
 
 <p>こんな悩みを解決します。</p>
 
@@ -109,7 +109,7 @@
 <li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
 </ul>
 
-<h2 id="やり口:4b51bf5da7c597406600f164b7d91579">やり口</h2>
+<h2 id="やり口">やり口</h2>
 
 <p>VagrantとDockerで解決します。</p>
 
@@ -122,7 +122,7 @@
 <li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
 </ul>
 
-<h2 id="セットアップ概要:4b51bf5da7c597406600f164b7d91579">セットアップ概要</h2>
+<h2 id="セットアップ概要">セットアップ概要</h2>
 
 <p>簡単す。</p>
 
@@ -135,7 +135,7 @@
 
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
 
-<h2 id="サンプル解説:4b51bf5da7c597406600f164b7d91579">サンプル解説</h2>
+<h2 id="サンプル解説">サンプル解説</h2>
 
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
 
@@ -207,21 +207,21 @@ end
 
 <p>$bootstrap=&lt;&lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
 
-<h3 id="common-tools:4b51bf5da7c597406600f164b7d91579">Common tools</h3>
+<h3 id="common-tools">Common tools</h3>
 
 <p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
 
-<h3 id="docker-engine-machine:4b51bf5da7c597406600f164b7d91579">Docker Engine &amp; Machine</h3>
+<h3 id="docker-engine-machine">Docker Engine &amp; Machine</h3>
 
 <p>この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。</p>
 
-<h3 id="azure-cli:4b51bf5da7c597406600f164b7d91579">Azure CLI</h3>
+<h3 id="azure-cli">Azure CLI</h3>
 
 <p>インストールせずに<a href="https://hub.docker.com/r/microsoft/azure-cli/">MS公式のDockerイメージ</a>を引っ張ります。なのでalias設定だけ。
 -v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
 また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&ndash;rmで消します。</p>
 
-<h3 id="terraform-packer:4b51bf5da7c597406600f164b7d91579">Terraform &amp; Packer</h3>
+<h3 id="terraform-packer">Terraform &amp; Packer</h3>
 
 <p>Azure CLIと同様です。Hashicorpが<a href="https://hub.docker.com/u/hashicorp/">公式イメージ</a>を提供しているので、それを活用します。
 方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
@@ -229,11 +229,11 @@ end
 
 <p>なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。</p>
 
-<h3 id="nodebrew:4b51bf5da7c597406600f164b7d91579">nodebrew</h3>
+<h3 id="nodebrew">nodebrew</h3>
 
 <p>nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。</p>
 
-<h3 id="python3:4b51bf5da7c597406600f164b7d91579">Python3</h3>
+<h3 id="python3">Python3</h3>
 
 <p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
 
@@ -241,7 +241,7 @@ end
 
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&rdquo;Vagrant.configure～&rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
 
-<h2 id="どれだけ楽か:4b51bf5da7c597406600f164b7d91579">どれだけ楽か</h2>
+<h2 id="どれだけ楽か">どれだけ楽か</h2>
 
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
 
@@ -281,7 +281,7 @@ end
 </ul></li>
 </ul>
 
-<h2 id="bash-on-windowsまで待つとか言わない:4b51bf5da7c597406600f164b7d91579">Bash on Windowsまで待つとか言わない</h2>
+<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
 
 <p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
 
@@ -307,15 +307,15 @@ end
                     <div class="post-description">
                         
 
-<h3 id="タイトルは釣りです:06c978f415868c5d089a8460c0068f0d">タイトルは釣りです</h3>
+<h3 id="タイトルは釣りです">タイトルは釣りです</h3>
 
 <p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
 
-<h3 id="なぜ必要か:06c978f415868c5d089a8460c0068f0d">なぜ必要か?</h3>
+<h3 id="なぜ必要か">なぜ必要か?</h3>
 
 <p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
 
-<h3 id="やりたいこと:06c978f415868c5d089a8460c0068f0d">やりたいこと</h3>
+<h3 id="やりたいこと">やりたいこと</h3>
 
 <ul>
 <li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
@@ -326,7 +326,7 @@ end
 <li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
 </ul>
 
-<h3 id="方針:06c978f415868c5d089a8460c0068f0d">方針</h3>
+<h3 id="方針">方針</h3>
 
 <ul>
 <li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
@@ -335,7 +335,7 @@ end
 <li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
 </ul>
 
-<h3 id="前提条件:06c978f415868c5d089a8460c0068f0d">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
@@ -344,7 +344,7 @@ end
 <li>ひとまずOpenStack CLIを使えるところまで作る</li>
 </ul>
 
-<h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
 
@@ -362,13 +362,13 @@ end
 127.0.0.1 ansible_connection=local</p></li>
 </ul>
 
-<h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
+<h4 id="provision-sh解説">provision.sh解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
 
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
 
-<h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
+<h4 id="playbook-site-yml-解説">playbook(site.yml)解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
 
@@ -384,7 +384,7 @@ OS_USERNAME: your_username<br />
 - タイムゾーンをAsia/Tokyoにします。
 - 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
 
-<h3 id="windowsでの実行例:06c978f415868c5d089a8460c0068f0d">Windowsでの実行例</h3>
+<h3 id="windowsでの実行例">Windowsでの実行例</h3>
 
 <p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
 
@@ -453,7 +453,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c">ツールやSDKはボチボチ集約したほうが</h3>
+<h3 id="ツールやsdkはボチボチ集約したほうが">ツールやSDKはボチボチ集約したほうが</h3>
 
 <p>これまでHP Public Cloudむけの<a href="http://www.vagrantup.com/">Vagrant</a>は、<a href="https://github.com/mohitsethi/vagrant-hp">vagrant-hp plug-in</a>を<a href="http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/">使って</a>ました。でも最近、より汎用的で開発が活発な<a href="https://github.com/cloudbau/vagrant-openstack-plugin">vagrant-openstack-plugin</a>へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。</p>
 
@@ -461,7 +461,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。</p>
 
-<h3 id="前提条件:19cca9a697cc15bcd3b98608a6f1163c">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Vagrant 1.6.3</li>
@@ -469,11 +469,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 <li>HP Public Cloud (2014/9/6)</li>
 </ul>
 
-<h3 id="プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c">プラグインのインストールと前準備</h3>
+<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
 
 <p><a href="https://github.com/cloudbau/vagrant-openstack-plugin">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
 
-<h3 id="ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/c9de20c61752864aca86.js"></script>
 
@@ -487,7 +487,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>で、ふつーに動きます。乗り換え決定です。</p>
 
-<h3 id="スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c">スナップショット便利</h3>
+<h3 id="スナップショット便利">スナップショット便利</h3>
 
 <p>vagrant-hpでは使えなかったはず。こいつは便利だ。</p>
 
@@ -514,13 +514,13 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322">あえて言おう、これは甘えであると</h3>
+<h3 id="あえて言おう-これは甘えであると">あえて言おう、これは甘えであると</h3>
 
 <p>現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。</p>
 
 <p>では始めましょう。<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">OpenStack Cloud Computing Cookbook</a>の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。</p>
 
-<h3 id="ほんと-これだけ:bf1ea282536d85f1cef895a583837322">ほんと、これだけ</h3>
+<h3 id="ほんと-これだけ">ほんと、これだけ</h3>
 
 <ol>
 <li>Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">このページ</a>で確認</li>
@@ -537,7 +537,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>以上。Horizonコンソールは <a href="http://172.16.0.200/">http://172.16.0.200/</a> から。</p>
 
-<h3 id="この環境だと30分でできた:bf1ea282536d85f1cef895a583837322">この環境だと30分でできた</h3>
+<h3 id="この環境だと30分でできた">この環境だと30分でできた</h3>
 
 <ul>
 <li>Vagrant 1.5.4</li>
@@ -566,13 +566,13 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183">みんな大好きHashiCorp</h3>
+<h3 id="みんな大好きhashicorp">みんな大好きHashiCorp</h3>
 
 <p>クラウド界隈のデベロッパーから熱く注目されているHashiCorp。<a href="http://www.packer.io/">Packer</a>、<a href="http://www.serfdom.io/">Serf</a>、<a href="http://www.consul.io/">Consul</a>と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は<a href="http://www.vagrantup.com/">Vagrant</a>でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。</p>
 
 <p>VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。</p>
 
-<h3 id="前提条件:eaab8f236553d8374ac2c6f2b8524183">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Vagrant 1.5.4</li>
@@ -580,11 +580,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 <li>HP Public Cloud (2014/5/5)</li>
 </ul>
 
-<h3 id="プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183">プラグインのインストールと前準備</h3>
+<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
 
 <p><a href="https://github.com/mohitsethi/vagrant-hp">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
 
-<h3 id="ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/25a33c679492676bb626.js"></script>
 
@@ -598,7 +598,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 <li>ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。</li>
 </ul>
 
-<h3 id="それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183">それではさっそくvagrant up</h3>
+<h3 id="それではさっそくvagrant-up">それではさっそくvagrant up</h3>
 
 <pre><code>$ vagrant up --provider=hp
 Bringing machine 'default' up with 'hp' provider...
@@ -624,7 +624,7 @@ WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically lo
 
 <p>できたっぽい。&ndash;provider=hpを忘れずに。</p>
 
-<h3 id="間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183">間髪入れずにvagrant ssh</h3>
+<h3 id="間髪入れずにvagrant-ssh">間髪入れずにvagrant ssh</h3>
 
 <pre><code>$ vagrant ssh
 WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1

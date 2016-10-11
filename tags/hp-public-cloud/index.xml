@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
       <description>
 
-&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
+&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
 
 &lt;p&gt;これまでHP Public Cloudむけの&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;は、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;vagrant-hp plug-in&lt;/a&gt;を&lt;a href=&#34;http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/&#34;&gt;使って&lt;/a&gt;ました。でも最近、より汎用的で開発が活発な&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;vagrant-openstack-plugin&lt;/a&gt;へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。&lt;/p&gt;
 
@@ -25,7 +25,7 @@
 
 &lt;p&gt;さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。&lt;/p&gt;
 
-&lt;h3 id=&#34;前提条件:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;前提条件&lt;/h3&gt;
+&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Vagrant 1.6.3&lt;/li&gt;
@@ -33,11 +33,11 @@
 &lt;li&gt;HP Public Cloud (2014/9/6)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
+&lt;h3 id=&#34;プラグインのインストールと前準備&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
 
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;
 
@@ -51,7 +51,7 @@
 
 &lt;p&gt;で、ふつーに動きます。乗り換え決定です。&lt;/p&gt;
 
-&lt;h3 id=&#34;スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c&#34;&gt;スナップショット便利&lt;/h3&gt;
+&lt;h3 id=&#34;スナップショット便利&#34;&gt;スナップショット便利&lt;/h3&gt;
 
 &lt;p&gt;vagrant-hpでは使えなかったはず。こいつは便利だ。&lt;/p&gt;
 
@@ -70,13 +70,13 @@
       <guid>http://torumakabe.github.io/post/vagrant-hpcloud/</guid>
       <description>
 
-&lt;h3 id=&#34;みんな大好きhashicorp:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;みんな大好きHashiCorp&lt;/h3&gt;
+&lt;h3 id=&#34;みんな大好きhashicorp&#34;&gt;みんな大好きHashiCorp&lt;/h3&gt;
 
 &lt;p&gt;クラウド界隈のデベロッパーから熱く注目されているHashiCorp。&lt;a href=&#34;http://www.packer.io/&#34;&gt;Packer&lt;/a&gt;、&lt;a href=&#34;http://www.serfdom.io/&#34;&gt;Serf&lt;/a&gt;、&lt;a href=&#34;http://www.consul.io/&#34;&gt;Consul&lt;/a&gt;と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。&lt;/p&gt;
 
 &lt;p&gt;VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。&lt;/p&gt;
 
-&lt;h3 id=&#34;前提条件:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;前提条件&lt;/h3&gt;
+&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
@@ -84,11 +84,11 @@
 &lt;li&gt;HP Public Cloud (2014/5/5)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;プラグインのインストールと前準備:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
+&lt;h3 id=&#34;プラグインのインストールと前準備&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
 
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
+&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
 
 &lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/25a33c679492676bb626.js&#34;&gt;&lt;/script&gt;
 
@@ -102,7 +102,7 @@
 &lt;li&gt;ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&#34;それではさっそくvagrant-up:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;それではさっそくvagrant up&lt;/h3&gt;
+&lt;h3 id=&#34;それではさっそくvagrant-up&#34;&gt;それではさっそくvagrant up&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code&gt;$ vagrant up --provider=hp
 Bringing machine &#39;default&#39; up with &#39;hp&#39; provider...
@@ -128,7 +128,7 @@ WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically lo
 
 &lt;p&gt;できたっぽい。&amp;ndash;provider=hpを忘れずに。&lt;/p&gt;
 
-&lt;h3 id=&#34;間髪入れずにvagrant-ssh:eaab8f236553d8374ac2c6f2b8524183&#34;&gt;間髪入れずにvagrant ssh&lt;/h3&gt;
+&lt;h3 id=&#34;間髪入れずにvagrant-ssh&#34;&gt;間髪入れずにvagrant ssh&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code&gt;$ vagrant ssh
 WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1

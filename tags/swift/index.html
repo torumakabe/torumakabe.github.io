@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Swift &middot; re-imagine">
@@ -83,11 +83,11 @@
                     <div class="post-description">
                         
 
-<h3 id="swiftへ-ファイルを分割してアップロードできる:a57d4690b9ff7b620d3e3f40a88fa609">Swiftへ、ファイルを分割してアップロードできる</h3>
+<h3 id="swiftへ-ファイルを分割してアップロードできる">Swiftへ、ファイルを分割してアップロードできる</h3>
 
 <p>今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。</p>
 
-<h3 id="アップロード形式は大きく3つ-そのまま-dlo-slo:a57d4690b9ff7b620d3e3f40a88fa609">アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO</h3>
+<h3 id="アップロード形式は大きく3つ-そのまま-dlo-slo">アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO</h3>
 
 <ol>
 <li>そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。</li>
@@ -95,7 +95,7 @@
 <li>SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。</li>
 </ol>
 
-<h3 id="動きを見てみよう:a57d4690b9ff7b620d3e3f40a88fa609">動きを見てみよう</h3>
+<h3 id="動きを見てみよう">動きを見てみよう</h3>
 
 <p>環境は以下の通り。</p>
 
@@ -106,7 +106,7 @@
 <li>約900MBあるubuntu desktopのisoファイルをアップロード</li>
 </ul>
 
-<h4 id="そのままアップロード:a57d4690b9ff7b620d3e3f40a88fa609">そのままアップロード</h4>
+<h4 id="そのままアップロード">そのままアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
@@ -135,7 +135,7 @@ Date: Sun, 23 Mar 2014 01:43:58 GMT
 
 <p>ヘッダはこんな感じ。</p>
 
-<h4 id="dlo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">DLO形式でアップロード</h4>
+<h4 id="dlo形式でアップロード">DLO形式でアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name dlo.iso --segment-size 104857600
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;
@@ -174,7 +174,7 @@ Date: Sun, 23 Mar 2014 01:44:15 GMT
 
 <p>X-Object-Manifestという属性が、セグメント化したファイルの置き場所を指しています。</p>
 
-<h4 id="slo形式でアップロード:a57d4690b9ff7b620d3e3f40a88fa609">SLO形式でアップロード</h4>
+<h4 id="slo形式でアップロード">SLO形式でアップロード</h4>
 
 <pre><code>$time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name slo.iso --segment-size 104857600 --use-slo
 No handlers could be found for logger &quot;keystoneclient.httpclient&quot;

@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Linux &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="定義領域全てが課金されるわけではありません:73b15a413c7cb87e88f45a7aaba2eebd">定義領域全てが課金されるわけではありません</h2>
+<h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
 
 <p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
 
@@ -102,7 +102,7 @@
 
 <p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
 
-<h2 id="書き込み方はosやファイルシステム次第:73b15a413c7cb87e88f45a7aaba2eebd">書き込み方はOSやファイルシステム次第</h2>
+<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
 
 <p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
 
@@ -144,9 +144,9 @@ return $blobSizeInBytes
 
 <p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
 
-<h2 id="結果:73b15a413c7cb87e88f45a7aaba2eebd">結果</h2>
+<h2 id="結果">結果</h2>
 
-<h3 id="xfs:73b15a413c7cb87e88f45a7aaba2eebd">XFS</h3>
+<h3 id="xfs">XFS</h3>
 
 <table>
 <thead>
@@ -189,7 +189,7 @@ return $blobSizeInBytes
 </tbody>
 </table>
 
-<h3 id="ext4:73b15a413c7cb87e88f45a7aaba2eebd">Ext4</h3>
+<h3 id="ext4">Ext4</h3>
 
 <table>
 <thead>
@@ -242,7 +242,9 @@ return $blobSizeInBytes
 <ul>
 <li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
 <li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
-<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a>
+
+<br /></li>
 </ul></li>
 </ul>
 
@@ -270,7 +272,7 @@ return $blobSizeInBytes
                     <div class="post-description">
                         
 
-<h2 id="ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba">ファイル共有、あまりおすすめしないです</h2>
+<h2 id="ファイル共有-あまりおすすめしないです">ファイル共有、あまりおすすめしないです</h2>
 
 <p>いきなりタイトルを否定しました。ロック。</p>
 
@@ -292,7 +294,7 @@ return $blobSizeInBytes
 
 <p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
 
-<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
+<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
 
 <p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
 
@@ -320,7 +322,7 @@ info:    storage account connectionstring show command OK
 data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 </code></pre>
 
-<h2 id="linux-2vmで共有:fa176ff87dca43c3d098f48095435bba">Linux * 2VMで共有</h2>
+<h2 id="linux-2vmで共有">Linux * 2VMで共有</h2>
 
 <p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
 
@@ -371,7 +373,7 @@ test
 onemoretest
 </code></pre>
 
-<h2 id="ご利用は計画的に:fa176ff87dca43c3d098f48095435bba">ご利用は計画的に</h2>
+<h2 id="ご利用は計画的に">ご利用は計画的に</h2>
 
 <p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
 
@@ -399,7 +401,7 @@ onemoretest
                     <div class="post-description">
                         
 
-<h2 id="俺の鉄板-ができるまで:cfa04af83b137faef18a5d4e4444f400">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
+<h2 id="俺の鉄板-ができるまで">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
 
 <p>前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。</p>
 
@@ -446,13 +448,14 @@ onemoretest
 
 <ul>
 <li>提案しっぱなしにせずフォローすることで、自信とパターンが増える</li>
-<li>次の案件で活きる</li>
+<li>次の案件で活きる
+<br /></li>
 </ul></li>
 </ol>
 
 <p>いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。</p>
 
-<h2 id="linux-on-azureでdisk-io性能を確保する方法:cfa04af83b137faef18a5d4e4444f400">Linux on AzureでDisk IO性能を確保する方法</h2>
+<h2 id="linux-on-azureでdisk-io性能を確保する方法">Linux on AzureでDisk IO性能を確保する方法</h2>
 
 <p>さて今回の主題です。</p>
 

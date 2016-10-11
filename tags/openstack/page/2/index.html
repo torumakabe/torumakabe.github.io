@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Openstack &middot; re-imagine">
@@ -83,15 +83,15 @@
                     <div class="post-description">
                         
 
-<h3 id="タイトルは釣りです:06c978f415868c5d089a8460c0068f0d">タイトルは釣りです</h3>
+<h3 id="タイトルは釣りです">タイトルは釣りです</h3>
 
 <p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
 
-<h3 id="なぜ必要か:06c978f415868c5d089a8460c0068f0d">なぜ必要か?</h3>
+<h3 id="なぜ必要か">なぜ必要か?</h3>
 
 <p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
 
-<h3 id="やりたいこと:06c978f415868c5d089a8460c0068f0d">やりたいこと</h3>
+<h3 id="やりたいこと">やりたいこと</h3>
 
 <ul>
 <li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
@@ -102,7 +102,7 @@
 <li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
 </ul>
 
-<h3 id="方針:06c978f415868c5d089a8460c0068f0d">方針</h3>
+<h3 id="方針">方針</h3>
 
 <ul>
 <li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
@@ -111,7 +111,7 @@
 <li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
 </ul>
 
-<h3 id="前提条件:06c978f415868c5d089a8460c0068f0d">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
@@ -120,7 +120,7 @@
 <li>ひとまずOpenStack CLIを使えるところまで作る</li>
 </ul>
 
-<h3 id="ではvagrantfileを見てみましょう:06c978f415868c5d089a8460c0068f0d">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
 
@@ -138,13 +138,13 @@
 127.0.0.1 ansible_connection=local</p></li>
 </ul>
 
-<h4 id="provision-sh解説:06c978f415868c5d089a8460c0068f0d">provision.sh解説</h4>
+<h4 id="provision-sh解説">provision.sh解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
 
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
 
-<h4 id="playbook-site-yml-解説:06c978f415868c5d089a8460c0068f0d">playbook(site.yml)解説</h4>
+<h4 id="playbook-site-yml-解説">playbook(site.yml)解説</h4>
 
 <script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
 
@@ -160,7 +160,7 @@ OS_USERNAME: your_username<br />
 - タイムゾーンをAsia/Tokyoにします。
 - 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
 
-<h3 id="windowsでの実行例:06c978f415868c5d089a8460c0068f0d">Windowsでの実行例</h3>
+<h3 id="windowsでの実行例">Windowsでの実行例</h3>
 
 <p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
 
@@ -229,7 +229,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="ツールやsdkはボチボチ集約したほうが:19cca9a697cc15bcd3b98608a6f1163c">ツールやSDKはボチボチ集約したほうが</h3>
+<h3 id="ツールやsdkはボチボチ集約したほうが">ツールやSDKはボチボチ集約したほうが</h3>
 
 <p>これまでHP Public Cloudむけの<a href="http://www.vagrantup.com/">Vagrant</a>は、<a href="https://github.com/mohitsethi/vagrant-hp">vagrant-hp plug-in</a>を<a href="http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/">使って</a>ました。でも最近、より汎用的で開発が活発な<a href="https://github.com/cloudbau/vagrant-openstack-plugin">vagrant-openstack-plugin</a>へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。</p>
 
@@ -237,7 +237,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。</p>
 
-<h3 id="前提条件:19cca9a697cc15bcd3b98608a6f1163c">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 
 <ul>
 <li>Vagrant 1.6.3</li>
@@ -245,11 +245,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 <li>HP Public Cloud (2014/9/6)</li>
 </ul>
 
-<h3 id="プラグインのインストールと前準備:19cca9a697cc15bcd3b98608a6f1163c">プラグインのインストールと前準備</h3>
+<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
 
 <p><a href="https://github.com/cloudbau/vagrant-openstack-plugin">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
 
-<h3 id="ではvagrantfileを見てみましょう:19cca9a697cc15bcd3b98608a6f1163c">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 
 <script type="text/javascript" src="http://gist.github.com/c9de20c61752864aca86.js"></script>
 
@@ -263,7 +263,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>で、ふつーに動きます。乗り換え決定です。</p>
 
-<h3 id="スナップショット便利:19cca9a697cc15bcd3b98608a6f1163c">スナップショット便利</h3>
+<h3 id="スナップショット便利">スナップショット便利</h3>
 
 <p>vagrant-hpでは使えなかったはず。こいつは便利だ。</p>
 
@@ -290,13 +290,13 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="あえて言おう-これは甘えであると:bf1ea282536d85f1cef895a583837322">あえて言おう、これは甘えであると</h3>
+<h3 id="あえて言おう-これは甘えであると">あえて言おう、これは甘えであると</h3>
 
 <p>現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。</p>
 
 <p>では始めましょう。<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">OpenStack Cloud Computing Cookbook</a>の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。</p>
 
-<h3 id="ほんと-これだけ:bf1ea282536d85f1cef895a583837322">ほんと、これだけ</h3>
+<h3 id="ほんと-これだけ">ほんと、これだけ</h3>
 
 <ol>
 <li>Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を<a href="http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/">このページ</a>で確認</li>
@@ -313,7 +313,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>以上。Horizonコンソールは <a href="http://172.16.0.200/">http://172.16.0.200/</a> から。</p>
 
-<h3 id="この環境だと30分でできた:bf1ea282536d85f1cef895a583837322">この環境だと30分でできた</h3>
+<h3 id="この環境だと30分でできた">この環境だと30分でできた</h3>
 
 <ul>
 <li>Vagrant 1.5.4</li>
@@ -342,7 +342,7 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="よく聞かれることをまとめました:05fdcc29da710e097e2f23b56c9852e1">よく聞かれることをまとめました</h3>
+<h3 id="よく聞かれることをまとめました">よく聞かれることをまとめました</h3>
 
 <p>ひとまず、初期3部作完結。また書くかもしれません。</p>
 
@@ -370,11 +370,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
                     <div class="post-description">
                         
 
-<h3 id="基本的な質問が増えてきた:fec58f188036762a83cb33b4dfa34673">基本的な質問が増えてきた</h3>
+<h3 id="基本的な質問が増えてきた">基本的な質問が増えてきた</h3>
 
 <p>OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。</p>
 
-<h3 id="よく聞かれることはまとめておこう:fec58f188036762a83cb33b4dfa34673">よく聞かれることはまとめておこう</h3>
+<h3 id="よく聞かれることはまとめておこう">よく聞かれることはまとめておこう</h3>
 
 <p>もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。</p>
 

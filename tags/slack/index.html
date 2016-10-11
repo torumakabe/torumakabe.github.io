@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Slack &middot; re-imagine">
@@ -87,7 +87,7 @@
                     <div class="post-description">
                         
 
-<h2 id="azure-functionsでやってみよう:3a5e8d97b60e50a739f033a761af1408">Azure Functionsでやってみよう</h2>
+<h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
 
 <p>Azure上でChatOpsしたい、と相談をいただきました。</p>
 
@@ -97,7 +97,7 @@
 
 <p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
 
-<h2 id="slackからrunbookを実行できて-何がうれしいか:3a5e8d97b60e50a739f033a761af1408">SlackからRunbookを実行できて、何がうれしいか</h2>
+<h2 id="slackからrunbookを実行できて-何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
 
 <ul>
 <li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
@@ -105,13 +105,13 @@
 <li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
 </ul>
 
-<h2 id="ブツ:3a5e8d97b60e50a739f033a761af1408">ブツ</h2>
+<h2 id="ブツ">ブツ</h2>
 
 <p>Githubに上げておきました。</p>
 
 <p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
 
-<h2 id="おおまかな流れ:3a5e8d97b60e50a739f033a761af1408">おおまかな流れ</h2>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
 
 <p>手順書つらいのでポイントだけ。</p>
 
@@ -165,7 +165,7 @@
 </ul></li>
 </ul>
 
-<h2 id="よもやま話:3a5e8d97b60e50a739f033a761af1408">よもやま話</h2>
+<h2 id="よもやま話">よもやま話</h2>
 
 <ul>
 <li><p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>
@@ -178,6 +178,8 @@
 <li><p>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</p></li>
 
 <li><p>ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。</p></li>
+
+<li><p>でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。</p></li>
 
 <li><p>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</p></li>
 </ul></li>

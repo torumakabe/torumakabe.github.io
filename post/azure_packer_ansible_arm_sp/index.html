@@ -7,7 +7,7 @@
 
     <meta name="description" content="">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="PackerとAnsibleでAzureのGolden Imageを作る(ARM対応) &middot; re-imagine">
@@ -97,17 +97,17 @@
                     <div class="post-description">
                         
 
-<h2 id="いつの間に:ebce8e7176cbf58fa7a5804522b325a3">いつの間に</h2>
+<h2 id="いつの間に">いつの間に</h2>
 
 <p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
 
-<h2 id="ansible-localと組み合わせたサンプル:ebce8e7176cbf58fa7a5804522b325a3">ansible_localと組み合わせたサンプル</h2>
+<h2 id="ansible-localと組み合わせたサンプル">ansible_localと組み合わせたサンプル</h2>
 
 <p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
 
 <p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
 
-<h3 id="前準備:ebce8e7176cbf58fa7a5804522b325a3">前準備</h3>
+<h3 id="前準備">前準備</h3>
 
 <ul>
 <li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
@@ -120,7 +120,7 @@
 <li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
 </ul>
 
-<h3 id="サンプル:ebce8e7176cbf58fa7a5804522b325a3">サンプル</h3>
+<h3 id="サンプル">サンプル</h3>
 
 <p>ubuntu.jsonはこんな感じです。</p>
 

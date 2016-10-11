@@ -17,7 +17,7 @@
       <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
       <description>
 
-&lt;h2 id=&#34;ファイル共有-あまりおすすめしないです:fa176ff87dca43c3d098f48095435bba&#34;&gt;ファイル共有、あまりおすすめしないです&lt;/h2&gt;
+&lt;h2 id=&#34;ファイル共有-あまりおすすめしないです&#34;&gt;ファイル共有、あまりおすすめしないです&lt;/h2&gt;
 
 &lt;p&gt;いきなりタイトルを否定しました。ロック。&lt;/p&gt;
 
@@ -39,7 +39,7 @@
 
 &lt;p&gt;もうちょっと情報欲しいですね。補足のためにわたしも流します。&lt;/p&gt;
 
-&lt;h2 id=&#34;azure-cliでストレージアカウントを作成し-ファイル共有を設定:fa176ff87dca43c3d098f48095435bba&#34;&gt;Azure CLIでストレージアカウントを作成し、ファイル共有を設定&lt;/h2&gt;
+&lt;h2 id=&#34;azure-cliでストレージアカウントを作成し-ファイル共有を設定&#34;&gt;Azure CLIでストレージアカウントを作成し、ファイル共有を設定&lt;/h2&gt;
 
 &lt;p&gt;ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。&lt;/p&gt;
 
@@ -67,7 +67,7 @@ info:    storage account connectionstring show command OK
 data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;linux-2vmで共有:fa176ff87dca43c3d098f48095435bba&#34;&gt;Linux * 2VMで共有&lt;/h2&gt;
+&lt;h2 id=&#34;linux-2vmで共有&#34;&gt;Linux * 2VMで共有&lt;/h2&gt;
 
 &lt;p&gt;Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/&#34;&gt;Marketplace提供の14.04 LTS&lt;/a&gt;であれば、すでに入ってるはずです。&lt;/p&gt;
 
@@ -118,7 +118,7 @@ test
 onemoretest
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;ご利用は計画的に:fa176ff87dca43c3d098f48095435bba&#34;&gt;ご利用は計画的に&lt;/h2&gt;
+&lt;h2 id=&#34;ご利用は計画的に&#34;&gt;ご利用は計画的に&lt;/h2&gt;
 
 &lt;p&gt;2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、&lt;a href=&#34;https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/&#34;&gt;Lustre&lt;/a&gt;など別の共有方法を検討してください。&lt;/p&gt;
 

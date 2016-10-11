@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.15" />
+    <meta name="generator" content="Hugo 0.16" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -89,7 +89,7 @@
 
 <p><strong>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。</strong></p>
 
-<h2 id="具体的な数値で-正しい理解を:d3d20b8a9dfb8ebe2c80e0d21980dbd3">具体的な数値で、正しい理解を</h2>
+<h2 id="具体的な数値で-正しい理解を">具体的な数値で、正しい理解を</h2>
 
 <p><a href="http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/">&ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;</a>という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。</p>
 
@@ -99,7 +99,7 @@
 
 <p>いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。</p>
 
-<h2 id="シングルvmでどれだけ:d3d20b8a9dfb8ebe2c80e0d21980dbd3">シングルVMでどれだけ</h2>
+<h2 id="シングルvmでどれだけ">シングルVMでどれだけ</h2>
 
 <p>話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。</p>
 
@@ -131,7 +131,7 @@
 
 <p>なお、<strong>現時点で</strong>まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。</p>
 
-<h2 id="32仮想cpuコアの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">32仮想CPUコアの規模感</h2>
+<h2 id="32仮想cpuコアの規模感">32仮想CPUコアの規模感</h2>
 
 <p>クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。</p>
 
@@ -217,7 +217,7 @@
 
 <p>なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は<a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">3-Tierベンチマーク</a>で確認できます。<a href="http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx">Azure上で247,880SAPS</a>出たそうです。</p>
 
-<h2 id="80-000iopsの規模感:d3d20b8a9dfb8ebe2c80e0d21980dbd3">80,000IOPSの規模感</h2>
+<h2 id="80-000iopsの規模感">80,000IOPSの規模感</h2>
 
 <p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
 
@@ -229,7 +229,7 @@
 
 <p>なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。</p>
 
-<h2 id="結論:d3d20b8a9dfb8ebe2c80e0d21980dbd3">結論</h2>
+<h2 id="結論">結論</h2>
 
 <ul>
 <li>Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり</li>
@@ -265,7 +265,7 @@
                     <div class="post-description">
                         
 
-<h2 id="ケースバイケースだけど:d8f24c1ecd76ea2b63a3969342359091">ケースバイケースだけど</h2>
+<h2 id="ケースバイケースだけど">ケースバイケースだけど</h2>
 
 <p>Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。</p>
 
@@ -275,7 +275,7 @@
 
 <p>私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。</p>
 
-<h2 id="書く前に前提など:d8f24c1ecd76ea2b63a3969342359091">書く前に前提など</h2>
+<h2 id="書く前に前提など">書く前に前提など</h2>
 
 <p>対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。</p>
 
@@ -283,13 +283,13 @@
 
 <p>では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。</p>
 
-<h2 id="そもそもツールで自動化すべきかを考える:d8f24c1ecd76ea2b63a3969342359091">そもそもツールで自動化すべきかを考える</h2>
+<h2 id="そもそもツールで自動化すべきかを考える">そもそもツールで自動化すべきかを考える</h2>
 
 <p>いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。</p>
 
 <p>なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。</p>
 
-<h2 id="使い捨てられないかを考える:d8f24c1ecd76ea2b63a3969342359091">使い捨てられないかを考える</h2>
+<h2 id="使い捨てられないかを考える">使い捨てられないかを考える</h2>
 
 <p>次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。</p>
 
@@ -299,7 +299,7 @@
 
 <p>変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。</p>
 
-<h2 id="優先事項や制約条件を洗い出す:d8f24c1ecd76ea2b63a3969342359091">優先事項や制約条件を洗い出す</h2>
+<h2 id="優先事項や制約条件を洗い出す">優先事項や制約条件を洗い出す</h2>
 
 <p>アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。</p>
 
@@ -333,7 +333,7 @@
 
 <p>　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。</p>
 
-<h2 id="マネージドサービス-機能を活用する:d8f24c1ecd76ea2b63a3969342359091">マネージドサービス、機能を活用する</h2>
+<h2 id="マネージドサービス-機能を活用する">マネージドサービス、機能を活用する</h2>
 
 <p>マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。</p>
 
@@ -349,7 +349,7 @@
 
 <p>以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。</p>
 
-<h2 id="汎用的-リファレンスアーキテクチャ:d8f24c1ecd76ea2b63a3969342359091">汎用的 リファレンスアーキテクチャ</h2>
+<h2 id="汎用的-リファレンスアーキテクチャ">汎用的 リファレンスアーキテクチャ</h2>
 
 <p>具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。</p>
 
@@ -365,7 +365,8 @@
 <li>OSの導入</li>
 <li>ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)</li>
 <li>他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)</li>
-<li>LinuxへChefサーバを導入、各種設定 (Shell Extension)</li>
+<li>LinuxへChefサーバを導入、各種設定 (Shell Extension)
+<br /></li>
 </ul></li>
 
 <li><p>ChefでConfiguration</p>
@@ -375,7 +376,8 @@
 <li>Chef Clientサービスの起動設定</li>
 <li>DBサーバのDB領域ディスク作成、フォーマット</li>
 <li>DBサーバへSQL Server 2014のインストール</li>
-<li>ChefがDBサーバが設定通りになるよう維持し続ける</li>
+<li>ChefがDBサーバが設定通りになるよう維持し続ける
+<br /></li>
 </ul></li>
 </ul>
 
@@ -405,13 +407,13 @@
                     <div class="post-description">
                         
 
-<h2 id="宣言的に-冪等に:7f9d18b141fe8baff11274b2e0ae3943">宣言的に、冪等に</h2>
+<h2 id="宣言的に-冪等に">宣言的に、冪等に</h2>
 
 <p>ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。</p>
 
 <p>さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。</p>
 
-<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview:7f9d18b141fe8baff11274b2e0ae3943"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
+<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
 
 <blockquote>
 <p>&ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;</p>
@@ -425,7 +427,7 @@
 
 <p>残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。</p>
 
-<h2 id="増分デプロイと完全デプロイ:7f9d18b141fe8baff11274b2e0ae3943">増分デプロイと完全デプロイ</h2>
+<h2 id="増分デプロイと完全デプロイ">増分デプロイと完全デプロイ</h2>
 
 <p>まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える<a href="https://github.com/Azure/azure-xplat-cli">クロスプラットフォームCLI</a>もあります。</p>
 
@@ -462,7 +464,7 @@
 
 <p>2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。</p>
 
-<h2 id="動きをつかむ:7f9d18b141fe8baff11274b2e0ae3943">動きをつかむ</h2>
+<h2 id="動きをつかむ">動きをつかむ</h2>
 
 <p>では動きを見ていきましょう。テンプレートはGithubに公開されている<a href="https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux">Very simple deployment of an Linux VM</a>を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を<a href="https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json">リンク先</a>でざっと確認してください。</p>
 
@@ -645,7 +647,7 @@ ProvisioningState : Succeeded
 
 <p>定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。</p>
 
-<h2 id="使い方:7f9d18b141fe8baff11274b2e0ae3943">使い方</h2>
+<h2 id="使い方">使い方</h2>
 
 <p>冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。</p>
 
@@ -681,7 +683,7 @@ ProvisioningState : Succeeded
                     <div class="post-description">
                         
 
-<h2 id="どこいってもいじられる:9e7f40e1d4e6f185223966639b28e39a">どこいってもいじられる</h2>
+<h2 id="どこいってもいじられる">どこいってもいじられる</h2>
 
 <p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
 
@@ -689,7 +691,7 @@ ProvisioningState : Succeeded
 
 <p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
 
-<h2 id="乗るしかないこのdockerウェーブに:9e7f40e1d4e6f185223966639b28e39a">乗るしかないこのDockerウェーブに</h2>
+<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
 
 <p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
 
@@ -705,7 +707,7 @@ ProvisioningState : Succeeded
 
 <p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
 
-<h2 id="ローカル環境:9e7f40e1d4e6f185223966639b28e39a">ローカル環境</h2>
+<h2 id="ローカル環境">ローカル環境</h2>
 
 <ul>
 <li>Mac OS X (El Capitan)
@@ -718,7 +720,7 @@ ProvisioningState : Succeeded
 <p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
 また、Swarmのマスタはローカルに配置します。</p>
 
-<h2 id="いざ実行:9e7f40e1d4e6f185223966639b28e39a">いざ実行</h2>
+<h2 id="いざ実行">いざ実行</h2>
 
 <p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
 
@@ -819,7 +821,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
 
 <p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
 
-<h2 id="ツールから入るハイブリッドクラウドも-またよし:9e7f40e1d4e6f185223966639b28e39a">ツールから入るハイブリッドクラウドも、またよし</h2>
+<h2 id="ツールから入るハイブリッドクラウドも-またよし">ツールから入るハイブリッドクラウドも、またよし</h2>
 
 <p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
 
@@ -855,7 +857,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
                     <div class="post-description">
                         
 
-<h2 id="まずはじめに:488dcbba59f3c8d3d94b3ed8ace3af66">まずはじめに</h2>
+<h2 id="まずはじめに">まずはじめに</h2>
 
 <p>先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。</p>
 
@@ -865,7 +867,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
 
 <p>なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。</p>
 
-<h2 id="azure-docker-vm-extension-を使う3つの理由:488dcbba59f3c8d3d94b3ed8ace3af66">Azure Docker VM Extension を使う3つの理由</h2>
+<h2 id="azure-docker-vm-extension-を使う3つの理由">Azure Docker VM Extension を使う3つの理由</h2>
 
 <p>さて、今回は話題沸騰のDocker関連のネタ、<a href="https://github.com/Azure/azure-docker-extension">Azure Docker VM Extension</a>について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。</p>
 
