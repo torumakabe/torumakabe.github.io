@@ -111,7 +111,7 @@
 
 <p>すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。</p>
 
-<pre><code>$ az appservice web config container show -n yourcontainer -g YourRG
+<pre><code>$ az appservice web config container show -n yourcontainerapp -g YourRG
 {
   &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot;
 }
@@ -119,7 +119,7 @@
 
 <p>新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。</p>
 
-<pre><code>$ az appservice web config container update -n yourcontainer -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot;
+<pre><code>$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot;
 {
   &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot;
 }
