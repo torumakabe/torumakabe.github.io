@@ -17,13 +17,13 @@
       <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>
 
-&lt;h2 id=&#34;cliでコンテナを更新しよう&#34;&gt;CLIでコンテナを更新しよう&lt;/h2&gt;
+&lt;h2 id=&#34;cliでコンテナを更新したい&#34;&gt;CLIでコンテナを更新したい&lt;/h2&gt;
 
 &lt;p&gt;Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
 
 &lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
 
-&lt;p&gt;まだプレビューなのでAzure、VSTSなどCI/CD側の機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
+&lt;p&gt;まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
 
 &lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
 
