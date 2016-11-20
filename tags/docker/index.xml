@@ -6,8 +6,48 @@
     <description>Recent content in Docker on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
+      <link>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <description>
+
+&lt;h2 id=&#34;cliでコンテナを更新しよう&#34;&gt;CLIでコンテナを更新しよう&lt;/h2&gt;
+
+&lt;p&gt;Connect(); 2016にあわせ、Azure App on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
+
+&lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
+
+&lt;p&gt;まだプレビューなのでAzure、VSTSなどCI/CD側の機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
+
+&lt;p&gt;Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。&lt;/p&gt;
+
+&lt;p&gt;すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container show -n yourcontainer -g YourRG
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container update -n yourcontainer -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで更新されます。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>

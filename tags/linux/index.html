@@ -68,6 +68,58 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">20 Nov 2016, 13:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_webapponlinux_dockertag/" class="post-title">Azure App Service on LinuxのコンテナをCLIで更新する方法</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="cliでコンテナを更新しよう">CLIでコンテナを更新しよう</h2>
+
+<p>Connect(); 2016にあわせ、Azure App on Linuxのコンテナ対応が<a href="https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/">発表</a>されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。</p>
+
+<p>さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。</p>
+
+<p>まだプレビューなのでAzure、VSTSなどCI/CD側の機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。</p>
+
+<h2 id="azure-cli-2-0">Azure CLI 2.0</h2>
+
+<p>Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。</p>
+
+<p>すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。</p>
+
+<pre><code>$ az appservice web config container show -n yourcontainer -g YourRG
+{
+  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot;
+}
+</code></pre>
+
+<p>新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。</p>
+
+<pre><code>$ az appservice web config container update -n yourcontainer -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot;
+{
+  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot;
+}
+</code></pre>
+
+<p>これで更新されます。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
                 <section class="post">
                     <header class="post-header">

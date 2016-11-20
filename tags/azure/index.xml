@@ -6,8 +6,48 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
+      <link>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <description>
+
+&lt;h2 id=&#34;cliでコンテナを更新しよう&#34;&gt;CLIでコンテナを更新しよう&lt;/h2&gt;
+
+&lt;p&gt;Connect(); 2016にあわせ、Azure App on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
+
+&lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
+
+&lt;p&gt;まだプレビューなのでAzure、VSTSなどCI/CD側の機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
+
+&lt;p&gt;Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。&lt;/p&gt;
+
+&lt;p&gt;すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container show -n yourcontainer -g YourRG
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container update -n yourcontainer -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで更新されます。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
@@ -1978,166 +2018,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;p&gt;完璧を求めずにいきましょう。&lt;/p&gt;
 
 &lt;p&gt;でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>http://torumakabe.github.io/post/azure_tf_arm_sp/</link>
-      <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
-      <description>
-
-&lt;h2 id=&#34;高まってまいりました&#34;&gt;高まってまいりました&lt;/h2&gt;
-
-&lt;p&gt;全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。&lt;/p&gt;
-
-&lt;p&gt;Terraformのマイナーバージョンアップのたびに、&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/index.html&#34;&gt;Azure Resource Manager Providerのリソース&lt;/a&gt;が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。&lt;/p&gt;
-
-&lt;p&gt;そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。&lt;/p&gt;
-
-&lt;h2 id=&#34;client-id-client-secret-って何よ&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
-
-&lt;p&gt;以下がARM向けのProvider設定です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
-provider &amp;quot;azurerm&amp;quot; {
-  subscription_id = &amp;quot;...&amp;quot;
-  client_id       = &amp;quot;...&amp;quot;
-  client_secret   = &amp;quot;...&amp;quot;
-  tenant_id       = &amp;quot;...&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、&lt;strong&gt;client_id/client_secret って何よ&lt;/strong&gt;。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;おっとそういうことか。OAuth。&lt;/p&gt;
-
-&lt;h2 id=&#34;サービスプリンシパルを使おう&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
-
-&lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/&#34;&gt;&amp;ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。&lt;/p&gt;
-
-&lt;p&gt;まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&amp;ndash;passwordはclient_secretになるので、おぼえておきましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure ad app create --name &amp;quot;My Terraform&amp;quot; --home-page &amp;quot;http://tftest.makabe.info&amp;quot; --identifier-uris &amp;quot;http://tftest.makabe.info&amp;quot; --password pAssw0rd%
-info:    Executing command ad app create
-+ Creating application My Terraform
-data:    AppId:                   AppId-AppId-AppId-AppId-AppId
-data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
-data:    DisplayName:             My Terraform
-data:    IdentifierUris:          0=http://tftest.makabe.info
-data:    ReplyUrls:
-data:    AvailableToOtherTenants:  False
-data:    AppPermissions:
-data:                             claimValue:  user_impersonation
-data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
-data:                             directAccessGrantTypes:
-data:                             displayName:  Access My Terraform
-data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
-data:                             isDisabled:
-data:                             origin:  Application
-data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
-data:                             resourceScopeType:  Personal
-data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
-data:                             userConsentDisplayName:  Access My Terraform
-data:                             lang:
-info:    ad app create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure ad sp create AppId-AppId-AppId-AppId-AppId
-info:    Executing command ad sp create
-+ Creating service principal for application AppId-AppId-AppId-AppId-AppId
-data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
-data:    Display Name:            My Terraform
-data:    Service Principal Names:
-data:                             AppId-AppId-AppId-AppId-AppId
-data:                             http://tftest.makabe.info
-info:    ad sp create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;サービスプリンシパルの役割を設定します。&amp;ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。&lt;/p&gt;
-
-&lt;p&gt;この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
-info:    Executing command role assignment create
-+ Finding role with specified name
-/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
-data:    RoleDefinitionName   : Contributor
-data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
-data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
-data:    Display Name         : My Terraform
-data:    SignInName           :
-data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
-data:    ObjectType           : ServicePrincipal
-data:
-+
-info:    role assignment create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;サービスプリンシパルまわりの設定は以上です。&lt;/p&gt;
-
-&lt;p&gt;テナントIDを確認しておきましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure account list --json
-[
-  {
-    &amp;quot;id&amp;quot;: &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;,
-    &amp;quot;name&amp;quot;: &amp;quot;Your Subscription Name&amp;quot;,
-    &amp;quot;user&amp;quot;: {
-      &amp;quot;name&amp;quot;: &amp;quot;abc@microsoft.com&amp;quot;,
-      &amp;quot;type&amp;quot;: &amp;quot;user&amp;quot;
-    },
-    &amp;quot;tenantId&amp;quot;: &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;,
-    &amp;quot;state&amp;quot;: &amp;quot;Enabled&amp;quot;,
-    &amp;quot;isDefault&amp;quot;: true,
-    &amp;quot;registeredProviders&amp;quot;: [],
-    &amp;quot;environmentName&amp;quot;: &amp;quot;AzureCloud&amp;quot;
-  }
-]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
-provider &amp;quot;azurerm&amp;quot; {
-  subscription_id = &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;
-  client_id       = &amp;quot;AppId-AppId-AppId-AppId-AppId&amp;quot;
-  client_secret   = &amp;quot;pAssw0rd%&amp;quot;
-  tenant_id       = &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;
-}
-
-# Create a resource group
-resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;test&amp;quot; {
-    name     = &amp;quot;test&amp;quot;
-    location = &amp;quot;Japan West&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;apply。もちろんplanしましたよ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ terraform apply
-azurerm_resource_group.test: Creating...
-  location: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;japanwest&amp;quot;
-  name:     &amp;quot;&amp;quot; =&amp;gt; &amp;quot;test&amp;quot;
-azurerm_resource_group.test: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これで、ARM認証難民がうまれなくなりますように。&lt;/p&gt;
 </description>
     </item>
     

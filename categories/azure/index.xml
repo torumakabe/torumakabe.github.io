@@ -6,8 +6,48 @@
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
+      <link>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <description>
+
+&lt;h2 id=&#34;cliでコンテナを更新しよう&#34;&gt;CLIでコンテナを更新しよう&lt;/h2&gt;
+
+&lt;p&gt;Connect(); 2016にあわせ、Azure App on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
+
+&lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
+
+&lt;p&gt;まだプレビューなのでAzure、VSTSなどCI/CD側の機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
+
+&lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
+
+&lt;p&gt;Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。&lt;/p&gt;
+
+&lt;p&gt;すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container show -n yourcontainer -g YourRG
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az appservice web config container update -n yourcontainer -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+{
+  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで更新されます。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
@@ -1899,202 +1939,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
 
 &lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
-      <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
-      <description>
-
-&lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
-
-&lt;p&gt;今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。&lt;/p&gt;
-
-&lt;p&gt;なお、考え方は他のクラウドやデプロイツールでも応用できるかと。&lt;/p&gt;
-
-&lt;h2 id=&#34;4原則&#34;&gt;4原則&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;セキュリティファースト&lt;/li&gt;
-&lt;li&gt;手順書をなくそう&lt;/li&gt;
-&lt;li&gt;分割境界にこだわりすぎない&lt;/li&gt;
-&lt;li&gt;早すぎる最適化は悪&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;なお、サンプルのTerraformファイル群を、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;Githubに置いて&lt;/a&gt;おきました。&lt;/p&gt;
-
-&lt;p&gt;今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── .gitignore
-├── main.tf
-├── availability_set
-│   ├── avset_web.tf
-│   ├── avset_db.tf
-│   └── variables.tf
-├── network
-│   ├── sg_backend.tf
-│   ├── sg_frontend.tf
-│   ├── variables.tf
-│   └── vnets.tf
-├── storage
-│   ├── storage_backend.tf
-│   ├── storage_frontend.tf
-│   └── variables.tf
-└── terraform.tfvars
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。&lt;/p&gt;
-
-&lt;h2 id=&#34;1-セキュリティファースト&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
-
-&lt;p&gt;セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;認証情報は変数指定し、設定ファイルから読み込む&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない&lt;/li&gt;
-&lt;li&gt;terraform.tfvarsなどにまとめて書く&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Gitなら.gitignoreに指定する&lt;/li&gt;
-&lt;li&gt;.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
-
-&lt;ul&gt;
-&lt;li&gt;チームで使う場合はファイルではなく、Consulなどのリモートバックエンドを使うと思いますが、念のため&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;RBACで必要最小限の権限を付与する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう&lt;/li&gt;
-&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ネットワークセキュリティグループはサブネットに指定しておく&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;個々のVMの管理者に任せず、サブネットで絞っておきましょう
-
-&lt;ul&gt;
-&lt;li&gt;VMはアドホックに作られるケースが多く、ルーズになりがちです&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
-
-&lt;ul&gt;
-&lt;li&gt;フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)&lt;/li&gt;
-&lt;li&gt;バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;2-手順書をなくそう&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
-
-&lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
-
-&lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
-
-&lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
-
-&lt;p&gt;TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。&lt;/p&gt;
-
-&lt;p&gt;グルーピング、分割する目的は、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;main.tfの肥大化を防止し、コードの見通しを良くする&lt;/li&gt;
-&lt;li&gt;再利用しやすくする&lt;/li&gt;
-&lt;li&gt;責任範囲を明確化し、オーナー意識を醸成する&lt;/li&gt;
-&lt;li&gt;権限とコードを一致させる&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。&lt;/p&gt;
-
-&lt;p&gt;以下が分割単位、境界ポリシーの例です。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;リソースタイプで分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サンプルはその例
-
-&lt;ul&gt;
-&lt;li&gt;ネットワーク、ストレージ、VM Availability Setで分割&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;直観的&lt;/li&gt;
-&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;組織単位で分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4&#34;&gt;コンウェイの法則&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;リソースタイプ = 組織 という場合もある
-
-&lt;ul&gt;
-&lt;li&gt;ネットワーク管理者が別グループ、など&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;地理的に分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リージョンやロケーションで分割&lt;/li&gt;
-&lt;li&gt;リソースタイプと組み合わせる手もある
-
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;静的なリソースと動的なリソースを分ける&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;変化の頻度で分ける
-
-&lt;ul&gt;
-&lt;li&gt;ネットワークが頻繁に変わることはまれ&lt;/li&gt;
-&lt;li&gt;VMは増減が激しい&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動的なリソースは対象から外す、別手段とする手も
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。&lt;/p&gt;
-
-&lt;h2 id=&#34;4-早すぎる最適化は悪&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
-
-&lt;p&gt;最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。&lt;/p&gt;
-
-&lt;p&gt;なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。&lt;/p&gt;
-
-&lt;p&gt;ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。&lt;/p&gt;
-
-&lt;p&gt;そして、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リファクタリングできるなら、する&lt;/li&gt;
-&lt;li&gt;リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす&lt;/li&gt;
-&lt;li&gt;はじめに作った人へマサカリを投げない&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;完璧を求めずにいきましょう。&lt;/p&gt;
-
-&lt;p&gt;でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。&lt;/p&gt;
 </description>
     </item>
     
