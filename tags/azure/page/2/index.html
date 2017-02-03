@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.16" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -67,6 +67,150 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">21 May 2016, 11:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_cli_resourcepolicy/" class="post-title">Azure X-Plat CLIでResource Policyを設定する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="azure-x-plat-cliのリリースサイクル">Azure X-Plat CLIのリリースサイクル</h2>
+
+<p>OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ<a href="https://github.com/Azure/azure-xplat-cli/releases">月次</a>です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。</p>
+
+<p>たとえば、今回のテーマであるResource Policy。GA直後に公開された<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/">ドキュメント</a>に、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。</p>
+
+<p>機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。</p>
+
+<h2 id="ポリシーによるアクセス管理">ポリシーによるアクセス管理</h2>
+
+<p>さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。</p>
+
+<ul>
+<li>VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい</li>
+<li>日本国外リージョンのデータセンタを使えないようにしたい</li>
+<li>Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい</li>
+<li>開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい</li>
+</ul>
+
+<p>などなど。こういう課題にポリシーが効きます。</p>
+
+<p>従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。<a href="https://azure.microsoft.com/ja-jp/documentation/articles/role-based-access-built-in-roles/">組み込みロールの一覧</a>を眺めると、理解しやすいでしょう。</p>
+
+<p>ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。</p>
+
+<p>リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。</p>
+
+<h2 id="x-plat-cliでの定義方法">X-Plat CLIでの定義方法</h2>
+
+<p>2016/4リリースの<a href="https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016">v0.9.20</a>から、X-Plat CLIでもResource Policyを定義できます。</p>
+
+<p>ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。</p>
+
+<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/">ポリシーを使用したリソース管理とアクセス制御</a></strong></p>
+
+<p>X-Plat CLI固有部分に絞って紹介します。</p>
+
+<h3 id="ポリシー定義ファイルを作る">ポリシー定義ファイルを作る</h3>
+
+<p>CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。</p>
+
+<p>例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。</p>
+
+<pre><code>{
+  &quot;if&quot;: {
+    &quot;allOf&quot;: [
+      {
+        &quot;field&quot;: &quot;type&quot;,
+        &quot;equals&quot;: &quot;Microsoft.Compute/virtualMachines&quot;
+      },
+      {
+        &quot;not&quot;: {
+          &quot;field&quot;: &quot;Microsoft.Compute/virtualMachines/sku.name&quot;,
+          &quot;in&quot;: [ &quot;Standard_D1_v2&quot;, &quot;Standard_D2_v2&quot;,&quot;Standard_D3_v2&quot;, &quot;Standard_D4_v2&quot;, &quot;Standard_D5_v2&quot; ]
+        }
+      }
+    ]
+  },
+  &quot;then&quot;: {
+    &quot;effect&quot;: &quot;deny&quot;
+  }
+}
+</code></pre>
+
+<p>policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</p>
+
+<pre><code>$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
+</code></pre>
+
+<pre><code>info:    Executing command policy definition create
++ Creating policy definition deny_vmsize
+data:    PolicyName:             deny_vmsize
+data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    PolicyType:             Custom
+data:    DisplayName:
+data:    Description:
+data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
+info:    policy definition create command OK
+</code></pre>
+
+<p>できたみたいです。</p>
+
+<h3 id="ポリシーをアサインする">ポリシーをアサインする</h3>
+
+<p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
+
+<pre><code>$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+</code></pre>
+
+<pre><code>info:    Executing command policy assignment create
++ Creating policy assignment deny_vmsize_assignment
+data:    PolicyAssignmentName:     deny_vmsize_assignment
+data:    Type:                     Microsoft.Authorization/policyAssignments
+data:    DisplayName:
+data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+data:    Scope:                    /subscriptions/mysubscription
+info:    policy assignment create command OK
+</code></pre>
+
+<p>割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。</p>
+
+<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_G5
+info:    Executing command vm quick-create
+[...snip]
++ Creating VM &quot;rppocvm&quot;
+error:   The resource action 'Microsoft.Compute/virtualMachines/write' is disallowed by one or more policies. Policy identifier(s): '/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize'.
+info:    Error information has been recorded to /root/.azure/azure.err
+error:   vm quick-create command failed
+</code></pre>
+
+<p>拒否られました。</p>
+
+<p>許可されているVMサイズだと。</p>
+
+<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_D1_v2
+info:    Executing command vm quick-create
+[...snip]
+info:    vm quick-create command OK
+</code></pre>
+
+<p>成功。</p>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">13 May 2016, 18:00</h1>
                 <section class="post">
@@ -910,125 +1054,6 @@ return $blobSizeInBytes
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_docker_cntk/" class="post-title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
-
-<p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
-
-<p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
-
-<h2 id="方針">方針</h2>
-
-<ul>
-<li>インフラはAzure Resource Manager Templateでデプロイする
-
-<ul>
-<li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
-</ul></li>
-<li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-<ul>
-<li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
-
-<ul>
-<li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
-</ul></li>
-<li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
-</ul></li>
-<li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-<ul>
-<li>docker extensionでdocker engineを導入</li>
-<li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
-</ul></li>
-<li>VMにログインしたら即CNTKを使える、幸せ</li>
-</ul>
-
-<h2 id="使い方">使い方</h2>
-
-<p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
-</code></pre>
-
-<p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
-
-<ul>
-<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
-
-<ul>
-<li>編集不要です</li>
-</ul></li>
-<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
-
-<ul>
-<li>テンプレートに直で書かきたくないパラメータです</li>
-<li>fileUris、commandToExecute以外は、各々で</li>
-<li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
-<br /></li>
-</ul></li>
-</ul>
-
-<p>うし、デプロイ。</p>
-
-<pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-</code></pre>
-
-<p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
-
-<p>docker engine入ってますかね。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-</code></pre>
-
-<p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-</code></pre>
-
-<p>問題なし。ではエンジョイ Deep Learning。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-</code></pre>
-
-<p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
-
-<h2 id="今後の展開">今後の展開</h2>
-
-<p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
-
-<p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
-
-<p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -1038,7 +1063,7 @@ root@a1234bc5d67d:/cntk#
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 5</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 6</span>
     
       <a href="/tags/azure/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

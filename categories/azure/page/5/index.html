@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.16" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -67,6 +67,135 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">07 Feb 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/fileshare_linuxonazure/" class="post-title">Linux on Azureでファイル共有する方法</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="ファイル共有-あまりおすすめしないです">ファイル共有、あまりおすすめしないです</h2>
+
+<p>いきなりタイトルを否定しました。ロック。</p>
+
+<p>さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。</p>
+
+<p>ですが<strong>個人的には</strong>あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。</p>
+
+<p>でも、否定はしません。アプリの作りを変えられないケースもあるかと思います。</p>
+
+<p>そこで、もしAzureでファイル共有が必要であれば、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/">Azure File Storage</a>を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。</p>
+
+<p>対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。</p>
+
+<p>使い方は公式ドキュメントを。</p>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares">&ldquo;Azure Storage での Azure CLI の使用&rdquo;</a></p>
+
+<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/">&ldquo;Linux で Azure File Storage を使用する方法&rdquo;</a></p>
+
+<p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
+
+<h2 id="azure-cliでストレージアカウントを作成し-ファイル共有を設定">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
+
+<p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
+
+<pre><code>local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc
+</code></pre>
+
+<p>ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。</p>
+
+<pre><code>local$ azure storage account connectionstring show tomakabefspoc -g fspoc
+info:    Executing command storage account connectionstring show
++ Getting storage account keys
+data:    connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==
+info:    storage account connectionstring show command OK
+</code></pre>
+
+<p>shareを作成します。share名はfspocshareとしました。</p>
+
+<pre><code>local$ azure storage share create -a tomakabefspoc -k qwertyuiopasdfghjklzxcvbnm== fspocshare
+</code></pre>
+
+<p>エンドポイントを確認しておきましょう。VMからのマウントの際に必要です。</p>
+
+<pre><code>local$ azure storage account show tomakabefspoc -g fspoc
+[snip]
+data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
+</code></pre>
+
+<h2 id="linux-2vmで共有">Linux * 2VMで共有</h2>
+
+<p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
+
+<pre><code>fspocvm01:~$ sudo apt-get install cifs-utils
+</code></pre>
+
+<p>マウントポイントを作り、マウントします。接続先の指定はエンドポイント+share名で。usernameはストレージアカウント名。パスワードはストレージアカウントのキーです。
+パーミッションは要件に合わせてください。</p>
+
+<pre><code>fspocvm01:~$ sudo mkdir -p /mnt/fspoc
+fspocvm01:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+</code></pre>
+
+<p>マウント完了。確認用のファイルを作っておきます。</p>
+
+<pre><code>fspocvm01:~$ echo &quot;test&quot; &gt; /mnt/fspoc/test.txt
+fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+</code></pre>
+
+<p>2台目のVMでも同様のマウント作業を。</p>
+
+<pre><code>fspocvm02:~$ sudo apt-get install cifs-utils
+fspocvm02:~$ sudo mkdir -p /mnt/fspoc
+fspocvm02:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
+</code></pre>
+
+<p>1台目で作ったファイルが見えますね。</p>
+
+<pre><code>fspocvm02:~$ ls /mnt/fspoc
+test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+</code></pre>
+
+<p>ファイルをいじりましょう。</p>
+
+<pre><code>fspocvm02:~$ echo &quot;onemoretest&quot; &gt;&gt; /mnt/fspoc/test.txt
+fspocvm02:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+</code></pre>
+
+<p>1台目から確認。</p>
+
+<pre><code>fspocvm01:~$ cat /mnt/fspoc/test.txt
+test
+onemoretest
+</code></pre>
+
+<h2 id="ご利用は計画的に">ご利用は計画的に</h2>
+
+<p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
+
+<p>なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。</p>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">27 Jan 2016, 00:19</h1>
                 <section class="post">
@@ -824,180 +953,6 @@ ProvisioningState : Succeeded
 <p>長くなったので、デプロイツールの組み合わせについては、あたらめて書きたいと思います。</p>
 
 <p>参考: <a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ Bootstrapping/Configuration/Orchestration</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">19 Dec 2015, 00:01</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_openstack_swarm/" class="post-title">OpenStackとAzureにDocker Swarmをかぶせてみた</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="どこいってもいじられる">どこいってもいじられる</h2>
-
-<p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
-
-<p>OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。</p>
-
-<p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
-
-<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
-
-<p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
-
-<p>ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。</p>
-
-<p>条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。</p>
-
-<p>あと、当然ですが個人で気軽にオンラインで契約できることも条件です。</p>
-
-<p>そうすると、ほぼ一択。<a href="https://www.conoha.jp/">Conoha</a>です。かわいらしい座敷童の<a href="https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu">&ldquo;このは&rdquo;</a>がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。</p>
-
-<p>では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。</p>
-
-<p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
-
-<h2 id="ローカル環境">ローカル環境</h2>
-
-<ul>
-<li>Mac OS X (El Capitan)
-
-<ul>
-<li>Docker Toolbox 1.9.1</li>
-</ul></li>
-</ul>
-
-<p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
-また、Swarmのマスタはローカルに配置します。</p>
-
-<h2 id="いざ実行">いざ実行</h2>
-
-<p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
-
-<p>Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は<a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/">ここ</a>を。</p>
-
-<pre><code>$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
-$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem
-</code></pre>
-
-<p>Conoha向けにOpenStack関連の環境変数をセットします。</p>
-
-<pre><code>$ export OS_USERNAME=yourname
-$ export OS_TENANT_NAME=yourtenantname
-$ export OS_PASSWORD=yourpass
-$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0
-</code></pre>
-
-<p>次はローカルコンテナ環境を整えます。</p>
-
-<p>Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。</p>
-
-<pre><code>$ docker-machine create -d virtualbox local
-$ eval &quot;$(docker-machine env local)&quot;
-$ docker run swarm create    
-Status: Downloaded newer image for swarm:latest
-tokentokentokentoken
-</code></pre>
-
-<p>このトークンは控えておきましょう。</p>
-
-<p>ではSwarmのマスタをローカルに作ります。先ほど生成したトークン指定を忘れずに。</p>
-
-<pre><code>$ docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://tokentokentokentoken head
-</code></pre>
-
-<p>SwarmのエージェントをAzureに作ります。VMを作って、OSとDockerをインストールして、なんて不要です。Docker Machineがやってくれます。ここでもトークン指定を忘れずに。</p>
-
-<pre><code>$ eval &quot;$(docker-machine env head)&quot;
-$ docker-machine create -d azure --swarm --swarm-discovery token://tokentokentokentoken worker-azure01 --azure-location &quot;East Asia&quot; worker-azure00
-</code></pre>
-
-<p>Conohaにも同様に。</p>
-
-<pre><code>$ docker-machine create -d openstack --openstack-flavor-name g-1gb --openstack-image-name vmi-ubuntu-14.04-amd64 --openstack-sec-groups &quot;default,gncs-ipv4-all&quot; --swarm --swarm-discovery token://tokentokentokentoken worker-conoha00
-</code></pre>
-
-<p>さあ環境がサクッと出来上がりました。これ以降はSwarmクラスタ全体を操作対象にします。</p>
-
-<pre><code>$ eval &quot;$(docker-machine env --swarm head)&quot;
-</code></pre>
-
-<p>環境をチラ見してみましょう。</p>
-
-<pre><code>$ docker info
-Containers: 4
-Images: 3
- Role: primary
- Strategy: spread
- Filters: health, port, dependency, affinity, constraint
- Nodes: 3
- head: 192.168.99.101:2376
-  └ Containers: 2
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.021 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=4.1.13-boot2docker, operatingsystem=Boot2Docker 1.9.1 (TCL 6.4.1); master : cef800b - Fri Dec 18 19:33:59 UTC 2015, provider=virtualbox, storagedriver=aufs
- worker-azure00: xxx.cloudapp.net:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.721 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.13.0-36-generic, operatingsystem=Ubuntu 14.04.1 LTS, provider=azure, storagedriver=aufs
- worker-conoha00: www.xxx.yyy.zzz:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 2
-  └ Reserved Memory: 0 B / 1.019 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.16.0-51-generic, operatingsystem=Ubuntu 14.04.3 LTS, provider=openstack, storagedriver=aufs
-CPUs: 4
-Total Memory: 3.761 GiB
-Name: 1234abcd
-</code></pre>
-
-<p>どこにどんな環境が作られたかが分かりますね。出力結果の4行目&rdquo;Strategy: spread&rdquo;を覚えておいてください。</p>
-
-<p>ではコンテナを作ってみましょう。Nginxコンテナ三連星です。どの環境に作るか、という指定はしません。</p>
-
-<pre><code>$ for i in `seq 1 3`; do docker run -d -p 80:80 nginx; done
-</code></pre>
-
-<p>どんな具合でしょう。</p>
-
-<pre><code>$ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                NAMES
-9cc2f5594fa5        nginx               &quot;nginx -g 'daemon off&quot;   5 seconds ago       Up 4 seconds        192.168.99.101:80-&gt;80/tcp, 443/tcp   head/goofy_goldberg
-b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 seconds ago      Up 31 seconds       www.xxx.yyy.zzz:80-&gt;80/tcp, 443/tcp   worker-conoha00/clever_chandrasekhar
-19e9d0e229a2        nginx               &quot;nginx -g 'daemon off&quot;   45 seconds ago      Up 42 seconds       zzz.yyy.xxx.www:80-&gt;80/tcp, 443/tcp    worker-azure00/reverent_bhaskara
-</code></pre>
-
-<p>Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&rdquo;Strategy: spread&rdquo;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。</p>
-
-<p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
-
-<h2 id="ツールから入るハイブリッドクラウドも-またよし">ツールから入るハイブリッドクラウドも、またよし</h2>
-
-<p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
-
-<p>でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。</p>
-
-<p>もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。</p>
-
-<p>簡単 = 正義です。簡単であれば使う人が増えて、要望が増えて、育ちます。かっちり感は後からついてくる。もしDockerで複数のクラウド環境を簡単に使いこなせるようになるのであれば、順番が逆ではありますが、お箸、Dockerというツールから入るのもいいかもしれません。</p>
-
-<p>まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。</p>
-
-<p>OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。</p>
 
                     </div>
                 </section>

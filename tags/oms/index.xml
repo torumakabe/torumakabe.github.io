@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Oms on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/oms/</link>
-    <description>Recent content in Oms on re-imagine</description>
+    <title>re-imagine</title>
+    <link>http://torumakabe.github.io/tags/oms/index.xml</link>
+    <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
     
     <item>

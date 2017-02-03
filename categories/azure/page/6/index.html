@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.16" />
+    <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -67,6 +67,180 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">19 Dec 2015, 00:01</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_openstack_swarm/" class="post-title">OpenStackとAzureにDocker Swarmをかぶせてみた</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="どこいってもいじられる">どこいってもいじられる</h2>
+
+<p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
+
+<p>OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。</p>
+
+<p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
+
+<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
+
+<p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
+
+<p>ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。</p>
+
+<p>条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。</p>
+
+<p>あと、当然ですが個人で気軽にオンラインで契約できることも条件です。</p>
+
+<p>そうすると、ほぼ一択。<a href="https://www.conoha.jp/">Conoha</a>です。かわいらしい座敷童の<a href="https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu">&ldquo;このは&rdquo;</a>がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。</p>
+
+<p>では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。</p>
+
+<p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
+
+<h2 id="ローカル環境">ローカル環境</h2>
+
+<ul>
+<li>Mac OS X (El Capitan)
+
+<ul>
+<li>Docker Toolbox 1.9.1</li>
+</ul></li>
+</ul>
+
+<p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
+また、Swarmのマスタはローカルに配置します。</p>
+
+<h2 id="いざ実行">いざ実行</h2>
+
+<p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
+
+<p>Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は<a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/">ここ</a>を。</p>
+
+<pre><code>$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
+$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem
+</code></pre>
+
+<p>Conoha向けにOpenStack関連の環境変数をセットします。</p>
+
+<pre><code>$ export OS_USERNAME=yourname
+$ export OS_TENANT_NAME=yourtenantname
+$ export OS_PASSWORD=yourpass
+$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0
+</code></pre>
+
+<p>次はローカルコンテナ環境を整えます。</p>
+
+<p>Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。</p>
+
+<pre><code>$ docker-machine create -d virtualbox local
+$ eval &quot;$(docker-machine env local)&quot;
+$ docker run swarm create    
+Status: Downloaded newer image for swarm:latest
+tokentokentokentoken
+</code></pre>
+
+<p>このトークンは控えておきましょう。</p>
+
+<p>ではSwarmのマスタをローカルに作ります。先ほど生成したトークン指定を忘れずに。</p>
+
+<pre><code>$ docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://tokentokentokentoken head
+</code></pre>
+
+<p>SwarmのエージェントをAzureに作ります。VMを作って、OSとDockerをインストールして、なんて不要です。Docker Machineがやってくれます。ここでもトークン指定を忘れずに。</p>
+
+<pre><code>$ eval &quot;$(docker-machine env head)&quot;
+$ docker-machine create -d azure --swarm --swarm-discovery token://tokentokentokentoken worker-azure01 --azure-location &quot;East Asia&quot; worker-azure00
+</code></pre>
+
+<p>Conohaにも同様に。</p>
+
+<pre><code>$ docker-machine create -d openstack --openstack-flavor-name g-1gb --openstack-image-name vmi-ubuntu-14.04-amd64 --openstack-sec-groups &quot;default,gncs-ipv4-all&quot; --swarm --swarm-discovery token://tokentokentokentoken worker-conoha00
+</code></pre>
+
+<p>さあ環境がサクッと出来上がりました。これ以降はSwarmクラスタ全体を操作対象にします。</p>
+
+<pre><code>$ eval &quot;$(docker-machine env --swarm head)&quot;
+</code></pre>
+
+<p>環境をチラ見してみましょう。</p>
+
+<pre><code>$ docker info
+Containers: 4
+Images: 3
+ Role: primary
+ Strategy: spread
+ Filters: health, port, dependency, affinity, constraint
+ Nodes: 3
+ head: 192.168.99.101:2376
+  └ Containers: 2
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.021 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=4.1.13-boot2docker, operatingsystem=Boot2Docker 1.9.1 (TCL 6.4.1); master : cef800b - Fri Dec 18 19:33:59 UTC 2015, provider=virtualbox, storagedriver=aufs
+ worker-azure00: xxx.cloudapp.net:2376
+  └ Containers: 1
+  └ Reserved CPUs: 0 / 1
+  └ Reserved Memory: 0 B / 1.721 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.13.0-36-generic, operatingsystem=Ubuntu 14.04.1 LTS, provider=azure, storagedriver=aufs
+ worker-conoha00: www.xxx.yyy.zzz:2376
+  └ Containers: 1
+  └ Reserved CPUs: 0 / 2
+  └ Reserved Memory: 0 B / 1.019 GiB
+  └ Labels: executiondriver=native-0.2, kernelversion=3.16.0-51-generic, operatingsystem=Ubuntu 14.04.3 LTS, provider=openstack, storagedriver=aufs
+CPUs: 4
+Total Memory: 3.761 GiB
+Name: 1234abcd
+</code></pre>
+
+<p>どこにどんな環境が作られたかが分かりますね。出力結果の4行目&rdquo;Strategy: spread&rdquo;を覚えておいてください。</p>
+
+<p>ではコンテナを作ってみましょう。Nginxコンテナ三連星です。どの環境に作るか、という指定はしません。</p>
+
+<pre><code>$ for i in `seq 1 3`; do docker run -d -p 80:80 nginx; done
+</code></pre>
+
+<p>どんな具合でしょう。</p>
+
+<pre><code>$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                NAMES
+9cc2f5594fa5        nginx               &quot;nginx -g 'daemon off&quot;   5 seconds ago       Up 4 seconds        192.168.99.101:80-&gt;80/tcp, 443/tcp   head/goofy_goldberg
+b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 seconds ago      Up 31 seconds       www.xxx.yyy.zzz:80-&gt;80/tcp, 443/tcp   worker-conoha00/clever_chandrasekhar
+19e9d0e229a2        nginx               &quot;nginx -g 'daemon off&quot;   45 seconds ago      Up 42 seconds       zzz.yyy.xxx.www:80-&gt;80/tcp, 443/tcp    worker-azure00/reverent_bhaskara
+</code></pre>
+
+<p>Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&rdquo;Strategy: spread&rdquo;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。</p>
+
+<p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
+
+<h2 id="ツールから入るハイブリッドクラウドも-またよし">ツールから入るハイブリッドクラウドも、またよし</h2>
+
+<p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
+
+<p>でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。</p>
+
+<p>もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。</p>
+
+<p>簡単 = 正義です。簡単であれば使う人が増えて、要望が増えて、育ちます。かっちり感は後からついてくる。もしDockerで複数のクラウド環境を簡単に使いこなせるようになるのであれば、順番が逆ではありますが、お箸、Dockerというツールから入るのもいいかもしれません。</p>
+
+<p>まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。</p>
+
+<p>OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。</p>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">05 Nov 2015, 15:40</h1>
                 <section class="post">

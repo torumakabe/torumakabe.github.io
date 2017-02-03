@@ -1,13 +1,103 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Azure on re-imagine</title>
-    <link>http://torumakabe.github.io/categories/azure/</link>
-    <description>Recent content in Azure on re-imagine</description>
+    <title>re-imagine</title>
+    <link>http://torumakabe.github.io/categories/azure/index.xml</link>
+    <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure N-SeriesでPaintsChainerを動かす</title>
+      <link>http://torumakabe.github.io/post/paintschainer_on_azure/</link>
+      <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/paintschainer_on_azure/</guid>
+      <description>
+
+&lt;h2 id=&#34;paintschainer面白い&#34;&gt;PaintsChainer面白い&lt;/h2&gt;
+
+&lt;p&gt;クラスメソッドさんのDevelopers.IOでのエントリ&lt;a href=&#34;http://dev.classmethod.jp/cloud/paintschainer-on-ec2/&#34;&gt;&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;&lt;/a&gt;に、とても刺激をうけました。&lt;/p&gt;
+
+&lt;p&gt;畳みこみニューラルネットワークで白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと試せるのもいいですね。&lt;/p&gt;
+
+&lt;p&gt;せっかくなのでAzureでもやってみようと思います。Ubuntuで動かすサンプルとして見ていただいてもいいかと。&lt;/p&gt;
+
+&lt;p&gt;AzureでGPGPUが使えるVMはN-SeriesのNCです。&lt;/p&gt;
+
+&lt;h2 id=&#34;試した環境&#34;&gt;試した環境&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;米国中南部リージョン&lt;/li&gt;
+&lt;li&gt;Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)&lt;/li&gt;
+&lt;li&gt;Ubuntu 16.04&lt;/li&gt;
+&lt;li&gt;NSGはSSH(22)以外にHTTP(80)を受信許可&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;導入手順&#34;&gt;導入手順&lt;/h2&gt;
+
+&lt;h3 id=&#34;nvidia-tesla-driversのインストール&#34;&gt;NVIDIA Tesla driversのインストール&lt;/h3&gt;
+
+&lt;p&gt;マイクロソフト公式ドキュメントの通りに導入します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-n-series-driver-setup&#34;&gt;Set up GPU drivers for N-series VMs&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;dockerのインストール&#34;&gt;Dockerのインストール&lt;/h3&gt;
+
+&lt;p&gt;Docker公式ドキュメントの通りに導入します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.docker.com/engine/installation/linux/ubuntu/&#34;&gt;Get Docker for Ubuntu&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;nvidia-dockerのインストール&#34;&gt;NVIDIA Dockerのインストール&lt;/h3&gt;
+
+&lt;p&gt;GitHub上のNVIDIAのドキュメント通りに導入します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/NVIDIA/nvidia-docker&#34;&gt;NVIDIA Docker&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ここまでの作業に問題がないか、確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
+Using default tag: latest
+latest: Pulling from nvidia/cuda
+8aec416115fd: Pull complete
+[...]
+Status: Downloaded newer image for nvidia/cuda:latest
+Fri Feb  3 06:43:18 2017
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
+| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID  Type  Process name                               Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;paintschainer-dockerのインストール&#34;&gt;PaintsChainer-Dockerのインストール&lt;/h3&gt;
+
+&lt;p&gt;Liam Jones氏が公開している&lt;a href=&#34;https://github.com/liamjones/PaintsChainer-Docker&#34;&gt;PaintsChainer-Docker&lt;/a&gt;を使って、PainsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+
+&lt;p&gt;VMのパブリックIP、ポート80番にアクセスします。クラウディアさんの白黒画像ファイルで試してみましょう。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png&#34; alt=&#34;結果&#34; title=&#34;Cloudia&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;PaintsChainer、すごいなぁ。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
@@ -1846,99 +1936,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 &lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;(2016/3/25 追記) 回避策を&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/&#34;&gt;別エントリ&lt;/a&gt;に書きました&lt;/strong&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
-      <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
-      <description>
-
-&lt;h2 id=&#34;いつの間に&#34;&gt;いつの間に&lt;/h2&gt;
-
-&lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
-
-&lt;h2 id=&#34;ansible-localと組み合わせたサンプル&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
-
-&lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
-
-&lt;h3 id=&#34;前準備&#34;&gt;前準備&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
-&lt;li&gt;認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。&lt;/li&gt;
-&lt;li&gt;Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
-
-&lt;ul&gt;
-&lt;li&gt;Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;サンプル&#34;&gt;サンプル&lt;/h3&gt;
-
-&lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;variables&amp;quot;: {
-    &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot;
-  },
-  &amp;quot;builders&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;,
-
-    &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;,
-    &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;,
-
-    &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;,
-    &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;,
-
-    &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;,
-    &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;,
-    &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;,
-
-    &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;,
-    &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot;
-  }],
-  &amp;quot;provisioners&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/provision.sh&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;ansible-local&amp;quot;,
-    &amp;quot;playbook_file&amp;quot;: &amp;quot;../ansible/baseimage.yml&amp;quot;,
-    &amp;quot;inventory_file&amp;quot;: &amp;quot;../ansible/hosts&amp;quot;,
-    &amp;quot;role_paths&amp;quot;: [
-      &amp;quot;../ansible/roles/baseimage&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/deprovision.sh&amp;quot;
-    ]
-  }]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
-
-&lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
 </description>
     </item>
     

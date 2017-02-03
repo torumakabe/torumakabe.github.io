@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nvidia &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.17" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Nvidia &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Nvidia &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">03 Feb 2017, 18:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/paintschainer_on_azure/" class="post-title">Azure N-SeriesでPaintsChainerを動かす</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="paintschainer面白い">PaintsChainer面白い</h2>
+
+<p>クラスメソッドさんのDevelopers.IOでのエントリ<a href="http://dev.classmethod.jp/cloud/paintschainer-on-ec2/">&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;</a>に、とても刺激をうけました。</p>
+
+<p>畳みこみニューラルネットワークで白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと試せるのもいいですね。</p>
+
+<p>せっかくなのでAzureでもやってみようと思います。Ubuntuで動かすサンプルとして見ていただいてもいいかと。</p>
+
+<p>AzureでGPGPUが使えるVMはN-SeriesのNCです。</p>
+
+<h2 id="試した環境">試した環境</h2>
+
+<ul>
+<li>米国中南部リージョン</li>
+<li>Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)</li>
+<li>Ubuntu 16.04</li>
+<li>NSGはSSH(22)以外にHTTP(80)を受信許可</li>
+</ul>
+
+<h2 id="導入手順">導入手順</h2>
+
+<h3 id="nvidia-tesla-driversのインストール">NVIDIA Tesla driversのインストール</h3>
+
+<p>マイクロソフト公式ドキュメントの通りに導入します。</p>
+
+<p><a href="https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-n-series-driver-setup">Set up GPU drivers for N-series VMs</a></p>
+
+<h3 id="dockerのインストール">Dockerのインストール</h3>
+
+<p>Docker公式ドキュメントの通りに導入します。</p>
+
+<p><a href="https://docs.docker.com/engine/installation/linux/ubuntu/">Get Docker for Ubuntu</a></p>
+
+<h3 id="nvidia-dockerのインストール">NVIDIA Dockerのインストール</h3>
+
+<p>GitHub上のNVIDIAのドキュメント通りに導入します。</p>
+
+<p><a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Docker</a></p>
+
+<p>ここまでの作業に問題がないか、確認します。</p>
+
+<pre><code>$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
+Using default tag: latest
+latest: Pulling from nvidia/cuda
+8aec416115fd: Pull complete
+[...]
+Status: Downloaded newer image for nvidia/cuda:latest
+Fri Feb  3 06:43:18 2017
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
+| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID  Type  Process name                               Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
+</code></pre>
+
+<h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
+
+<p>Liam Jones氏が公開している<a href="https://github.com/liamjones/PaintsChainer-Docker">PaintsChainer-Docker</a>を使って、PainsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。</p>
+
+<pre><code>$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
+</code></pre>
+
+<h2 id="結果">結果</h2>
+
+<p>VMのパブリックIP、ポート80番にアクセスします。クラウディアさんの白黒画像ファイルで試してみましょう。</p>
+
+<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia" /></p>
+
+<p>PaintsChainer、すごいなぁ。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
