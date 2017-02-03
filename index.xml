@@ -21,9 +21,9 @@
 
 &lt;p&gt;クラスメソッドさんのDevelopers.IOでのエントリ&lt;a href=&#34;http://dev.classmethod.jp/cloud/paintschainer-on-ec2/&#34;&gt;&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;&lt;/a&gt;が、とても面白いです。&lt;/p&gt;
 
-&lt;p&gt;畳みこみニューラルネットワークで白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと試せるのもいいですね。&lt;/p&gt;
+&lt;p&gt;畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。&lt;/p&gt;
 
-&lt;p&gt;せっかくなのでAzureでもやってみようと思います。AzurerにはN-Series &amp;amp; NDIVIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintChainerを動かす参考手順として見ていただいてもいいかと。&lt;/p&gt;
+&lt;p&gt;せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp;amp; NDIVIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintChainerを動かす参考手順として見ていただいてもいいかと。&lt;/p&gt;
 
 &lt;h2 id=&#34;試した環境&#34;&gt;試した環境&lt;/h2&gt;
 
@@ -31,7 +31,7 @@
 &lt;li&gt;米国中南部リージョン&lt;/li&gt;
 &lt;li&gt;Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)&lt;/li&gt;
 &lt;li&gt;Ubuntu 16.04&lt;/li&gt;
-&lt;li&gt;NSGはSSH(22)以外にHTTP(80)を受信許可&lt;/li&gt;
+&lt;li&gt;NSGはSSH(22)の他にHTTP(80)を受信許可&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;導入手順&#34;&gt;導入手順&lt;/h2&gt;
