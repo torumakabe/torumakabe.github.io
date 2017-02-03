@@ -23,7 +23,7 @@
 
 &lt;p&gt;畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。&lt;/p&gt;
 
-&lt;p&gt;せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp;amp; NDIVIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintChainerを動かす参考手順として見ていただいてもいいかと。&lt;/p&gt;
+&lt;p&gt;せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp;amp; NDIVIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。&lt;/p&gt;
 
 &lt;h2 id=&#34;試した環境&#34;&gt;試した環境&lt;/h2&gt;
 
@@ -88,9 +88,9 @@ Fri Feb  3 06:43:18 2017
 &lt;pre&gt;&lt;code&gt;$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;paintchainerを使ってみる&#34;&gt;PaintChainerを使ってみる&lt;/h2&gt;
+&lt;h2 id=&#34;paintschainerを使ってみる&#34;&gt;PaintsChainerを使ってみる&lt;/h2&gt;
 
-&lt;p&gt;VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintChanerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。&lt;/p&gt;
+&lt;p&gt;VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintsChanerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png&#34; alt=&#34;結果&#34; title=&#34;Cloudia&#34; /&gt;&lt;/p&gt;
 
