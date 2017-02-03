@@ -18,13 +18,11 @@
 
 &lt;h2 id=&#34;paintschainer面白い&#34;&gt;PaintsChainer面白い&lt;/h2&gt;
 
-&lt;p&gt;クラスメソッドさんのDevelopers.IOでのエントリ&lt;a href=&#34;http://dev.classmethod.jp/cloud/paintschainer-on-ec2/&#34;&gt;&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;&lt;/a&gt;に、とても刺激をうけました。&lt;/p&gt;
+&lt;p&gt;クラスメソッドさんのDevelopers.IOでのエントリ&lt;a href=&#34;http://dev.classmethod.jp/cloud/paintschainer-on-ec2/&#34;&gt;&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;&lt;/a&gt;が、とても面白いです。&lt;/p&gt;
 
 &lt;p&gt;畳みこみニューラルネットワークで白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと試せるのもいいですね。&lt;/p&gt;
 
-&lt;p&gt;せっかくなのでAzureでもやってみようと思います。Ubuntuで動かすサンプルとして見ていただいてもいいかと。&lt;/p&gt;
-
-&lt;p&gt;AzureでGPGPUが使えるVMはN-SeriesのNCです。&lt;/p&gt;
+&lt;p&gt;せっかくなのでAzureでもやってみようと思います。AzurerにはN-Series &amp;amp; NDIVIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintChainerを動かす参考手順として見ていただいてもいいかと。&lt;/p&gt;
 
 &lt;h2 id=&#34;試した環境&#34;&gt;試した環境&lt;/h2&gt;
 
@@ -89,9 +87,9 @@ Fri Feb  3 06:43:18 2017
 &lt;pre&gt;&lt;code&gt;$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+&lt;h2 id=&#34;paintchainerを使ってみる&#34;&gt;PaintChainerを使ってみる&lt;/h2&gt;
 
-&lt;p&gt;VMのパブリックIP、ポート80番にアクセスします。クラウディアさんの白黒画像ファイルで試してみましょう。&lt;/p&gt;
+&lt;p&gt;VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintChanerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png&#34; alt=&#34;結果&#34; title=&#34;Cloudia&#34; /&gt;&lt;/p&gt;
 
