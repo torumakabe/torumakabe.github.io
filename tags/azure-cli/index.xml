@@ -96,7 +96,7 @@ Mode                LastWriteTime         Length Name
 -a----       2017/02/28      8:30            374 azuredeploy.parameters.json
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;いくつかのファイルとサブディレクトリがあります。&lt;/p&gt;
+&lt;p&gt;いくつかのファイルがあります。&lt;/p&gt;
 
 &lt;p&gt;コンテナを起動してみましょう。az_cli functionを呼びます。&lt;/p&gt;
 
