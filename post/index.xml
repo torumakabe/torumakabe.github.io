@@ -22,7 +22,7 @@
 &lt;ul&gt;
 &lt;li&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/li&gt;
 &lt;li&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/li&gt;
-&lt;li&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/li&gt;
+&lt;li&gt;ARMテンプレートでManaged Diskを作る時のコツ&lt;/li&gt;
 &lt;li&gt;可用性セットを意識しよう&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -42,7 +42,7 @@
 
 &lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension&#34;&gt;Get VS Code and extension&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;armテンプレートでmanaged-osdiskを作る時のコツ&#34;&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/h2&gt;
+&lt;h2 id=&#34;armテンプレートでmanaged-diskを作る時のコツ&#34;&gt;ARMテンプレートでManaged Diskを作る時のコツ&lt;/h2&gt;
 
 &lt;p&gt;Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。&lt;/p&gt;
 
