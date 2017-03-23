@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.17" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Azure Resource Manager テンプレートでManaged Diskを作るときのコツ &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Azure Resource Manager テンプレートでManaged Diskを作るときのコツ &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/arm_template_managed_disk/" data-title="Azure Resource Manager テンプレートでManaged Diskを作るときのコツ" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/arm_template_managed_disk/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/arm_template_managed_disk/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
+
+<ul>
+<li>ARMテンプレートのドキュメントが使いやすくなった</li>
+<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
+<li>ARMテンプレートでManaged OSDiskを作る時のコツ</li>
+<li>可用性セットを意識しよう</li>
+</ul>
+
+<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
+
+<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
+
+<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
+
+<p>これがあまり知られてないようなのでアピールしておきます。</p>
+
+<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
+
+<p>コードアシストしてくれます。</p>
+
+<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
+
+<h2 id="armテンプレートでmanaged-osdiskを作る時のコツ">ARMテンプレートでManaged OSDiskを作る時のコツ</h2>
+
+<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
+
+<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に作れますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
+
+<pre><code>&quot;osDisk&quot;: {
+  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
+  &quot;createOption&quot;: &quot;FromImage&quot;,
+  &quot;managedDisk&quot;: {
+    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
+  },
+  &quot;diskSizeGB&quot;: 128
+}
+</code></pre>
+
+<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
+
+<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
+
+<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
+
+<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
+
+<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
+
+<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン&rdquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
+
+<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
+
+<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
+
+<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
+
+<pre><code>{
+  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
+  &quot;name&quot;: &quot;AvSet01&quot;,
+  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
+  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
+  &quot;properties&quot;: {
+    &quot;managed&quot;: true,
+    &quot;platformFaultDomainCount&quot;: 2,
+    &quot;platformUpdateDomainCount&quot;: 5
+  }
+},
+</code></pre>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
+
+<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
+
+<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
+
+<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+</code></pre>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

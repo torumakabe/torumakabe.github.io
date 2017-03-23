@@ -68,6 +68,93 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">25 Aug 2016, 16:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/oms_container_linux/" class="post-title">OMSでLinuxコンテナのログを分析する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
+
+<p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
+
+<p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
+
+<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
+
+<ul>
+<li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
+
+<ul>
+<li>収集データの詳細 - <a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">Containers data collection details</a></li>
+</ul></li>
+<li>導入が楽ちん
+
+<ol>
+<li>OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる</li>
+<li>コンテナホストに直接OMS Agentを導入することもできる</li>
+</ol></li>
+</ul>
+
+<p>1がコンテナ的でいいですよね。実現イメージはこんな感じです。</p>
+
+<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" title="from microsoft.com" /></p>
+
+<p>これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。</p>
+
+<p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
+
+<h2 id="手順">手順</h2>
+
+<ul>
+<li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
+
+<ul>
+<li>Azureのサブスクリプションを持っている場合、&rdquo;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
+</ul></li>
+<li>OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加</li>
+<li>UbuntuにDockerを導入
+
+<ul>
+<li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
+<li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
+</ul></li>
+<li>OMSエージェントコンテナを導入
+
+<ul>
+<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
+</ul></li>
+</ul>
+
+<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
+</code></pre>
+
+<p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
+
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com" /></p>
+
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com" /></p>
+
+<p>なんと簡単じゃありませんか。詳細が気になるかたは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/">こちら</a>から。</p>
+
+<p>なお、フィードバック<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">熱烈歓迎</a>だそうです。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">21 May 2016, 11:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -865,191 +952,6 @@ module.exports = function (context, req) {
 <h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_pageblob_billable_linux/" class="post-title">Azure Linux VMのディスク利用料節約Tips</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
-
-<p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
-
-<p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
-
-<pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
-
-空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
-</code></pre>
-
-<p>詳細な定義は、以下で。</p>
-
-<p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
-
-<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
-
-<p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
-
-<ul>
-<li>RHEL 7.2 on Azure</li>
-<li>XFS &amp; Ext4</li>
-<li>10GBytesのPage Blobの上にファイルシステムを作成</li>
-<li>mkfsはデフォルト</li>
-<li>mountはデフォルトとdiscardオプションありの2パターン</li>
-<li>MD、LVM構成にしない</li>
-<li>以下のタイミングで課金対象容量を確認
-
-<ul>
-<li>Page BlobのVMアタッチ時</li>
-<li>ファイルシステム作成時</li>
-<li>マウント時</li>
-<li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
-<li>5GBytesのファイル削除時</li>
-</ul></li>
-</ul>
-
-<p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
-
-<pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
-
-$blobSizeInBytes = 124 + $Blob.Name.Length * 2
-
-$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
-while ($metadataEnumerator.MoveNext())
-{
-    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
-}
-
-$Blob.ICloudBlob.GetPageRanges() | 
-    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
-
-return $blobSizeInBytes
-</code></pre>
-
-<p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
-
-<h2 id="結果">結果</h2>
-
-<h3 id="xfs">XFS</h3>
-
-<table>
-<thead>
-<tr>
-<th align="left">　確認タイミング　</th>
-<th align="right">　課金対象容量(Bytes)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Page BlobのVMアタッチ時</td>
-<td align="right">960</td>
-</tr>
-
-<tr>
-<td align="left">ファイルシステム作成時</td>
-<td align="right">10,791,949</td>
-</tr>
-
-<tr>
-<td align="left">マウント時</td>
-<td align="right">10,791,949</td>
-</tr>
-
-<tr>
-<td align="left">5GBytesのデータ書き込み時</td>
-<td align="right">5,253,590,051</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時</td>
-<td align="right">5,253,590,051</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時 (discard)</td>
-<td align="right">10,710,029</td>
-</tr>
-</tbody>
-</table>
-
-<h3 id="ext4">Ext4</h3>
-
-<table>
-<thead>
-<tr>
-<th align="left">　確認タイミング　</th>
-<th align="right">　課金対象容量(Bytes)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Page BlobのVMアタッチ時</td>
-<td align="right">960</td>
-</tr>
-
-<tr>
-<td align="left">ファイルシステム作成時</td>
-<td align="right">138,683,592</td>
-</tr>
-
-<tr>
-<td align="left">マウント時</td>
-<td align="right">306,451,689</td>
-</tr>
-
-<tr>
-<td align="left">5GBytesのデータ書き込み時</td>
-<td align="right">5,549,470,887</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時</td>
-<td align="right">5,549,470,887</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時 (discard)</td>
-<td align="right">306,586,780</td>
-</tr>
-</tbody>
-</table>
-
-<p>この結果から、以下のことがわかります。</p>
-
-<ul>
-<li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
-<li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
-<li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
-
-<ul>
-<li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
-<li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
-<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a>
-
-<br /></li>
-</ul></li>
-</ul>
-
-<p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
 
                     </div>
                 </section>

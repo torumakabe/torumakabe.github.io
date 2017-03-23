@@ -9,6 +9,101 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
+      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
+      <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
+      <description>
+
+&lt;h2 id=&#34;お伝えしたいこと&#34;&gt;お伝えしたいこと&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/li&gt;
+&lt;li&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/li&gt;
+&lt;li&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/li&gt;
+&lt;li&gt;可用性セットを意識しよう&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;armテンプレートのドキュメントが使いやすくなった&#34;&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/h2&gt;
+
+&lt;p&gt;docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/&#34;&gt;使いやすくなりました&lt;/a&gt;。ARMテンプレート使いのみなさまは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/&#34;&gt;https://docs.microsoft.com/ja-jp/azure/templates/&lt;/a&gt; をブックマークして、サクサク調べちゃってください。&lt;/p&gt;
+
+&lt;h2 id=&#34;visual-studio-codeとazure-resource-manager-toolsを使おう&#34;&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/h2&gt;
+
+&lt;p&gt;これがあまり知られてないようなのでアピールしておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png&#34; alt=&#34;コードアシスト&#34; title=&#34;コードアシスト&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;コードアシストしてくれます。&lt;/p&gt;
+
+&lt;p&gt;画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension&#34;&gt;Get VS Code and extension&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;armテンプレートでmanaged-osdiskを作る時のコツ&#34;&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。&lt;/p&gt;
+
+&lt;p&gt;Managed Diskは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks&#34;&gt;Microsoft.Compute/disks&lt;/a&gt;  で個別に作れますが、省略もできます。&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines&#34;&gt;Microsoft.Compute/virtualMachines&lt;/a&gt; の中に書いてしまうやり口です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;osDisk&amp;quot;: {
+  &amp;quot;name&amp;quot;: &amp;quot;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&amp;quot;,
+  &amp;quot;createOption&amp;quot;: &amp;quot;FromImage&amp;quot;,
+  &amp;quot;managedDisk&amp;quot;: {
+    &amp;quot;storageAccountType&amp;quot;: &amp;quot;Standard_LRS&amp;quot;
+  },
+  &amp;quot;diskSizeGB&amp;quot;: 128
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じで書けます。ポイントはサイズ指定 &amp;ldquo;diskSizeGB&amp;rdquo; の位置です。&amp;rdquo;managedDisk&amp;rdquo;の下ではありません。おじさんちょっと悩みました。&lt;/p&gt;
+
+&lt;h2 id=&#34;可用性セットを意識しよう&#34;&gt;可用性セットを意識しよう&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。&lt;/p&gt;
+
+&lt;p&gt;Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf&#34;&gt;参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;可用性セットは、電源とネットワークを共有するグループである&amp;rdquo;障害ドメイン&amp;rdquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg&#34; alt=&#34;Unmanaged vs Managed&#34; title=&#34;Unmanaged vs Managed&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。&lt;/p&gt;
+
+&lt;p&gt;さて、この場合の可用性セット定義ですが、以下のように書きます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/availabilitySets&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;AvSet01&amp;quot;,
+  &amp;quot;apiVersion&amp;quot;: &amp;quot;2016-04-30-preview&amp;quot;,
+  &amp;quot;location&amp;quot;: &amp;quot;[resourceGroup().location]&amp;quot;,
+  &amp;quot;properties&amp;quot;: {
+    &amp;quot;managed&amp;quot;: true,
+    &amp;quot;platformFaultDomainCount&amp;quot;: 2,
+    &amp;quot;platformUpdateDomainCount&amp;quot;: 5
+  }
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets&#34;&gt;Microsoft.Compute/availabilitySets&lt;/a&gt; を読むと、Managed Diskを使う場合は&amp;rdquo;propaties&amp;rdquo;の&amp;rdquo;managed&amp;rdquo;をtrueにすべし、とあります。なるほど。&lt;/p&gt;
+
+&lt;p&gt;そしてポイントです。合わせて&amp;rdquo;platformFaultDomainCount&amp;rdquo;を指定してください。managedにする場合は必須パラメータです。&lt;/p&gt;
+
+&lt;p&gt;なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks&#34;&gt;Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
       <link>http://torumakabe.github.io/post/dockerforwin_azurecli2/</link>
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
@@ -1898,126 +1993,6 @@ PS C:\work&amp;gt; Add-AzureRmLogAlertRule -Name createdVM -Location &amp;quot;J
 &lt;p&gt;以上。これで&amp;rdquo;dev&amp;rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。&lt;/p&gt;
 
 &lt;p&gt;なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
-      <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
-      <description>
-
-&lt;h2 id=&#34;俺の屍を越えていけ&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
-
-&lt;p&gt;今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。この週末お楽しみ、という人も多いかもしれません。&lt;/p&gt;
-
-&lt;p&gt;小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。&lt;/p&gt;
-
-&lt;h2 id=&#34;この3つは触る前から意識しよう&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;ARMテンプレートリソースは分離して使う&lt;/li&gt;
-&lt;li&gt;リソース競合したら依存関係を定義する&lt;/li&gt;
-&lt;li&gt;公開鍵認証SSH指定でエラーが出ても驚かない&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
-
-&lt;p&gt;v0.6.14で、リソース&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html&#34;&gt;&amp;ldquo;azurerm_template_deployment&amp;rdquo;&lt;/a&gt;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。&lt;/p&gt;
-
-&lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
-
-&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
-
-&lt;p&gt;避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
-
-&lt;h3 id=&#34;タイムアウトしがち&#34;&gt;タイムアウトしがち&lt;/h3&gt;
-
-&lt;p&gt;それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;
-
-&lt;h3 id=&#34;せっかくのリソースグラフを活用できない&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
-
-&lt;p&gt;Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;
-
-&lt;h3 id=&#34;読みづらい&#34;&gt;読みづらい&lt;/h3&gt;
-
-&lt;p&gt;Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;
-
-&lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
-
-&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
-
-&lt;p&gt;Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&lt;a href=&#34;https://www.terraform.io/intro/getting-started/dependencies.html&#34;&gt;&amp;ldquo;depends_on&amp;rdquo;&lt;/a&gt;で明示してあげましょう。&lt;/p&gt;
-
-&lt;p&gt;例えば、&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_429_workaround/&#34;&gt;以前のエントリ&lt;/a&gt;で紹介した下記の問題。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい&lt;/li&gt;
-&lt;li&gt;セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを&lt;strong&gt;作成したら/存在したら&lt;/strong&gt;次にすすむ」というTerraformのグラフでうまく表現できないようです。&lt;/p&gt;
-
-&lt;p&gt;そのような場合、明示的に依存関係を&amp;rdquo;depends_on&amp;rdquo;で定義します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Create a frontend subnet
-# &amp;quot;depends_on&amp;quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
-    name = &amp;quot;frontend&amp;quot;
-    resource_group_name = &amp;quot;${var.resource_group_name}&amp;quot;
-    virtual_network_name = &amp;quot;${azurerm_virtual_network.vnet1.name}&amp;quot;
-    address_prefix = &amp;quot;${var.vnet1_frontend_address_prefix}&amp;quot;
-    network_security_group_id = &amp;quot;${azurerm_network_security_group.frontend.id}&amp;quot;
-    depends_on = [
-        &amp;quot;azurerm_network_security_rule.fe_web80&amp;quot;,
-        &amp;quot;azurerm_network_security_rule.fe_web443&amp;quot;,
-        &amp;quot;azurerm_network_security_rule.fe_ssh&amp;quot;
-    ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。&lt;/p&gt;
-
-&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
-
-&lt;p&gt;TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &amp;quot;/home/${var.adminuser}/.ssh/authorized_keys&amp;quot;
-        key_data = &amp;quot;${file(&amp;quot;/Users/you/.ssh/yourkey.pem&amp;quot;)}&amp;quot;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;が、エラーが返ってきます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;amp;errors.errorString{s:&amp;quot;Invalid address to set: []string{\&amp;quot;os_profile_linux_config\&amp;quot;, \&amp;quot;12345678\&amp;quot;, \&amp;quot;ssh_keys\&amp;quot;}&amp;quot;}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。&lt;/p&gt;
-
-&lt;p&gt;妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5793&#34;&gt;Issueとして認識&lt;/a&gt;されていますので、修正を待ちましょう。&lt;/p&gt;
 </description>
     </item>
     

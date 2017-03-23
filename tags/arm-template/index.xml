@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>re-imagine</title>
+    <link>http://torumakabe.github.io/tags/arm-template/index.xml</link>
+    <description>Recent content on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <atom:link href="http://torumakabe.github.io/tags/arm-template/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
+      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
+      <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
+      <description>
+
+&lt;h2 id=&#34;お伝えしたいこと&#34;&gt;お伝えしたいこと&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/li&gt;
+&lt;li&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/li&gt;
+&lt;li&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/li&gt;
+&lt;li&gt;可用性セットを意識しよう&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;armテンプレートのドキュメントが使いやすくなった&#34;&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/h2&gt;
+
+&lt;p&gt;docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/&#34;&gt;使いやすくなりました&lt;/a&gt;。ARMテンプレート使いのみなさまは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/&#34;&gt;https://docs.microsoft.com/ja-jp/azure/templates/&lt;/a&gt; をブックマークして、サクサク調べちゃってください。&lt;/p&gt;
+
+&lt;h2 id=&#34;visual-studio-codeとazure-resource-manager-toolsを使おう&#34;&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/h2&gt;
+
+&lt;p&gt;これがあまり知られてないようなのでアピールしておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png&#34; alt=&#34;コードアシスト&#34; title=&#34;コードアシスト&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;コードアシストしてくれます。&lt;/p&gt;
+
+&lt;p&gt;画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension&#34;&gt;Get VS Code and extension&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;armテンプレートでmanaged-osdiskを作る時のコツ&#34;&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。&lt;/p&gt;
+
+&lt;p&gt;Managed Diskは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks&#34;&gt;Microsoft.Compute/disks&lt;/a&gt;  で個別に作れますが、省略もできます。&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines&#34;&gt;Microsoft.Compute/virtualMachines&lt;/a&gt; の中に書いてしまうやり口です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;osDisk&amp;quot;: {
+  &amp;quot;name&amp;quot;: &amp;quot;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&amp;quot;,
+  &amp;quot;createOption&amp;quot;: &amp;quot;FromImage&amp;quot;,
+  &amp;quot;managedDisk&amp;quot;: {
+    &amp;quot;storageAccountType&amp;quot;: &amp;quot;Standard_LRS&amp;quot;
+  },
+  &amp;quot;diskSizeGB&amp;quot;: 128
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じで書けます。ポイントはサイズ指定 &amp;ldquo;diskSizeGB&amp;rdquo; の位置です。&amp;rdquo;managedDisk&amp;rdquo;の下ではありません。おじさんちょっと悩みました。&lt;/p&gt;
+
+&lt;h2 id=&#34;可用性セットを意識しよう&#34;&gt;可用性セットを意識しよう&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。&lt;/p&gt;
+
+&lt;p&gt;Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf&#34;&gt;参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;可用性セットは、電源とネットワークを共有するグループである&amp;rdquo;障害ドメイン&amp;rdquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg&#34; alt=&#34;Unmanaged vs Managed&#34; title=&#34;Unmanaged vs Managed&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。&lt;/p&gt;
+
+&lt;p&gt;さて、この場合の可用性セット定義ですが、以下のように書きます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/availabilitySets&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;AvSet01&amp;quot;,
+  &amp;quot;apiVersion&amp;quot;: &amp;quot;2016-04-30-preview&amp;quot;,
+  &amp;quot;location&amp;quot;: &amp;quot;[resourceGroup().location]&amp;quot;,
+  &amp;quot;properties&amp;quot;: {
+    &amp;quot;managed&amp;quot;: true,
+    &amp;quot;platformFaultDomainCount&amp;quot;: 2,
+    &amp;quot;platformUpdateDomainCount&amp;quot;: 5
+  }
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets&#34;&gt;Microsoft.Compute/availabilitySets&lt;/a&gt; を読むと、Managed Diskを使う場合は&amp;rdquo;propaties&amp;rdquo;の&amp;rdquo;managed&amp;rdquo;をtrueにすべし、とあります。なるほど。&lt;/p&gt;
+
+&lt;p&gt;そしてポイントです。合わせて&amp;rdquo;platformFaultDomainCount&amp;rdquo;を指定してください。managedにする場合は必須パラメータです。&lt;/p&gt;
+
+&lt;p&gt;なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks&#34;&gt;Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

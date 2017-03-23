@@ -68,6 +68,113 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
+
+<ul>
+<li>ARMテンプレートのドキュメントが使いやすくなった</li>
+<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
+<li>ARMテンプレートでManaged OSDiskを作る時のコツ</li>
+<li>可用性セットを意識しよう</li>
+</ul>
+
+<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
+
+<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
+
+<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
+
+<p>これがあまり知られてないようなのでアピールしておきます。</p>
+
+<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
+
+<p>コードアシストしてくれます。</p>
+
+<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
+
+<h2 id="armテンプレートでmanaged-osdiskを作る時のコツ">ARMテンプレートでManaged OSDiskを作る時のコツ</h2>
+
+<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
+
+<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に作れますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
+
+<pre><code>&quot;osDisk&quot;: {
+  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
+  &quot;createOption&quot;: &quot;FromImage&quot;,
+  &quot;managedDisk&quot;: {
+    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
+  },
+  &quot;diskSizeGB&quot;: 128
+}
+</code></pre>
+
+<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
+
+<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
+
+<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
+
+<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
+
+<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
+
+<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン&rdquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
+
+<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
+
+<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
+
+<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
+
+<pre><code>{
+  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
+  &quot;name&quot;: &quot;AvSet01&quot;,
+  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
+  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
+  &quot;properties&quot;: {
+    &quot;managed&quot;: true,
+    &quot;platformFaultDomainCount&quot;: 2,
+    &quot;platformUpdateDomainCount&quot;: 5
+  }
+},
+</code></pre>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
+
+<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
+
+<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
+
+<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+</code></pre>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">28 Feb 2017, 08:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -509,87 +616,12 @@ Fri Feb  3 06:43:18 2017
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">14 Sep 2016, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/bashonwindows_nvm/" class="post-title">Bash on WindowsでNode開発環境を作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Node" href="http://torumakabe.github.io//categories/node">Node</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="bash-on-windows-現時点での使いどころ">Bash on Windows 現時点での使いどころ</h2>
-
-<p>Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。</p>
-
-<p>たとえばNodeのバージョン管理。Windowsには<a href="https://github.com/marcelklehr/nodist">nodist</a>がありますが、Linux/Macでは動きません。Linux/Macで使ってる<a href="https://github.com/creationix/nvm">NVM</a>がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。</p>
-
-<p>最近、Azure FunctionsでNode v6.4.0が<a href="https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/">使えるようになった</a>ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。</p>
-
-<h2 id="nvmのインストール">NVMのインストール</h2>
-
-<ul>
-<li>Bash on Ubuntu on Windowsを入れます (<a href="http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html">参考</a>)</li>
-<li>Bash on Ubuntu on Windowsを起動します</li>
-<li>build-essentialとlibssl-devを入れます</li>
-</ul>
-
-<pre><code>sudo apt-get install build-essential checkinstall
-sudo apt-get install libssl-dev
-</code></pre>
-
-<ul>
-<li>インストールスクリプトを流します</li>
-</ul>
-
-<pre><code>curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
-</code></pre>
-
-<p>バージョンアップを考慮し、インストールのつど<a href="https://github.com/creationix/nvm">公式ページ</a>を確認してください。</p>
-
-<p>以上。</p>
-
-<h2 id="nvmの使い方">NVMの使い方</h2>
-
-<pre><code>nvm install 6.4.0
-</code></pre>
-
-<p>指定のバージョンをインストールします。</p>
-
-<pre><code>nvm use 6.4.0
-</code></pre>
-
-<p>使うバージョンを指定します。</p>
-
-<p>簡単ですね。</p>
-
-<pre><code>cd /mnt/c/your_work_directory
-node ./index.js
-</code></pre>
-
-<p>なんて感じで、書いたコードをテストしちゃってください。</p>
-
-<p>なお、Visual Studio Code使いの人は<a href="https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/">統合ターミナルをBashにしておく</a>と、さらに幸せになれます。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 9</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 10</span>
     
       <a href="/post/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

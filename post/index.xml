@@ -6,8 +6,103 @@
     <description>Recent content in Post-rsses on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 28 Feb 2017 08:00:30 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 23 Mar 2017 15:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
+      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
+      <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
+      <description>
+
+&lt;h2 id=&#34;お伝えしたいこと&#34;&gt;お伝えしたいこと&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/li&gt;
+&lt;li&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/li&gt;
+&lt;li&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/li&gt;
+&lt;li&gt;可用性セットを意識しよう&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;armテンプレートのドキュメントが使いやすくなった&#34;&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/h2&gt;
+
+&lt;p&gt;docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/&#34;&gt;使いやすくなりました&lt;/a&gt;。ARMテンプレート使いのみなさまは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/&#34;&gt;https://docs.microsoft.com/ja-jp/azure/templates/&lt;/a&gt; をブックマークして、サクサク調べちゃってください。&lt;/p&gt;
+
+&lt;h2 id=&#34;visual-studio-codeとazure-resource-manager-toolsを使おう&#34;&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/h2&gt;
+
+&lt;p&gt;これがあまり知られてないようなのでアピールしておきます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png&#34; alt=&#34;コードアシスト&#34; title=&#34;コードアシスト&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;コードアシストしてくれます。&lt;/p&gt;
+
+&lt;p&gt;画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension&#34;&gt;Get VS Code and extension&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;armテンプレートでmanaged-osdiskを作る時のコツ&#34;&gt;ARMテンプレートでManaged OSDiskを作る時のコツ&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。&lt;/p&gt;
+
+&lt;p&gt;Managed Diskは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks&#34;&gt;Microsoft.Compute/disks&lt;/a&gt;  で個別に作れますが、省略もできます。&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines&#34;&gt;Microsoft.Compute/virtualMachines&lt;/a&gt; の中に書いてしまうやり口です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;osDisk&amp;quot;: {
+  &amp;quot;name&amp;quot;: &amp;quot;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&amp;quot;,
+  &amp;quot;createOption&amp;quot;: &amp;quot;FromImage&amp;quot;,
+  &amp;quot;managedDisk&amp;quot;: {
+    &amp;quot;storageAccountType&amp;quot;: &amp;quot;Standard_LRS&amp;quot;
+  },
+  &amp;quot;diskSizeGB&amp;quot;: 128
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じで書けます。ポイントはサイズ指定 &amp;ldquo;diskSizeGB&amp;rdquo; の位置です。&amp;rdquo;managedDisk&amp;rdquo;の下ではありません。おじさんちょっと悩みました。&lt;/p&gt;
+
+&lt;h2 id=&#34;可用性セットを意識しよう&#34;&gt;可用性セットを意識しよう&lt;/h2&gt;
+
+&lt;p&gt;Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。&lt;/p&gt;
+
+&lt;p&gt;Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf&#34;&gt;参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;可用性セットは、電源とネットワークを共有するグループである&amp;rdquo;障害ドメイン&amp;rdquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg&#34; alt=&#34;Unmanaged vs Managed&#34; title=&#34;Unmanaged vs Managed&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。&lt;/p&gt;
+
+&lt;p&gt;さて、この場合の可用性セット定義ですが、以下のように書きます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/availabilitySets&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;AvSet01&amp;quot;,
+  &amp;quot;apiVersion&amp;quot;: &amp;quot;2016-04-30-preview&amp;quot;,
+  &amp;quot;location&amp;quot;: &amp;quot;[resourceGroup().location]&amp;quot;,
+  &amp;quot;properties&amp;quot;: {
+    &amp;quot;managed&amp;quot;: true,
+    &amp;quot;platformFaultDomainCount&amp;quot;: 2,
+    &amp;quot;platformUpdateDomainCount&amp;quot;: 5
+  }
+},
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets&#34;&gt;Microsoft.Compute/availabilitySets&lt;/a&gt; を読むと、Managed Diskを使う場合は&amp;rdquo;propaties&amp;rdquo;の&amp;rdquo;managed&amp;rdquo;をtrueにすべし、とあります。なるほど。&lt;/p&gt;
+
+&lt;p&gt;そしてポイントです。合わせて&amp;rdquo;platformFaultDomainCount&amp;rdquo;を指定してください。managedにする場合は必須パラメータです。&lt;/p&gt;
+
+&lt;p&gt;なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks&#34;&gt;Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
@@ -1841,127 +1936,6 @@ root@a1234bc5d67d:/cntk#
 &lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
 
 &lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
-      <link>http://torumakabe.github.io/post/azure_auditlog_alert/</link>
-      <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_auditlog_alert/</guid>
-      <description>
-
-&lt;h2 id=&#34;監査ログからアラートを上げられるようになります&#34;&gt;監査ログからアラートを上げられるようになります&lt;/h2&gt;
-
-&lt;p&gt;Azureの監査ログからアラートを上げる機能のプレビューが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/&#34;&gt;はじまりました&lt;/a&gt;。これ、地味ですが便利な機能です。日々の運用に効きます。&lt;/p&gt;
-
-&lt;h2 id=&#34;どんな風に使えるか&#34;&gt;どんな風に使えるか&lt;/h2&gt;
-
-&lt;p&gt;ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。&lt;/p&gt;
-
-&lt;p&gt;たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。&lt;/p&gt;
-
-&lt;p&gt;これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。&lt;/p&gt;
-
-&lt;p&gt;これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。&lt;/p&gt;
-
-&lt;h2 id=&#34;実装例&#34;&gt;実装例&lt;/h2&gt;
-
-&lt;p&gt;例としてこんな仕組みを作ってみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;西日本リージョンのリソースグループ&amp;rdquo;dev&amp;rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行&lt;/li&gt;
-&lt;li&gt;WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する&lt;/li&gt;
-&lt;li&gt;OMSでログ分析&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;準備&#34;&gt;準備&lt;/h2&gt;
-
-&lt;p&gt;以下の準備ができているか確認します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azure Automation向けADアプリ、サービスプリンシパル作成&lt;/li&gt;
-&lt;li&gt;サービスプリンシパルへのロール割り当て&lt;/li&gt;
-&lt;li&gt;Azure Automationのアカウント作成&lt;/li&gt;
-&lt;li&gt;Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録&lt;/li&gt;
-&lt;li&gt;Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています)&lt;/li&gt;
-&lt;li&gt;OMSワークスペースの作成&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5&#34;&gt;勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automation側の仕掛け&#34;&gt;Azure Automation側の仕掛け&lt;/h2&gt;
-
-&lt;p&gt;先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。&lt;/p&gt;
-
-&lt;p&gt;ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;param ( 
-    [object]$WebhookData          
-)
-
-if ($WebhookData -ne $null) {  
-    $WebhookName    =   $WebhookData.WebhookName
-    $WebhookBody    =   $WebhookData.RequestBody  
-    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody)
-
-    $AlertContext = [object]$WebhookBody.context
-
-    $SPAppID = Get-AutomationVariable -Name &#39;SPAppID&#39;
-    $Tenant = Get-AutomationVariable -Name &#39;TenantID&#39;
-    $OMSWorkspaceId = Get-AutomationVariable -Name &#39;OMSWorkspaceId&#39;
-    $OMSWorkspaceKey = Get-AutomationVariable -Name &#39;OMSWorkspaceKey&#39;
-    $CertificationName = Get-AutomationVariable -Name &#39;CertificationName&#39;
-    $Certificate = Get-AutomationCertificate -Name $CertificationName
-    $CertThumbprint = ($Certificate.Thumbprint).ToString()    
-
-    $null = Login-AzureRmAccount -ServicePrincipal -TenantId $Tenant -CertificateThumbprint $CertThumbprint -ApplicationId $SPAppID   
-
-    $resourceObj = Get-AzureRmResource -ResourceId $AlertContext.resourceId
-    $VM = Get-AzureRmVM -Name $resourceObj.Name -ResourceGroupName $resourceObj.ResourceGroupName
-
-    $Settings = @{&amp;quot;workspaceId&amp;quot; = &amp;quot;$OMSWorkspaceId&amp;quot;}
-    $ProtectedSettings = @{&amp;quot;workspaceKey&amp;quot; = &amp;quot;$OMSWorkspaceKey&amp;quot;}
-
-    if ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Linux&amp;quot;) {  
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;OmsAgentForLinux&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;OmsAgentForLinux&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    elseif ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Windows&amp;quot;)
-    {
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;MicrosoftMonitoringAgent&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;MicrosoftMonitoringAgent&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    else
-    {
-        Write-Error &amp;quot;Unknown OS Type.&amp;quot;
-    }
-}
-else 
-{
-    Write-Error &amp;quot;This runbook is meant to only be started from a webhook.&amp;quot; 
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Runbookができたら、Webhookを作ります。詳しくは&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/automation-webhooks/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;WebhookのURLを控えておいてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-監査ログアラート側の仕掛け&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h2&gt;
-
-&lt;p&gt;Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\work&amp;gt; $actionEmail = New-AzureRmAlertRuleEmail -CustomEmail yourname@example.com
-
-PS C:\work&amp;gt; $actionWebhook = New-AzureRmAlertRuleWebhook -ServiceUri https://abcdefgh.azure-automation.net/webhooks?token=your_token
-
-PS C:\work&amp;gt; Add-AzureRmLogAlertRule -Name createdVM -Location &amp;quot;Japan West&amp;quot; -ResourceGroup dev -OperationName Microsoft.Compute/virtualMachines/write -Status Succeeded  -SubStatus Created -TargetResourceGroup dev -Actions $actionEmail,$actionWebhook
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。これで&amp;rdquo;dev&amp;rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。&lt;/p&gt;
-
-&lt;p&gt;なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。&lt;/p&gt;
 </description>
     </item>
     
