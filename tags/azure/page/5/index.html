@@ -68,6 +68,341 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">11 Feb 2016, 12:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azureblobupload_perf/" class="post-title">Azure Blob Upload ツール別ベンチマーク</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="同じ目的を達成できるツールがたくさん">同じ目的を達成できるツールがたくさん</h2>
+
+<p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
+
+<p>端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。</p>
+
+<p>そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。</p>
+
+<p>で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。</p>
+
+<p>なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
+
+<h2 id="環境と測定方式">環境と測定方式</h2>
+
+<p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
+
+<p>環境は以下の通り。</p>
+
+<ul>
+<li>Windows端末
+
+<ul>
+<li>Surface Pro 4 Core i7/16GB Memory/802.11ac</li>
+<li>1Gbps Ethernet (USB経由)</li>
+<li>Windows 10 (1511)</li>
+</ul></li>
+<li>Mac端末
+
+<ul>
+<li>Macbook 12inch Core M/8GB Memory/802.11ac</li>
+<li>USB-C&hellip; 有線テストは省きます</li>
+<li>El Capitan</li>
+</ul></li>
+<li>Wi-Fiアクセスポイント/端末間帯域
+
+<ul>
+<li>100~200Mbpsでつながっています</li>
+</ul></li>
+<li>Azureデータセンタまでの接続
+
+<ul>
+<li>日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続</li>
+<li>よってWAN側の遅延、帯域ともに条件がいい</li>
+</ul></li>
+<li>対象ツール
+
+<ul>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/">AzCopy v5.0.0.27</a> (Windowsのみ)</li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/">Azure CLI v0.9.15</a></li>
+<li><a href="http://storageexplorer.com/">Azure Storage Explorer - Cross Platform GUI v0.7</a></li>
+</ul></li>
+<li>転送ファイル
+
+<ul>
+<li>Ubuntu 15.10 ISOイメージ (647MBytes)</li>
+</ul></li>
+</ul>
+
+<p>そして測定方式。</p>
+
+<p>AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが平行度指定です。デフォルトの平行度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。</p>
+
+<pre><code>Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
+</code></pre>
+
+<p>Azure CLIも同様にMeasure-Commandで。&ndash;concurrenttaskcountで平行度を指定できますが、<a href="https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js">ソース</a>を確認したところ、平行度のデフォルトは5です。&rdquo;StorageUtil.threadsInOperation = 5;&ldquo;ですね。</p>
+
+<pre><code>Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
+</code></pre>
+
+<p>残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。</p>
+
+<pre><code>time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
+</code></pre>
+
+<p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
+
+<h2 id="結果">結果</h2>
+
+<p>平行度上げても伸びないな、というタイミングまで上げます。</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">　実行No　</th>
+<th align="center">　クライアントOS　</th>
+<th align="center">　ネットワーク接続　</th>
+<th align="center">　クライアント　</th>
+<th align="right">　並行数　</th>
+<th align="right">　転送時間(秒)　</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">1</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">AzCopy</td>
+<td align="right">(default:32)</td>
+<td align="right">9.62</td>
+</tr>
+
+<tr>
+<td align="right">2</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">AzCopy</td>
+<td align="right">5</td>
+<td align="right">12.28</td>
+</tr>
+
+<tr>
+<td align="right">3</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">AzCopy</td>
+<td align="right">10</td>
+<td align="right">10.83</td>
+</tr>
+
+<tr>
+<td align="right">4</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">AzCopy</td>
+<td align="right">20</td>
+<td align="right">10.43</td>
+</tr>
+
+<tr>
+<td align="right">5</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">49.92</td>
+</tr>
+
+<tr>
+<td align="right">6</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">29.47</td>
+</tr>
+
+<tr>
+<td align="right">7</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">21.05</td>
+</tr>
+
+<tr>
+<td align="right">8</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">Azure CLI</td>
+<td align="right">40</td>
+<td align="right">20.12</td>
+</tr>
+
+<tr>
+<td align="right">9</td>
+<td align="center">Windows 10</td>
+<td align="center">1Gbps Ethernet</td>
+<td align="center">Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">50.10</td>
+</tr>
+
+<tr>
+<td align="right">10</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">AzCopy</td>
+<td align="right">(default:32)</td>
+<td align="right">74.87</td>
+</tr>
+
+<tr>
+<td align="right">11</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">AzCopy</td>
+<td align="right">5</td>
+<td align="right">53.32</td>
+</tr>
+
+<tr>
+<td align="right">12</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">AzCopy</td>
+<td align="right">10</td>
+<td align="right">58.85</td>
+</tr>
+
+<tr>
+<td align="right">13</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">57.23</td>
+</tr>
+
+<tr>
+<td align="right">14</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">50.71</td>
+</tr>
+
+<tr>
+<td align="right">15</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">54.37</td>
+</tr>
+
+<tr>
+<td align="right">16</td>
+<td align="center">Windows 10</td>
+<td align="center">802.11ac</td>
+<td align="center">Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">54.63</td>
+</tr>
+
+<tr>
+<td align="right">17</td>
+<td align="center">Mac OS X</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">(default:5)</td>
+<td align="right">40.86</td>
+</tr>
+
+<tr>
+<td align="right">18</td>
+<td align="center">Mac OS X</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">10</td>
+<td align="right">33.97</td>
+</tr>
+
+<tr>
+<td align="right">19</td>
+<td align="center">Mac OS X</td>
+<td align="center">802.11ac</td>
+<td align="center">Azure CLI</td>
+<td align="right">20</td>
+<td align="right">58.57</td>
+</tr>
+
+<tr>
+<td align="right">20</td>
+<td align="center">Mac OS X</td>
+<td align="center">802.11ac</td>
+<td align="center">Storage Explorer</td>
+<td align="right">N/A</td>
+<td align="right">58.20</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="考察">考察</h2>
+
+<ul>
+<li>有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>
+<li>平行度は大きく性能に影響します。
+
+<ul>
+<li>平行度が高すぎてもだめ
+
+<ul>
+<li>無線AzCopyのデフォルト(平行度32)が平行度10、20より時間がかかっていることからわかる</li>
+</ul></li>
+<li>デフォルトで遅いからといってあきらめず、平行度変えて試してみましょう</li>
+<li>SDK使って自分で作る時も同じ。平行度パラメータを意識してください
+
+<ul>
+<li>.NET: BlobRequestOptions</li>
+<li>Java/Android: BlobRequestOptions.setConcurrentRequestCount()</li>
+<li>Node.js: parallelOperationThreadCount</li>
+<li>C++: blob_request_options::set_parallelism_factor</li>
+</ul></li>
+</ul></li>
+<li>Azure CLIよりAzCopyが早い。
+
+<ul>
+<li>.NETで最適化できているから合点</li>
+<li>Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い</li>
+<li>でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる</li>
+<li>No.18の結果は無線状態がよかったと想定</li>
+</ul></li>
+<li>Azure Storage Explorer Cross Platform GUIは、現時点で平行度変えられないので性能面では不利。でも直観的なので、使い分け。</li>
+</ul>
+
+<p>WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な平行度が変わってくるはずです。</p>
+
+<p>でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">07 Feb 2016, 17:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -677,282 +1012,6 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 <p>どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。</p>
 
 <p>書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">06 Jan 2016, 00:16</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/arm_idempotent/" class="post-title">Azure ARM Templateによるデプロイと冪等性</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="宣言的に-冪等に">宣言的に、冪等に</h2>
-
-<p>ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。</p>
-
-<p>さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。</p>
-
-<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
-
-<blockquote>
-<p>&ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;</p>
-
-<p>&ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;</p>
-</blockquote>
-
-<p>冪等と言い切ってはいませんが、目的は似ています。</p>
-
-<p>なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。</p>
-
-<p>残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。</p>
-
-<h2 id="増分デプロイと完全デプロイ">増分デプロイと完全デプロイ</h2>
-
-<p>まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える<a href="https://github.com/Azure/azure-xplat-cli">クロスプラットフォームCLI</a>もあります。</p>
-
-<pre><code>PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json
-</code></pre>
-
-<p>ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。</p>
-
-<p>今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">ドキュメント</a>で確認してください。</p>
-
-<p>さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。</p>
-
-<p>コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。</p>
-
-<blockquote>
-<p>・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します</p>
-
-<p>・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します</p>
-
-<p>・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません</p>
-</blockquote>
-
-<p>すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。</p>
-
-<p>いっぽうで、完全モードです。</p>
-
-<blockquote>
-<p>・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</p>
-
-<p>・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します</p>
-
-<p>・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません</p>
-</blockquote>
-
-<p>2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。</p>
-
-<h2 id="動きをつかむ">動きをつかむ</h2>
-
-<p>では動きを見ていきましょう。テンプレートはGithubに公開されている<a href="https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux">Very simple deployment of an Linux VM</a>を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を<a href="https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json">リンク先</a>でざっと確認してください。</p>
-
-<p>パラメータファイル(azuredeploy.parameters.json)は以下とします。</p>
-
-<pre><code>{
-  &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&quot;,
-  &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
-  &quot;parameters&quot;: {
-    &quot;adminUsername&quot;: {
-      &quot;value&quot;: &quot;azureUser&quot;
-    },
-    &quot;adminPassword&quot;: {
-      &quot;value&quot;: &quot;password1234!&quot;
-    },
-    &quot;dnsLabelPrefix&quot;: {
-      &quot;value&quot;: &quot;armpocps&quot;
-    },
-    &quot;ubuntuOSVersion&quot;: {
-      &quot;value&quot;: &quot;14.04.2-LTS&quot;
-    }    
-  }
-}
-</code></pre>
-
-<p>まず、1回目の実行です。リソースグループ &ldquo;ARMEval&rdquo;に対しデプロイします。このリソースグループは前もって作っておいた空の箱です。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 11:46:41
-Mode              : Incremental
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-</code></pre>
-
-<p>できあがりです。空のリソースグループ にLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどがデプロイされました。Modeを指定しない場合は増分(Incremental)となります。</p>
-
-<p>この環境にじわじわと変更を入れていきましょう。まずはazuredeploy.parameter.json上のパラメータ、DNS名のPrefix(dnsLabelPrefix)をarmpocps -&gt; armpocps2と変えます。</p>
-
-<pre><code>&quot;dnsLabelPrefix&quot;: {
-  &quot;value&quot;: &quot;armpocps2&quot;
-},
-</code></pre>
-
-<p>では再投入です。パラメータファイルの内容は変えましたが、コマンドは同じです。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-[snip]
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-</code></pre>
-
-<p>変更内容の確認です。</p>
-
-<pre><code>PS C:\Workspace&gt; Get-AzureRmPublicIpAddress
-[snip]
-DnsSettings              : {
-                             &quot;DomainNameLabel&quot;: &quot;armpocps2&quot;,
-                             &quot;Fqdn&quot;: &quot;armpocps2.japanwest.cloudapp.azure.com&quot;
-                           }
-</code></pre>
-
-<p>問題なく変わっていますね。冪等チックです。この例ではシンプルにDNS名のPrefixを変えましたが、VMインスタンス数やsubnet名を変えたりもできます。関心のある方は<a href="https://gallery.technet.microsoft.com/Cloud-Consistency-with-0b79b775">ドキュメント</a>を。</p>
-
-<p>増分モードによる変更は期待できそうです。が、さて、ここからが探検です。リソース削除が可能な完全モードを試してみましょう。
-リソース定義ファイル(azuredeploy.json)から、大胆にVMの定義を削ってみます。下記リソースをファイルからごっそり消します。</p>
-
-<pre><code>{
-  &quot;apiVersion&quot;: &quot;[variables('apiVersion')]&quot;,
-  &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines&quot;,
-  &quot;name&quot;: &quot;[variables('vmName')]&quot;,
-[snip]
-</code></pre>
-
-<p>では、完全モード &ldquo;-Mode complete&rdquo;付きでコマンドを再投入します。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group 'ARMEval' which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &quot;Y&quot;): Y
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 12:01:00
-Mode              : Complete
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-</code></pre>
-
-<p>あっさり完了しました。本当にVMが消えているが確認します。出力が冗長ですがご容赦ください。</p>
-
-<pre><code>PS C:\Workspace&gt; Find-AzureRmResource -ResourceGroupNameContains ARMEval
-
-Name              : myPublicIP
-ResourceId        :     /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/publicIPAddresses/myPublicIP
-ResourceName      : myPublicIP
-ResourceType      : Microsoft.Network/publicIPAddresses
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : myVMNic
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/networkInterfaces/myVMNic
-ResourceName      : myVMNic
-ResourceType      : Microsoft.Network/networkInterfaces
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : MyVNET
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/virtualNetworks/MyVNET
-ResourceName      : MyVNET
-ResourceType      : Microsoft.Network/virtualNetworks
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : yourstorageaccount
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Storage/storageAccounts/yourstorageaccount
-ResourceName      : yourstorageaccount
-ResourceType      : Microsoft.Storage/storageAccounts
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-Tags              : {}
-</code></pre>
-
-<p>VMだけが消えています。定義からリソースがなくなれば、存在するリソースも消す、これが完全モードです。</p>
-
-<p>さらに検証。冪等さを求めるのであれば、またリソース定義にVMを加えて再投入したら、涼しい顔で復活してほしい。先ほどazuredeploy.jsonから消したVMリソース定義を、そのまま書き戻して再投入してみます。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group 'ARMEval' which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &quot;Y&quot;): Y
-
-New-AzureRmResourceGroupDeployment : 21:05:52 - Resource Microsoft.Compute/virtualMachines 'MyUbuntuVM' failed with message 'The resource operation completed with terminal provisioning state 'Failed'.'
-[snip]
-New-AzureRmResourceGroupDeployment : 21:05:52 - One or more errors occurred while preparing VM disks. See disk instance view for details.
-</code></pre>
-
-<p>残念ながら失敗しました。どうやらdiskまわりのエラーが発生したようです。</p>
-
-<p>これは、完全モードでのリソース削除の仕様が原因です。ARMは該当のVMリソースは消すのですが、VMが格納されているストレージを削除しません。リソース作成時は依存関係が考慮されますが、削除時は異なります。</p>
-
-<p>試しにストレージを消して再実行してみましょう。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-[snip]
-ProvisioningState : Succeeded
-</code></pre>
-
-<p>定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<p>冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。</p>
-
-<p>そこで、ARM Templateをデプロイに組み込む際、ARMによるデプロイはBootstrap用途に限定し、より構成頻度が高いConfiguration用途には、冪等性を持った別のツールを組み合わせるのが現実解と考えます。</p>
-
-<p>Bootstrap用途では、プラットフォームの提供機能を使ったほうが、機能も多いし最適化されています。Azureで今後この層を担当していくのはARMです。そして、この用途ではChefやAnsibleなど汎用ツールに物足りなさがあります。</p>
-
-<p>また、Bootstrapは1回切りであるケースが多いので、失敗したらリソースグループをばっさり消して再作成する、と割り切りやすいです。それならば冪等でなくともいいでしょう。</p>
-
-<p>長くなったので、デプロイツールの組み合わせについては、あたらめて書きたいと思います。</p>
-
-<p>参考: <a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ Bootstrapping/Configuration/Orchestration</a></p>
 
                     </div>
                 </section>

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latency &middot; re-imagine</title>
+
+    <meta name="description" content="my life is the sum of my imagination">
+
+    <meta name="generator" content="Hugo 0.17" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="Latency &middot; re-imagine">
+    <meta name="twitter:description" content="my life is the sum of my imagination">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Latency &middot; re-imagine">
+    <meta property="og:description" content="my life is the sum of my imagination">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                
+                <h1 class="content-subhead">09 Apr 2017, 15:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_latency/" class="post-title">AzureのLatency測定 2017/4版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="関東の片隅で遅延を測る">関東の片隅で遅延を測る</h2>
+
+<p>Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。</p>
+
+<p>せっかくなので、</p>
+
+<ul>
+<li>太平洋のそれも測定しましょう</li>
+<li><a href="https://azure.microsoft.com/en-us/blog/how-microsoft-builds-its-fast-and-reliable-global-network/">Azureバックボーンを通るリージョン間通信</a>も測りましょう</li>
+</ul>
+
+<h2 id="計測パターン">計測パターン</h2>
+
+<ol>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</li>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</li>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</li>
+<li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</li>
+<li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</li>
+</ol>
+
+<h2 id="もろもろの条件">もろもろの条件</h2>
+
+<ul>
+<li>遅延測定ツール
+
+<ul>
+<li><a href="https://technet.microsoft.com/en-us/sysinternals/psping.aspx">PsPing</a></li>
+<li>Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing</li>
+<li>NSGでデフォルト許可されているRDPポートへのPsPing</li>
+<li>VPN接続せず、パブリックIPへPsPing</li>
+</ul></li>
+<li>自宅Wi-Fi環境
+
+<ul>
+<li>802.11ac(5GHz)</li>
+</ul></li>
+<li>自宅加入インターネット接続サービス
+
+<ul>
+<li>OCN 光 マンション 100M</li>
+</ul></li>
+<li>OCNゲートウェイ
+
+<ul>
+<li>(ほげほげ)hodogaya.kanagawa.ocn.ne.jp</li>
+<li>神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです</li>
+</ul></li>
+<li>米国リージョン
+
+<ul>
+<li>US WEST (カリフォルニア)</li>
+</ul></li>
+</ul>
+
+<h2 id="測定結果">測定結果</h2>
+
+<h3 id="1-自宅-神奈川-ocn光-インターネット-azure東日本リージョン">1. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 104.41.187.55:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 11.43ms, Maximum = 15.66ms, Average = 12.88ms
+</code></pre>
+
+<h3 id="2-自宅-神奈川-ocn光-インターネット-azure西日本リージョン">2. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 17.96ms, Maximum = 19.64ms, Average = 18.92ms
+</code></pre>
+
+<h3 id="3-自宅-神奈川-ocn光-インターネット-azure米国西海岸リージョン">3. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</h3>
+
+<pre><code>TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 137.73ms, Maximum = 422.56ms, Average = 218.85ms
+</code></pre>
+
+<h3 id="4-azure東日本リージョン-azureバックボーン-azure西日本リージョン">4. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 8.61ms, Maximum = 9.38ms, Average = 9.00ms
+</code></pre>
+
+<h3 id="azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン">Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</h3>
+
+<pre><code>TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 106.38ms, Maximum = 107.38ms, Average = 106.65ms
+</code></pre>
+
+<p>Azureバックボーンを通すと、遅延が半分になりました。</p>
+
+<h2 id="ひとこと">ひとこと</h2>
+
+<p>契約しているラストワンマイルのサービスが遅延要因、ボトルネックになっている場合は、Azureで完結させてみるのも手です。</p>
+
+<p>たとえば、</p>
+
+<ul>
+<li>会社で契約しているインターネット接続サービスが、貧弱</li>
+<li>シリコンバレーの研究所からインターネット経由でデータを取得しているが、遅い</li>
+</ul>
+
+<p>こんなケースではAzureを間に入れると、幸せになれるかもしれません。</p>
+
+                    </div>
+                </section>
+                
+            </div>
+            
+
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

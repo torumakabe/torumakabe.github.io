@@ -9,6 +9,123 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>AzureのLatency測定 2017/4版</title>
+      <link>http://torumakabe.github.io/post/azure_latency/</link>
+      <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_latency/</guid>
+      <description>
+
+&lt;h2 id=&#34;関東の片隅で遅延を測る&#34;&gt;関東の片隅で遅延を測る&lt;/h2&gt;
+
+&lt;p&gt;Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。&lt;/p&gt;
+
+&lt;p&gt;せっかくなので、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;太平洋のそれも測定しましょう&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/how-microsoft-builds-its-fast-and-reliable-global-network/&#34;&gt;Azureバックボーンを通るリージョン間通信&lt;/a&gt;も測りましょう&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;計測パターン&#34;&gt;計測パターン&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure東日本リージョン&lt;/li&gt;
+&lt;li&gt;自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure西日本リージョン&lt;/li&gt;
+&lt;li&gt;自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure米国西海岸リージョン&lt;/li&gt;
+&lt;li&gt;Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure西日本リージョン&lt;/li&gt;
+&lt;li&gt;Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure米国西海岸リージョン&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;もろもろの条件&#34;&gt;もろもろの条件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;遅延測定ツール
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://technet.microsoft.com/en-us/sysinternals/psping.aspx&#34;&gt;PsPing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing&lt;/li&gt;
+&lt;li&gt;NSGでデフォルト許可されているRDPポートへのPsPing&lt;/li&gt;
+&lt;li&gt;VPN接続せず、パブリックIPへPsPing&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;自宅Wi-Fi環境
+
+&lt;ul&gt;
+&lt;li&gt;802.11ac(5GHz)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;自宅加入インターネット接続サービス
+
+&lt;ul&gt;
+&lt;li&gt;OCN 光 マンション 100M&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;OCNゲートウェイ
+
+&lt;ul&gt;
+&lt;li&gt;(ほげほげ)hodogaya.kanagawa.ocn.ne.jp&lt;/li&gt;
+&lt;li&gt;神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;米国リージョン
+
+&lt;ul&gt;
+&lt;li&gt;US WEST (カリフォルニア)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;測定結果&#34;&gt;測定結果&lt;/h2&gt;
+
+&lt;h3 id=&#34;1-自宅-神奈川-ocn光-インターネット-azure東日本リージョン&#34;&gt;1. 自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure東日本リージョン&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;TCP connect statistics for 104.41.187.55:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 11.43ms, Maximum = 15.66ms, Average = 12.88ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;2-自宅-神奈川-ocn光-インターネット-azure西日本リージョン&#34;&gt;2. 自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure西日本リージョン&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 17.96ms, Maximum = 19.64ms, Average = 18.92ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;3-自宅-神奈川-ocn光-インターネット-azure米国西海岸リージョン&#34;&gt;3. 自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure米国西海岸リージョン&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 137.73ms, Maximum = 422.56ms, Average = 218.85ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;4-azure東日本リージョン-azureバックボーン-azure西日本リージョン&#34;&gt;4. Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure西日本リージョン&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 8.61ms, Maximum = 9.38ms, Average = 9.00ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン&#34;&gt;Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure米国西海岸リージョン&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 106.38ms, Maximum = 107.38ms, Average = 106.65ms
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Azureバックボーンを通すと、遅延が半分になりました。&lt;/p&gt;
+
+&lt;h2 id=&#34;ひとこと&#34;&gt;ひとこと&lt;/h2&gt;
+
+&lt;p&gt;契約しているラストワンマイルのサービスが遅延要因、ボトルネックになっている場合は、Azureで完結させてみるのも手です。&lt;/p&gt;
+
+&lt;p&gt;たとえば、&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;会社で契約しているインターネット接続サービスが、貧弱&lt;/li&gt;
+&lt;li&gt;シリコンバレーの研究所からインターネット経由でデータを取得しているが、遅い&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;こんなケースではAzureを間に入れると、幸せになれるかもしれません。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
       <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
@@ -1872,127 +1989,6 @@ root@a1234bc5d67d:/cntk#
 &lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
 
 &lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
-      <link>http://torumakabe.github.io/post/azure_auditlog_alert/</link>
-      <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_auditlog_alert/</guid>
-      <description>
-
-&lt;h2 id=&#34;監査ログからアラートを上げられるようになります&#34;&gt;監査ログからアラートを上げられるようになります&lt;/h2&gt;
-
-&lt;p&gt;Azureの監査ログからアラートを上げる機能のプレビューが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/&#34;&gt;はじまりました&lt;/a&gt;。これ、地味ですが便利な機能です。日々の運用に効きます。&lt;/p&gt;
-
-&lt;h2 id=&#34;どんな風に使えるか&#34;&gt;どんな風に使えるか&lt;/h2&gt;
-
-&lt;p&gt;ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。&lt;/p&gt;
-
-&lt;p&gt;たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。&lt;/p&gt;
-
-&lt;p&gt;これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。&lt;/p&gt;
-
-&lt;p&gt;これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。&lt;/p&gt;
-
-&lt;h2 id=&#34;実装例&#34;&gt;実装例&lt;/h2&gt;
-
-&lt;p&gt;例としてこんな仕組みを作ってみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;西日本リージョンのリソースグループ&amp;rdquo;dev&amp;rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行&lt;/li&gt;
-&lt;li&gt;WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する&lt;/li&gt;
-&lt;li&gt;OMSでログ分析&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;準備&#34;&gt;準備&lt;/h2&gt;
-
-&lt;p&gt;以下の準備ができているか確認します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azure Automation向けADアプリ、サービスプリンシパル作成&lt;/li&gt;
-&lt;li&gt;サービスプリンシパルへのロール割り当て&lt;/li&gt;
-&lt;li&gt;Azure Automationのアカウント作成&lt;/li&gt;
-&lt;li&gt;Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録&lt;/li&gt;
-&lt;li&gt;Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています)&lt;/li&gt;
-&lt;li&gt;OMSワークスペースの作成&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5&#34;&gt;勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automation側の仕掛け&#34;&gt;Azure Automation側の仕掛け&lt;/h2&gt;
-
-&lt;p&gt;先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。&lt;/p&gt;
-
-&lt;p&gt;ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;param ( 
-    [object]$WebhookData          
-)
-
-if ($WebhookData -ne $null) {  
-    $WebhookName    =   $WebhookData.WebhookName
-    $WebhookBody    =   $WebhookData.RequestBody  
-    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody)
-
-    $AlertContext = [object]$WebhookBody.context
-
-    $SPAppID = Get-AutomationVariable -Name &#39;SPAppID&#39;
-    $Tenant = Get-AutomationVariable -Name &#39;TenantID&#39;
-    $OMSWorkspaceId = Get-AutomationVariable -Name &#39;OMSWorkspaceId&#39;
-    $OMSWorkspaceKey = Get-AutomationVariable -Name &#39;OMSWorkspaceKey&#39;
-    $CertificationName = Get-AutomationVariable -Name &#39;CertificationName&#39;
-    $Certificate = Get-AutomationCertificate -Name $CertificationName
-    $CertThumbprint = ($Certificate.Thumbprint).ToString()    
-
-    $null = Login-AzureRmAccount -ServicePrincipal -TenantId $Tenant -CertificateThumbprint $CertThumbprint -ApplicationId $SPAppID   
-
-    $resourceObj = Get-AzureRmResource -ResourceId $AlertContext.resourceId
-    $VM = Get-AzureRmVM -Name $resourceObj.Name -ResourceGroupName $resourceObj.ResourceGroupName
-
-    $Settings = @{&amp;quot;workspaceId&amp;quot; = &amp;quot;$OMSWorkspaceId&amp;quot;}
-    $ProtectedSettings = @{&amp;quot;workspaceKey&amp;quot; = &amp;quot;$OMSWorkspaceKey&amp;quot;}
-
-    if ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Linux&amp;quot;) {  
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;OmsAgentForLinux&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;OmsAgentForLinux&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    elseif ($VM.StorageProfile.OsDisk.OsType -eq &amp;quot;Windows&amp;quot;)
-    {
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &amp;quot;MicrosoftMonitoringAgent&amp;quot; -Publisher &amp;quot;Microsoft.EnterpriseCloud.Monitoring&amp;quot; -ExtensionType &amp;quot;MicrosoftMonitoringAgent&amp;quot; -TypeHandlerVersion &amp;quot;1.0&amp;quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    else
-    {
-        Write-Error &amp;quot;Unknown OS Type.&amp;quot;
-    }
-}
-else 
-{
-    Write-Error &amp;quot;This runbook is meant to only be started from a webhook.&amp;quot; 
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Runbookができたら、Webhookを作ります。詳しくは&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/automation-webhooks/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;WebhookのURLを控えておいてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-監査ログアラート側の仕掛け&#34;&gt;Azure 監査ログアラート側の仕掛け&lt;/h2&gt;
-
-&lt;p&gt;Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\work&amp;gt; $actionEmail = New-AzureRmAlertRuleEmail -CustomEmail yourname@example.com
-
-PS C:\work&amp;gt; $actionWebhook = New-AzureRmAlertRuleWebhook -ServiceUri https://abcdefgh.azure-automation.net/webhooks?token=your_token
-
-PS C:\work&amp;gt; Add-AzureRmLogAlertRule -Name createdVM -Location &amp;quot;Japan West&amp;quot; -ResourceGroup dev -OperationName Microsoft.Compute/virtualMachines/write -Status Succeeded  -SubStatus Created -TargetResourceGroup dev -Actions $actionEmail,$actionWebhook
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。これで&amp;rdquo;dev&amp;rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。&lt;/p&gt;
-
-&lt;p&gt;なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。&lt;/p&gt;
 </description>
     </item>
     
