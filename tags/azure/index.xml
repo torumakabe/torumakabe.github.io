@@ -102,7 +102,7 @@
   Minimum = 8.61ms, Maximum = 9.38ms, Average = 9.00ms
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h3 id=&#34;azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン&#34;&gt;Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure米国西海岸リージョン&lt;/h3&gt;
+&lt;h3 id=&#34;5-azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン&#34;&gt;5. Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure米国西海岸リージョン&lt;/h3&gt;
 
 &lt;pre&gt;&lt;code&gt;TCP connect statistics for 40.83.220.19:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
