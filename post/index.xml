@@ -48,6 +48,7 @@
 &lt;li&gt;Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing&lt;/li&gt;
 &lt;li&gt;NSGでデフォルト許可されているRDPポートへのPsPing&lt;/li&gt;
 &lt;li&gt;VPN接続せず、パブリックIPへPsPing&lt;/li&gt;
+&lt;li&gt;リージョン間PsPingは仮想マシンから仮想マシンへ&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;自宅Wi-Fi環境
 
@@ -109,11 +110,11 @@
   Minimum = 106.38ms, Maximum = 107.38ms, Average = 106.65ms
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Azureバックボーンを通すと、遅延が半分になりました。&lt;/p&gt;
+&lt;p&gt;Azureバックボーンを通すと首都圏からの遅延が半分になりました。Wi-Fiの有無など、ちょっと条件は違いますが。&lt;/p&gt;
 
 &lt;h2 id=&#34;ひとこと&#34;&gt;ひとこと&lt;/h2&gt;
 
-&lt;p&gt;契約しているインターネット接続サービスが遅延要因、ボトルネックになっている場合は、Azureで完結させてみるのも手です。&lt;/p&gt;
+&lt;p&gt;インターネット、および接続サービスの遅延が性能の上がらない原因になっている場合は、Azureで完結させてみるのも手です。&lt;/p&gt;
 
 &lt;p&gt;たとえば、&lt;/p&gt;
 
