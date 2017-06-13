@@ -184,7 +184,7 @@
 &lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;PS Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PowerShell&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;00:11:11&lt;/td&gt;
 &lt;/tr&gt;
@@ -202,7 +202,7 @@
 &lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;PS Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PowerShell&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;00.09:20&lt;/td&gt;
 &lt;/tr&gt;
