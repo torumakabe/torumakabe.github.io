@@ -39,24 +39,23 @@
 &lt;h3 id=&#34;アクセス回線パターン&#34;&gt;アクセス回線パターン&lt;/h3&gt;
 
 &lt;ol&gt;
-&lt;li&gt;一般的な回線&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;一般的な回線&lt;/p&gt;
+
+&lt;ul&gt;
 &lt;li&gt;自宅(川崎)&lt;/li&gt;
 &lt;li&gt;OCN光 100M マンションタイプ&lt;/li&gt;
 &lt;li&gt;宅内は802.11ac(5GHz)&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ&lt;/p&gt;
-
-&lt;ul&gt;
+&lt;li&gt;川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ&lt;/li&gt;
 &lt;li&gt;ゲートウェイ名から推測&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;いい感じの回線&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;いい感じの回線&lt;/p&gt;
 
-&lt;li&gt;&lt;p&gt;日本マイクロソフト 品川オフィス&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;1Gbps 有線&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Azureデータセンターへ「ネットワーク的に近くて広帯域」&lt;/p&gt;&lt;/li&gt;
+&lt;ul&gt;
+&lt;li&gt;日本マイクロソフト 品川オフィス&lt;/li&gt;
+&lt;li&gt;1Gbps 有線&lt;/li&gt;
+&lt;li&gt;Azureデータセンターへ「ネットワーク的に近くて広帯域」&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&#34;コピーするファイル&#34;&gt;コピーするファイル&lt;/h3&gt;
@@ -120,7 +119,7 @@
 
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -129,7 +128,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -138,7 +137,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -147,7 +146,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -156,7 +155,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -165,7 +164,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -174,7 +173,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Copy&lt;/td&gt;
@@ -183,16 +182,16 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;イメージ&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;PowerShell Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PS Start-AzureStorageBlobCopy&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;00:11:11&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Copy&lt;/td&gt;
@@ -201,10 +200,10 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;イメージ&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;PowerShell Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PS Start-AzureStorageBlobCopy&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;00.09:20&lt;/td&gt;
 &lt;/tr&gt;
