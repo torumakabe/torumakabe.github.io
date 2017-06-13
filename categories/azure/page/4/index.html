@@ -68,6 +68,125 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_docker_cntk/" class="post-title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
+
+<p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
+
+<p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
+
+<h2 id="方針">方針</h2>
+
+<ul>
+<li>インフラはAzure Resource Manager Templateでデプロイする
+
+<ul>
+<li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
+</ul></li>
+<li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
+
+<ul>
+<li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
+
+<ul>
+<li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
+</ul></li>
+<li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
+</ul></li>
+<li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
+
+<ul>
+<li>docker extensionでdocker engineを導入</li>
+<li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
+</ul></li>
+<li>VMにログインしたら即CNTKを使える、幸せ</li>
+</ul>
+
+<h2 id="使い方">使い方</h2>
+
+<p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
+
+<p>リソースグループを作ります。</p>
+
+<pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
+</code></pre>
+
+<p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
+
+<ul>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
+
+<ul>
+<li>編集不要です</li>
+</ul></li>
+<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
+
+<ul>
+<li>テンプレートに直で書かきたくないパラメータです</li>
+<li>fileUris、commandToExecute以外は、各々で</li>
+<li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
+<br /></li>
+</ul></li>
+</ul>
+
+<p>うし、デプロイ。</p>
+
+<pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
+</code></pre>
+
+<p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
+
+<p>docker engine入ってますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker -v
+Docker version 1.11.0, build 4dc5990
+</code></pre>
+
+<p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker images
+REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
+yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
+</code></pre>
+
+<p>問題なし。ではエンジョイ Deep Learning。</p>
+
+<pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
+root@a1234bc5d67d:/cntk#
+</code></pre>
+
+<p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
+
+<h2 id="今後の展開">今後の展開</h2>
+
+<p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
+
+<p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
+
+<p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">06 Apr 2016, 17:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -522,214 +641,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">09 Mar 2016, 16:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_tf_fundamental_rules/" class="post-title">Terraform &amp; Azure デプロイ設計4原則</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="情報がありそうでない">情報がありそうでない</h2>
-
-<p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
-
-<p>今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。</p>
-
-<p>なお、考え方は他のクラウドやデプロイツールでも応用できるかと。</p>
-
-<h2 id="4原則">4原則</h2>
-
-<ol>
-<li>セキュリティファースト</li>
-<li>手順書をなくそう</li>
-<li>分割境界にこだわりすぎない</li>
-<li>早すぎる最適化は悪</li>
-</ol>
-
-<p>なお、サンプルのTerraformファイル群を、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">Githubに置いて</a>おきました。</p>
-
-<p>今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。</p>
-
-<pre><code>.
-├── .gitignore
-├── main.tf
-├── availability_set
-│   ├── avset_web.tf
-│   ├── avset_db.tf
-│   └── variables.tf
-├── network
-│   ├── sg_backend.tf
-│   ├── sg_frontend.tf
-│   ├── variables.tf
-│   └── vnets.tf
-├── storage
-│   ├── storage_backend.tf
-│   ├── storage_frontend.tf
-│   └── variables.tf
-└── terraform.tfvars
-</code></pre>
-
-<p>Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。</p>
-
-<h2 id="1-セキュリティファースト">1. セキュリティファースト</h2>
-
-<p>セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。</p>
-
-<ul>
-<li><p>認証情報は変数指定し、設定ファイルから読み込む</p>
-
-<ul>
-<li>サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない</li>
-<li>terraform.tfvarsなどにまとめて書く</li>
-</ul></li>
-
-<li><p>認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する</p>
-
-<ul>
-<li>Gitなら.gitignoreに指定する</li>
-<li>.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
-
-<ul>
-<li>チームで使う場合はファイルではなく、Consulなどのリモートバックエンドを使うと思いますが、念のため</li>
-</ul></li>
-</ul></li>
-
-<li><p>RBACで必要最小限の権限を付与する</p>
-
-<ul>
-<li>Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう</li>
-<li>身内がリソースをうっかり壊したら、それは管理者の責任です
-<br /></li>
-</ul></li>
-
-<li><p>ネットワークセキュリティグループはサブネットに指定しておく</p>
-
-<ul>
-<li>個々のVMの管理者に任せず、サブネットで絞っておきましょう
-
-<ul>
-<li>VMはアドホックに作られるケースが多く、ルーズになりがちです</li>
-</ul></li>
-<li>サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
-
-<ul>
-<li>フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)</li>
-<li>バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2 id="2-手順書をなくそう">2. 手順書をなくそう</h2>
-
-<p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
-
-<p>ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。</p>
-
-<h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
-
-<p>TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。</p>
-
-<p>グルーピング、分割する目的は、</p>
-
-<ul>
-<li>main.tfの肥大化を防止し、コードの見通しを良くする</li>
-<li>再利用しやすくする</li>
-<li>責任範囲を明確化し、オーナー意識を醸成する</li>
-<li>権限とコードを一致させる</li>
-</ul>
-
-<p>などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。</p>
-
-<p>以下が分割単位、境界ポリシーの例です。</p>
-
-<ul>
-<li><p>リソースタイプで分割する</p>
-
-<ul>
-<li>サンプルはその例
-
-<ul>
-<li>ネットワーク、ストレージ、VM Availability Setで分割</li>
-</ul></li>
-<li>直観的</li>
-<li>デプロイに関わる人数が少ない間はこれがおすすめ
-<br /></li>
-</ul></li>
-
-<li><p>組織単位で分割する</p>
-
-<ul>
-<li><a href="https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4">コンウェイの法則</a></li>
-<li>リソースタイプ = 組織 という場合もある
-
-<ul>
-<li>ネットワーク管理者が別グループ、など</li>
-</ul></li>
-</ul></li>
-
-<li><p>地理的に分割する</p>
-
-<ul>
-<li>リージョンやロケーションで分割</li>
-<li>リソースタイプと組み合わせる手もある
-
-<ul>
-<li>&ldquo;Network_JapanEast&rdquo;など
-<br /></li>
-</ul></li>
-</ul></li>
-
-<li><p>静的なリソースと動的なリソースを分ける</p>
-
-<ul>
-<li>変化の頻度で分ける
-
-<ul>
-<li>ネットワークが頻繁に変わることはまれ</li>
-<li>VMは増減が激しい</li>
-</ul></li>
-<li>動的なリソースは対象から外す、別手段とする手も
-<br /></li>
-</ul></li>
-</ul>
-
-<p>スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。</p>
-
-<h2 id="4-早すぎる最適化は悪">4. 早すぎる最適化は悪</h2>
-
-<p>最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。</p>
-
-<p>なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。</p>
-
-<p>ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。</p>
-
-<p>そして、</p>
-
-<ul>
-<li>リファクタリングできるなら、する</li>
-<li>リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす</li>
-<li>はじめに作った人へマサカリを投げない</li>
-</ul>
-
-<p>完璧を求めずにいきましょう。</p>
-
-<p>でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -739,7 +650,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 6</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 7</span>
     
       <a href="/categories/azure/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

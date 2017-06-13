@@ -9,6 +9,262 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
+      <link>http://torumakabe.github.io/post/azureblobcopy_perf/</link>
+      <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azureblobcopy_perf/</guid>
+      <description>
+
+&lt;h2 id=&#34;ファイルコピーの需要は根強い&#34;&gt;ファイルコピーの需要は根強い&lt;/h2&gt;
+
+&lt;p&gt;グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。&lt;/p&gt;
+
+&lt;p&gt;でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。&lt;/p&gt;
+
+&lt;h2 id=&#34;調べてみた&#34;&gt;調べてみた&lt;/h2&gt;
+
+&lt;p&gt;ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。&lt;/p&gt;
+
+&lt;h3 id=&#34;ツールと実行環境&#34;&gt;ツールと実行環境&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;AzCopy 6.1.0&lt;/li&gt;
+&lt;li&gt;Azure PowerShell 4.1.0&lt;/li&gt;
+&lt;li&gt;Windows 10 1703&lt;/li&gt;
+&lt;li&gt;ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;アクセス回線パターン&#34;&gt;アクセス回線パターン&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;一般的な回線&lt;/li&gt;
+&lt;li&gt;自宅(川崎)&lt;/li&gt;
+&lt;li&gt;OCN光 100M マンションタイプ&lt;/li&gt;
+&lt;li&gt;宅内は802.11ac(5GHz)&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ゲートウェイ名から推測&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;いい感じの回線&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;日本マイクロソフト 品川オフィス&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;1Gbps 有線&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azureデータセンターへ「ネットワーク的に近くて広帯域」&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;コピーするファイル&#34;&gt;コピーするファイル&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;総容量: 約60GB
+
+&lt;ul&gt;
+&lt;li&gt;6160ファイル&lt;/li&gt;
+&lt;li&gt;1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Linux fallocateコマンドで作成&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;ファイル形式パターン&#34;&gt;ファイル形式パターン&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;ファイル、Blobそのまま送る (6160ファイル)&lt;/li&gt;
+&lt;li&gt;ディスクイメージで送る (1ファイル)
+
+&lt;ul&gt;
+&lt;li&gt;Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置&lt;/li&gt;
+&lt;li&gt;転送前にデタッチ、エクスポート(Blob SAS形式)&lt;/li&gt;
+&lt;li&gt;AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;対象のazureリージョン&#34;&gt;対象のAzureリージョン&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;東日本 (マスター、複製元と位置づける)&lt;/li&gt;
+&lt;li&gt;米国中南部 (太平洋越え + 米国内を見たい)&lt;/li&gt;
+&lt;li&gt;ブラジル南部&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;転送パターン&#34;&gt;転送パターン&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ユーザー拠点の端末からAzureリージョン: AzCopy Upload&lt;/li&gt;
+&lt;li&gt;Azureリージョン間 (Storage to Storage)
+
+&lt;ul&gt;
+&lt;li&gt;ファイル: AzCopy Copy&lt;/li&gt;
+&lt;li&gt;イメージ: PowerShell Start-AzureStorageBlobCopy&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;right&#34;&gt;　形式　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　From　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　To　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　Command　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　並列数　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　実行時間(時:分:秒)　&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7:55:22&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;10:22:30&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;12:46:37&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;16&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00:20:47&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;16&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00:45.11&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;02:07.58&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Copy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00:28:55&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;イメージ&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PowerShell Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00:11:11&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;ファイル&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Copy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00.25:33&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;イメージ&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;PowerShell Start-AzureStorageBlobCopy&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;00.09:20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;考察&#34;&gt;考察&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;アクセス回線の差が大きく影響&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;自宅パターンでプロバイダから帯域制限されていたかは不明 (自宅からAzure東日本まで16Mbpsくらいは出た)&lt;/li&gt;
+&lt;li&gt;アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい&lt;/li&gt;
+&lt;li&gt;こまめに送る&lt;/li&gt;
+&lt;li&gt;Azure内でデータを生成する&lt;/li&gt;
+&lt;li&gt;もしくはExpressRouteを引く (自宅で、とは言っていない)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;アクセス回線が細い場合、AzCopy Uploadの並列数を下げる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;AzCopyのデフォルト並列数は実行環境のCPUコア数 *8だが、今回実施した端末での並列数(4コア * 8 = 32)ではかえって性能が劣化した&lt;/li&gt;
+&lt;li&gt;アクセス回線に合わせて並列数は調整する&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azureのリージョン間コピーは早い&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Azureバックボーンを通るから&lt;/li&gt;
+&lt;li&gt;端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;地理的な距離感覚で考えてはダメ&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;地理的な近さではなく、ネットワーク的な近さと太さ&lt;/li&gt;
+&lt;li&gt;Azureのバックボーンを使うと日本とブラジルでもそれなりのスループット出せる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ファイル数が多いときはイメージで送るのも手&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ファイル数がコピー時間に影響する (1 vs 6160)&lt;/li&gt;
+&lt;li&gt;そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&amp;hellip;&lt;/li&gt;
+&lt;li&gt;もしファイルシステムとして、であれば有効な手段&lt;/li&gt;
+&lt;li&gt;エクスポートのひと手間は考慮&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Azureバックボーンを使うと、意外にブラジル近い&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;土管か(ない&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Azureバックボーンの帯域はSLAの対象ではありませんが、活用したほうが得ですね。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azureユーザー視点のLatency測定 2017/4版</title>
       <link>http://torumakabe.github.io/post/azure_latency/</link>
       <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
@@ -1883,113 +2139,6 @@ return $blobSizeInBytes
 &lt;/ul&gt;
 
 &lt;p&gt;知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>http://torumakabe.github.io/post/azure_docker_cntk/</link>
-      <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
-      <description>
-
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
-
-&lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
-
-&lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
-
-&lt;ul&gt;
-&lt;li&gt;Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-&lt;ul&gt;
-&lt;li&gt;Dockerfileの元ネタは&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Tools/docker&#34;&gt;ここ&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;GPUむけもあるけどグッと我慢、今回はCPUで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Hub上のリポジトリは &lt;a href=&#34;https://hub.docker.com/r/torumakabe/cntk-cpu/&#34;&gt;torumakabe/cntk-cpu&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-&lt;ul&gt;
-&lt;li&gt;docker extensionでdocker engineを導入&lt;/li&gt;
-&lt;li&gt;custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
-
-&lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
-
-&lt;p&gt;リソースグループを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json&#34;&gt;azuredeploy.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;編集不要です&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json&#34;&gt;azuredeploy.parameters.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;うし、デプロイ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。&lt;/p&gt;
-
-&lt;p&gt;docker engine入ってますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKビルド済みのdockerイメージ、pullできてますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;問題なし。ではエンジョイ Deep Learning。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
-
-&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
-
-&lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
-
-&lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
-
-&lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
 </description>
     </item>
     
