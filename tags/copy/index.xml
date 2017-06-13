@@ -118,16 +118,16 @@
 
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;7:55:22&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;07:55:22&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -136,7 +136,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -145,7 +145,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -154,7 +154,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -163,7 +163,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -172,7 +172,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Copy&lt;/td&gt;
@@ -181,7 +181,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　イメージ　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;イメージ　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;PowerShell&lt;/td&gt;
@@ -190,7 +190,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;ファイル　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;AzCopy Copy&lt;/td&gt;
@@ -199,7 +199,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;　イメージ　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;イメージ　&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;left&#34;&gt;PowerShell&lt;/td&gt;
@@ -236,11 +236,11 @@
 &lt;li&gt;端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;地理的な距離感覚で考えてはダメ&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;地理的な距離感覚だけで考えてはダメ&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;地理的な近さではなく、ネットワーク的な近さと太さ&lt;/li&gt;
-&lt;li&gt;Azureのバックボーンを使うと日本とブラジルでもそれなりのスループット出せる&lt;/li&gt;
+&lt;li&gt;Azureバックボーンを使うと日本とブラジルの間でもそれなりのスループット&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;ファイル数が多いときはイメージで送るのも手&lt;/p&gt;
@@ -259,7 +259,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Azureバックボーンの帯域はSLAの対象ではありませんが、活用したほうが得ですね。&lt;/p&gt;
+&lt;p&gt;Azureバックボーンの帯域にはSLAがありませんが、意識して仕組みを作ると得をします。&lt;/p&gt;
 </description>
     </item>
     
