@@ -82,7 +82,7 @@
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&#34;対象のazureリージョン&#34;&gt;対象のAzureリージョン&lt;/h2&gt;
+&lt;h3 id=&#34;対象のazureリージョン&#34;&gt;対象のAzureリージョン&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;東日本 (マスター、複製元と位置づける)&lt;/li&gt;
