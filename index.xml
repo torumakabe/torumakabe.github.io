@@ -108,12 +108,12 @@
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th align=&#34;left&#34;&gt;　形式　&lt;/th&gt;
-&lt;th align=&#34;left&#34;&gt;　コピー元　&lt;/th&gt;
-&lt;th align=&#34;left&#34;&gt;　コピー先　&lt;/th&gt;
-&lt;th align=&#34;left&#34;&gt;　コマンド　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　並列数　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　実行時間(時:分:秒)　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;形式　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;コピー元　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;コピー先　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;コマンド　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　並列数&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　実行時間(時:分:秒)&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 
