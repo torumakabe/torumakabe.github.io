@@ -108,10 +108,10 @@
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th align=&#34;right&#34;&gt;　形式　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　From　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　To　&lt;/th&gt;
-&lt;th align=&#34;center&#34;&gt;　Command　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　形式　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　コピー元　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　コピー先　&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;　コマンド　&lt;/th&gt;
 &lt;th align=&#34;right&#34;&gt;　並列数　&lt;/th&gt;
 &lt;th align=&#34;right&#34;&gt;　実行時間(時:分:秒)　&lt;/th&gt;
 &lt;/tr&gt;
@@ -119,7 +119,7 @@
 
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -128,7 +128,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -137,7 +137,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;自宅&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -146,7 +146,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -155,7 +155,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -164,7 +164,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;オフィス&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Upload&lt;/td&gt;
@@ -173,7 +173,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;AzCopy Copy&lt;/td&gt;
@@ -182,7 +182,7 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 米国中南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;PowerShell&lt;/td&gt;
@@ -191,16 +191,16 @@
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　ファイル　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　ファイル　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
-&lt;td align=&#34;center&#34;&gt;Copy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;AzCopy Copy&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;N/A&lt;/td&gt;
 &lt;td align=&#34;right&#34;&gt;00.25:33&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td align=&#34;right&#34;&gt;　イメージ　&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;　イメージ　&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure 東日本&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;Azure ブラジル南部&lt;/td&gt;
 &lt;td align=&#34;center&#34;&gt;PowerShell&lt;/td&gt;
