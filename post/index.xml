@@ -6,8 +6,342 @@
     <description>Recent content in Post-rsses on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 13 Jun 2017 17:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Event GridでBlobイベントを拾う</title>
+      <link>http://torumakabe.github.io/post/azure_blobevent/</link>
+      <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_blobevent/</guid>
+      <description>
+
+&lt;h2 id=&#34;event-gridがblobに対応&#34;&gt;Event GridがBlobに対応&lt;/h2&gt;
+
+&lt;p&gt;Event GridがBlobのイベントを拾えるように&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/&#34;&gt;なりました&lt;/a&gt;。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。&lt;/p&gt;
+
+&lt;p&gt;プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。&lt;/p&gt;
+
+&lt;h2 id=&#34;event-gridがblobに対応して何がうれしいか&#34;&gt;Event GridがBlobに対応して何がうれしいか&lt;/h2&gt;
+
+&lt;p&gt;Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。&lt;/p&gt;
+
+&lt;p&gt;イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subcriptionにはフィルタも定義できます。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://docs.microsoft.com/en-us/azure/storage/blobs/media/storage-blob-event-overview/event-grid-functional-model.png&#34; alt=&#34;コンセプト&#34; title=&#34;Concept&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Event Gridに期待する理由はいくつかあります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;フィルタ
+
+&lt;ul&gt;
+&lt;li&gt;特定のBlobコンテナーにあるjpegファイルのみで発火させる、なんてことができます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;信頼性
+
+&lt;ul&gt;
+&lt;li&gt;リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;スケールと高スループット
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings&#34;&gt;Azure Functions Blobトリガー&lt;/a&gt;のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった&lt;/li&gt;
+&lt;li&gt;具体的な数値はプレビュー後に期待しましょう&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ファンアウト
+
+&lt;ul&gt;
+&lt;li&gt;ひとつのイベントを複数のHandlerに紐づけられます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azureの外やサードパーティーとの連携
+
+&lt;ul&gt;
+&lt;li&gt;Webhookでシンプルにできます&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;前提条件&#34;&gt;前提条件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません&lt;/li&gt;
+&lt;li&gt;現時点ではWest Central USリージョンのみで提供しています&lt;/li&gt;
+&lt;li&gt;プライベートプレビューは申請が必要です&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Azure CLIの下記コマンドでプレビューに申請できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az provider register --namespace  Microsoft.EventGrid
+az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下のコマンドで確認し、statusが&amp;rdquo;Registered&amp;rdquo;であれば使えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;p&gt;ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。&lt;/p&gt;
+
+&lt;p&gt;リソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group create -n blobeventpoc-rg -l westcentralus
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Blobストレージアカウントを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではいよいよEvent GridのSubscriptionを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
+ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
+-g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以下はパラメーターの補足です。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&amp;ndash;endpoint
+
+&lt;ul&gt;
+&lt;li&gt;Handlerのエンドポイントを指定します。ここではテストのために&lt;a href=&#34;https://requestb.in/&#34;&gt;RequestBin&lt;/a&gt;に作ったエンドポイントを指定します&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&amp;ndash;included-event-types
+
+&lt;ul&gt;
+&lt;li&gt;イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&amp;ndash;subject-ends-with
+
+&lt;ul&gt;
+&lt;li&gt;対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには&lt;a href=&#34;https://azure.microsoft.com/ja-jp/features/storage-explorer/&#34;&gt;Azure Storage Explorer&lt;/a&gt;が便利です。&lt;/p&gt;
+
+&lt;p&gt;RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[{
+  &amp;quot;topic&amp;quot;: &amp;quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&amp;quot;,
+  &amp;quot;subject&amp;quot;: &amp;quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&amp;quot;,
+  &amp;quot;eventType&amp;quot;: &amp;quot;Microsoft.Storage.BlobCreated&amp;quot;,
+  &amp;quot;eventTime&amp;quot;: &amp;quot;2017-09-02T02:25:15.2635962Z&amp;quot;,
+  &amp;quot;id&amp;quot;: &amp;quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&amp;quot;,
+  &amp;quot;data&amp;quot;: {
+    &amp;quot;api&amp;quot;: &amp;quot;PutBlob&amp;quot;,
+    &amp;quot;clientRequestId&amp;quot;: &amp;quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&amp;quot;,
+    &amp;quot;requestId&amp;quot;: &amp;quot;f3ff6b96-001e-001d-6e92-23bdea000000&amp;quot;,
+    &amp;quot;eTag&amp;quot;: &amp;quot;0x8D4F1A9D8A6703A&amp;quot;,
+    &amp;quot;contentType&amp;quot;: &amp;quot;image/jpeg&amp;quot;,
+    &amp;quot;contentLength&amp;quot;: 42497,
+    &amp;quot;blobType&amp;quot;: &amp;quot;BlockBlob&amp;quot;,
+    &amp;quot;url&amp;quot;: &amp;quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&amp;quot;,
+    &amp;quot;sequencer&amp;quot;: &amp;quot;0000000000000BAB0000000000060986&amp;quot;,
+    &amp;quot;storageDiagnostics&amp;quot;: {
+      &amp;quot;batchId&amp;quot;: &amp;quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&amp;quot;
+    }
+  }
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&amp;ndash;subject-ends-withをjpegとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y0jbj1y0 -n blobeventpocsub-jpeg --pro
+vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
+g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;すると、拡張子.jpegのファイルをアップロードしても発火しました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[{
+  &amp;quot;topic&amp;quot;: &amp;quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&amp;quot;,
+  &amp;quot;subject&amp;quot;: &amp;quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&amp;quot;,
+  &amp;quot;eventType&amp;quot;: &amp;quot;Microsoft.Storage.BlobCreated&amp;quot;,
+  &amp;quot;eventTime&amp;quot;: &amp;quot;2017-09-02T02:36:33.827967Z&amp;quot;,
+  &amp;quot;id&amp;quot;: &amp;quot;e8b036ee-001e-00e7-4994-23740d06225b&amp;quot;,
+  &amp;quot;data&amp;quot;: {
+    &amp;quot;api&amp;quot;: &amp;quot;PutBlob&amp;quot;,
+    &amp;quot;clientRequestId&amp;quot;: &amp;quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&amp;quot;,
+    &amp;quot;requestId&amp;quot;: &amp;quot;e8b036ee-001e-00e7-4994-23740d000000&amp;quot;,
+    &amp;quot;eTag&amp;quot;: &amp;quot;0x8D4F1AB6D1B24F6&amp;quot;,
+    &amp;quot;contentType&amp;quot;: &amp;quot;image/jpeg&amp;quot;,
+    &amp;quot;contentLength&amp;quot;: 42497,
+    &amp;quot;blobType&amp;quot;: &amp;quot;BlockBlob&amp;quot;,
+    &amp;quot;url&amp;quot;: &amp;quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&amp;quot;,
+    &amp;quot;sequencer&amp;quot;: &amp;quot;0000000000000BAB0000000000060D42&amp;quot;,
+    &amp;quot;storageDiagnostics&amp;quot;: {
+      &amp;quot;batchId&amp;quot;: &amp;quot;9ec5c091-061d-4111-ad82-52d9803ce373&amp;quot;
+    }
+  }
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;azure-functionsにイメージリサイズファンクションを作って連携してみる&#34;&gt;Azure Functionsにイメージリサイズファンクションを作って連携してみる&lt;/h2&gt;
+
+&lt;p&gt;Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functionsに画像ファイルのサイズを変えるHandlerアプリを作ってみます。&lt;/p&gt;
+
+&lt;h3 id=&#34;概要&#34;&gt;概要&lt;/h3&gt;
+
+&lt;p&gt;当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、設計を変えました。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png&#34; alt=&#34;Bindings&#34; title=&#34;Bindings&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using &lt;a href=&#34;https://functions-visualizer.azurewebsites.net/&#34;&gt;Azure Functions Bindings Visualizer&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&amp;rdquo;path&amp;rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。&lt;/p&gt;
+
+&lt;p&gt;入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。&lt;/p&gt;
+
+&lt;p&gt;そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。&lt;/p&gt;
+
+&lt;p&gt;なお、この悩みはAzureの開発チームも認識しており、Functons側で対応する方針とのことです。&lt;/p&gt;
+
+&lt;h3 id=&#34;handler&#34;&gt;Handler&lt;/h3&gt;
+
+&lt;p&gt;C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。&lt;/p&gt;
+
+&lt;p&gt;[run.csx]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#r &amp;quot;Newtonsoft.json&amp;quot;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
+
+public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
+{
+    log.Info(eventGridEvent.Data[&amp;quot;url&amp;quot;].ToString());
+
+    string imageUrl = eventGridEvent.Data[&amp;quot;url&amp;quot;].ToString();
+    outputQueueItem = System.IO.Path.GetFileName(imageUrl);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Event GridのWebJobs拡張向けパッケージを指定します。&lt;/p&gt;
+
+&lt;p&gt;[project.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+&amp;quot;frameworks&amp;quot;: {
+  &amp;quot;net46&amp;quot;:{
+    &amp;quot;dependencies&amp;quot;: {
+      &amp;quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&amp;quot;: &amp;quot;1.0.0-beta1-10006&amp;quot;
+    }
+  }
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;トリガーとバインドは以下の通りです。&lt;/p&gt;
+
+&lt;p&gt;[function.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;bindings&amp;quot;: [
+    {
+      &amp;quot;type&amp;quot;: &amp;quot;eventGridTrigger&amp;quot;,
+      &amp;quot;name&amp;quot;: &amp;quot;eventGridEvent&amp;quot;,
+      &amp;quot;direction&amp;quot;: &amp;quot;in&amp;quot;
+    },
+    {
+      &amp;quot;type&amp;quot;: &amp;quot;queue&amp;quot;,
+      &amp;quot;name&amp;quot;: &amp;quot;outputQueueItem&amp;quot;,
+      &amp;quot;queueName&amp;quot;: &amp;quot;imagefilename&amp;quot;,
+      &amp;quot;connection&amp;quot;: &amp;quot;AzureWebJobsStorage&amp;quot;,
+      &amp;quot;direction&amp;quot;: &amp;quot;out&amp;quot;
+    }
+  ],
+  &amp;quot;disabled&amp;quot;: false
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;resizer&#34;&gt;Resizer&lt;/h3&gt;
+
+&lt;p&gt;Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。&lt;/p&gt;
+
+&lt;p&gt;[run.csx]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;using ImageResizer;
+
+public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
+{
+  var imageBuilder = ImageResizer.ImageBuilder.Current;
+  var size = imageDimensionsTable[ImageSize.Small];
+
+  imageBuilder.Build(inputBlob, outputBlob,
+    new ResizeSettings(size.Item1, size.Item2, FitMode.Max, null), false);
+
+}
+
+public enum ImageSize
+{
+  Small
+}
+
+private static Dictionary&amp;lt;ImageSize, Tuple&amp;lt;int, int&amp;gt;&amp;gt; imageDimensionsTable = new Dictionary&amp;lt;ImageSize, Tuple&amp;lt;int, int&amp;gt;&amp;gt;()
+{
+  { ImageSize.Small,      Tuple.Create(100, 100) }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ImageResizerのパッケージを指定します。&lt;/p&gt;
+
+&lt;p&gt;[project.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+&amp;quot;frameworks&amp;quot;: {
+  &amp;quot;net46&amp;quot;:{
+    &amp;quot;dependencies&amp;quot;: {
+      &amp;quot;ImageResizer&amp;quot;: &amp;quot;4.1.9&amp;quot;
+    }
+  }
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&amp;rdquo;images-s&amp;rdquo;として別途作成しました。コンテナー&amp;rdquo;images&amp;rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。&lt;/p&gt;
+
+&lt;p&gt;[function.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;bindings&amp;quot;: [
+    {
+      &amp;quot;name&amp;quot;: &amp;quot;myQueueItem&amp;quot;,
+      &amp;quot;type&amp;quot;: &amp;quot;queueTrigger&amp;quot;,
+      &amp;quot;direction&amp;quot;: &amp;quot;in&amp;quot;,
+      &amp;quot;queueName&amp;quot;: &amp;quot;imagefilename&amp;quot;,
+      &amp;quot;connection&amp;quot;: &amp;quot;AzureWebJobsStorage&amp;quot;
+    },
+    {
+      &amp;quot;name&amp;quot;: &amp;quot;inputBlob&amp;quot;,
+      &amp;quot;type&amp;quot;: &amp;quot;blob&amp;quot;,
+      &amp;quot;path&amp;quot;: &amp;quot;images/{QueueTrigger}&amp;quot;,
+      &amp;quot;connection&amp;quot;: &amp;quot;BLOB_IMAGES&amp;quot;,
+      &amp;quot;direction&amp;quot;: &amp;quot;in&amp;quot;
+    },
+    {
+      &amp;quot;name&amp;quot;: &amp;quot;outputBlob&amp;quot;,
+      &amp;quot;type&amp;quot;: &amp;quot;blob&amp;quot;,
+      &amp;quot;path&amp;quot;: &amp;quot;images-s/{QueueTrigger}&amp;quot;,
+      &amp;quot;connection&amp;quot;: &amp;quot;BLOB_IMAGES&amp;quot;,
+      &amp;quot;direction&amp;quot;: &amp;quot;out&amp;quot;
+    }
+  ],
+  &amp;quot;disabled&amp;quot;: false
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。トークン付きのエンドポイントは、ポータルの[統合]で確認できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az eventgrid resource event-subscription create --endpoint &amp;quot;https://blobeventpoc.azurewebsites.net/admin/exte
+nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;amp;code=tokenTOKEN1234567890==&amp;quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &amp;quot;Microsoft.Storage.BlobCreated&amp;quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &amp;quot;/blobServices/default/containers/images/&amp;quot;  --subject-ends-with jpg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで、コンテナー&amp;rdquo;images&amp;rdquo;にjpgファイルがアップロードされると、コンテナー&amp;rdquo;images-s&amp;rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
@@ -1860,175 +2194,6 @@ module.exports = function (context, req) {
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
-      <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
-
-&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
-
-&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
-節約」でしょう。&lt;/p&gt;
-
-&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
-
-&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
-
-&lt;h2 id=&#34;コンセプト&#34;&gt;コンセプト&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;管理サーバを作らない&lt;/li&gt;
-&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
-&lt;li&gt;ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
-&lt;li&gt;サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
-&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;サンプル&#34;&gt;サンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
-
-&lt;p&gt;ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── blob
-│   ├── application
-│   │   ├── starttask.sh
-│   │   └── task.sh
-│   ├── input
-│   │   └── the_star_spangled_banner.txt
-│   └── output
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
-
-&lt;p&gt;コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
-
-&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
-&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
-&lt;li&gt;ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
-&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
-&lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
-&lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;  {
-  &amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
-  &amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
-  &amp;quot;schedule&amp;quot;: {
-    &amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
-    &amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
-  },
-  &amp;quot;jobSpecification&amp;quot;: {
-    &amp;quot;priority&amp;quot;:100,
-    &amp;quot;constraints&amp;quot;: {
-      &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-      &amp;quot;maxTaskRetryCount&amp;quot;:-1
-    },
-    &amp;quot;jobManagerTask&amp;quot;: {
-      &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
-      &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
-      &amp;quot;resourceFiles&amp;quot;: [ {
-        &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-        &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
-      }], 
-      &amp;quot;environmentSettings&amp;quot;: [ {
-        &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
-        &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
-      } ],
-      &amp;quot;constraints&amp;quot;: {
-        &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-        &amp;quot;maxTaskRetryCount&amp;quot;:0,
-        &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
-      },
-      &amp;quot;killJobOnCompletion&amp;quot;:false,
-      &amp;quot;runElevated&amp;quot;:true,
-      &amp;quot;runExclusive&amp;quot;:true
-      },
-      &amp;quot;poolInfo&amp;quot;: {
-        &amp;quot;autoPoolSpecification&amp;quot;: {
-          &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
-          &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
-          &amp;quot;pool&amp;quot;: {
-            &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
-            &amp;quot;virtualMachineConfiguration&amp;quot;: {
-              &amp;quot;imageReference&amp;quot;: {
-                &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
-                &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
-                &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
-                &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
-              },
-              &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
-            },
-            &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
-            &amp;quot;targetDedicated&amp;quot;:1,
-            &amp;quot;maxTasksPerNode&amp;quot;:1,
-            &amp;quot;taskSchedulingPolicy&amp;quot;: {
-              &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
-            },
-            &amp;quot;enableAutoScale&amp;quot;:false,
-            &amp;quot;enableInterNodeCommunication&amp;quot;:false,
-            &amp;quot;startTask&amp;quot;: {
-              &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
-              &amp;quot;resourceFiles&amp;quot;: [ {
-                &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-                &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
-              } ],
-              &amp;quot;environmentSettings&amp;quot;: [ {
-                &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
-                &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
-              } ],
-              &amp;quot;runElevated&amp;quot;:true,
-              &amp;quot;waitForSuccess&amp;quot;:true
-            },
-            &amp;quot;metadata&amp;quot;: [ {
-              &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
-              &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
-            } ]
-          }
-        }
-      }
-    }
-  }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。&lt;/p&gt;
-
-&lt;p&gt;それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。&lt;/p&gt;
-
-&lt;p&gt;ではスケジュールジョブをAzure BatchにCLIで送り込みます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
-
-&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
 </description>
     </item>
     
