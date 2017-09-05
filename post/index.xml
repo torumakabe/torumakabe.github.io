@@ -37,7 +37,7 @@
 &lt;li&gt;フィルタ
 
 &lt;ul&gt;
-&lt;li&gt;特定のBlobコンテナーにあるjpegファイルのみで発火させる、なんてことができます&lt;/li&gt;
+&lt;li&gt;特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;信頼性
 
@@ -181,9 +181,9 @@ g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
 }]
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;h2 id=&#34;azure-functionsにイメージリサイズファンクションを作って連携してみる&#34;&gt;Azure Functionsにイメージリサイズファンクションを作って連携してみる&lt;/h2&gt;
+&lt;h2 id=&#34;azure-functionsに画像リサイズファンクションを作って連携してみる&#34;&gt;Azure Functionsに画像リサイズファンクションを作って連携してみる&lt;/h2&gt;
 
-&lt;p&gt;Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functionsに画像ファイルのサイズを変えるHandlerアプリを作ってみます。&lt;/p&gt;
+&lt;p&gt;Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。&lt;/p&gt;
 
 &lt;h3 id=&#34;概要&#34;&gt;概要&lt;/h3&gt;
 
