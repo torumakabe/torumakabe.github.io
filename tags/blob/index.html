@@ -221,7 +221,7 @@ ider-namespace Microsoft.Storage --resource-type storageAccounts --included-even
 
 <p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
 
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y0jbj1y0 -n blobeventpocsub-jpeg --pro
+<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
 vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
 g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
 </code></pre>
@@ -273,7 +273,7 @@ g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
 
 <h3 id="handler">Handler</h3>
 
-<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。</p>
+<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
 
 <p>[run.csx]</p>
 
