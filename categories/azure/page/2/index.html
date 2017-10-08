@@ -68,6 +68,173 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">28 Feb 2017, 08:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/dockerforwin_azurecli2/" class="post-title">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="azure-cli-2-0版です">Azure CLI 2.0版です</h2>
+
+<p><a href="http://torumakabe.github.io/post/dockerforwin_azurecli/">Docker for WindowsでインストールレスAzure CLI環境を作る</a>、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。</p>
+
+<h2 id="動機">動機</h2>
+
+<ul>
+<li>Docker for Windows、もっと活用しようぜ</li>
+<li>がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい</li>
+<li>開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい</li>
+<li>WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう</li>
+<li>○○レスって言ってみたかった</li>
+</ul>
+
+<h2 id="やり口">やり口</h2>
+
+<ul>
+<li>もちろんDocker for Windows (on Client Hyper-V) を使う</li>
+<li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る</li>
+<li>&ldquo;az_cli&rdquo;入力にてAzure CLIコンテナを起動</li>
+<li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
+</ul>
+
+<h2 id="作業の中身">作業の中身</h2>
+
+<ul>
+<li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/install/">インストール</a>
+
+<ul>
+<li>64bit Windows 10 Pro/Enterprise/Education 1511以降に対応</li>
+<li>Hyper-Vの有効化を忘れずに</li>
+<li>Hyper-VとぶつかるVirtualBoxとはお別れです</li>
+<li>モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]</li>
+<li>ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]</li>
+</ul></li>
+<li>PowerShell functionを作成
+
+<ul>
+<li>のちほど詳しく</li>
+</ul></li>
+</ul>
+
+<h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
+
+<p>ここが作業のハイライト。</p>
+
+<p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
+
+<pre><code>PS C:\Workspace\ARM&gt; code $profile
+</code></pre>
+
+<p>こんなfunctionを作ります。</p>
+
+<pre><code>function az_cli {
+   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
+}
+</code></pre>
+
+<ul>
+<li>エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので</li>
+<li>コンテナが溜まるのがいやなので、&ndash;rmで都度消します</li>
+<li>毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します</li>
+<li>ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します</li>
+<li>コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
+</ul>
+
+<p>ではテスト。まずはホスト側のファイルを確認。</p>
+
+<pre><code>PS C:\Workspace\ARM&gt; ls
+
+
+    ディレクトリ: C:\Workspace\ARM
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       2017/02/28      8:29           4515 azuredeploy.json
+-a----       2017/02/28      8:30            374 azuredeploy.parameters.json
+</code></pre>
+
+<p>いくつかのファイルがあります。</p>
+
+<p>コンテナを起動してみましょう。az_cli functionを呼びます。</p>
+
+<pre><code>PS C:\Workspace\ARM&gt; az_cli
+bash-4.3#
+</code></pre>
+
+<p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
+
+<p>カレントディレクトリを確認。</p>
+
+<pre><code>bash-4.3# pwd
+/data
+</code></pre>
+
+<p>ファイル共有できているか確認。</p>
+
+<pre><code>bash-4.3# ls
+azuredeploy.json             azuredeploy.parameters.json
+</code></pre>
+
+<p>できてますね。</p>
+
+<p>azコマンドが打てるか確認。</p>
+
+<pre><code>bash-4.3# az --version
+azure-cli (2.0.0+dev)
+
+acr (0.1.1b4+dev)
+acs (2.0.0+dev)
+appservice (0.1.1b5+dev)
+batch (0.1.1b4+dev)
+cloud (2.0.0+dev)
+component (2.0.0+dev)
+configure (2.0.0+dev)
+container (0.1.1b4+dev)
+core (2.0.0+dev)
+documentdb (0.1.1b2+dev)
+feedback (2.0.0+dev)
+iot (0.1.1b3+dev)
+keyvault (0.1.1b5+dev)
+network (2.0.0+dev)
+nspkg (2.0.0+dev)
+profile (2.0.0+dev)
+redis (0.1.1b3+dev)
+resource (2.0.0+dev)
+role (2.0.0+dev)
+sql (0.1.1b5+dev)
+storage (2.0.0+dev)
+taskhelp (0.1.1b3+dev)
+vm (2.0.0+dev)
+
+Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
+[GCC 5.3.0]
+</code></pre>
+
+<p>タブで補完も効きます。</p>
+
+<pre><code>bash-4.3# az a
+account     acr         acs         ad          appservice
+</code></pre>
+
+<p>しあわせ。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">03 Feb 2017, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -504,93 +671,6 @@ Fri Feb  3 06:43:18 2017
 </ul>
 
 <p><strong>それでは、幸せな運用管理サーバレス生活を。</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Aug 2016, 16:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/oms_container_linux/" class="post-title">OMSでLinuxコンテナのログを分析する</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
-
-<p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
-
-<p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
-
-<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
-
-<ul>
-<li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
-
-<ul>
-<li>収集データの詳細 - <a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">Containers data collection details</a></li>
-</ul></li>
-<li>導入が楽ちん
-
-<ol>
-<li>OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる</li>
-<li>コンテナホストに直接OMS Agentを導入することもできる</li>
-</ol></li>
-</ul>
-
-<p>1がコンテナ的でいいですよね。実現イメージはこんな感じです。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" title="from microsoft.com" /></p>
-
-<p>これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。</p>
-
-<p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
-
-<h2 id="手順">手順</h2>
-
-<ul>
-<li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
-
-<ul>
-<li>Azureのサブスクリプションを持っている場合、&rdquo;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
-</ul></li>
-<li>OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加</li>
-<li>UbuntuにDockerを導入
-
-<ul>
-<li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
-<li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
-</ul></li>
-<li>OMSエージェントコンテナを導入
-
-<ul>
-<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
-</ul></li>
-</ul>
-
-<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
-</code></pre>
-
-<p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com" /></p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com" /></p>
-
-<p>なんと簡単じゃありませんか。詳細が気になるかたは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/">こちら</a>から。</p>
-
-<p>なお、フィードバック<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">熱烈歓迎</a>だそうです。</p>
 
                     </div>
                 </section>

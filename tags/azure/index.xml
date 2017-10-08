@@ -9,6 +9,316 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
+      <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <description>
+
+&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://kogelog.com/&#34;&gt;焦げlogさん&lt;/a&gt;で、とても興味深いエントリを拝見しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kogelog.com/2017/10/06/20171006-01/&#34;&gt;Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。&lt;/p&gt;
+
+&lt;p&gt;そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;遅延&lt;/li&gt;
+&lt;li&gt;リージョン間通信に関するサムシング&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。&lt;/p&gt;
+
+&lt;h2 id=&#34;検証方針&#34;&gt;検証方針&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;同一リージョン(東日本)に、2つのVNETを作る&lt;/li&gt;
+&lt;li&gt;それぞれのVNETにVPN Gatewayを配置し、接続する&lt;/li&gt;
+&lt;li&gt;比較しやすいよう、焦げlogさんの検証と条件を合わせる
+
+&lt;ul&gt;
+&lt;li&gt;同じ仮想マシンサイズ: DS3_V2&lt;/li&gt;
+&lt;li&gt;同じストレージ: Premium Storage Managed Disk&lt;/li&gt;
+&lt;li&gt;同じOS: Ubuntu 16.04&lt;/li&gt;
+&lt;li&gt;同じツール: ntttcp&lt;/li&gt;
+&lt;li&gt;同じパラメータ: ntttcp -r -m 16,*,&lt;IP&gt; -t 300&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;送信側 VNET1 -&amp;gt; 受信側 VNET2 のパターンに絞る&lt;/li&gt;
+&lt;li&gt;スループットのポテンシャルを引き出す検証はしない&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+
+&lt;h3 id=&#34;vpngw1-650mbps&#34;&gt;VpnGW1(650Mbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;677.48Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.38Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.34Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;673.85Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;99%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;701.19Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;699.91Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;103%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw2-1gbps&#34;&gt;VpnGW2(1Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;813.09Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;805.60Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.02Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;256%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw3-1-25gbps&#34;&gt;VpnGW3(1.25Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;958.56Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;953.72Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;234%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン1-act-stb-to-act-stb&#34;&gt;SKU視点 パターン1(Act/Stb to Act/Stb)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;119%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;141%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン2-act-stb-to-act-act&#34;&gt;SKU視点 パターン2(Act/Stb to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;179%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;211%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン3-act-act-to-act-act&#34;&gt;SKU視点 パターン3(Act/Act to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;297%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;320%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;考察と推奨&#34;&gt;考察と推奨&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
+
+&lt;ul&gt;
+&lt;li&gt;Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
+
+&lt;ul&gt;
+&lt;li&gt;期待しちゃうのが人情ではありますが&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
       <link>http://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
@@ -2200,113 +2510,6 @@ return $blobSizeInBytes
 &lt;/ul&gt;
 
 &lt;p&gt;知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>http://torumakabe.github.io/post/azure_docker_cntk/</link>
-      <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
-      <description>
-
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
-
-&lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
-
-&lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
-
-&lt;ul&gt;
-&lt;li&gt;Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-&lt;ul&gt;
-&lt;li&gt;Dockerfileの元ネタは&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Tools/docker&#34;&gt;ここ&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;GPUむけもあるけどグッと我慢、今回はCPUで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Hub上のリポジトリは &lt;a href=&#34;https://hub.docker.com/r/torumakabe/cntk-cpu/&#34;&gt;torumakabe/cntk-cpu&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-&lt;ul&gt;
-&lt;li&gt;docker extensionでdocker engineを導入&lt;/li&gt;
-&lt;li&gt;custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
-
-&lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
-
-&lt;p&gt;リソースグループを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json&#34;&gt;azuredeploy.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;編集不要です&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json&#34;&gt;azuredeploy.parameters.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;うし、デプロイ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。&lt;/p&gt;
-
-&lt;p&gt;docker engine入ってますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKビルド済みのdockerイメージ、pullできてますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;問題なし。ではエンジョイ Deep Learning。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
-
-&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
-
-&lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
-
-&lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
-
-&lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
 </description>
     </item>
     

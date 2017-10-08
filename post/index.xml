@@ -6,8 +6,318 @@
     <description>Recent content in Post-rsses on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 08 Oct 2017 10:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
+      <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <description>
+
+&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://kogelog.com/&#34;&gt;焦げlogさん&lt;/a&gt;で、とても興味深いエントリを拝見しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kogelog.com/2017/10/06/20171006-01/&#34;&gt;Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。&lt;/p&gt;
+
+&lt;p&gt;そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;遅延&lt;/li&gt;
+&lt;li&gt;リージョン間通信に関するサムシング&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。&lt;/p&gt;
+
+&lt;h2 id=&#34;検証方針&#34;&gt;検証方針&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;同一リージョン(東日本)に、2つのVNETを作る&lt;/li&gt;
+&lt;li&gt;それぞれのVNETにVPN Gatewayを配置し、接続する&lt;/li&gt;
+&lt;li&gt;比較しやすいよう、焦げlogさんの検証と条件を合わせる
+
+&lt;ul&gt;
+&lt;li&gt;同じ仮想マシンサイズ: DS3_V2&lt;/li&gt;
+&lt;li&gt;同じストレージ: Premium Storage Managed Disk&lt;/li&gt;
+&lt;li&gt;同じOS: Ubuntu 16.04&lt;/li&gt;
+&lt;li&gt;同じツール: ntttcp&lt;/li&gt;
+&lt;li&gt;同じパラメータ: ntttcp -r -m 16,*,&lt;IP&gt; -t 300&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;送信側 VNET1 -&amp;gt; 受信側 VNET2 のパターンに絞る&lt;/li&gt;
+&lt;li&gt;スループットのポテンシャルを引き出す検証はしない&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+
+&lt;h3 id=&#34;vpngw1-650mbps&#34;&gt;VpnGW1(650Mbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;677.48Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.38Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.34Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;673.85Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;99%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;701.19Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;699.91Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;103%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw2-1gbps&#34;&gt;VpnGW2(1Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;813.09Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;805.60Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.02Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;256%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw3-1-25gbps&#34;&gt;VpnGW3(1.25Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;958.56Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;953.72Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;234%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン1-act-stb-to-act-stb&#34;&gt;SKU視点 パターン1(Act/Stb to Act/Stb)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;119%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;141%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン2-act-stb-to-act-act&#34;&gt;SKU視点 パターン2(Act/Stb to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;179%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;211%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン3-act-act-to-act-act&#34;&gt;SKU視点 パターン3(Act/Act to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;297%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;320%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;考察と推奨&#34;&gt;考察と推奨&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
+
+&lt;ul&gt;
+&lt;li&gt;Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
+
+&lt;ul&gt;
+&lt;li&gt;期待しちゃうのが人情ではありますが&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
@@ -1954,246 +2264,6 @@ end
 &lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
 
 &lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
-      <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
-      <description>
-
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
-
-&lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
-
-&lt;p&gt;Azure Functionsは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう&lt;/li&gt;
-&lt;li&gt;利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表&lt;/li&gt;
-&lt;li&gt;Azure内外機能との、容易なイベント連動。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;が特徴です。AWSのLambdaと似てるっちゃ似ています。&lt;/p&gt;
-
-&lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIを使って、webhook連動する&lt;/li&gt;
-&lt;li&gt;Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す&lt;/li&gt;
-&lt;li&gt;ビールは&lt;a href=&#34;http://beertaster.org/beerstyle/web/beerstyle_main_j.html&#34;&gt;Craft Beer Association&lt;/a&gt;の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す&lt;/li&gt;
-&lt;li&gt;Botらしく、それらしい文末表現をランダムで返す&lt;/li&gt;
-&lt;li&gt;好みとか文脈は全く聞かないぜSorry&lt;/li&gt;
-&lt;li&gt;アプリはNodeで書く。C#のサンプルは増えてきたので&lt;/li&gt;
-&lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
-&lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
-&lt;li&gt;拡張性はひとまず目をつぶる  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
-
-&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
-
-&lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azureで
-
-&lt;ul&gt;
-&lt;li&gt;Function Appの作成  #1&lt;/li&gt;
-&lt;li&gt;Bot用Functionの作成 #2&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIとの接続検証  #6&lt;/li&gt;
-&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #8&lt;/li&gt;
-&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9&lt;/li&gt;
-&lt;li&gt;DocumentDBのストアドプロシージャ作成  #10&lt;/li&gt;
-&lt;li&gt;Function Appを書く  #11&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #12&lt;/li&gt;
-&lt;li&gt;Function AppのGithub連携設定  #13&lt;/li&gt;
-&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #14&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Facebookで
-
-&lt;ul&gt;
-&lt;li&gt;Facebook for Developersへの登録  #3&lt;/li&gt;
-&lt;li&gt;Botをひも付けるFacebook Pageの作成  #4&lt;/li&gt;
-&lt;li&gt;Bot用マイアプリの作成  #5&lt;/li&gt;
-&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #6&lt;/li&gt;
-&lt;li&gt;Azure Functions向けTokenを生成 #7&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを書くまで、#1〜2、#5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;li&gt;Facebook for Developersへの登録、#3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
-&lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
-&lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/&#34;&gt;DBアカウント〜コレクション作成&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する#12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。&lt;/p&gt;
-
-&lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
-var documentClient = require(&amp;quot;documentdb&amp;quot;).DocumentClient;
-const databaseUrl = &amp;quot;dbs/&amp;quot; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &amp;quot;masterKey&amp;quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &amp;quot; &amp;quot; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &amp;quot;attachment&amp;quot;:{
-          &amp;quot;type&amp;quot;:&amp;quot;template&amp;quot;,
-          &amp;quot;payload&amp;quot;:{
-            &amp;quot;template_type&amp;quot;:&amp;quot;button&amp;quot;,
-            &amp;quot;text&amp;quot;:msgAll,
-            &amp;quot;buttons&amp;quot;:[
-              {
-                &amp;quot;type&amp;quot;:&amp;quot;web_url&amp;quot;,
-                &amp;quot;url&amp;quot;:value[0].randomDocument.url,
-                &amp;quot;title&amp;quot;:&amp;quot;詳しく&amp;quot;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: &#39;graph.facebook.com&#39;,
-      port: 443,
-      path: &#39;/v2.6/me/messages&#39;,
-      method: &#39;POST&#39;,
-      headers: {
-        &#39;Content-Type&#39;: &#39;application/json&#39;,
-        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/beer&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/eom&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &amp;lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;amp;&amp;amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;最下部のmodule.export以降のブロックで、webhookイベントを受け取ります&lt;/li&gt;
-&lt;li&gt;それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
-
-&lt;ul&gt;
-&lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
-
-&lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
-  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
 </description>
     </item>
     

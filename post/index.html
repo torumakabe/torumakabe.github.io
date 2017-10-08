@@ -68,6 +68,328 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">08 Oct 2017, 10:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_vpngw_act_act_perf/" class="post-title">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="動機">動機</h2>
+
+<p><a href="https://kogelog.com/">焦げlogさん</a>で、とても興味深いエントリを拝見しました。</p>
+
+<ul>
+<li><a href="https://kogelog.com/2017/10/06/20171006-01/">Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました</a></li>
+</ul>
+
+<p>確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは</p>
+
+<blockquote>
+<p>※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…</p>
+</blockquote>
+
+<p>ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。</p>
+
+<p>そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる</p>
+
+<ul>
+<li>遅延</li>
+<li>リージョン間通信に関するサムシング</li>
+</ul>
+
+<p>を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。</p>
+
+<h2 id="検証方針">検証方針</h2>
+
+<ul>
+<li>同一リージョン(東日本)に、2つのVNETを作る</li>
+<li>それぞれのVNETにVPN Gatewayを配置し、接続する</li>
+<li>比較しやすいよう、焦げlogさんの検証と条件を合わせる
+
+<ul>
+<li>同じ仮想マシンサイズ: DS3_V2</li>
+<li>同じストレージ: Premium Storage Managed Disk</li>
+<li>同じOS: Ubuntu 16.04</li>
+<li>同じツール: ntttcp</li>
+<li>同じパラメータ: ntttcp -r -m 16,*,<IP> -t 300</li>
+</ul></li>
+<li>送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る</li>
+<li>スループットのポテンシャルを引き出す検証はしない</li>
+</ul>
+
+<h2 id="結果">結果</h2>
+
+<h3 id="vpngw1-650mbps">VpnGW1(650Mbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">677.48Mbps</td>
+<td align="right">676.38Mbps</td>
+<td align="right">676.93Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">674.34Mbps</td>
+<td align="right">673.85Mbps</td>
+<td align="right">674.10Mbps</td>
+<td align="right">99%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">701.19Mbps</td>
+<td align="right">699.91Mbps</td>
+<td align="right">700.55Mbps</td>
+<td align="right">103%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="vpngw2-1gbps">VpnGW2(1Gbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">813.09Mbps</td>
+<td align="right">805.60Mbps</td>
+<td align="right">809.35Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">1.18Gbps</td>
+<td align="right">1.18Gbps</td>
+<td align="right">1.18Gbps</td>
+<td align="right">149%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">2.03Gbps</td>
+<td align="right">2.02Gbps</td>
+<td align="right">2.03Gbps</td>
+<td align="right">256%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="vpngw3-1-25gbps">VpnGW3(1.25Gbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">958.56Mbps</td>
+<td align="right">953.72Mbps</td>
+<td align="right">956.14Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">1.39Gbps</td>
+<td align="right">1.39Gbps</td>
+<td align="right">1.39Gbps</td>
+<td align="right">149%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">2.19Gbps</td>
+<td align="right">2.19Gbps</td>
+<td align="right">2.19Gbps</td>
+<td align="right">234%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン1-act-stb-to-act-stb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">676.93Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">809.35Mbps</td>
+<td align="right">119%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">956.14Mbps</td>
+<td align="right">141%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン2-act-stb-to-act-act">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">674.10Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">1.18Gbps</td>
+<td align="right">179%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">1.39Gbps</td>
+<td align="right">211%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン3-act-act-to-act-act">SKU視点 パターン3(Act/Act to Act/Act)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">700.55Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">2.03Gbps</td>
+<td align="right">297%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">2.19Gbps</td>
+<td align="right">320%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="考察と推奨">考察と推奨</h2>
+
+<ul>
+<li>リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
+
+<ul>
+<li>Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる</li>
+</ul></li>
+<li>公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
+
+<ul>
+<li>期待しちゃうのが人情ではありますが</li>
+</ul></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -914,173 +1236,6 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKE
 
 Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
 </code></pre>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Feb 2017, 08:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/dockerforwin_azurecli2/" class="post-title">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-cli-2-0版です">Azure CLI 2.0版です</h2>
-
-<p><a href="http://torumakabe.github.io/post/dockerforwin_azurecli/">Docker for WindowsでインストールレスAzure CLI環境を作る</a>、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。</p>
-
-<h2 id="動機">動機</h2>
-
-<ul>
-<li>Docker for Windows、もっと活用しようぜ</li>
-<li>がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい</li>
-<li>開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい</li>
-<li>WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう</li>
-<li>○○レスって言ってみたかった</li>
-</ul>
-
-<h2 id="やり口">やり口</h2>
-
-<ul>
-<li>もちろんDocker for Windows (on Client Hyper-V) を使う</li>
-<li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る</li>
-<li>&ldquo;az_cli&rdquo;入力にてAzure CLIコンテナを起動</li>
-<li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
-</ul>
-
-<h2 id="作業の中身">作業の中身</h2>
-
-<ul>
-<li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/install/">インストール</a>
-
-<ul>
-<li>64bit Windows 10 Pro/Enterprise/Education 1511以降に対応</li>
-<li>Hyper-Vの有効化を忘れずに</li>
-<li>Hyper-VとぶつかるVirtualBoxとはお別れです</li>
-<li>モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]</li>
-<li>ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]</li>
-</ul></li>
-<li>PowerShell functionを作成
-
-<ul>
-<li>のちほど詳しく</li>
-</ul></li>
-</ul>
-
-<h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
-
-<p>ここが作業のハイライト。</p>
-
-<p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; code $profile
-</code></pre>
-
-<p>こんなfunctionを作ります。</p>
-
-<pre><code>function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-</code></pre>
-
-<ul>
-<li>エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので</li>
-<li>コンテナが溜まるのがいやなので、&ndash;rmで都度消します</li>
-<li>毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します</li>
-<li>ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します</li>
-<li>コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
-</ul>
-
-<p>ではテスト。まずはホスト側のファイルを確認。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-</code></pre>
-
-<p>いくつかのファイルがあります。</p>
-
-<p>コンテナを起動してみましょう。az_cli functionを呼びます。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; az_cli
-bash-4.3#
-</code></pre>
-
-<p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
-
-<p>カレントディレクトリを確認。</p>
-
-<pre><code>bash-4.3# pwd
-/data
-</code></pre>
-
-<p>ファイル共有できているか確認。</p>
-
-<pre><code>bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-</code></pre>
-
-<p>できてますね。</p>
-
-<p>azコマンドが打てるか確認。</p>
-
-<pre><code>bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-</code></pre>
-
-<p>タブで補完も効きます。</p>
-
-<pre><code>bash-4.3# az a
-account     acr         acs         ad          appservice
-</code></pre>
-
-<p>しあわせ。</p>
 
                     </div>
                 </section>

@@ -9,6 +9,316 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
+      <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <description>
+
+&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://kogelog.com/&#34;&gt;焦げlogさん&lt;/a&gt;で、とても興味深いエントリを拝見しました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kogelog.com/2017/10/06/20171006-01/&#34;&gt;Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。&lt;/p&gt;
+
+&lt;p&gt;そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;遅延&lt;/li&gt;
+&lt;li&gt;リージョン間通信に関するサムシング&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。&lt;/p&gt;
+
+&lt;h2 id=&#34;検証方針&#34;&gt;検証方針&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;同一リージョン(東日本)に、2つのVNETを作る&lt;/li&gt;
+&lt;li&gt;それぞれのVNETにVPN Gatewayを配置し、接続する&lt;/li&gt;
+&lt;li&gt;比較しやすいよう、焦げlogさんの検証と条件を合わせる
+
+&lt;ul&gt;
+&lt;li&gt;同じ仮想マシンサイズ: DS3_V2&lt;/li&gt;
+&lt;li&gt;同じストレージ: Premium Storage Managed Disk&lt;/li&gt;
+&lt;li&gt;同じOS: Ubuntu 16.04&lt;/li&gt;
+&lt;li&gt;同じツール: ntttcp&lt;/li&gt;
+&lt;li&gt;同じパラメータ: ntttcp -r -m 16,*,&lt;IP&gt; -t 300&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;送信側 VNET1 -&amp;gt; 受信側 VNET2 のパターンに絞る&lt;/li&gt;
+&lt;li&gt;スループットのポテンシャルを引き出す検証はしない&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
+
+&lt;h3 id=&#34;vpngw1-650mbps&#34;&gt;VpnGW1(650Mbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;677.48Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.38Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.34Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;673.85Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;99%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;701.19Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;699.91Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;103%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw2-1gbps&#34;&gt;VpnGW2(1Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;813.09Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;805.60Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.02Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;256%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;vpngw3-1-25gbps&#34;&gt;VpnGW3(1.25Gbps)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;パターン　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;送信側GW構成　　　　　&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;受信側GW構成　　　　　　　　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;送信側スループット　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　受信側スループット&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　パターン1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン1　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;958.56Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;953.72Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン2　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Stb&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;149%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;パターン3　&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;Act/Act&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;234%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン1-act-stb-to-act-stb&#34;&gt;SKU視点 パターン1(Act/Stb to Act/Stb)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;676.93Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;809.35Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;119%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;956.14Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;141%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン2-act-stb-to-act-act&#34;&gt;SKU視点 パターン2(Act/Stb to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;674.10Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.18Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;179%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;211%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&#34;sku視点-パターン3-act-act-to-act-act&#34;&gt;SKU視点 パターン3(Act/Act to Act/Act)&lt;/h3&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;left&#34;&gt;SKU　&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　スループット平均&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;　VpnGw1との比較&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw1　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;700.55Mbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;-&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw2　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.03Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;297%&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;left&#34;&gt;VpnGw3　&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.19Gbps&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;320%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;考察と推奨&#34;&gt;考察と推奨&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
+
+&lt;ul&gt;
+&lt;li&gt;Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
+
+&lt;ul&gt;
+&lt;li&gt;期待しちゃうのが人情ではありますが&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
       <link>http://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
@@ -2130,175 +2440,6 @@ module.exports = function (context, req) {
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
-      <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
-
-&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
-
-&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
-節約」でしょう。&lt;/p&gt;
-
-&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
-
-&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
-
-&lt;h2 id=&#34;コンセプト&#34;&gt;コンセプト&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;管理サーバを作らない&lt;/li&gt;
-&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
-&lt;li&gt;ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
-&lt;li&gt;サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
-&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;サンプル&#34;&gt;サンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
-
-&lt;p&gt;ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── blob
-│   ├── application
-│   │   ├── starttask.sh
-│   │   └── task.sh
-│   ├── input
-│   │   └── the_star_spangled_banner.txt
-│   └── output
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
-
-&lt;p&gt;コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
-
-&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
-&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
-&lt;li&gt;ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
-&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
-&lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
-&lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;  {
-  &amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
-  &amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
-  &amp;quot;schedule&amp;quot;: {
-    &amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
-    &amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
-  },
-  &amp;quot;jobSpecification&amp;quot;: {
-    &amp;quot;priority&amp;quot;:100,
-    &amp;quot;constraints&amp;quot;: {
-      &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-      &amp;quot;maxTaskRetryCount&amp;quot;:-1
-    },
-    &amp;quot;jobManagerTask&amp;quot;: {
-      &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
-      &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
-      &amp;quot;resourceFiles&amp;quot;: [ {
-        &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-        &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
-      }], 
-      &amp;quot;environmentSettings&amp;quot;: [ {
-        &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
-        &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
-      } ],
-      &amp;quot;constraints&amp;quot;: {
-        &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-        &amp;quot;maxTaskRetryCount&amp;quot;:0,
-        &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
-      },
-      &amp;quot;killJobOnCompletion&amp;quot;:false,
-      &amp;quot;runElevated&amp;quot;:true,
-      &amp;quot;runExclusive&amp;quot;:true
-      },
-      &amp;quot;poolInfo&amp;quot;: {
-        &amp;quot;autoPoolSpecification&amp;quot;: {
-          &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
-          &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
-          &amp;quot;pool&amp;quot;: {
-            &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
-            &amp;quot;virtualMachineConfiguration&amp;quot;: {
-              &amp;quot;imageReference&amp;quot;: {
-                &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
-                &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
-                &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
-                &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
-              },
-              &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
-            },
-            &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
-            &amp;quot;targetDedicated&amp;quot;:1,
-            &amp;quot;maxTasksPerNode&amp;quot;:1,
-            &amp;quot;taskSchedulingPolicy&amp;quot;: {
-              &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
-            },
-            &amp;quot;enableAutoScale&amp;quot;:false,
-            &amp;quot;enableInterNodeCommunication&amp;quot;:false,
-            &amp;quot;startTask&amp;quot;: {
-              &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
-              &amp;quot;resourceFiles&amp;quot;: [ {
-                &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-                &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
-              } ],
-              &amp;quot;environmentSettings&amp;quot;: [ {
-                &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
-                &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
-              } ],
-              &amp;quot;runElevated&amp;quot;:true,
-              &amp;quot;waitForSuccess&amp;quot;:true
-            },
-            &amp;quot;metadata&amp;quot;: [ {
-              &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
-              &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
-            } ]
-          }
-        }
-      }
-    }
-  }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。&lt;/p&gt;
-
-&lt;p&gt;それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。&lt;/p&gt;
-
-&lt;p&gt;ではスケジュールジョブをAzure BatchにCLIで送り込みます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
-
-&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
 </description>
     </item>
     
