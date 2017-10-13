@@ -123,7 +123,7 @@ Install-WindowsUpdate -acceptEula
 
 &lt;p&gt;便利。&lt;/p&gt;
 
-&lt;p&gt;ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio/Visual Studio Code &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync&#34;&gt;Settings Sync拡張&lt;/a&gt;を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。&lt;/p&gt;
+&lt;p&gt;ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio Code &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync&#34;&gt;Settings Sync拡張&lt;/a&gt;を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。&lt;/p&gt;
 
 &lt;p&gt;新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。&lt;/p&gt;
 </description>
