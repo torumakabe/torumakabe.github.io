@@ -68,6 +68,138 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">13 Oct 2017, 14:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/intro_boxstarter/" class="post-title">自動化を愛するWindows使いへ Boxstarterのすすめ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Windows" href="http://torumakabe.github.io//categories/windows">Windows</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="windowsのセットアップどうする問題">Windowsのセットアップどうする問題</h2>
+
+<p>そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようかという人も多いのはないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～３回はスッキリしたい派なので、アップデートはいいタイミングです。</p>
+
+<p>でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。</p>
+
+<p><a href="http://boxstarter.org/">Boxstarter</a></p>
+
+<p>わたしはマイクロソフトの仲間、Jessieの<a href="https://blog.jessfraz.com/post/windows-for-linux-nerds/">ポスト</a>で知りました。サンクスJessie。</p>
+
+<h2 id="boxstarterで出来ること">Boxstarterで出来ること</h2>
+
+<ul>
+<li>シンプルなスクリプトで
+
+<ul>
+<li>Windowsの各種設定</li>
+<li>Chocolateyパッケージの導入</li>
+</ul></li>
+<li>設定ファイルをネットワーク経由で読み込める
+
+<ul>
+<li>Gistから</li>
+</ul></li>
+<li>ベアメタルでも仮想マシンでもOK</li>
+</ul>
+
+<h2 id="実行手順">実行手順</h2>
+
+<p>手順は<a href="http://boxstarter.org/Learn/WebLauncher">Boxstarterのサイト</a>で紹介されています。</p>
+
+<ul>
+<li>スクリプトを作る</li>
+<li>Gistに上げる</li>
+<li>Boxstarterを導入する</li>
+</ul>
+
+<p>PowerShell 3以降であれば</p>
+
+<pre><code>. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+</code></pre>
+
+<ul>
+<li>Gist上のスクリプトを指定して実行する</li>
+</ul>
+
+<p>なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)</p>
+
+<pre><code>Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots
+</code></pre>
+
+<p>以上。</p>
+
+<h2 id="サンプル設定ファイル">サンプル設定ファイル</h2>
+
+<p>設定ファイルは<a href="https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac">こんな感じ</a>に書きます。</p>
+
+<p>ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。</p>
+
+<pre><code># Learn more: http://boxstarter.org/Learn/WebLauncher
+
+# Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
+# Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)
+
+#---- TEMPORARY ---
+Disable-UAC
+
+#--- Fonts ---
+choco install inconsolata
+  
+#--- Windows Settings ---
+# 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.org/WinConfig)
+Disable-GameBarTips
+
+Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowFileExtensions
+Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
+
+Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name NavPaneShowAllFolders -Value 1
+
+#--- Windows Subsystems/Features ---
+choco install Microsoft-Hyper-V-All -source windowsFeatures
+choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
+choco install containers -source windowsfeatures
+
+#--- Tools ---
+choco install git.install
+choco install yarn
+choco install sysinternals
+choco install 7zip
+
+#--- Apps ---
+choco install googlechrome
+choco install docker-for-windows
+choco install microsoft-teams
+choco install slack
+choco install putty
+choco install visualstudiocode
+
+#--- Restore Temporary Settings ---
+Enable-UAC
+Enable-MicrosoftUpdate
+Install-WindowsUpdate -acceptEula
+</code></pre>
+
+<p>便利。</p>
+
+<p>ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio/Visual Studio Code <a href="https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync">Settings Sync拡張</a>を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。</p>
+
+<p>新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">08 Oct 2017, 10:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1134,119 +1266,12 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKE
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
-
-<ul>
-<li>ARMテンプレートのドキュメントが使いやすくなった</li>
-<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
-<li>ARMテンプレートでManaged Diskを作る時のコツ</li>
-<li>可用性セットを意識しよう</li>
-</ul>
-
-<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
-
-<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
-
-<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
-
-<p>これがあまり知られてないようなのでアピールしておきます。</p>
-
-<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
-
-<p>コードアシストしてくれます。</p>
-
-<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
-
-<h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
-
-<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
-
-<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
-
-<pre><code>&quot;osDisk&quot;: {
-  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
-  &quot;createOption&quot;: &quot;FromImage&quot;,
-  &quot;managedDisk&quot;: {
-    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
-  },
-  &quot;diskSizeGB&quot;: 128
-}
-</code></pre>
-
-<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
-
-<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
-
-<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
-
-<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
-
-<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
-
-<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン(FD: Fault Domain)&ldquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
-
-<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
-
-<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
-
-<pre><code>{
-  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
-  &quot;name&quot;: &quot;AvSet01&quot;,
-  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
-  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
-  &quot;properties&quot;: {
-    &quot;managed&quot;: true,
-    &quot;platformFaultDomainCount&quot;: 2,
-    &quot;platformUpdateDomainCount&quot;: 5
-  }
-},
-</code></pre>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
-
-<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
-
-<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
-
-<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
-
-Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
-</code></pre>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 10</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 11</span>
     
       <a href="/post/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
