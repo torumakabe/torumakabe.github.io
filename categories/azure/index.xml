@@ -9,6 +9,115 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
+      <link>http://torumakabe.github.io/post/azblob_golang/</link>
+      <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azblob_golang/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-blob-アップローダーをgoで書いた&#34;&gt;Azure Blob アップローダーをGoで書いた&lt;/h2&gt;
+
+&lt;p&gt;ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。&lt;/p&gt;
+
+&lt;h2 id=&#34;ひとつめの理由-sdkが新しくなったから&#34;&gt;ひとつめの理由: SDKが新しくなったから&lt;/h2&gt;
+
+&lt;p&gt;最近公式ブログで&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/&#34;&gt;紹介された&lt;/a&gt;通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。&lt;/p&gt;
+
+&lt;p&gt;ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;flag&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/url&amp;quot;
+	&amp;quot;os&amp;quot;
+
+	&amp;quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&amp;quot;
+)
+
+var (
+	accountName    string
+	accountKey     string
+	containerName  string
+	fileName       string
+	blockSize      int64
+	blockSizeBytes int64
+)
+
+func init() {
+	flag.StringVar(&amp;amp;accountName, &amp;quot;account-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Name&amp;quot;)
+	flag.StringVar(&amp;amp;accountKey, &amp;quot;account-key&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Key&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;c&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;container-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;f&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Upload filename&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;file&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Upload filename&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;b&amp;quot;, 4, &amp;quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;blocksize&amp;quot;, 4, &amp;quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Parse()
+
+	if (blockSize &amp;lt; 1) || (blockSize) &amp;gt; 100 {
+		fmt.Println(&amp;quot;Blocksize must be from 1MB to 100MB&amp;quot;)
+		os.Exit(1)
+	}
+	blockSizeBytes = blockSize * 1024 * 1024
+}
+
+func main() {
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	fileSize, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u, _ := url.Parse(fmt.Sprintf(&amp;quot;https://%s.blob.core.windows.net/%s/%s&amp;quot;, accountName, containerName, fileName))
+	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
+
+	ctx := context.Background()
+
+	fmt.Println(&amp;quot;Uploading block blob...&amp;quot;)
+	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
+		azblob.UploadStreamToBlockBlobOptions{
+			BlockSize: blockSizeBytes,
+			Progress: func(bytesTransferred int64) {
+				fmt.Printf(&amp;quot;Uploaded %d of %d bytes.\n&amp;quot;, bytesTransferred, fileSize.Size())
+			},
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = putBlockList // Avoid compiler&#39;s &amp;quot;declared and not used&amp;quot; error
+
+	fmt.Println(&amp;quot;Done&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。&lt;/p&gt;
+
+&lt;p&gt;ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、&lt;a href=&#34;https://github.com/Azure/azure-storage-blob-go/issues/8&#34;&gt;修正してもらった&lt;/a&gt;ので、次のリリースでは解決していると思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;ふたつめの理由-レガシー対応&#34;&gt;ふたつめの理由: レガシー対応&lt;/h2&gt;
+
+&lt;p&gt;Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。&lt;/p&gt;
+
+&lt;p&gt;たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。&lt;/p&gt;
+
+&lt;p&gt;ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。&lt;/p&gt;
+
+&lt;p&gt;ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。&lt;/p&gt;
+
+&lt;p&gt;C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
       <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
@@ -2201,246 +2310,6 @@ end
 &lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
 
 &lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
-      <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
-      <description>
-
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
-
-&lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
-
-&lt;p&gt;Azure Functionsは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう&lt;/li&gt;
-&lt;li&gt;利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表&lt;/li&gt;
-&lt;li&gt;Azure内外機能との、容易なイベント連動。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;が特徴です。AWSのLambdaと似てるっちゃ似ています。&lt;/p&gt;
-
-&lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIを使って、webhook連動する&lt;/li&gt;
-&lt;li&gt;Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す&lt;/li&gt;
-&lt;li&gt;ビールは&lt;a href=&#34;http://beertaster.org/beerstyle/web/beerstyle_main_j.html&#34;&gt;Craft Beer Association&lt;/a&gt;の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す&lt;/li&gt;
-&lt;li&gt;Botらしく、それらしい文末表現をランダムで返す&lt;/li&gt;
-&lt;li&gt;好みとか文脈は全く聞かないぜSorry&lt;/li&gt;
-&lt;li&gt;アプリはNodeで書く。C#のサンプルは増えてきたので&lt;/li&gt;
-&lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
-&lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
-&lt;li&gt;拡張性はひとまず目をつぶる  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
-
-&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
-
-&lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azureで
-
-&lt;ul&gt;
-&lt;li&gt;Function Appの作成  #1&lt;/li&gt;
-&lt;li&gt;Bot用Functionの作成 #2&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIとの接続検証  #6&lt;/li&gt;
-&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #8&lt;/li&gt;
-&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9&lt;/li&gt;
-&lt;li&gt;DocumentDBのストアドプロシージャ作成  #10&lt;/li&gt;
-&lt;li&gt;Function Appを書く  #11&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #12&lt;/li&gt;
-&lt;li&gt;Function AppのGithub連携設定  #13&lt;/li&gt;
-&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #14&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Facebookで
-
-&lt;ul&gt;
-&lt;li&gt;Facebook for Developersへの登録  #3&lt;/li&gt;
-&lt;li&gt;Botをひも付けるFacebook Pageの作成  #4&lt;/li&gt;
-&lt;li&gt;Bot用マイアプリの作成  #5&lt;/li&gt;
-&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #6&lt;/li&gt;
-&lt;li&gt;Azure Functions向けTokenを生成 #7&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを書くまで、#1〜2、#5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;li&gt;Facebook for Developersへの登録、#3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
-&lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
-&lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/&#34;&gt;DBアカウント〜コレクション作成&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する#12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。&lt;/p&gt;
-
-&lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
-var documentClient = require(&amp;quot;documentdb&amp;quot;).DocumentClient;
-const databaseUrl = &amp;quot;dbs/&amp;quot; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &amp;quot;masterKey&amp;quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &amp;quot; &amp;quot; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &amp;quot;attachment&amp;quot;:{
-          &amp;quot;type&amp;quot;:&amp;quot;template&amp;quot;,
-          &amp;quot;payload&amp;quot;:{
-            &amp;quot;template_type&amp;quot;:&amp;quot;button&amp;quot;,
-            &amp;quot;text&amp;quot;:msgAll,
-            &amp;quot;buttons&amp;quot;:[
-              {
-                &amp;quot;type&amp;quot;:&amp;quot;web_url&amp;quot;,
-                &amp;quot;url&amp;quot;:value[0].randomDocument.url,
-                &amp;quot;title&amp;quot;:&amp;quot;詳しく&amp;quot;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: &#39;graph.facebook.com&#39;,
-      port: 443,
-      path: &#39;/v2.6/me/messages&#39;,
-      method: &#39;POST&#39;,
-      headers: {
-        &#39;Content-Type&#39;: &#39;application/json&#39;,
-        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/beer&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/eom&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &amp;lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;amp;&amp;amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;最下部のmodule.export以降のブロックで、webhookイベントを受け取ります&lt;/li&gt;
-&lt;li&gt;それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
-
-&lt;ul&gt;
-&lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
-
-&lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
-  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
 </description>
     </item>
     

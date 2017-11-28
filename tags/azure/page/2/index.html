@@ -68,6 +68,113 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
+
+<ul>
+<li>ARMテンプレートのドキュメントが使いやすくなった</li>
+<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
+<li>ARMテンプレートでManaged Diskを作る時のコツ</li>
+<li>可用性セットを意識しよう</li>
+</ul>
+
+<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
+
+<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
+
+<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
+
+<p>これがあまり知られてないようなのでアピールしておきます。</p>
+
+<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
+
+<p>コードアシストしてくれます。</p>
+
+<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
+
+<h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
+
+<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
+
+<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
+
+<pre><code>&quot;osDisk&quot;: {
+  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
+  &quot;createOption&quot;: &quot;FromImage&quot;,
+  &quot;managedDisk&quot;: {
+    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
+  },
+  &quot;diskSizeGB&quot;: 128
+}
+</code></pre>
+
+<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
+
+<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
+
+<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
+
+<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
+
+<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
+
+<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン(FD: Fault Domain)&ldquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
+
+<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
+
+<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
+
+<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
+
+<pre><code>{
+  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
+  &quot;name&quot;: &quot;AvSet01&quot;,
+  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
+  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
+  &quot;properties&quot;: {
+    &quot;managed&quot;: true,
+    &quot;platformFaultDomainCount&quot;: 2,
+    &quot;platformUpdateDomainCount&quot;: 5
+  }
+},
+</code></pre>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
+
+<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
+
+<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
+
+<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+
+Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+</code></pre>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">03 Feb 2017, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -504,93 +611,6 @@ Fri Feb  3 06:43:18 2017
 </ul>
 
 <p><strong>それでは、幸せな運用管理サーバレス生活を。</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Aug 2016, 16:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/oms_container_linux/" class="post-title">OMSでLinuxコンテナのログを分析する</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
-
-<p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
-
-<p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
-
-<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
-
-<ul>
-<li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
-
-<ul>
-<li>収集データの詳細 - <a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">Containers data collection details</a></li>
-</ul></li>
-<li>導入が楽ちん
-
-<ol>
-<li>OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる</li>
-<li>コンテナホストに直接OMS Agentを導入することもできる</li>
-</ol></li>
-</ul>
-
-<p>1がコンテナ的でいいですよね。実現イメージはこんな感じです。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" title="from microsoft.com" /></p>
-
-<p>これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。</p>
-
-<p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
-
-<h2 id="手順">手順</h2>
-
-<ul>
-<li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
-
-<ul>
-<li>Azureのサブスクリプションを持っている場合、&rdquo;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
-</ul></li>
-<li>OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加</li>
-<li>UbuntuにDockerを導入
-
-<ul>
-<li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
-<li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
-</ul></li>
-<li>OMSエージェントコンテナを導入
-
-<ul>
-<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
-</ul></li>
-</ul>
-
-<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
-</code></pre>
-
-<p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com" /></p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com" /></p>
-
-<p>なんと簡単じゃありませんか。詳細が気になるかたは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/">こちら</a>から。</p>
-
-<p>なお、フィードバック<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">熱烈歓迎</a>だそうです。</p>
 
                     </div>
                 </section>

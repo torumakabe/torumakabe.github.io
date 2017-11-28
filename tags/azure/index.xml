@@ -9,6 +9,115 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
+      <link>http://torumakabe.github.io/post/azblob_golang/</link>
+      <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azblob_golang/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-blob-アップローダーをgoで書いた&#34;&gt;Azure Blob アップローダーをGoで書いた&lt;/h2&gt;
+
+&lt;p&gt;ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。&lt;/p&gt;
+
+&lt;h2 id=&#34;ひとつめの理由-sdkが新しくなったから&#34;&gt;ひとつめの理由: SDKが新しくなったから&lt;/h2&gt;
+
+&lt;p&gt;最近公式ブログで&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/&#34;&gt;紹介された&lt;/a&gt;通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。&lt;/p&gt;
+
+&lt;p&gt;ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;flag&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/url&amp;quot;
+	&amp;quot;os&amp;quot;
+
+	&amp;quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&amp;quot;
+)
+
+var (
+	accountName    string
+	accountKey     string
+	containerName  string
+	fileName       string
+	blockSize      int64
+	blockSizeBytes int64
+)
+
+func init() {
+	flag.StringVar(&amp;amp;accountName, &amp;quot;account-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Name&amp;quot;)
+	flag.StringVar(&amp;amp;accountKey, &amp;quot;account-key&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Key&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;c&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;container-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;f&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Upload filename&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;file&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Upload filename&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;b&amp;quot;, 4, &amp;quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;blocksize&amp;quot;, 4, &amp;quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Parse()
+
+	if (blockSize &amp;lt; 1) || (blockSize) &amp;gt; 100 {
+		fmt.Println(&amp;quot;Blocksize must be from 1MB to 100MB&amp;quot;)
+		os.Exit(1)
+	}
+	blockSizeBytes = blockSize * 1024 * 1024
+}
+
+func main() {
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	fileSize, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u, _ := url.Parse(fmt.Sprintf(&amp;quot;https://%s.blob.core.windows.net/%s/%s&amp;quot;, accountName, containerName, fileName))
+	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
+
+	ctx := context.Background()
+
+	fmt.Println(&amp;quot;Uploading block blob...&amp;quot;)
+	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
+		azblob.UploadStreamToBlockBlobOptions{
+			BlockSize: blockSizeBytes,
+			Progress: func(bytesTransferred int64) {
+				fmt.Printf(&amp;quot;Uploaded %d of %d bytes.\n&amp;quot;, bytesTransferred, fileSize.Size())
+			},
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = putBlockList // Avoid compiler&#39;s &amp;quot;declared and not used&amp;quot; error
+
+	fmt.Println(&amp;quot;Done&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。&lt;/p&gt;
+
+&lt;p&gt;ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、&lt;a href=&#34;https://github.com/Azure/azure-storage-blob-go/issues/8&#34;&gt;修正してもらった&lt;/a&gt;ので、次のリリースでは解決していると思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;ふたつめの理由-レガシー対応&#34;&gt;ふたつめの理由: レガシー対応&lt;/h2&gt;
+
+&lt;p&gt;Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。&lt;/p&gt;
+
+&lt;p&gt;たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。&lt;/p&gt;
+
+&lt;p&gt;ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。&lt;/p&gt;
+
+&lt;p&gt;ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。&lt;/p&gt;
+
+&lt;p&gt;C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
       <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
@@ -2338,179 +2447,6 @@ module.exports = function (context, req) {
 &lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
 
 &lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
-      <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
-      <description>
-
-&lt;h2 id=&#34;定義領域全てが課金されるわけではありません&#34;&gt;定義領域全てが課金されるわけではありません&lt;/h2&gt;
-
-&lt;p&gt;AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。&lt;/p&gt;
-
-&lt;p&gt;なお、Premium Storageは例外です。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/pricing/details/storage/&#34;&gt;FAQ&lt;/a&gt;を確認してみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
-
-空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;詳細な定義は、以下で。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/&#34;&gt;Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;書き込み方はosやファイルシステム次第&#34;&gt;書き込み方はOSやファイルシステム次第&lt;/h2&gt;
-
-&lt;p&gt;じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;RHEL 7.2 on Azure&lt;/li&gt;
-&lt;li&gt;XFS &amp;amp; Ext4&lt;/li&gt;
-&lt;li&gt;10GBytesのPage Blobの上にファイルシステムを作成&lt;/li&gt;
-&lt;li&gt;mkfsはデフォルト&lt;/li&gt;
-&lt;li&gt;mountはデフォルトとdiscardオプションありの2パターン&lt;/li&gt;
-&lt;li&gt;MD、LVM構成にしない&lt;/li&gt;
-&lt;li&gt;以下のタイミングで課金対象容量を確認
-
-&lt;ul&gt;
-&lt;li&gt;Page BlobのVMアタッチ時&lt;/li&gt;
-&lt;li&gt;ファイルシステム作成時&lt;/li&gt;
-&lt;li&gt;マウント時&lt;/li&gt;
-&lt;li&gt;約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)&lt;/li&gt;
-&lt;li&gt;5GBytesのファイル削除時&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;課金対象容量は、以下のPowerShellで取得します。リファレンスは&lt;a href=&#34;https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
-
-$blobSizeInBytes = 124 + $Blob.Name.Length * 2
-
-$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
-while ($metadataEnumerator.MoveNext())
-{
-    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
-}
-
-$Blob.ICloudBlob.GetPageRanges() | 
-    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
-
-return $blobSizeInBytes
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ストレージコンテキストの作り方は&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/&#34;&gt;ここ&lt;/a&gt;を参考にしてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
-
-&lt;h3 id=&#34;xfs&#34;&gt;XFS&lt;/h3&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,710,029&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;h3 id=&#34;ext4&#34;&gt;Ext4&lt;/h3&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;138,683,592&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;306,451,689&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;306,586,780&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;この結果から、以下のことがわかります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;10GBytesのBlobを作成しても、全てが課金対象ではない&lt;/li&gt;
-&lt;li&gt;当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる&lt;/li&gt;
-&lt;li&gt;discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
-
-&lt;ul&gt;
-&lt;li&gt;OSがPage Blobに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
-&lt;li&gt;discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
-&lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;
-
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。&lt;/p&gt;
 </description>
     </item>
     

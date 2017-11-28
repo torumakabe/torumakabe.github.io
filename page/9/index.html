@@ -68,6 +68,67 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">09 Dec 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/longtermsupport/" class="post-title">OpenStackと長期バージョン固定</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<p>このエントリーは、<a href="http://www.adventar.org/calendars/602">OpenStack (2枚目) Advent Calendar 2014</a>の9夜目担当作品です。</p>
+
+<h3 id="ソフトウェア-バージョン-サポート">ソフトウェア、バージョン、サポート</h3>
+
+<p>たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。</p>
+
+<h3 id="進化著しいソフト-openstackでは">進化著しいソフト、OpenStackでは</h3>
+
+<p>OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして<a href="https://wiki.openstack.org/wiki/Releases">公式サイト</a>を見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。</p>
+
+<h3 id="でも-長期バージョン固定するとどうなるか">でも、長期バージョン固定するとどうなるか</h3>
+
+<p>では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。</p>
+
+<p>[とあるクラウド その1]<br />
+- (Dev)  今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。<br />
+- (Ops) あー、うちの環境Jよ。<br />
+- (Dev) そうすか。じゃあ他のにするわ。</p>
+
+<p>使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。</p>
+
+<p>[とあるクラウド その2]<br />
+- (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!!<br />
+- (Dev) おーいいね。決定。3年のんびりするわ。<br />
+〜3年後〜<br />
+- (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!!<br />
+- (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。</p>
+
+<p>リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。</p>
+
+<h3 id="アップデートの仕組みに投資したほうが建設的と思う">アップデートの仕組みに投資したほうが建設的と思う</h3>
+
+<p>もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。</p>
+
+<p>それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。</p>
+
+<p>最後に、<a href="http://superuser.openstack.org/articles/openstack-user-survey-insights-november-2014">最新のOpenStack User Survey</a>を紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。</p>
+
+<p>OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&rdquo;Ability to innovate&rdquo;なんですよね。
+あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。</p>
+
+<p>メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">06 Dec 2014, 00:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -390,107 +451,6 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 
 <p>デモや新機能の試用くらいであればこれで十分ですね。<br />
 著者に感謝。わたしは買いました。 &ndash; <a href="http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/">OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">05 May 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/vagrant-hpcloud/" class="post-title">Vagrant HP Public Cloud Pluginを試す</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="みんな大好きhashicorp">みんな大好きHashiCorp</h3>
-
-<p>クラウド界隈のデベロッパーから熱く注目されているHashiCorp。<a href="http://www.packer.io/">Packer</a>、<a href="http://www.serfdom.io/">Serf</a>、<a href="http://www.consul.io/">Consul</a>と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は<a href="http://www.vagrantup.com/">Vagrant</a>でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。</p>
-
-<p>VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。</p>
-
-<h3 id="前提条件">前提条件</h3>
-
-<ul>
-<li>Vagrant 1.5.4</li>
-<li>vagrant-hp 0.1.4</li>
-<li>HP Public Cloud (2014/5/5)</li>
-</ul>
-
-<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
-
-<p><a href="https://github.com/mohitsethi/vagrant-hp">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
-
-<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
-
-<script type="text/javascript" src="http://gist.github.com/25a33c679492676bb626.js"></script>
-
-<p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、<a href="https://github.com/mohitsethi/vagrant-hp">Github</a>の説明には若干のトラップがありますのでご注意を。</p>
-
-<ul>
-<li>イメージにUbuntu 14.04 LTSを使う例です。</li>
-<li>Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。</li>
-<li>Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。</li>
-<li>Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。</li>
-<li>ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。</li>
-</ul>
-
-<h3 id="それではさっそくvagrant-up">それではさっそくvagrant up</h3>
-
-<pre><code>$ vagrant up --provider=hp
-Bringing machine 'default' up with 'hp' provider...
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-==&gt; default: Warning! The HP provider doesn't support any of the Vagrant
-==&gt; default: high-level network configurations (`config.vm.network`). They
-==&gt; default: will be silently ignored.
-==&gt; default: Finding flavor for server...
-==&gt; default: Finding image for server...
-==&gt; default: Finding floating-ip...
-==&gt; default: Launching a server with the following settings...
-==&gt; default:  -- Flavor: standard.xsmall
-==&gt; default:  -- Image: Ubuntu Server 14.04 LTS (amd64 20140416.1) - Partner Image
-==&gt; default:  -- Name: hogehoge
-==&gt; default:  -- Key-name: your_keypair_name
-==&gt; default:  -- Security Groups: [&quot;default&quot;, &quot;http&quot;]
-==&gt; default: Finding network...
-==&gt; default: Waiting for the server to be built...
-==&gt; default: Waiting for SSH to become available...
-==&gt; default: Machine is booted and ready for use!
-==&gt; default: Rsyncing folder: /your_path/data/ =&gt; /vagrant/data
-</code></pre>
-
-<p>できたっぽい。&ndash;provider=hpを忘れずに。</p>
-
-<h3 id="間髪入れずにvagrant-ssh">間髪入れずにvagrant ssh</h3>
-
-<pre><code>$ vagrant ssh
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
-* Documentation:  https://help.ubuntu.com/
-
-System information disabled due to load higher than 1.0
-
-Get cloud support with Ubuntu Advantage Cloud Guest:
-    http://www.ubuntu.com/business/services/cloud
-
-0 packages can be updated.
-0 updates are security updates.
-
-
-ubuntu@hogehoge:~$ ls /vagrant/data
-test.txt
-</code></pre>
-
-<p>フォルダ同期も効いてますね。んー、楽ちん。</p>
-
-<p>それではお楽しみ下さい。</p>
 
                     </div>
                 </section>

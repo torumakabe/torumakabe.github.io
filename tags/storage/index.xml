@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>re-imagine</title>
+    <link>http://torumakabe.github.io/tags/storage/index.xml</link>
+    <description>Recent content on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <atom:link href="http://torumakabe.github.io/tags/storage/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
+      <link>http://torumakabe.github.io/post/azblob_golang/</link>
+      <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azblob_golang/</guid>
+      <description>
+
+&lt;h2 id=&#34;azure-blob-アップローダーをgoで書いた&#34;&gt;Azure Blob アップローダーをGoで書いた&lt;/h2&gt;
+
+&lt;p&gt;ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。&lt;/p&gt;
+
+&lt;h2 id=&#34;ひとつめの理由-sdkが新しくなったから&#34;&gt;ひとつめの理由: SDKが新しくなったから&lt;/h2&gt;
+
+&lt;p&gt;最近公式ブログで&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/&#34;&gt;紹介された&lt;/a&gt;通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。&lt;/p&gt;
+
+&lt;p&gt;ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;flag&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/url&amp;quot;
+	&amp;quot;os&amp;quot;
+
+	&amp;quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&amp;quot;
+)
+
+var (
+	accountName    string
+	accountKey     string
+	containerName  string
+	fileName       string
+	blockSize      int64
+	blockSizeBytes int64
+)
+
+func init() {
+	flag.StringVar(&amp;amp;accountName, &amp;quot;account-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Name&amp;quot;)
+	flag.StringVar(&amp;amp;accountKey, &amp;quot;account-key&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Key&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;c&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;containerName, &amp;quot;container-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Blob Container Name&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;f&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required - short option) Upload filename&amp;quot;)
+	flag.StringVar(&amp;amp;fileName, &amp;quot;file&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Upload filename&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;b&amp;quot;, 4, &amp;quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Int64Var(&amp;amp;blockSize, &amp;quot;blocksize&amp;quot;, 4, &amp;quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&amp;quot;)
+	flag.Parse()
+
+	if (blockSize &amp;lt; 1) || (blockSize) &amp;gt; 100 {
+		fmt.Println(&amp;quot;Blocksize must be from 1MB to 100MB&amp;quot;)
+		os.Exit(1)
+	}
+	blockSizeBytes = blockSize * 1024 * 1024
+}
+
+func main() {
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	fileSize, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u, _ := url.Parse(fmt.Sprintf(&amp;quot;https://%s.blob.core.windows.net/%s/%s&amp;quot;, accountName, containerName, fileName))
+	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
+
+	ctx := context.Background()
+
+	fmt.Println(&amp;quot;Uploading block blob...&amp;quot;)
+	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
+		azblob.UploadStreamToBlockBlobOptions{
+			BlockSize: blockSizeBytes,
+			Progress: func(bytesTransferred int64) {
+				fmt.Printf(&amp;quot;Uploaded %d of %d bytes.\n&amp;quot;, bytesTransferred, fileSize.Size())
+			},
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = putBlockList // Avoid compiler&#39;s &amp;quot;declared and not used&amp;quot; error
+
+	fmt.Println(&amp;quot;Done&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。&lt;/p&gt;
+
+&lt;p&gt;ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、&lt;a href=&#34;https://github.com/Azure/azure-storage-blob-go/issues/8&#34;&gt;修正してもらった&lt;/a&gt;ので、次のリリースでは解決していると思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;ふたつめの理由-レガシー対応&#34;&gt;ふたつめの理由: レガシー対応&lt;/h2&gt;
+
+&lt;p&gt;Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。&lt;/p&gt;
+
+&lt;p&gt;たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。&lt;/p&gt;
+
+&lt;p&gt;ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。&lt;/p&gt;
+
+&lt;p&gt;ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。&lt;/p&gt;
+
+&lt;p&gt;C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
