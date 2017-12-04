@@ -6,8 +6,45 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 28 Nov 2017 08:45:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
+      <link>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <description>
+
+&lt;h2 id=&#34;小ネタです&#34;&gt;小ネタです&lt;/h2&gt;
+
+&lt;p&gt;Goはクロスプラットフォーム向けに開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。でも正直なところ入れたくありません。なのでDockerでやります。&lt;/p&gt;
+
+&lt;h2 id=&#34;条件&#34;&gt;条件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Docker for Windows
+
+&lt;ul&gt;
+&lt;li&gt;Linuxモード&lt;/li&gt;
+&lt;li&gt;ドライブ共有&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;powershell窓で実行&#34;&gt;PowerShell窓で実行&lt;/h2&gt;
+
+&lt;p&gt;ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -o yourapp_linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;golang:1.9.2-alpine DockerイメージはGOPATHに/goを&lt;a href=&#34;https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile&#34;&gt;設定して&lt;/a&gt;ビルドされていますが、念のため実行時にも設定&lt;/li&gt;
+&lt;li&gt;-v オプションでのマウントは&lt;a href=&#34;https://docs.docker.com/engine/admin/volumes/bind-mounts/&#34;&gt;非推奨&lt;/a&gt;になったので &amp;ndash;mount で&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
@@ -2033,123 +2070,6 @@ node ./index.js
 &lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
 
 &lt;p&gt;なお、フィードバック&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;熱烈歓迎&lt;/a&gt;だそうです。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Docker for WindowsでインストールレスAzure CLI環境を作る</title>
-      <link>http://torumakabe.github.io/post/dockerforwin_azurecli/</link>
-      <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
-      <description>
-
-&lt;h2 id=&#34;舌の根の乾かぬ内に&#34;&gt;舌の根の乾かぬ内に&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_osstools_iac/&#34;&gt;最近&lt;/a&gt;、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows(on Client Hyper-V)のベータが一般開放された&lt;/li&gt;
-&lt;li&gt;Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい&lt;/li&gt;
-&lt;li&gt;月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;azure_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。&lt;/li&gt;
-&lt;li&gt;共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function azure_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data microsoft/azure-cli:latest
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 azure login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\dockereval\arm
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2016/06/22     11:21                subd
--a----       2016/06/22     10:26           8783 azuredeploy.json
--a----       2016/06/22     11:28            690 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルとサブディレクトリがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。azure_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; azure_cli
-root@be41d3389a21:/data#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。公式Azure CLIコンテナは&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/~/dockerfile/&#34;&gt;debianベース&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# ls
-azuredeploy.json  azuredeploy.parameters.json  subd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azureコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# azure -v
-0.10.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
 </description>
     </item>
     

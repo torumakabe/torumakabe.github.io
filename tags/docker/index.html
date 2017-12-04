@@ -68,6 +68,55 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">04 Dec 2017, 22:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/" class="post-title">Windows上でLinux向けGoバイナリをDockerでビルドする</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Windows" href="http://torumakabe.github.io//categories/windows">Windows</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="小ネタです">小ネタです</h2>
+
+<p>Goはクロスプラットフォーム向けに開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。でも正直なところ入れたくありません。なのでDockerでやります。</p>
+
+<h2 id="条件">条件</h2>
+
+<ul>
+<li>Docker for Windows
+
+<ul>
+<li>Linuxモード</li>
+<li>ドライブ共有</li>
+</ul></li>
+</ul>
+
+<h2 id="powershell窓で実行">PowerShell窓で実行</h2>
+
+<p>ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。</p>
+
+<pre><code>docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -o yourapp_linux
+</code></pre>
+
+<ul>
+<li>golang:1.9.2-alpine DockerイメージはGOPATHに/goを<a href="https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile">設定して</a>ビルドされていますが、念のため実行時にも設定</li>
+<li>-v オプションでのマウントは<a href="https://docs.docker.com/engine/admin/volumes/bind-mounts/">非推奨</a>になったので &ndash;mount で</li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">20 Nov 2016, 13:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -608,125 +657,6 @@ end
 <h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">17 Apr 2016, 10:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_docker_cntk/" class="post-title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
-
-<p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
-
-<p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
-
-<h2 id="方針">方針</h2>
-
-<ul>
-<li>インフラはAzure Resource Manager Templateでデプロイする
-
-<ul>
-<li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
-</ul></li>
-<li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-<ul>
-<li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
-
-<ul>
-<li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
-</ul></li>
-<li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
-</ul></li>
-<li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-<ul>
-<li>docker extensionでdocker engineを導入</li>
-<li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
-</ul></li>
-<li>VMにログインしたら即CNTKを使える、幸せ</li>
-</ul>
-
-<h2 id="使い方">使い方</h2>
-
-<p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
-</code></pre>
-
-<p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
-
-<ul>
-<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
-
-<ul>
-<li>編集不要です</li>
-</ul></li>
-<li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
-
-<ul>
-<li>テンプレートに直で書かきたくないパラメータです</li>
-<li>fileUris、commandToExecute以外は、各々で</li>
-<li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
-<br /></li>
-</ul></li>
-</ul>
-
-<p>うし、デプロイ。</p>
-
-<pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-</code></pre>
-
-<p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
-
-<p>docker engine入ってますかね。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-</code></pre>
-
-<p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-</code></pre>
-
-<p>問題なし。ではエンジョイ Deep Learning。</p>
-
-<pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-</code></pre>
-
-<p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
-
-<h2 id="今後の展開">今後の展開</h2>
-
-<p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
-
-<p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
-
-<p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
 
                     </div>
                 </section>

@@ -9,6 +9,43 @@
     <atom:link href="http://torumakabe.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
+      <link>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <description>
+
+&lt;h2 id=&#34;小ネタです&#34;&gt;小ネタです&lt;/h2&gt;
+
+&lt;p&gt;Goはクロスプラットフォーム向けに開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。でも正直なところ入れたくありません。なのでDockerでやります。&lt;/p&gt;
+
+&lt;h2 id=&#34;条件&#34;&gt;条件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Docker for Windows
+
+&lt;ul&gt;
+&lt;li&gt;Linuxモード&lt;/li&gt;
+&lt;li&gt;ドライブ共有&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;powershell窓で実行&#34;&gt;PowerShell窓で実行&lt;/h2&gt;
+
+&lt;p&gt;ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -o yourapp_linux
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;golang:1.9.2-alpine DockerイメージはGOPATHに/goを&lt;a href=&#34;https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile&#34;&gt;設定して&lt;/a&gt;ビルドされていますが、念のため実行時にも設定&lt;/li&gt;
+&lt;li&gt;-v オプションでのマウントは&lt;a href=&#34;https://docs.docker.com/engine/admin/volumes/bind-mounts/&#34;&gt;非推奨&lt;/a&gt;になったので &amp;ndash;mount で&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
       <link>http://torumakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>

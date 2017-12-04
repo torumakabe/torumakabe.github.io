@@ -68,6 +68,55 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">04 Dec 2017, 22:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/" class="post-title">Windows上でLinux向けGoバイナリをDockerでビルドする</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Windows" href="http://torumakabe.github.io//categories/windows">Windows</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="小ネタです">小ネタです</h2>
+
+<p>Goはクロスプラットフォーム向けに開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。でも正直なところ入れたくありません。なのでDockerでやります。</p>
+
+<h2 id="条件">条件</h2>
+
+<ul>
+<li>Docker for Windows
+
+<ul>
+<li>Linuxモード</li>
+<li>ドライブ共有</li>
+</ul></li>
+</ul>
+
+<h2 id="powershell窓で実行">PowerShell窓で実行</h2>
+
+<p>ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。</p>
+
+<pre><code>docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -o yourapp_linux
+</code></pre>
+
+<ul>
+<li>golang:1.9.2-alpine DockerイメージはGOPATHに/goを<a href="https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile">設定して</a>ビルドされていますが、念のため実行時にも設定</li>
+<li>-v オプションでのマウントは<a href="https://docs.docker.com/engine/admin/volumes/bind-mounts/">非推奨</a>になったので &ndash;mount で</li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">28 Nov 2017, 08:45</h1>
                 <section class="post">
                     <header class="post-header">
