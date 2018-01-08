@@ -68,6 +68,90 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">23 Mar 2016, 13:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/" class="post-title">Azure &amp; Terraform エラーコード429の対処法</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="terraformer増加に備えて">Terraformer増加に備えて</h2>
+
+<p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
+
+<p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
+
+<h2 id="エラーコード429">エラーコード429</h2>
+
+<p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
+
+<pre><code>Error applying plan:
+
+1 error(s) occurred:
+azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
+</code></pre>
+
+<p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
+
+<h2 id="対処法">対処法</h2>
+
+<p><strong>もう一度applyしてください</strong></p>
+
+<p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
+
+<h2 id="背景">背景</h2>
+
+<p>エラーになった背景ですが、2つの可能性があります。</p>
+
+<ol>
+<li>APIリクエスト数上限に達した</li>
+<li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
+</ol>
+
+<h3 id="1-apiリクエスト数上限に達した">1. APIリクエスト数上限に達した</h3>
+
+<p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
+
+<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">Azure サブスクリプションとサービスの制限、クォータ、制約</a></strong></p>
+
+<p>Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。</p>
+
+<p>長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。</p>
+
+<p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
+
+<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
+
+<p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
+
+<p>わたしが経験したエラーの中に、こんなものがありました。</p>
+
+<pre><code>Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
+</code></pre>
+
+<p>Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。</p>
+
+<p>Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして<a href="https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429">あがっています</a>。</p>
+
+<p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
+
+<p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">17 Mar 2016, 23:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -192,6 +276,8 @@
                     <div class="post-description">
                         
 
+<p>注: 2018/1/8にサンプルを更新しました。更新エントリは<a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/">こちら</a>。</p>
+
 <h2 id="情報がありそうでない">情報がありそうでない</h2>
 
 <p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
@@ -286,7 +372,7 @@
 
 <p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
 
-<p>ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。</p>
+<p>ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。</p>
 
 <h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
 
@@ -636,341 +722,6 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 <p>CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。</p>
 
 <p>最後に。攻撃されている感があれば、カスタマーサポートまで。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Feb 2016, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azureblobupload_perf/" class="post-title">Azure Blob Upload ツール別ベンチマーク</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="同じ目的を達成できるツールがたくさん">同じ目的を達成できるツールがたくさん</h2>
-
-<p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
-
-<p>端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。</p>
-
-<p>そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。</p>
-
-<p>で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。</p>
-
-<p>なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
-
-<h2 id="環境と測定方式">環境と測定方式</h2>
-
-<p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
-
-<p>環境は以下の通り。</p>
-
-<ul>
-<li>Windows端末
-
-<ul>
-<li>Surface Pro 4 Core i7/16GB Memory/802.11ac</li>
-<li>1Gbps Ethernet (USB経由)</li>
-<li>Windows 10 (1511)</li>
-</ul></li>
-<li>Mac端末
-
-<ul>
-<li>Macbook 12inch Core M/8GB Memory/802.11ac</li>
-<li>USB-C&hellip; 有線テストは省きます</li>
-<li>El Capitan</li>
-</ul></li>
-<li>Wi-Fiアクセスポイント/端末間帯域
-
-<ul>
-<li>100~200Mbpsでつながっています</li>
-</ul></li>
-<li>Azureデータセンタまでの接続
-
-<ul>
-<li>日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続</li>
-<li>よってWAN側の遅延、帯域ともに条件がいい</li>
-</ul></li>
-<li>対象ツール
-
-<ul>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/">AzCopy v5.0.0.27</a> (Windowsのみ)</li>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/">Azure CLI v0.9.15</a></li>
-<li><a href="http://storageexplorer.com/">Azure Storage Explorer - Cross Platform GUI v0.7</a></li>
-</ul></li>
-<li>転送ファイル
-
-<ul>
-<li>Ubuntu 15.10 ISOイメージ (647MBytes)</li>
-</ul></li>
-</ul>
-
-<p>そして測定方式。</p>
-
-<p>AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが平行度指定です。デフォルトの平行度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。</p>
-
-<pre><code>Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
-</code></pre>
-
-<p>Azure CLIも同様にMeasure-Commandで。&ndash;concurrenttaskcountで平行度を指定できますが、<a href="https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js">ソース</a>を確認したところ、平行度のデフォルトは5です。&rdquo;StorageUtil.threadsInOperation = 5;&ldquo;ですね。</p>
-
-<pre><code>Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
-</code></pre>
-
-<p>残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。</p>
-
-<pre><code>time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
-</code></pre>
-
-<p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
-
-<h2 id="結果">結果</h2>
-
-<p>平行度上げても伸びないな、というタイミングまで上げます。</p>
-
-<table>
-<thead>
-<tr>
-<th align="right">　実行No　</th>
-<th align="center">　クライアントOS　</th>
-<th align="center">　ネットワーク接続　</th>
-<th align="center">　クライアント　</th>
-<th align="right">　並行数　</th>
-<th align="right">　転送時間(秒)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="right">1</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">(default:32)</td>
-<td align="right">9.62</td>
-</tr>
-
-<tr>
-<td align="right">2</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">5</td>
-<td align="right">12.28</td>
-</tr>
-
-<tr>
-<td align="right">3</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">10</td>
-<td align="right">10.83</td>
-</tr>
-
-<tr>
-<td align="right">4</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">20</td>
-<td align="right">10.43</td>
-</tr>
-
-<tr>
-<td align="right">5</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">49.92</td>
-</tr>
-
-<tr>
-<td align="right">6</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">29.47</td>
-</tr>
-
-<tr>
-<td align="right">7</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">21.05</td>
-</tr>
-
-<tr>
-<td align="right">8</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">40</td>
-<td align="right">20.12</td>
-</tr>
-
-<tr>
-<td align="right">9</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">50.10</td>
-</tr>
-
-<tr>
-<td align="right">10</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">(default:32)</td>
-<td align="right">74.87</td>
-</tr>
-
-<tr>
-<td align="right">11</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">5</td>
-<td align="right">53.32</td>
-</tr>
-
-<tr>
-<td align="right">12</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">10</td>
-<td align="right">58.85</td>
-</tr>
-
-<tr>
-<td align="right">13</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">57.23</td>
-</tr>
-
-<tr>
-<td align="right">14</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">50.71</td>
-</tr>
-
-<tr>
-<td align="right">15</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">54.37</td>
-</tr>
-
-<tr>
-<td align="right">16</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">54.63</td>
-</tr>
-
-<tr>
-<td align="right">17</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">40.86</td>
-</tr>
-
-<tr>
-<td align="right">18</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">33.97</td>
-</tr>
-
-<tr>
-<td align="right">19</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">58.57</td>
-</tr>
-
-<tr>
-<td align="right">20</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">58.20</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="考察">考察</h2>
-
-<ul>
-<li>有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>
-<li>平行度は大きく性能に影響します。
-
-<ul>
-<li>平行度が高すぎてもだめ
-
-<ul>
-<li>無線AzCopyのデフォルト(平行度32)が平行度10、20より時間がかかっていることからわかる</li>
-</ul></li>
-<li>デフォルトで遅いからといってあきらめず、平行度変えて試してみましょう</li>
-<li>SDK使って自分で作る時も同じ。平行度パラメータを意識してください
-
-<ul>
-<li>.NET: BlobRequestOptions</li>
-<li>Java/Android: BlobRequestOptions.setConcurrentRequestCount()</li>
-<li>Node.js: parallelOperationThreadCount</li>
-<li>C++: blob_request_options::set_parallelism_factor</li>
-</ul></li>
-</ul></li>
-<li>Azure CLIよりAzCopyが早い。
-
-<ul>
-<li>.NETで最適化できているから合点</li>
-<li>Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い</li>
-<li>でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる</li>
-<li>No.18の結果は無線状態がよかったと想定</li>
-</ul></li>
-<li>Azure Storage Explorer Cross Platform GUIは、現時点で平行度変えられないので性能面では不利。でも直観的なので、使い分け。</li>
-</ul>
-
-<p>WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な平行度が変わってくるはずです。</p>
-
-<p>でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。</p>
 
                     </div>
                 </section>

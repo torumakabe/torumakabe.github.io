@@ -9,6 +9,285 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>TerraformでAzure サンプル 2018/1版</title>
+      <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <description>
+
+&lt;h2 id=&#34;サンプルのアップデート&#34;&gt;サンプルのアップデート&lt;/h2&gt;
+
+&lt;p&gt;年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_fundamental_rules/&#34;&gt;記事&lt;/a&gt;に目が止まりました。原則はいいとして、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;サンプル&lt;/a&gt;は2年物で腐りかけです。ということでアップデートします。&lt;/p&gt;
+
+&lt;h2 id=&#34;インパクトの大きな変更点&#34;&gt;インパクトの大きな変更点&lt;/h2&gt;
+
+&lt;p&gt;Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;BackendにAzure Blobを使えるようになった&lt;/li&gt;
+&lt;li&gt;Workspaceで同一コード・複数環境管理ができるようになった&lt;/li&gt;
+&lt;li&gt;対応リソースが増えた&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://registry.terraform.io/&#34;&gt;Terraform Module Registry&lt;/a&gt;が公開された&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;更新版サンプルの方針&#34;&gt;更新版サンプルの方針&lt;/h2&gt;
+
+&lt;p&gt;重要アップデートをふまえ、以下の方針で新サンプルを作りました。&lt;/p&gt;
+
+&lt;h3 id=&#34;チーム-複数端末での運用&#34;&gt;チーム、複数端末での運用&lt;/h3&gt;
+
+&lt;p&gt;BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。&lt;/p&gt;
+
+&lt;h3 id=&#34;workspaceの導入&#34;&gt;Workspaceの導入&lt;/h3&gt;
+
+&lt;p&gt;従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。&lt;/p&gt;
+
+&lt;p&gt;要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。&lt;/p&gt;
+
+&lt;h3 id=&#34;module-terraform-module-registryの活用&#34;&gt;Module、Terraform Module Registryの活用&lt;/h3&gt;
+
+&lt;p&gt;TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。&lt;/p&gt;
+
+&lt;h3 id=&#34;リソースグループは環境ごとに準備し-管理をterraformから分離&#34;&gt;リソースグループは環境ごとに準備し、管理をTerraformから分離&lt;/h3&gt;
+
+&lt;p&gt;AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。&lt;/p&gt;
+
+&lt;p&gt;TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。&lt;/p&gt;
+
+&lt;p&gt;ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。&lt;/p&gt;
+
+&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
+
+&lt;p&gt;サンプルは&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801&#34;&gt;GitHub&lt;/a&gt;に置きました。合わせてご確認ください。&lt;/p&gt;
+
+&lt;p&gt;このコードをapplyすると、以下のリソースが出来上がります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;NGINX on Ubuntu Webサーバー VMスケールセット&lt;/li&gt;
+&lt;li&gt;VMスケールセット向けロードバランサー&lt;/li&gt;
+&lt;li&gt;踏み台サーバー&lt;/li&gt;
+&lt;li&gt;上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;リポジトリ構造&#34;&gt;リポジトリ構造&lt;/h3&gt;
+
+&lt;p&gt;サンプルのリポジトリ構造です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;├── modules
+│   ├── computegroup
+│   │   ├── main.tf
+│   │   ├── os
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── loadbalancer
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── network
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── projects
+    ├── project_a
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   └── variables.tf
+    └── shared
+        ├── backend.tf
+        ├── main.tf
+        ├── outputs.tf
+        └── variables.tf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;/modulesには&lt;a href=&#34;https://registry.terraform.io/browse?provider=azurerm&#34;&gt;Terraform Module Registry&lt;/a&gt;でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。&lt;/p&gt;
+
+&lt;p&gt;そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。&lt;/p&gt;
+
+&lt;p&gt;このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;アプリ開発者がproject_a下でアプリ関連リソースに集中したい&lt;/li&gt;
+&lt;li&gt;性能観点で分割したい (Terraformはリソース量につれて重くなりがち)&lt;/li&gt;
+&lt;li&gt;有事を考慮し影響範囲を分割したい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1&#34;&gt;output&lt;/a&gt;し、project_aで参照できるよう&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10&#34;&gt;定義&lt;/a&gt;しています。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;h3 id=&#34;前提&#34;&gt;前提&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Linux、WSL、macOSなどbash環境の実行例です&lt;/li&gt;
+&lt;li&gt;SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;管理者向けのサービスプリンシパルを用意する&#34;&gt;管理者向けのサービスプリンシパルを用意する&lt;/h3&gt;
+
+&lt;p&gt;インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。&lt;/p&gt;
+
+&lt;p&gt;もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html&#34;&gt;Terraformのドキュメント&lt;/a&gt;も参考に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes=&amp;quot;/subscriptions/SUBSCRIPTION_ID&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。&lt;/p&gt;
+
+&lt;p&gt;なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go&#34;&gt;使う&lt;/a&gt;からです。&lt;/p&gt;
+
+&lt;p&gt;そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go&#34;&gt;使われません&lt;/a&gt;。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。&lt;/p&gt;
+
+&lt;p&gt;サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも&lt;a href=&#34;https://www.terraform.io/docs/backends/types/azurerm.html&#34;&gt;対応できます&lt;/a&gt;。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。&lt;/p&gt;
+
+&lt;h3 id=&#34;管理者の環境変数を設定する&#34;&gt;管理者の環境変数を設定する&lt;/h3&gt;
+
+&lt;p&gt;Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;export ARM_SUBSCRIPTION_ID=&amp;quot;&amp;lt;your subscription id&amp;gt;&amp;quot;
+export ARM_CLIENT_ID=&amp;quot;&amp;lt;your servicce principal appid&amp;gt;&amp;quot;
+export ARM_CLIENT_SECRET=&amp;quot;&amp;lt;your service principal password&amp;gt;&amp;quot;
+export ARM_TENANT_ID=&amp;quot;&amp;lt;your service principal tenant&amp;gt;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;workspaceを作る&#34;&gt;Workspaceを作る&lt;/h3&gt;
+
+&lt;p&gt;開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace new dev
+terraform workspace new stage
+terraform workspace new prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;リソースグループを作る&#34;&gt;リソースグループを作る&lt;/h3&gt;
+
+&lt;p&gt;まずWorkspace別にリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-dev-rg -l japaneast
+az group create -n tf-sample-stage-rg -l japaneast
+az group create -n tf-sample-prod-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;data &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;resource_group&amp;quot; {
+  name = &amp;quot;${var.resource_group_name}-${terraform.workspace}-rg&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&amp;rdquo;tf-sample&amp;rdquo;と指定しています。&lt;/p&gt;
+
+&lt;p&gt;次にBackend、state共有向けリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-state-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループは、各projectのbackend.tfで指定しています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-dev-rg&amp;quot; &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-state-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;backendを準備する&#34;&gt;Backendを準備する&lt;/h3&gt;
+
+&lt;p&gt;project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ストレージアカウント (名前は任意)&lt;/li&gt;
+&lt;li&gt;コンテナー *2 (tfstate-project-a, tfstate-shared)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を作ってください。GUIでもCLIでも、お好きなやり方で。&lt;/p&gt;
+
+&lt;p&gt;その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+
+data &amp;quot;terraform_remote_state&amp;quot; &amp;quot;shared&amp;quot; {
+  backend = &amp;quot;azurerm&amp;quot;
+
+  config {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-shared&amp;quot;
+    key                  = &amp;quot;terraform.tfstateenv:${terraform.workspace}&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで準備完了です。&lt;/p&gt;
+
+&lt;h3 id=&#34;実行&#34;&gt;実行&lt;/h3&gt;
+
+&lt;p&gt;Workspaceをdevに切り替えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select dev
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まずは土台となるリソースを作成するsharedから。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd shared
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;土台となるリソースが作成されたら、次はprocject_aを。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ../procject_a
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。&lt;/p&gt;
+
+&lt;p&gt;dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select stage
+[以下devと同様の操作]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考情報&#34;&gt;参考情報&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/terraform/&#34;&gt;Terraform on Azure のドキュメント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples&#34;&gt;サンプル集 on GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
       <link>http://torumakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
@@ -2278,175 +2557,6 @@ module.exports = function (context, req) {
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
 
 &lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
-      <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
-
-&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
-
-&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
-節約」でしょう。&lt;/p&gt;
-
-&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
-
-&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
-
-&lt;h2 id=&#34;コンセプト&#34;&gt;コンセプト&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;管理サーバを作らない&lt;/li&gt;
-&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
-&lt;li&gt;ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
-&lt;li&gt;サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
-&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;サンプル&#34;&gt;サンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
-
-&lt;p&gt;ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── blob
-│   ├── application
-│   │   ├── starttask.sh
-│   │   └── task.sh
-│   ├── input
-│   │   └── the_star_spangled_banner.txt
-│   └── output
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
-
-&lt;p&gt;コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
-
-&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
-&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
-&lt;li&gt;ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
-&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
-&lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
-&lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;  {
-  &amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
-  &amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
-  &amp;quot;schedule&amp;quot;: {
-    &amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
-    &amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
-  },
-  &amp;quot;jobSpecification&amp;quot;: {
-    &amp;quot;priority&amp;quot;:100,
-    &amp;quot;constraints&amp;quot;: {
-      &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-      &amp;quot;maxTaskRetryCount&amp;quot;:-1
-    },
-    &amp;quot;jobManagerTask&amp;quot;: {
-      &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
-      &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
-      &amp;quot;resourceFiles&amp;quot;: [ {
-        &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-        &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
-      }], 
-      &amp;quot;environmentSettings&amp;quot;: [ {
-        &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
-        &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
-      } ],
-      &amp;quot;constraints&amp;quot;: {
-        &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-        &amp;quot;maxTaskRetryCount&amp;quot;:0,
-        &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
-      },
-      &amp;quot;killJobOnCompletion&amp;quot;:false,
-      &amp;quot;runElevated&amp;quot;:true,
-      &amp;quot;runExclusive&amp;quot;:true
-      },
-      &amp;quot;poolInfo&amp;quot;: {
-        &amp;quot;autoPoolSpecification&amp;quot;: {
-          &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
-          &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
-          &amp;quot;pool&amp;quot;: {
-            &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
-            &amp;quot;virtualMachineConfiguration&amp;quot;: {
-              &amp;quot;imageReference&amp;quot;: {
-                &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
-                &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
-                &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
-                &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
-              },
-              &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
-            },
-            &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
-            &amp;quot;targetDedicated&amp;quot;:1,
-            &amp;quot;maxTasksPerNode&amp;quot;:1,
-            &amp;quot;taskSchedulingPolicy&amp;quot;: {
-              &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
-            },
-            &amp;quot;enableAutoScale&amp;quot;:false,
-            &amp;quot;enableInterNodeCommunication&amp;quot;:false,
-            &amp;quot;startTask&amp;quot;: {
-              &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
-              &amp;quot;resourceFiles&amp;quot;: [ {
-                &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-                &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
-              } ],
-              &amp;quot;environmentSettings&amp;quot;: [ {
-                &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
-                &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
-              } ],
-              &amp;quot;runElevated&amp;quot;:true,
-              &amp;quot;waitForSuccess&amp;quot;:true
-            },
-            &amp;quot;metadata&amp;quot;: [ {
-              &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
-              &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
-            } ]
-          }
-        }
-      }
-    }
-  }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。&lt;/p&gt;
-
-&lt;p&gt;それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。&lt;/p&gt;
-
-&lt;p&gt;ではスケジュールジョブをAzure BatchにCLIで送り込みます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
-
-&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
 </description>
     </item>
     

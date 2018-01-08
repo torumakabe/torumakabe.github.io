@@ -68,6 +68,172 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">13 Sep 2016, 17:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azurefunctions_getusagedata/" class="post-title">Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="背景と動機">背景と動機</h2>
+
+<p>Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。</p>
+
+<p>さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。</p>
+
+<ul>
+<li>運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。</li>
+<li>Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(<a href="https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx">MS OMS</a>、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。</li>
+<li>でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。</li>
+<li>Azureリソースの使用量データ取得が一例。Azureでは使用量データを<a href="https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/">ポータルからダウンロード</a>したり、<a href="https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/">Power BIで分析</a>できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。</li>
+<li>ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。</li>
+<li>それAzure Functionsで出来るよ。</li>
+</ul>
+
+<h2 id="方針">方針</h2>
+
+<ul>
+<li>Azure FunctionsのTimer Triggerを使って、日次で実行</li>
+<li>Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み</li>
+<li>Nodeで書く (C#のサンプルはたくさんあるので)</li>
+<li>業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)</li>
+</ul>
+
+<h2 id="quick-start">Quick Start</h2>
+
+<h3 id="準備">準備</h3>
+
+<ul>
+<li>ところでAzure Funtionsって何よ、って人はまず<a href="https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/">いい資料1</a>と<a href="https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/">いい資料2</a>でざっと把握を</li>
+<li>AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (<a href="https://doc.co/66mYfB">ここ</a>とか<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">ここ</a>を参考に)
+
+<ul>
+<li>後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください</li>
+<li>権限はsubscriptionに対するreaderが妥当でしょう</li>
+</ul></li>
+<li>Githubのリポジトリを作成 (VSTSやBitbucketも使えます)</li>
+<li>使用量データを貯めるストレージアカウントを作成
+
+<ul>
+<li>後ほど環境変数に設定するので、接続文字列を控えておいてください</li>
+</ul></li>
+</ul>
+
+<h3 id="デプロイ">デプロイ</h3>
+
+<ul>
+<li>Function Appを作成
+
+<ul>
+<li>ポータル左上&rdquo;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App</li>
+<li>アプリ名は.azurewebsites.net空間でユニークになるように</li>
+<li>App Seriviceプランは、占有型の&rdquo;クラシック&rdquo;か、共有で実行したぶん課金の&rdquo;動的&rdquo;かを選べます。今回の使い方だと動的がお得でしょう</li>
+<li>メモリは128MBあれば十分です</li>
+<li>他のパラメータはお好みで</li>
+</ul></li>
+<li>環境変数の設定
+
+<ul>
+<li>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; アプリケーション設定の構成 -&gt; アプリ設定</li>
+<li>先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)</li>
+</ul></li>
+<li>サンプルコードを取得
+
+<ul>
+<li>githubに置いてますので、作業するマシンにcloneしてください -&gt; <a href="https://github.com/ToruMakabe/AZFuncTimerTriggerSample">AZFuncTimerTriggerSample</a></li>
+</ul></li>
+<li>準備済みのGithubリポジトリにpush</li>
+<li>リポジトリとFunction Appを同期
+
+<ul>
+<li>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; 継続的インテグレーションの構成 -&gt; セットアップ</li>
+<li>Githubリポジトリとブランチを設定し、同期を待ちます</li>
+</ul></li>
+<li>Nodeのモジュールをインストール
+
+<ul>
+<li><del>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; kuduに移動 -&gt; site/wwwroot/getUsageData へ移動</del></li>
+<li><del>このディレクトリが、実行する関数、functionの単位です</del></li>
+<li><del>&ldquo;npm install&rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&rdquo;へインストールされます)</del></li>
+<li>deploy.cmd で自動的にインストールするよう変えました</li>
+</ul></li>
+</ul>
+
+<p>これで、指定ストレージアカウントの&rdquo;usagedata&rdquo;コンテナに日次で使用量データファイルができます。</p>
+
+<h2 id="コード解説">コード解説</h2>
+
+<p>3つのファイルをデプロイしました。簡単な順に、ざっと解説します。<a href="https://github.com/ToruMakabe/AZFuncTimerTriggerSample">コード</a>を眺めながら読み進めてください。</p>
+
+<h3 id="package-json">package.json</h3>
+
+<p>主となるコードファイルは後述の&rdquo;index.js&rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。</p>
+
+<h3 id="function-json">function.json</h3>
+
+<p>Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&rdquo;schedule&rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。</p>
+
+<p>&ldquo;0 0 0 * * *&rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。</p>
+
+<h3 id="index-js">index.js</h3>
+
+<p>メインロジックです。</p>
+
+<ul>
+<li>先ほど設定した環境変数は、&rdquo;process.env.HOGE&rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。</li>
+<li>日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。</li>
+<li>0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は<a href="https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx">こちら</a>。</li>
+<li>module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。</li>
+<li>最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。</li>
+<li>ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
+
+<ul>
+<li>Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。</li>
+<li>ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&rdquo;YYYY-MM-DD_n.json&rdquo;です。</li>
+</ul></li>
+</ul>
+
+<h2 id="豆知識-node-on-azure-functions">豆知識 (Node on Azure Functions)</h2>
+
+<ul>
+<li>通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
+
+<ul>
+<li>NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です</li>
+<li>Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを<a href="https://github.com/Azure/azure-sdk-for-node/issues/1450">サポートしていない</a>ので、サポートされるまではcallbackで堅く書きましょう</li>
+</ul></li>
+<li>Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
+
+<ul>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7">サポートマトリックス</a>を確認しましょう</li>
+<li>なのでサンプルではOutput Binding使わずに書きました</li>
+<li>Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください</li>
+</ul></li>
+</ul>
+
+<h2 id="豆知識-azure-usage-api">豆知識 (Azure Usage API)</h2>
+
+<ul>
+<li>Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/">Ratecard API</a>を組み合わせてください</li>
+</ul>
+
+<p><strong>それでは、幸せな運用管理サーバレス生活を。</strong></p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">25 Aug 2016, 16:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -771,187 +937,6 @@ module.exports = function (context, req) {
 <p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。</p>
 
 <p><em>&ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&rdquo;</em></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">29 Apr 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_batch_docker/" class="post-title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
-
-<p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
-
-<p>クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
-節約」でしょう。</p>
-
-<p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。</p>
-
-<p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
-
-<h2 id="コンセプト">コンセプト</h2>
-
-<ul>
-<li>管理サーバを作らない</li>
-<li>Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される</li>
-<li>ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される</li>
-<li>サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
-<li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
-</ul>
-
-<h2 id="サンプル">サンプル</h2>
-
-<p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
-
-<h3 id="バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
-
-<p>ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。</p>
-
-<pre><code>.
-├── blob
-│   ├── application
-│   │   ├── starttask.sh
-│   │   └── task.sh
-│   ├── input
-│   │   └── the_star_spangled_banner.txt
-│   └── output
-</code></pre>
-
-<p>applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。</p>
-
-<ul>
-<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh">starttask.sh</a> - docker engineをインストールします</li>
-<li><a href="https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh">task.sh</a> - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。<a href="https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker">サンプル</a>はPythonで書いたシンプルなWord Countアプリです</li>
-</ul>
-
-<p>また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。</p>
-
-<p>コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。</p>
-
-<p>さて、いよいよジョブをJSONで定義します。詳細は<a href="https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;MSPPError=-2147217396">公式ドキュメント</a>を確認してください。ポイントだけまとめます。</p>
-
-<ul>
-<li>2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil</li>
-<li>4時間ごとに実行する - schedule/recurrenceInterval</li>
-<li>ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption</li>
-<li>ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine</li>
-<li>サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
-<li>サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
-<li>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
-</ul>
-
-<pre><code>  {
-  &quot;odata.metadata&quot;:&quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;,
-  &quot;id&quot;:&quot;myjobschedule1&quot;,
-  &quot;schedule&quot;: {
-    &quot;doNotRunUntil&quot;:&quot;2016-04-29T05:30:00.000Z&quot;,
-    &quot;recurrenceInterval&quot;:&quot;PT4H&quot;
-  },
-  &quot;jobSpecification&quot;: {
-    &quot;priority&quot;:100,
-    &quot;constraints&quot;: {
-      &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-      &quot;maxTaskRetryCount&quot;:-1
-    },
-    &quot;jobManagerTask&quot;: {
-      &quot;id&quot;:&quot;mytask1&quot;,
-      &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./task.sh'&quot;,
-      &quot;resourceFiles&quot;: [ {
-        &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-        &quot;filePath&quot;:&quot;task.sh&quot;
-      }], 
-      &quot;environmentSettings&quot;: [ {
-        &quot;name&quot;:&quot;VAR1&quot;,
-        &quot;value&quot;:&quot;hello&quot;
-      } ],
-      &quot;constraints&quot;: {
-        &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-        &quot;maxTaskRetryCount&quot;:0,
-        &quot;retentionTime&quot;:&quot;PT1H&quot;
-      },
-      &quot;killJobOnCompletion&quot;:false,
-      &quot;runElevated&quot;:true,
-      &quot;runExclusive&quot;:true
-      },
-      &quot;poolInfo&quot;: {
-        &quot;autoPoolSpecification&quot;: {
-          &quot;autoPoolIdPrefix&quot;:&quot;mypool&quot;,
-          &quot;poolLifetimeOption&quot;:&quot;job&quot;,
-          &quot;pool&quot;: {
-            &quot;vmSize&quot;:&quot;STANDARD_D1&quot;,
-            &quot;virtualMachineConfiguration&quot;: {
-              &quot;imageReference&quot;: {
-                &quot;publisher&quot;:&quot;Canonical&quot;,
-                &quot;offer&quot;:&quot;UbuntuServer&quot;,
-                &quot;sku&quot;:&quot;14.04.4-LTS&quot;,
-                &quot;version&quot;:&quot;latest&quot;
-              },
-              &quot;nodeAgentSKUId&quot;:&quot;batch.node.ubuntu 14.04&quot;
-            },
-            &quot;resizeTimeout&quot;:&quot;PT15M&quot;,
-            &quot;targetDedicated&quot;:1,
-            &quot;maxTasksPerNode&quot;:1,
-            &quot;taskSchedulingPolicy&quot;: {
-              &quot;nodeFillType&quot;:&quot;Spread&quot;
-            },
-            &quot;enableAutoScale&quot;:false,
-            &quot;enableInterNodeCommunication&quot;:false,
-            &quot;startTask&quot;: {
-              &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./starttask.sh'&quot;,
-              &quot;resourceFiles&quot;: [ {
-                &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-                &quot;filePath&quot;:&quot;starttask.sh&quot;
-              } ],
-              &quot;environmentSettings&quot;: [ {
-                &quot;name&quot;:&quot;VAR2&quot;,
-                &quot;value&quot;:&quot;Chao&quot;
-              } ],
-              &quot;runElevated&quot;:true,
-              &quot;waitForSuccess&quot;:true
-            },
-            &quot;metadata&quot;: [ {
-              &quot;name&quot;:&quot;myproperty&quot;,
-              &quot;value&quot;:&quot;myvalue&quot;
-            } ]
-          }
-        }
-      }
-    }
-  }
-</code></pre>
-
-<p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
-
-<p>それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。</p>
-
-<p>ではスケジュールジョブをAzure BatchにCLIで送り込みます。</p>
-
-<pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
-</code></pre>
-
-<p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。</p>
-
-<h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
-
-<p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 
                     </div>
                 </section>

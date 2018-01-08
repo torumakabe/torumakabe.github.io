@@ -301,6 +301,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>
 
+&lt;p&gt;注: 2018/1/8にサンプルを更新しました。更新エントリは&lt;a href=&#34;http://torumakabe.github.io/post/terraform_azure_sample_201801/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
+
 &lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
@@ -395,7 +397,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
 
-&lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
+&lt;p&gt;ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。&lt;/p&gt;
 
 &lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
 

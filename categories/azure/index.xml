@@ -9,6 +9,285 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>TerraformでAzure サンプル 2018/1版</title>
+      <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <description>
+
+&lt;h2 id=&#34;サンプルのアップデート&#34;&gt;サンプルのアップデート&lt;/h2&gt;
+
+&lt;p&gt;年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_fundamental_rules/&#34;&gt;記事&lt;/a&gt;に目が止まりました。原則はいいとして、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;サンプル&lt;/a&gt;は2年物で腐りかけです。ということでアップデートします。&lt;/p&gt;
+
+&lt;h2 id=&#34;インパクトの大きな変更点&#34;&gt;インパクトの大きな変更点&lt;/h2&gt;
+
+&lt;p&gt;Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;BackendにAzure Blobを使えるようになった&lt;/li&gt;
+&lt;li&gt;Workspaceで同一コード・複数環境管理ができるようになった&lt;/li&gt;
+&lt;li&gt;対応リソースが増えた&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://registry.terraform.io/&#34;&gt;Terraform Module Registry&lt;/a&gt;が公開された&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;更新版サンプルの方針&#34;&gt;更新版サンプルの方針&lt;/h2&gt;
+
+&lt;p&gt;重要アップデートをふまえ、以下の方針で新サンプルを作りました。&lt;/p&gt;
+
+&lt;h3 id=&#34;チーム-複数端末での運用&#34;&gt;チーム、複数端末での運用&lt;/h3&gt;
+
+&lt;p&gt;BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。&lt;/p&gt;
+
+&lt;h3 id=&#34;workspaceの導入&#34;&gt;Workspaceの導入&lt;/h3&gt;
+
+&lt;p&gt;従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。&lt;/p&gt;
+
+&lt;p&gt;要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。&lt;/p&gt;
+
+&lt;h3 id=&#34;module-terraform-module-registryの活用&#34;&gt;Module、Terraform Module Registryの活用&lt;/h3&gt;
+
+&lt;p&gt;TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。&lt;/p&gt;
+
+&lt;h3 id=&#34;リソースグループは環境ごとに準備し-管理をterraformから分離&#34;&gt;リソースグループは環境ごとに準備し、管理をTerraformから分離&lt;/h3&gt;
+
+&lt;p&gt;AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。&lt;/p&gt;
+
+&lt;p&gt;TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。&lt;/p&gt;
+
+&lt;p&gt;ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。&lt;/p&gt;
+
+&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
+
+&lt;p&gt;サンプルは&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801&#34;&gt;GitHub&lt;/a&gt;に置きました。合わせてご確認ください。&lt;/p&gt;
+
+&lt;p&gt;このコードをapplyすると、以下のリソースが出来上がります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;NGINX on Ubuntu Webサーバー VMスケールセット&lt;/li&gt;
+&lt;li&gt;VMスケールセット向けロードバランサー&lt;/li&gt;
+&lt;li&gt;踏み台サーバー&lt;/li&gt;
+&lt;li&gt;上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;リポジトリ構造&#34;&gt;リポジトリ構造&lt;/h3&gt;
+
+&lt;p&gt;サンプルのリポジトリ構造です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;├── modules
+│   ├── computegroup
+│   │   ├── main.tf
+│   │   ├── os
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── loadbalancer
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── network
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── projects
+    ├── project_a
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   └── variables.tf
+    └── shared
+        ├── backend.tf
+        ├── main.tf
+        ├── outputs.tf
+        └── variables.tf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;/modulesには&lt;a href=&#34;https://registry.terraform.io/browse?provider=azurerm&#34;&gt;Terraform Module Registry&lt;/a&gt;でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。&lt;/p&gt;
+
+&lt;p&gt;そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。&lt;/p&gt;
+
+&lt;p&gt;このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;アプリ開発者がproject_a下でアプリ関連リソースに集中したい&lt;/li&gt;
+&lt;li&gt;性能観点で分割したい (Terraformはリソース量につれて重くなりがち)&lt;/li&gt;
+&lt;li&gt;有事を考慮し影響範囲を分割したい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1&#34;&gt;output&lt;/a&gt;し、project_aで参照できるよう&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10&#34;&gt;定義&lt;/a&gt;しています。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;h3 id=&#34;前提&#34;&gt;前提&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Linux、WSL、macOSなどbash環境の実行例です&lt;/li&gt;
+&lt;li&gt;SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;管理者向けのサービスプリンシパルを用意する&#34;&gt;管理者向けのサービスプリンシパルを用意する&lt;/h3&gt;
+
+&lt;p&gt;インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。&lt;/p&gt;
+
+&lt;p&gt;もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html&#34;&gt;Terraformのドキュメント&lt;/a&gt;も参考に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes=&amp;quot;/subscriptions/SUBSCRIPTION_ID&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。&lt;/p&gt;
+
+&lt;p&gt;なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go&#34;&gt;使う&lt;/a&gt;からです。&lt;/p&gt;
+
+&lt;p&gt;そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go&#34;&gt;使われません&lt;/a&gt;。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。&lt;/p&gt;
+
+&lt;p&gt;サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも&lt;a href=&#34;https://www.terraform.io/docs/backends/types/azurerm.html&#34;&gt;対応できます&lt;/a&gt;。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。&lt;/p&gt;
+
+&lt;h3 id=&#34;管理者の環境変数を設定する&#34;&gt;管理者の環境変数を設定する&lt;/h3&gt;
+
+&lt;p&gt;Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;export ARM_SUBSCRIPTION_ID=&amp;quot;&amp;lt;your subscription id&amp;gt;&amp;quot;
+export ARM_CLIENT_ID=&amp;quot;&amp;lt;your servicce principal appid&amp;gt;&amp;quot;
+export ARM_CLIENT_SECRET=&amp;quot;&amp;lt;your service principal password&amp;gt;&amp;quot;
+export ARM_TENANT_ID=&amp;quot;&amp;lt;your service principal tenant&amp;gt;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;workspaceを作る&#34;&gt;Workspaceを作る&lt;/h3&gt;
+
+&lt;p&gt;開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace new dev
+terraform workspace new stage
+terraform workspace new prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;リソースグループを作る&#34;&gt;リソースグループを作る&lt;/h3&gt;
+
+&lt;p&gt;まずWorkspace別にリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-dev-rg -l japaneast
+az group create -n tf-sample-stage-rg -l japaneast
+az group create -n tf-sample-prod-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;data &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;resource_group&amp;quot; {
+  name = &amp;quot;${var.resource_group_name}-${terraform.workspace}-rg&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&amp;rdquo;tf-sample&amp;rdquo;と指定しています。&lt;/p&gt;
+
+&lt;p&gt;次にBackend、state共有向けリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-state-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループは、各projectのbackend.tfで指定しています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-dev-rg&amp;quot; &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-state-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;backendを準備する&#34;&gt;Backendを準備する&lt;/h3&gt;
+
+&lt;p&gt;project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ストレージアカウント (名前は任意)&lt;/li&gt;
+&lt;li&gt;コンテナー *2 (tfstate-project-a, tfstate-shared)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を作ってください。GUIでもCLIでも、お好きなやり方で。&lt;/p&gt;
+
+&lt;p&gt;その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+
+data &amp;quot;terraform_remote_state&amp;quot; &amp;quot;shared&amp;quot; {
+  backend = &amp;quot;azurerm&amp;quot;
+
+  config {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-shared&amp;quot;
+    key                  = &amp;quot;terraform.tfstateenv:${terraform.workspace}&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで準備完了です。&lt;/p&gt;
+
+&lt;h3 id=&#34;実行&#34;&gt;実行&lt;/h3&gt;
+
+&lt;p&gt;Workspaceをdevに切り替えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select dev
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まずは土台となるリソースを作成するsharedから。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd shared
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;土台となるリソースが作成されたら、次はprocject_aを。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ../procject_a
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。&lt;/p&gt;
+
+&lt;p&gt;dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select stage
+[以下devと同様の操作]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考情報&#34;&gt;参考情報&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/terraform/&#34;&gt;Terraform on Azure のドキュメント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples&#34;&gt;サンプル集 on GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
       <link>http://torumakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
@@ -2098,218 +2377,6 @@ info:    vm quick-create command OK
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;成功。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>http://torumakabe.github.io/post/azure_osstools_iac/</link>
-      <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
-      <description>
-
-&lt;h2 id=&#34;端末だってコード化されたい&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
-
-&lt;p&gt;Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。&lt;/p&gt;
-
-&lt;h2 id=&#34;解決したい課題&#34;&gt;解決したい課題&lt;/h2&gt;
-
-&lt;p&gt;こんな悩みを解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい&lt;/li&gt;
-&lt;li&gt;WindowsもMacも使っているので、どちらでも同じ環境を作りたい&lt;/li&gt;
-&lt;li&gt;サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー&lt;/li&gt;
-&lt;li&gt;2016年にもなって長いコードをVimとかEmacsで書きたくない&lt;/li&gt;
-&lt;li&gt;Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい&lt;/li&gt;
-&lt;li&gt;仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい&lt;/li&gt;
-&lt;li&gt;Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか)&lt;/li&gt;
-&lt;li&gt;でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい&lt;/li&gt;
-&lt;li&gt;新メンバーがチームに入るたび、セットアップが大変&lt;/li&gt;
-&lt;li&gt;不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変&lt;/li&gt;
-&lt;li&gt;毎度作業のどこかが抜ける、漏れる、間違う 人間だもの&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;p&gt;VagrantとDockerで解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る&lt;/li&gt;
-&lt;li&gt;Vagrantでセットアップを自動化する&lt;/li&gt;
-&lt;li&gt;Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する&lt;/li&gt;
-&lt;li&gt;Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する&lt;/li&gt;
-&lt;li&gt;公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る&lt;/li&gt;
-&lt;li&gt;Windows/MacのいまどきなIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;セットアップ概要&#34;&gt;セットアップ概要&lt;/h2&gt;
-
-&lt;p&gt;簡単す。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Virtualboxを&lt;a href=&#34;https://www.virtualbox.org/&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrantを&lt;a href=&#34;https://www.vagrantup.com/downloads.html&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrant Putty Plugin(vagrant-multi-putty)を&lt;a href=&#34;https://github.com/nickryand/vagrant-multi-putty&#34;&gt;インストール&lt;/a&gt; #Windowsのみ。Puttyは別途入れてください&lt;/li&gt;
-&lt;li&gt;作業フォルダを作り、Vagrant ファイルを書く&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。&lt;/p&gt;
-
-&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
-
-&lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
-VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot;
-
-$bootstrap=&amp;lt;&amp;lt;SCRIPT
-
-#Common tools
-sudo apt-get update
-sudo apt-get -y install wget unzip jq
-
-#Docker Engine
-sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install linux-image-extra-$(uname -r)
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-sudo sh -c &amp;quot;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &amp;gt; /etc/apt/sources.list.d/docker.list&amp;quot;
-sudo apt-get update
-sudo apt-get -y purge lxc-docker
-sudo apt-cache policy docker-engine
-sudo apt-get -y install docker-engine=1.11.1-0~trusty
-sudo gpasswd -a vagrant docker
-sudo service docker restart
-
-#Docker Machine
-sudo sh -c &amp;quot;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &amp;gt;/usr/local/bin/docker-machine &amp;amp;&amp;amp; chmod +x /usr/local/bin/docker-machine&amp;quot;
-
-#Azure CLI
-echo &amp;quot;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Terraform
-echo &amp;quot;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Packer
-echo &amp;quot;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#nodebrew
-curl -L git.io/nodebrew | perl - setup
-echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &amp;gt;&amp;gt; $HOME/.bashrc
-$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
-$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
-
-#Python3
-wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
-
-SCRIPT
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-
-  config.vm.box = &amp;quot;ubuntu/trusty64&amp;quot;
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-
-  config.vm.network &amp;quot;private_network&amp;quot;, ip: &amp;quot;192.168.33.10&amp;quot;
-
-  config.vm.provider &amp;quot;virtualbox&amp;quot; do |vb|
-     vb.customize [&amp;quot;modifyvm&amp;quot;, :id, &amp;quot;--memory&amp;quot;, &amp;quot;2048&amp;quot;]
-  end
-
-  config.vm.provision :shell, inline: $bootstrap, privileged: false
-
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;$bootstrap=&amp;lt;&amp;lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。&lt;/p&gt;
-
-&lt;h3 id=&#34;common-tools&#34;&gt;Common tools&lt;/h3&gt;
-
-&lt;p&gt;一般的なツールをaptでインストールします。wgetとかjqとか。&lt;/p&gt;
-
-&lt;h3 id=&#34;docker-engine-machine&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
-
-&lt;p&gt;この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。&lt;/p&gt;
-
-&lt;h3 id=&#34;azure-cli&#34;&gt;Azure CLI&lt;/h3&gt;
-
-&lt;p&gt;インストールせずに&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/&#34;&gt;MS公式のDockerイメージ&lt;/a&gt;を引っ張ります。なのでalias設定だけ。
--v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
-また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&amp;ndash;rmで消します。&lt;/p&gt;
-
-&lt;h3 id=&#34;terraform-packer&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
-
-&lt;p&gt;Azure CLIと同様です。Hashicorpが&lt;a href=&#34;https://hub.docker.com/u/hashicorp/&#34;&gt;公式イメージ&lt;/a&gt;を提供しているので、それを活用します。
-方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
--v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。&lt;/p&gt;
-
-&lt;p&gt;なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。&lt;/p&gt;
-
-&lt;h3 id=&#34;nodebrew&#34;&gt;nodebrew&lt;/h3&gt;
-
-&lt;p&gt;nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。&lt;/p&gt;
-
-&lt;h3 id=&#34;python3&#34;&gt;Python3&lt;/h3&gt;
-
-&lt;p&gt;Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。&lt;/p&gt;
-
-&lt;p&gt;みなさん他にもいろいろあるでしょう。シェルなのでお好みで。&lt;/p&gt;
-
-&lt;p&gt;さて、ここまでがプロビジョニング時の処理です。以降の&amp;rdquo;Vagrant.configure～&amp;rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。&lt;/p&gt;
-
-&lt;h2 id=&#34;どれだけ楽か&#34;&gt;どれだけ楽か&lt;/h2&gt;
-
-&lt;p&gt;では、環境を作ってみましょう。Vagrantfileがあるフォルダで&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant up
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;仮想マシンが作成されます。初回はプロビジョニング処理も走ります。&lt;/p&gt;
-
-&lt;p&gt;できましたか。できたら、&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant putty
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
-
-&lt;p&gt;あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant destroy
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。&lt;/p&gt;
-
-&lt;p&gt;なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。&lt;/p&gt;
-
-&lt;p&gt;わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。&lt;/p&gt;
-
-&lt;p&gt;また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう&lt;/li&gt;
-&lt;li&gt;サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
-
-&lt;ul&gt;
-&lt;li&gt;(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
-
-&lt;p&gt;「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。&lt;/p&gt;
-
-&lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
-
-&lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
 </description>
     </item>
     

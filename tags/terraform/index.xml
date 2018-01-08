@@ -9,6 +9,285 @@
     <atom:link href="http://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>TerraformでAzure サンプル 2018/1版</title>
+      <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <description>
+
+&lt;h2 id=&#34;サンプルのアップデート&#34;&gt;サンプルのアップデート&lt;/h2&gt;
+
+&lt;p&gt;年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_fundamental_rules/&#34;&gt;記事&lt;/a&gt;に目が止まりました。原則はいいとして、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;サンプル&lt;/a&gt;は2年物で腐りかけです。ということでアップデートします。&lt;/p&gt;
+
+&lt;h2 id=&#34;インパクトの大きな変更点&#34;&gt;インパクトの大きな変更点&lt;/h2&gt;
+
+&lt;p&gt;Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;BackendにAzure Blobを使えるようになった&lt;/li&gt;
+&lt;li&gt;Workspaceで同一コード・複数環境管理ができるようになった&lt;/li&gt;
+&lt;li&gt;対応リソースが増えた&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://registry.terraform.io/&#34;&gt;Terraform Module Registry&lt;/a&gt;が公開された&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;更新版サンプルの方針&#34;&gt;更新版サンプルの方針&lt;/h2&gt;
+
+&lt;p&gt;重要アップデートをふまえ、以下の方針で新サンプルを作りました。&lt;/p&gt;
+
+&lt;h3 id=&#34;チーム-複数端末での運用&#34;&gt;チーム、複数端末での運用&lt;/h3&gt;
+
+&lt;p&gt;BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。&lt;/p&gt;
+
+&lt;h3 id=&#34;workspaceの導入&#34;&gt;Workspaceの導入&lt;/h3&gt;
+
+&lt;p&gt;従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。&lt;/p&gt;
+
+&lt;p&gt;要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。&lt;/p&gt;
+
+&lt;h3 id=&#34;module-terraform-module-registryの活用&#34;&gt;Module、Terraform Module Registryの活用&lt;/h3&gt;
+
+&lt;p&gt;TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。&lt;/p&gt;
+
+&lt;h3 id=&#34;リソースグループは環境ごとに準備し-管理をterraformから分離&#34;&gt;リソースグループは環境ごとに準備し、管理をTerraformから分離&lt;/h3&gt;
+
+&lt;p&gt;AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。&lt;/p&gt;
+
+&lt;p&gt;TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。&lt;/p&gt;
+
+&lt;p&gt;ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。&lt;/p&gt;
+
+&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
+
+&lt;p&gt;サンプルは&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801&#34;&gt;GitHub&lt;/a&gt;に置きました。合わせてご確認ください。&lt;/p&gt;
+
+&lt;p&gt;このコードをapplyすると、以下のリソースが出来上がります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;NGINX on Ubuntu Webサーバー VMスケールセット&lt;/li&gt;
+&lt;li&gt;VMスケールセット向けロードバランサー&lt;/li&gt;
+&lt;li&gt;踏み台サーバー&lt;/li&gt;
+&lt;li&gt;上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;リポジトリ構造&#34;&gt;リポジトリ構造&lt;/h3&gt;
+
+&lt;p&gt;サンプルのリポジトリ構造です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;├── modules
+│   ├── computegroup
+│   │   ├── main.tf
+│   │   ├── os
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── loadbalancer
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── network
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── projects
+    ├── project_a
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   └── variables.tf
+    └── shared
+        ├── backend.tf
+        ├── main.tf
+        ├── outputs.tf
+        └── variables.tf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;/modulesには&lt;a href=&#34;https://registry.terraform.io/browse?provider=azurerm&#34;&gt;Terraform Module Registry&lt;/a&gt;でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。&lt;/p&gt;
+
+&lt;p&gt;そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。&lt;/p&gt;
+
+&lt;p&gt;このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;アプリ開発者がproject_a下でアプリ関連リソースに集中したい&lt;/li&gt;
+&lt;li&gt;性能観点で分割したい (Terraformはリソース量につれて重くなりがち)&lt;/li&gt;
+&lt;li&gt;有事を考慮し影響範囲を分割したい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1&#34;&gt;output&lt;/a&gt;し、project_aで参照できるよう&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10&#34;&gt;定義&lt;/a&gt;しています。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;h3 id=&#34;前提&#34;&gt;前提&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Linux、WSL、macOSなどbash環境の実行例です&lt;/li&gt;
+&lt;li&gt;SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;管理者向けのサービスプリンシパルを用意する&#34;&gt;管理者向けのサービスプリンシパルを用意する&lt;/h3&gt;
+
+&lt;p&gt;インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。&lt;/p&gt;
+
+&lt;p&gt;もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html&#34;&gt;Terraformのドキュメント&lt;/a&gt;も参考に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes=&amp;quot;/subscriptions/SUBSCRIPTION_ID&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。&lt;/p&gt;
+
+&lt;p&gt;なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go&#34;&gt;使う&lt;/a&gt;からです。&lt;/p&gt;
+
+&lt;p&gt;そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go&#34;&gt;使われません&lt;/a&gt;。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。&lt;/p&gt;
+
+&lt;p&gt;サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも&lt;a href=&#34;https://www.terraform.io/docs/backends/types/azurerm.html&#34;&gt;対応できます&lt;/a&gt;。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。&lt;/p&gt;
+
+&lt;h3 id=&#34;管理者の環境変数を設定する&#34;&gt;管理者の環境変数を設定する&lt;/h3&gt;
+
+&lt;p&gt;Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;export ARM_SUBSCRIPTION_ID=&amp;quot;&amp;lt;your subscription id&amp;gt;&amp;quot;
+export ARM_CLIENT_ID=&amp;quot;&amp;lt;your servicce principal appid&amp;gt;&amp;quot;
+export ARM_CLIENT_SECRET=&amp;quot;&amp;lt;your service principal password&amp;gt;&amp;quot;
+export ARM_TENANT_ID=&amp;quot;&amp;lt;your service principal tenant&amp;gt;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;workspaceを作る&#34;&gt;Workspaceを作る&lt;/h3&gt;
+
+&lt;p&gt;開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace new dev
+terraform workspace new stage
+terraform workspace new prod
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;リソースグループを作る&#34;&gt;リソースグループを作る&lt;/h3&gt;
+
+&lt;p&gt;まずWorkspace別にリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-dev-rg -l japaneast
+az group create -n tf-sample-stage-rg -l japaneast
+az group create -n tf-sample-prod-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;data &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;resource_group&amp;quot; {
+  name = &amp;quot;${var.resource_group_name}-${terraform.workspace}-rg&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&amp;rdquo;tf-sample&amp;rdquo;と指定しています。&lt;/p&gt;
+
+&lt;p&gt;次にBackend、state共有向けリソースグループを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az group create -n tf-sample-state-rg -l japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループは、各projectのbackend.tfで指定しています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-dev-rg&amp;quot; &amp;quot;/subscriptions/&amp;lt;your subscription id&amp;gt;/resourceGroups/tf-sample-state-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。&lt;/p&gt;
+
+&lt;h3 id=&#34;backendを準備する&#34;&gt;Backendを準備する&lt;/h3&gt;
+
+&lt;p&gt;project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ストレージアカウント (名前は任意)&lt;/li&gt;
+&lt;li&gt;コンテナー *2 (tfstate-project-a, tfstate-shared)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;を作ってください。GUIでもCLIでも、お好きなやり方で。&lt;/p&gt;
+
+&lt;p&gt;その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform {
+  backend &amp;quot;azurerm&amp;quot; {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-project-a&amp;quot;
+    key                  = &amp;quot;terraform.tfstate&amp;quot;
+  }
+}
+
+data &amp;quot;terraform_remote_state&amp;quot; &amp;quot;shared&amp;quot; {
+  backend = &amp;quot;azurerm&amp;quot;
+
+  config {
+    resource_group_name  = &amp;quot;tf-sample-state-rg&amp;quot;
+    storage_account_name = &amp;quot;&amp;lt;your storage account name&amp;gt;&amp;quot;
+    container_name       = &amp;quot;tfstate-shared&amp;quot;
+    key                  = &amp;quot;terraform.tfstateenv:${terraform.workspace}&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これで準備完了です。&lt;/p&gt;
+
+&lt;h3 id=&#34;実行&#34;&gt;実行&lt;/h3&gt;
+
+&lt;p&gt;Workspaceをdevに切り替えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select dev
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;まずは土台となるリソースを作成するsharedから。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd shared
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;土台となるリソースが作成されたら、次はprocject_aを。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ../procject_a
+terraform init
+terraform plan
+terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。&lt;/p&gt;
+
+&lt;p&gt;dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;terraform workspace select stage
+[以下devと同様の操作]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。&lt;/p&gt;
+
+&lt;h2 id=&#34;参考情報&#34;&gt;参考情報&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/terraform/&#34;&gt;Terraform on Azure のドキュメント&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples&#34;&gt;サンプル集 on GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
       <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
@@ -208,6 +487,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>
 
+&lt;p&gt;注: 2018/1/8にサンプルを更新しました。更新エントリは&lt;a href=&#34;http://torumakabe.github.io/post/terraform_azure_sample_201801/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
+
 &lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
@@ -302,7 +583,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 &lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
 
-&lt;p&gt;ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。&lt;/p&gt;
+&lt;p&gt;ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。&lt;/p&gt;
 
 &lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
 

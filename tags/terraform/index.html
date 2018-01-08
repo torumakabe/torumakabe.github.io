@@ -68,6 +68,297 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">08 Jan 2018, 16:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/" class="post-title">TerraformでAzure サンプル 2018/1版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="サンプルのアップデート">サンプルのアップデート</h2>
+
+<p>年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの<a href="http://torumakabe.github.io/post/azure_tf_fundamental_rules/">記事</a>に目が止まりました。原則はいいとして、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">サンプル</a>は2年物で腐りかけです。ということでアップデートします。</p>
+
+<h2 id="インパクトの大きな変更点">インパクトの大きな変更点</h2>
+
+<p>Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。</p>
+
+<ol>
+<li>BackendにAzure Blobを使えるようになった</li>
+<li>Workspaceで同一コード・複数環境管理ができるようになった</li>
+<li>対応リソースが増えた</li>
+<li><a href="https://registry.terraform.io/">Terraform Module Registry</a>が公開された</li>
+</ol>
+
+<h2 id="更新版サンプルの方針">更新版サンプルの方針</h2>
+
+<p>重要アップデートをふまえ、以下の方針で新サンプルを作りました。</p>
+
+<h3 id="チーム-複数端末での運用">チーム、複数端末での運用</h3>
+
+<p>BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。</p>
+
+<h3 id="workspaceの導入">Workspaceの導入</h3>
+
+<p>従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。</p>
+
+<p>要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。</p>
+
+<h3 id="module-terraform-module-registryの活用">Module、Terraform Module Registryの活用</h3>
+
+<p>TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。</p>
+
+<h3 id="リソースグループは環境ごとに準備し-管理をterraformから分離">リソースグループは環境ごとに準備し、管理をTerraformから分離</h3>
+
+<p>AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。</p>
+
+<p>TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。</p>
+
+<p>ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。</p>
+
+<pre><code>terraform workspace select prod
+</code></pre>
+
+<p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
+
+<h2 id="サンプル解説">サンプル解説</h2>
+
+<p>サンプルは<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801">GitHub</a>に置きました。合わせてご確認ください。</p>
+
+<p>このコードをapplyすると、以下のリソースが出来上がります。</p>
+
+<ul>
+<li>NGINX on Ubuntu Webサーバー VMスケールセット</li>
+<li>VMスケールセット向けロードバランサー</li>
+<li>踏み台サーバー</li>
+<li>上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)</li>
+</ul>
+
+<h3 id="リポジトリ構造">リポジトリ構造</h3>
+
+<p>サンプルのリポジトリ構造です。</p>
+
+<pre><code>├── modules
+│   ├── computegroup
+│   │   ├── main.tf
+│   │   ├── os
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── loadbalancer
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── network
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── projects
+    ├── project_a
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   └── variables.tf
+    └── shared
+        ├── backend.tf
+        ├── main.tf
+        ├── outputs.tf
+        └── variables.tf
+</code></pre>
+
+<p>/modulesには<a href="https://registry.terraform.io/browse?provider=azurerm">Terraform Module Registry</a>でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。</p>
+
+<p>そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。</p>
+
+<p>このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。</p>
+
+<ul>
+<li>アプリ開発者がproject_a下でアプリ関連リソースに集中したい</li>
+<li>性能観点で分割したい (Terraformはリソース量につれて重くなりがち)</li>
+<li>有事を考慮し影響範囲を分割したい</li>
+</ul>
+
+<p>プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1">output</a>し、project_aで参照できるよう<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10">定義</a>しています。</p>
+
+<h2 id="使い方">使い方</h2>
+
+<h3 id="前提">前提</h3>
+
+<ul>
+<li>Linux、WSL、macOSなどbash環境の実行例です</li>
+<li>SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください</li>
+</ul>
+
+<h3 id="管理者向けのサービスプリンシパルを用意する">管理者向けのサービスプリンシパルを用意する</h3>
+
+<p>インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。</p>
+
+<p>もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。<a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html">Terraformのドキュメント</a>も参考に。</p>
+
+<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/SUBSCRIPTION_ID&quot;
+</code></pre>
+
+<p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
+
+<p>なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go">使う</a>からです。</p>
+
+<p>そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが<a href="https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go">使われません</a>。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。</p>
+
+<p>サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも<a href="https://www.terraform.io/docs/backends/types/azurerm.html">対応できます</a>。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。</p>
+
+<h3 id="管理者の環境変数を設定する">管理者の環境変数を設定する</h3>
+
+<p>Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。</p>
+
+<pre><code>export ARM_SUBSCRIPTION_ID=&quot;&lt;your subscription id&gt;&quot;
+export ARM_CLIENT_ID=&quot;&lt;your servicce principal appid&gt;&quot;
+export ARM_CLIENT_SECRET=&quot;&lt;your service principal password&gt;&quot;
+export ARM_TENANT_ID=&quot;&lt;your service principal tenant&gt;&quot;
+</code></pre>
+
+<h3 id="workspaceを作る">Workspaceを作る</h3>
+
+<p>開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。</p>
+
+<pre><code>terraform workspace new dev
+terraform workspace new stage
+terraform workspace new prod
+</code></pre>
+
+<h3 id="リソースグループを作る">リソースグループを作る</h3>
+
+<p>まずWorkspace別にリソースグループを作ります。</p>
+
+<pre><code>az group create -n tf-sample-dev-rg -l japaneast
+az group create -n tf-sample-stage-rg -l japaneast
+az group create -n tf-sample-prod-rg -l japaneast
+</code></pre>
+
+<p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
+
+<pre><code>data &quot;azurerm_resource_group&quot; &quot;resource_group&quot; {
+  name = &quot;${var.resource_group_name}-${terraform.workspace}-rg&quot;
+}
+</code></pre>
+
+<p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&rdquo;tf-sample&rdquo;と指定しています。</p>
+
+<p>次にBackend、state共有向けリソースグループを作ります。</p>
+
+<pre><code>az group create -n tf-sample-state-rg -l japaneast
+</code></pre>
+
+<p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
+
+<pre><code>terraform {
+  backend &quot;azurerm&quot; {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-project-a&quot;
+    key                  = &quot;terraform.tfstate&quot;
+  }
+}
+</code></pre>
+
+<p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
+
+<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&quot; &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&quot;
+</code></pre>
+
+<p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
+
+<h3 id="backendを準備する">Backendを準備する</h3>
+
+<p>project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに</p>
+
+<ul>
+<li>ストレージアカウント (名前は任意)</li>
+<li>コンテナー *2 (tfstate-project-a, tfstate-shared)</li>
+</ul>
+
+<p>を作ってください。GUIでもCLIでも、お好きなやり方で。</p>
+
+<p>その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。</p>
+
+<pre><code>terraform {
+  backend &quot;azurerm&quot; {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-project-a&quot;
+    key                  = &quot;terraform.tfstate&quot;
+  }
+}
+
+data &quot;terraform_remote_state&quot; &quot;shared&quot; {
+  backend = &quot;azurerm&quot;
+
+  config {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-shared&quot;
+    key                  = &quot;terraform.tfstateenv:${terraform.workspace}&quot;
+  }
+}
+</code></pre>
+
+<p>これで準備完了です。</p>
+
+<h3 id="実行">実行</h3>
+
+<p>Workspaceをdevに切り替えます。</p>
+
+<pre><code>terraform workspace select dev
+</code></pre>
+
+<p>まずは土台となるリソースを作成するsharedから。</p>
+
+<pre><code>cd shared
+terraform init
+terraform plan
+terraform apply
+</code></pre>
+
+<p>土台となるリソースが作成されたら、次はprocject_aを。</p>
+
+<pre><code>cd ../procject_a
+terraform init
+terraform plan
+terraform apply
+</code></pre>
+
+<p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
+
+<p>dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。</p>
+
+<pre><code>terraform workspace select stage
+[以下devと同様の操作]
+</code></pre>
+
+<p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
+
+<h2 id="参考情報">参考情報</h2>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>
+<li><a href="https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples">サンプル集 on GitHub</a></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
                 <section class="post">
                     <header class="post-header">
@@ -303,6 +594,8 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
                     <div class="post-description">
                         
 
+<p>注: 2018/1/8にサンプルを更新しました。更新エントリは<a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/">こちら</a>。</p>
+
 <h2 id="情報がありそうでない">情報がありそうでない</h2>
 
 <p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
@@ -397,7 +690,7 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 
 <p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
 
-<p>ポリシーや使い方、前提条件をリポジトリのREADMEに書いておけばOK、あとはコードで語る。という世界を目指したいものです。</p>
+<p>ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。</p>
 
 <h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
 
@@ -664,116 +957,20 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">04 Apr 2015, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/terraform-openstack-minimum/" class="post-title">いきなり Terraform OpenStack Provider</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="terraform-0-4でopenstack-providerリリース">Terraform 0.4でOpenStack Providerリリース</h3>
-
-<p>以前からOpenStack対応は表明されていたのですが、いよいよ<a href="https://hashicorp.com/blog/terraform-0-4.html">v0.4</a>でリリースされました。</p>
-
-<h3 id="小さくはじめましょう">小さくはじめましょう</h3>
-
-<p>この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。</p>
-
-<h3 id="テストした環境">テストした環境</h3>
-
-<ul>
-<li>Terraform 0.4</li>
-<li>Mac OS 10.10.2</li>
-<li>HP Helion Public Cloud</li>
-</ul>
-
-<h3 id="openstackerのみだしなみ-環境変数">OpenStackerのみだしなみ、環境変数</h3>
-
-<p>下記、環境変数はセットされてますよね。要確認。</p>
-
-<ul>
-<li>OS_AUTH_URL<br /></li>
-<li>OS_USERNAME<br /></li>
-<li>OS_PASSWORD<br /></li>
-<li>OS_REGION_NAME<br /></li>
-<li>OS_TENANT_NAME<br /></li>
-</ul>
-
-<h3 id="最小限の構成ファイル">最小限の構成ファイル</h3>
-
-<script type="text/javascript" src="http://gist.github.com/977209064bcfda66d085.js"></script>
-
-<p>これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。</p>
-
-<h3 id="さあ実行">さあ実行</h3>
-
-<p>まずはterraform planコマンドで、実行計画を確認します。</p>
-
-<pre><code>$ terraform plan
-Refreshing Terraform state prior to plan...
-
-
-The Terraform execution plan has been generated and is shown below.
-Resources are shown in alphabetical order for quick scanning. Green resources
-will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
-
-Note: You didn't specify an &quot;-out&quot; parameter to save this plan, so when &quot;apply&quot; is called, Terraform can't guarantee this is what will execute.
-
-+ openstack_compute_instance_v2.sample-server
-    access_ip_v4:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    access_ip_v6:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    flavor_id:         &quot;&quot; =&gt; &quot;my_flavor_id&quot;
-    flavor_name:       &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    floating_ip:       &quot;&quot; =&gt; &quot;aaa.bbb.ccc.ddd&quot;
-    image_id:          &quot;&quot; =&gt; &quot;my_image_id&quot;
-    image_name:        &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    key_pair:          &quot;&quot; =&gt; &quot;my_keypair&quot;
-    name:              &quot;&quot; =&gt; &quot;tf-sample&quot;
-    network.#:         &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    region:            &quot;&quot; =&gt; &quot;my_region&quot;
-    security_groups.#: &quot;&quot; =&gt; &quot;1&quot;
-    security_groups.0: &quot;&quot; =&gt; &quot;my_sg&quot;
-</code></pre>
-
-<p>定義通りに動きそうですね。では実行。applyです。</p>
-
-<pre><code>$ terraform apply  
-openstack_compute_instance_v2.sample-server: Creating...  
-    access_ip_v4:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    access_ip_v6:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    flavor_id:         &quot;&quot; =&gt; &quot;my_flavor&quot;  
-    flavor_name:       &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    floating_ip:       &quot;&quot; =&gt; &quot;aaa.bbb.ccc.ddd&quot;  
-    image_id:          &quot;&quot; =&gt; &quot;my_image_id&quot;  
-    image_name:        &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    key_pair:          &quot;&quot; =&gt; &quot;my_keypair&quot;  
-    name:              &quot;&quot; =&gt; &quot;tf-sample&quot;  
-    network.#:         &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    region:            &quot;&quot; =&gt; &quot;my_region&quot;
-    security_groups.#: &quot;&quot; =&gt; &quot;1&quot;
-    security_groups.0: &quot;&quot; =&gt; &quot;my_sg&quot;
-openstack_compute_instance_v2.test-server: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
-
-The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `terraform show` command.
-</code></pre>
-
-<p>とても楽ちんですね。あとはオプションを追加して込み入った構成に挑戦してみてください。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
+<div class="pagination">
+  <nav role="pagination" class="post-list-pagination">
+      
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 2</span>
+    
+      <a href="/tags/terraform/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
+        Older&nbsp;<i class="fa fa-angle-double-right"></i>
+      </a>
+    
+  </nav>
+</div>
+
 
             <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
