@@ -262,7 +262,7 @@ terraform apply
 
 &lt;p&gt;土台となるリソースが作成されたら、次はprocject_aを。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;cd ../procject_a
+&lt;pre&gt;&lt;code&gt;cd ../project_a
 terraform init
 terraform plan
 terraform apply
