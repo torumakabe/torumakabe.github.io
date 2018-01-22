@@ -6,8 +6,160 @@
     <description>Recent content in Post-rsses on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 08 Jan 2018 16:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jan 2018 22:00:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
+      <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
+      <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
+      <description>
+
+&lt;h2 id=&#34;共同作成者は-ちょっと強い&#34;&gt;共同作成者は、ちょっと強い&lt;/h2&gt;
+
+&lt;p&gt;Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。&lt;/p&gt;
+
+&lt;p&gt;ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。&lt;/p&gt;
+
+&lt;p&gt;なのですが、このようなケースで、権限付与の落とし穴があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サブスクリプション所有者が開発用リソースグループを作る&lt;/li&gt;
+&lt;li&gt;スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる&lt;/li&gt;
+&lt;li&gt;開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ&lt;/li&gt;
+&lt;li&gt;開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)&lt;/li&gt;
+&lt;li&gt;開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない&lt;/li&gt;
+&lt;li&gt;詰む&lt;/li&gt;
+&lt;li&gt;サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;いい感じのカスタムロールを作る&#34;&gt;いい感じのカスタムロールを作る&lt;/h2&gt;
+
+&lt;p&gt;Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。&lt;/p&gt;
+
+&lt;p&gt;シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;Name&amp;quot;: &amp;quot;Resource Group Contributor&amp;quot;,
+    &amp;quot;IsCustom&amp;quot;: true,
+    &amp;quot;Description&amp;quot;: &amp;quot;Lets you manage everything except access to resources, but can not delete Resouce Group&amp;quot;,
+    &amp;quot;Actions&amp;quot;: [
+        &amp;quot;*&amp;quot;
+    ],
+    &amp;quot;NotActions&amp;quot;: [
+        &amp;quot;Microsoft.Authorization/*/Delete&amp;quot;,
+        &amp;quot;Microsoft.Authorization/*/Write&amp;quot;,
+        &amp;quot;Microsoft.Authorization/elevateAccess/Action&amp;quot;,
+        &amp;quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&amp;quot;
+    ],
+    &amp;quot;AssignableScopes&amp;quot;: [
+        &amp;quot;/subscriptions/your-subscriotion-id&amp;quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。&lt;/p&gt;
+
+&lt;p&gt;では、カスタムロールを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role definition create --role-definition ./role.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力にカスタムロールのIDが入っていますので、控えておきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;id&amp;quot;: &amp;quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる&#34;&gt;カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる&lt;/h2&gt;
+
+&lt;p&gt;次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスプリンシパル作成時に割り当てる場合は、以下のように。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac -n &amp;quot;rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; --role your-customrole-id --scopes &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;余談ですが、&amp;rdquo;az ad sp create-for-rbac&amp;rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。&lt;/p&gt;
+
+&lt;h2 id=&#34;試してみる&#34;&gt;試してみる&lt;/h2&gt;
+
+&lt;p&gt;ログインして試してみましょう。サービスプリンシパルの例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az login --service-principal -u &amp;quot;http://rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; -t &amp;quot;your-tenant-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+Name              ResourceGroup     Location
+----------------  ----------------  ----------
+sampledevvm01     sample-dev-rg  japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group create -n rgc-poc-rg -l japaneast
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループを消してみます。消すかい？ -&amp;gt; y -&amp;gt; ダメ、という、持ち上げて落とす怒り方です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group delete -n sample-dev-rg
+Are you sure you want to perform this operation? (y/n): y
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;でもリソースグループのリソースを一括削除したい&#34;&gt;でもリソースグループのリソースを一括削除したい&lt;/h2&gt;
+
+&lt;p&gt;でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。&lt;/p&gt;
+
+&lt;p&gt;空テンプレートを、empty.jsonとしましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&amp;quot;,
+    &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
+    &amp;quot;parameters&amp;quot;: {},
+    &amp;quot;variables&amp;quot;: {},
+    &amp;quot;resources&amp;quot;: [],
+    &amp;quot;outputs&amp;quot;: {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;破壊的空砲を打ちます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループは残ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
@@ -2121,160 +2273,6 @@ node ./index.js
 &lt;p&gt;なんて感じで、書いたコードをテストしちゃってください。&lt;/p&gt;
 
 &lt;p&gt;なお、Visual Studio Code使いの人は&lt;a href=&#34;https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/&#34;&gt;統合ターミナルをBashにしておく&lt;/a&gt;と、さらに幸せになれます。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
-      <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
-      <description>
-
-&lt;h2 id=&#34;背景と動機&#34;&gt;背景と動機&lt;/h2&gt;
-
-&lt;p&gt;Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。&lt;/p&gt;
-
-&lt;p&gt;さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。&lt;/li&gt;
-&lt;li&gt;Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(&lt;a href=&#34;https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx&#34;&gt;MS OMS&lt;/a&gt;、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。&lt;/li&gt;
-&lt;li&gt;でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。&lt;/li&gt;
-&lt;li&gt;Azureリソースの使用量データ取得が一例。Azureでは使用量データを&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/&#34;&gt;ポータルからダウンロード&lt;/a&gt;したり、&lt;a href=&#34;https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/&#34;&gt;Power BIで分析&lt;/a&gt;できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。&lt;/li&gt;
-&lt;li&gt;ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。&lt;/li&gt;
-&lt;li&gt;それAzure Functionsで出来るよ。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azure FunctionsのTimer Triggerを使って、日次で実行&lt;/li&gt;
-&lt;li&gt;Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み&lt;/li&gt;
-&lt;li&gt;Nodeで書く (C#のサンプルはたくさんあるので)&lt;/li&gt;
-&lt;li&gt;業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;quick-start&#34;&gt;Quick Start&lt;/h2&gt;
-
-&lt;h3 id=&#34;準備&#34;&gt;準備&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ところでAzure Funtionsって何よ、って人はまず&lt;a href=&#34;https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/&#34;&gt;いい資料1&lt;/a&gt;と&lt;a href=&#34;https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/&#34;&gt;いい資料2&lt;/a&gt;でざっと把握を&lt;/li&gt;
-&lt;li&gt;AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (&lt;a href=&#34;https://doc.co/66mYfB&#34;&gt;ここ&lt;/a&gt;とか&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;ここ&lt;/a&gt;を参考に)
-
-&lt;ul&gt;
-&lt;li&gt;後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください&lt;/li&gt;
-&lt;li&gt;権限はsubscriptionに対するreaderが妥当でしょう&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Githubのリポジトリを作成 (VSTSやBitbucketも使えます)&lt;/li&gt;
-&lt;li&gt;使用量データを貯めるストレージアカウントを作成
-
-&lt;ul&gt;
-&lt;li&gt;後ほど環境変数に設定するので、接続文字列を控えておいてください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;デプロイ&#34;&gt;デプロイ&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを作成
-
-&lt;ul&gt;
-&lt;li&gt;ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App&lt;/li&gt;
-&lt;li&gt;アプリ名は.azurewebsites.net空間でユニークになるように&lt;/li&gt;
-&lt;li&gt;App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行したぶん課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう&lt;/li&gt;
-&lt;li&gt;メモリは128MBあれば十分です&lt;/li&gt;
-&lt;li&gt;他のパラメータはお好みで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;環境変数の設定
-
-&lt;ul&gt;
-&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定&lt;/li&gt;
-&lt;li&gt;先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;サンプルコードを取得
-
-&lt;ul&gt;
-&lt;li&gt;githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; &lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;AZFuncTimerTriggerSample&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;準備済みのGithubリポジトリにpush&lt;/li&gt;
-&lt;li&gt;リポジトリとFunction Appを同期
-
-&lt;ul&gt;
-&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ&lt;/li&gt;
-&lt;li&gt;Githubリポジトリとブランチを設定し、同期を待ちます&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Nodeのモジュールをインストール
-
-&lt;ul&gt;
-&lt;li&gt;&lt;del&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;&lt;del&gt;このディレクトリが、実行する関数、functionの単位です&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;&lt;del&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;deploy.cmd で自動的にインストールするよう変えました&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;これで、指定ストレージアカウントの&amp;rdquo;usagedata&amp;rdquo;コンテナに日次で使用量データファイルができます。&lt;/p&gt;
-
-&lt;h2 id=&#34;コード解説&#34;&gt;コード解説&lt;/h2&gt;
-
-&lt;p&gt;3つのファイルをデプロイしました。簡単な順に、ざっと解説します。&lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;コード&lt;/a&gt;を眺めながら読み進めてください。&lt;/p&gt;
-
-&lt;h3 id=&#34;package-json&#34;&gt;package.json&lt;/h3&gt;
-
-&lt;p&gt;主となるコードファイルは後述の&amp;rdquo;index.js&amp;rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。&lt;/p&gt;
-
-&lt;h3 id=&#34;function-json&#34;&gt;function.json&lt;/h3&gt;
-
-&lt;p&gt;Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&amp;rdquo;schedule&amp;rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。&lt;/p&gt;
-
-&lt;p&gt;&amp;ldquo;0 0 0 * * *&amp;rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。&lt;/p&gt;
-
-&lt;h3 id=&#34;index-js&#34;&gt;index.js&lt;/h3&gt;
-
-&lt;p&gt;メインロジックです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;先ほど設定した環境変数は、&amp;rdquo;process.env.HOGE&amp;rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。&lt;/li&gt;
-&lt;li&gt;日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。&lt;/li&gt;
-&lt;li&gt;0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx&#34;&gt;こちら&lt;/a&gt;。&lt;/li&gt;
-&lt;li&gt;module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。&lt;/li&gt;
-&lt;li&gt;最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。&lt;/li&gt;
-&lt;li&gt;ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
-
-&lt;ul&gt;
-&lt;li&gt;Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。&lt;/li&gt;
-&lt;li&gt;ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&amp;rdquo;YYYY-MM-DD_n.json&amp;rdquo;です。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;豆知識-node-on-azure-functions&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
-
-&lt;ul&gt;
-&lt;li&gt;NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です&lt;/li&gt;
-&lt;li&gt;Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを&lt;a href=&#34;https://github.com/Azure/azure-sdk-for-node/issues/1450&#34;&gt;サポートしていない&lt;/a&gt;ので、サポートされるまではcallbackで堅く書きましょう&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7&#34;&gt;サポートマトリックス&lt;/a&gt;を確認しましょう&lt;/li&gt;
-&lt;li&gt;なのでサンプルではOutput Binding使わずに書きました&lt;/li&gt;
-&lt;li&gt;Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;豆知識-azure-usage-api&#34;&gt;豆知識 (Azure Usage API)&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/&#34;&gt;Ratecard API&lt;/a&gt;を組み合わせてください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;それでは、幸せな運用管理サーバレス生活を。&lt;/strong&gt;&lt;/p&gt;
 </description>
     </item>
     

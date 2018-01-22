@@ -9,6 +9,158 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
+      <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
+      <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
+      <description>
+
+&lt;h2 id=&#34;共同作成者は-ちょっと強い&#34;&gt;共同作成者は、ちょっと強い&lt;/h2&gt;
+
+&lt;p&gt;Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。&lt;/p&gt;
+
+&lt;p&gt;ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。&lt;/p&gt;
+
+&lt;p&gt;なのですが、このようなケースで、権限付与の落とし穴があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サブスクリプション所有者が開発用リソースグループを作る&lt;/li&gt;
+&lt;li&gt;スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる&lt;/li&gt;
+&lt;li&gt;開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ&lt;/li&gt;
+&lt;li&gt;開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)&lt;/li&gt;
+&lt;li&gt;開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない&lt;/li&gt;
+&lt;li&gt;詰む&lt;/li&gt;
+&lt;li&gt;サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;いい感じのカスタムロールを作る&#34;&gt;いい感じのカスタムロールを作る&lt;/h2&gt;
+
+&lt;p&gt;Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。&lt;/p&gt;
+
+&lt;p&gt;シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;Name&amp;quot;: &amp;quot;Resource Group Contributor&amp;quot;,
+    &amp;quot;IsCustom&amp;quot;: true,
+    &amp;quot;Description&amp;quot;: &amp;quot;Lets you manage everything except access to resources, but can not delete Resouce Group&amp;quot;,
+    &amp;quot;Actions&amp;quot;: [
+        &amp;quot;*&amp;quot;
+    ],
+    &amp;quot;NotActions&amp;quot;: [
+        &amp;quot;Microsoft.Authorization/*/Delete&amp;quot;,
+        &amp;quot;Microsoft.Authorization/*/Write&amp;quot;,
+        &amp;quot;Microsoft.Authorization/elevateAccess/Action&amp;quot;,
+        &amp;quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&amp;quot;
+    ],
+    &amp;quot;AssignableScopes&amp;quot;: [
+        &amp;quot;/subscriptions/your-subscriotion-id&amp;quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。&lt;/p&gt;
+
+&lt;p&gt;では、カスタムロールを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role definition create --role-definition ./role.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力にカスタムロールのIDが入っていますので、控えておきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;id&amp;quot;: &amp;quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる&#34;&gt;カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる&lt;/h2&gt;
+
+&lt;p&gt;次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスプリンシパル作成時に割り当てる場合は、以下のように。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac -n &amp;quot;rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; --role your-customrole-id --scopes &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;余談ですが、&amp;rdquo;az ad sp create-for-rbac&amp;rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。&lt;/p&gt;
+
+&lt;h2 id=&#34;試してみる&#34;&gt;試してみる&lt;/h2&gt;
+
+&lt;p&gt;ログインして試してみましょう。サービスプリンシパルの例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az login --service-principal -u &amp;quot;http://rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; -t &amp;quot;your-tenant-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+Name              ResourceGroup     Location
+----------------  ----------------  ----------
+sampledevvm01     sample-dev-rg  japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group create -n rgc-poc-rg -l japaneast
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループを消してみます。消すかい？ -&amp;gt; y -&amp;gt; ダメ、という、持ち上げて落とす怒り方です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group delete -n sample-dev-rg
+Are you sure you want to perform this operation? (y/n): y
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;でもリソースグループのリソースを一括削除したい&#34;&gt;でもリソースグループのリソースを一括削除したい&lt;/h2&gt;
+
+&lt;p&gt;でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。&lt;/p&gt;
+
+&lt;p&gt;空テンプレートを、empty.jsonとしましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&amp;quot;,
+    &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
+    &amp;quot;parameters&amp;quot;: {},
+    &amp;quot;variables&amp;quot;: {},
+    &amp;quot;resources&amp;quot;: [],
+    &amp;quot;outputs&amp;quot;: {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;破壊的空砲を打ちます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループは残ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
       <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
@@ -2245,138 +2397,6 @@ azuredeploy.json  azuredeploy.parameters.json  subd
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;しあわせ。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure X-Plat CLIでResource Policyを設定する</title>
-      <link>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</link>
-      <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
-      <description>
-
-&lt;h2 id=&#34;azure-x-plat-cliのリリースサイクル&#34;&gt;Azure X-Plat CLIのリリースサイクル&lt;/h2&gt;
-
-&lt;p&gt;OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases&#34;&gt;月次&lt;/a&gt;です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。&lt;/p&gt;
-
-&lt;p&gt;たとえば、今回のテーマであるResource Policy。GA直後に公開された&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ドキュメント&lt;/a&gt;に、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。&lt;/p&gt;
-
-&lt;p&gt;機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;ポリシーによるアクセス管理&#34;&gt;ポリシーによるアクセス管理&lt;/h2&gt;
-
-&lt;p&gt;さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい&lt;/li&gt;
-&lt;li&gt;日本国外リージョンのデータセンタを使えないようにしたい&lt;/li&gt;
-&lt;li&gt;Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい&lt;/li&gt;
-&lt;li&gt;開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;などなど。こういう課題にポリシーが効きます。&lt;/p&gt;
-
-&lt;p&gt;従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/role-based-access-built-in-roles/&#34;&gt;組み込みロールの一覧&lt;/a&gt;を眺めると、理解しやすいでしょう。&lt;/p&gt;
-
-&lt;p&gt;ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。&lt;/p&gt;
-
-&lt;p&gt;リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。&lt;/p&gt;
-
-&lt;h2 id=&#34;x-plat-cliでの定義方法&#34;&gt;X-Plat CLIでの定義方法&lt;/h2&gt;
-
-&lt;p&gt;2016/4リリースの&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli/releases/tag/v0.9.20-April2016&#34;&gt;v0.9.20&lt;/a&gt;から、X-Plat CLIでもResource Policyを定義できます。&lt;/p&gt;
-
-&lt;p&gt;ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-manager-policy/&#34;&gt;ポリシーを使用したリソース管理とアクセス制御&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;X-Plat CLI固有部分に絞って紹介します。&lt;/p&gt;
-
-&lt;h3 id=&#34;ポリシー定義ファイルを作る&#34;&gt;ポリシー定義ファイルを作る&lt;/h3&gt;
-
-&lt;p&gt;CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。&lt;/p&gt;
-
-&lt;p&gt;例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;if&amp;quot;: {
-    &amp;quot;allOf&amp;quot;: [
-      {
-        &amp;quot;field&amp;quot;: &amp;quot;type&amp;quot;,
-        &amp;quot;equals&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot;
-      },
-      {
-        &amp;quot;not&amp;quot;: {
-          &amp;quot;field&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/sku.name&amp;quot;,
-          &amp;quot;in&amp;quot;: [ &amp;quot;Standard_D1_v2&amp;quot;, &amp;quot;Standard_D2_v2&amp;quot;,&amp;quot;Standard_D3_v2&amp;quot;, &amp;quot;Standard_D4_v2&amp;quot;, &amp;quot;Standard_D5_v2&amp;quot; ]
-        }
-      }
-    ]
-  },
-  &amp;quot;then&amp;quot;: {
-    &amp;quot;effect&amp;quot;: &amp;quot;deny&amp;quot;
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;info:    Executing command policy definition create
-+ Creating policy definition deny_vmsize
-data:    PolicyName:             deny_vmsize
-data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
-data:    PolicyType:             Custom
-data:    DisplayName:
-data:    Description:
-data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
-info:    policy definition create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できたみたいです。&lt;/p&gt;
-
-&lt;h3 id=&#34;ポリシーをアサインする&#34;&gt;ポリシーをアサインする&lt;/h3&gt;
-
-&lt;p&gt;では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも&lt;a href=&#34;https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx&#34;&gt;指定可能&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;info:    Executing command policy assignment create
-+ Creating policy assignment deny_vmsize_assignment
-data:    PolicyAssignmentName:     deny_vmsize_assignment
-data:    Type:                     Microsoft.Authorization/policyAssignments
-data:    DisplayName:
-data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
-data:    Scope:                    /subscriptions/mysubscription
-info:    policy assignment create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_G5
-info:    Executing command vm quick-create
-[...snip]
-+ Creating VM &amp;quot;rppocvm&amp;quot;
-error:   The resource action &#39;Microsoft.Compute/virtualMachines/write&#39; is disallowed by one or more policies. Policy identifier(s): &#39;/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize&#39;.
-info:    Error information has been recorded to /root/.azure/azure.err
-error:   vm quick-create command failed
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;拒否られました。&lt;/p&gt;
-
-&lt;p&gt;許可されているVMサイズだと。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &amp;quot;canonical:ubuntuserver:14.04.4-LTS:latest&amp;quot; -u &amp;quot;adminname&amp;quot; -p &amp;quot;adminpass&amp;quot; -z Standard_D1_v2
-info:    Executing command vm quick-create
-[...snip]
-info:    vm quick-create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;成功。&lt;/p&gt;
 </description>
     </item>
     

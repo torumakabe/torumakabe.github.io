@@ -9,6 +9,158 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
+      <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
+      <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
+      <description>
+
+&lt;h2 id=&#34;共同作成者は-ちょっと強い&#34;&gt;共同作成者は、ちょっと強い&lt;/h2&gt;
+
+&lt;p&gt;Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。&lt;/p&gt;
+
+&lt;p&gt;ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。&lt;/p&gt;
+
+&lt;p&gt;なのですが、このようなケースで、権限付与の落とし穴があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;サブスクリプション所有者が開発用リソースグループを作る&lt;/li&gt;
+&lt;li&gt;スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる&lt;/li&gt;
+&lt;li&gt;開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ&lt;/li&gt;
+&lt;li&gt;開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)&lt;/li&gt;
+&lt;li&gt;開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない&lt;/li&gt;
+&lt;li&gt;詰む&lt;/li&gt;
+&lt;li&gt;サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;いい感じのカスタムロールを作る&#34;&gt;いい感じのカスタムロールを作る&lt;/h2&gt;
+
+&lt;p&gt;Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。&lt;/p&gt;
+
+&lt;p&gt;シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;Name&amp;quot;: &amp;quot;Resource Group Contributor&amp;quot;,
+    &amp;quot;IsCustom&amp;quot;: true,
+    &amp;quot;Description&amp;quot;: &amp;quot;Lets you manage everything except access to resources, but can not delete Resouce Group&amp;quot;,
+    &amp;quot;Actions&amp;quot;: [
+        &amp;quot;*&amp;quot;
+    ],
+    &amp;quot;NotActions&amp;quot;: [
+        &amp;quot;Microsoft.Authorization/*/Delete&amp;quot;,
+        &amp;quot;Microsoft.Authorization/*/Write&amp;quot;,
+        &amp;quot;Microsoft.Authorization/elevateAccess/Action&amp;quot;,
+        &amp;quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&amp;quot;
+    ],
+    &amp;quot;AssignableScopes&amp;quot;: [
+        &amp;quot;/subscriptions/your-subscriotion-id&amp;quot;
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。&lt;/p&gt;
+
+&lt;p&gt;では、カスタムロールを作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role definition create --role-definition ./role.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力にカスタムロールのIDが入っていますので、控えておきます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;id&amp;quot;: &amp;quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる&#34;&gt;カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる&lt;/h2&gt;
+
+&lt;p&gt;次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスプリンシパル作成時に割り当てる場合は、以下のように。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac -n &amp;quot;rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; --role your-customrole-id --scopes &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;余談ですが、&amp;rdquo;az ad sp create-for-rbac&amp;rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。&lt;/p&gt;
+
+&lt;h2 id=&#34;試してみる&#34;&gt;試してみる&lt;/h2&gt;
+
+&lt;p&gt;ログインして試してみましょう。サービスプリンシパルの例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az login --service-principal -u &amp;quot;http://rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; -t &amp;quot;your-tenant-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+Name              ResourceGroup     Location
+----------------  ----------------  ----------
+sampledevvm01     sample-dev-rg  japaneast
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group create -n rgc-poc-rg -l japaneast
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループを消してみます。消すかい？ -&amp;gt; y -&amp;gt; ダメ、という、持ち上げて落とす怒り方です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group delete -n sample-dev-rg
+Are you sure you want to perform this operation? (y/n): y
+The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;でもリソースグループのリソースを一括削除したい&#34;&gt;でもリソースグループのリソースを一括削除したい&lt;/h2&gt;
+
+&lt;p&gt;でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。&lt;/p&gt;
+
+&lt;p&gt;空テンプレートを、empty.jsonとしましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&amp;quot;,
+    &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
+    &amp;quot;parameters&amp;quot;: {},
+    &amp;quot;variables&amp;quot;: {},
+    &amp;quot;resources&amp;quot;: [],
+    &amp;quot;outputs&amp;quot;: {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;破壊的空砲を打ちます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;リソースグループは残ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm list -o table
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
       <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
@@ -2317,246 +2469,6 @@ end
 &lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
 
 &lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
-      <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
-      <description>
-
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
-
-&lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
-
-&lt;p&gt;Azure Functionsは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう&lt;/li&gt;
-&lt;li&gt;利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表&lt;/li&gt;
-&lt;li&gt;Azure内外機能との、容易なイベント連動。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;が特徴です。AWSのLambdaと似てるっちゃ似ています。&lt;/p&gt;
-
-&lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIを使って、webhook連動する&lt;/li&gt;
-&lt;li&gt;Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す&lt;/li&gt;
-&lt;li&gt;ビールは&lt;a href=&#34;http://beertaster.org/beerstyle/web/beerstyle_main_j.html&#34;&gt;Craft Beer Association&lt;/a&gt;の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す&lt;/li&gt;
-&lt;li&gt;Botらしく、それらしい文末表現をランダムで返す&lt;/li&gt;
-&lt;li&gt;好みとか文脈は全く聞かないぜSorry&lt;/li&gt;
-&lt;li&gt;アプリはNodeで書く。C#のサンプルは増えてきたので&lt;/li&gt;
-&lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
-&lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
-&lt;li&gt;拡張性はひとまず目をつぶる  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
-
-&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
-
-&lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azureで
-
-&lt;ul&gt;
-&lt;li&gt;Function Appの作成  #1&lt;/li&gt;
-&lt;li&gt;Bot用Functionの作成 #2&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIとの接続検証  #6&lt;/li&gt;
-&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #8&lt;/li&gt;
-&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9&lt;/li&gt;
-&lt;li&gt;DocumentDBのストアドプロシージャ作成  #10&lt;/li&gt;
-&lt;li&gt;Function Appを書く  #11&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #12&lt;/li&gt;
-&lt;li&gt;Function AppのGithub連携設定  #13&lt;/li&gt;
-&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #14&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Facebookで
-
-&lt;ul&gt;
-&lt;li&gt;Facebook for Developersへの登録  #3&lt;/li&gt;
-&lt;li&gt;Botをひも付けるFacebook Pageの作成  #4&lt;/li&gt;
-&lt;li&gt;Bot用マイアプリの作成  #5&lt;/li&gt;
-&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #6&lt;/li&gt;
-&lt;li&gt;Azure Functions向けTokenを生成 #7&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを書くまで、#1〜2、#5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;li&gt;Facebook for Developersへの登録、#3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
-&lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
-&lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/&#34;&gt;DBアカウント〜コレクション作成&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する#12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。&lt;/p&gt;
-
-&lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
-var documentClient = require(&amp;quot;documentdb&amp;quot;).DocumentClient;
-const databaseUrl = &amp;quot;dbs/&amp;quot; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &amp;quot;masterKey&amp;quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &amp;quot; &amp;quot; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &amp;quot;attachment&amp;quot;:{
-          &amp;quot;type&amp;quot;:&amp;quot;template&amp;quot;,
-          &amp;quot;payload&amp;quot;:{
-            &amp;quot;template_type&amp;quot;:&amp;quot;button&amp;quot;,
-            &amp;quot;text&amp;quot;:msgAll,
-            &amp;quot;buttons&amp;quot;:[
-              {
-                &amp;quot;type&amp;quot;:&amp;quot;web_url&amp;quot;,
-                &amp;quot;url&amp;quot;:value[0].randomDocument.url,
-                &amp;quot;title&amp;quot;:&amp;quot;詳しく&amp;quot;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: &#39;graph.facebook.com&#39;,
-      port: 443,
-      path: &#39;/v2.6/me/messages&#39;,
-      method: &#39;POST&#39;,
-      headers: {
-        &#39;Content-Type&#39;: &#39;application/json&#39;,
-        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/beer&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/eom&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &amp;lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;amp;&amp;amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;最下部のmodule.export以降のブロックで、webhookイベントを受け取ります&lt;/li&gt;
-&lt;li&gt;それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
-
-&lt;ul&gt;
-&lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
-
-&lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
-  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
 </description>
     </item>
     

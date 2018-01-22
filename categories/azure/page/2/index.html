@@ -68,6 +68,273 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">13 Jun 2017, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azureblobcopy_perf/" class="post-title">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="ファイルコピーの需要は根強い">ファイルコピーの需要は根強い</h2>
+
+<p>グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。</p>
+
+<p>でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。</p>
+
+<h2 id="調べてみた">調べてみた</h2>
+
+<p>ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。</p>
+
+<h3 id="ツールと実行環境">ツールと実行環境</h3>
+
+<ul>
+<li>AzCopy 6.1.0</li>
+<li>Azure PowerShell 4.1.0</li>
+<li>Windows 10 1703</li>
+<li>ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory</li>
+</ul>
+
+<h3 id="アクセス回線パターン">アクセス回線パターン</h3>
+
+<ol>
+<li><p>一般的な回線</p>
+
+<ul>
+<li>自宅(川崎)</li>
+<li>OCN光 100M マンションタイプ</li>
+<li>宅内は802.11ac(5GHz)</li>
+<li>川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ</li>
+<li>ゲートウェイ名から推測</li>
+</ul></li>
+
+<li><p>いい感じの回線</p>
+
+<ul>
+<li>日本マイクロソフト 品川オフィス</li>
+<li>1Gbps 有線</li>
+<li>Azureデータセンターへ「ネットワーク的に近くて広帯域」</li>
+</ul></li>
+</ol>
+
+<h3 id="コピーするファイル">コピーするファイル</h3>
+
+<ul>
+<li>総容量: 約60GB
+
+<ul>
+<li>6160ファイル</li>
+<li>1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10</li>
+</ul></li>
+<li>Linux fallocateコマンドで作成</li>
+</ul>
+
+<h3 id="ファイル形式パターン">ファイル形式パターン</h3>
+
+<ol>
+<li>ファイル、Blobそのまま送る (6160ファイル)</li>
+<li>ディスクイメージで送る (1ファイル)
+
+<ul>
+<li>Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置</li>
+<li>転送前にデタッチ、エクスポート(Blob SAS形式)</li>
+<li>AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)</li>
+</ul></li>
+</ol>
+
+<h3 id="対象のazureリージョン">対象のAzureリージョン</h3>
+
+<ul>
+<li>東日本 (マスター、複製元と位置づける)</li>
+<li>米国中南部 (太平洋越え + 米国内を見たい)</li>
+<li>ブラジル南部</li>
+</ul>
+
+<h3 id="転送パターン">転送パターン</h3>
+
+<ul>
+<li>ユーザー拠点の端末からAzureリージョン: AzCopy Upload</li>
+<li>Azureリージョン間 (Storage to Storage)
+
+<ul>
+<li>ファイル: AzCopy Copy</li>
+<li>イメージ: PowerShell Start-AzureStorageBlobCopy</li>
+</ul></li>
+</ul>
+
+<h2 id="結果">結果</h2>
+
+<table>
+<thead>
+<tr>
+<th align="left">形式　</th>
+<th align="left">コピー元　　　　　</th>
+<th align="left">コピー先　　　　　　　　</th>
+<th align="left">コマンド　</th>
+<th align="right">　並列数</th>
+<th align="right">　実行時間(時:分:秒)</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">自宅</td>
+<td align="left">Azure 東日本</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">2</td>
+<td align="right">07:55:22</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">自宅</td>
+<td align="left">Azure 米国中南部</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">2</td>
+<td align="right">10:22:30</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">自宅</td>
+<td align="left">Azure ブラジル南部</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">2</td>
+<td align="right">12:46:37</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">オフィス</td>
+<td align="left">Azure 東日本</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">16</td>
+<td align="right">00:20:47</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">オフィス</td>
+<td align="left">Azure 米国中南部</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">16</td>
+<td align="right">00:45.11</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">オフィス</td>
+<td align="left">Azure ブラジル南部</td>
+<td align="left">AzCopy Upload</td>
+<td align="right">8</td>
+<td align="right">02:07.58</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">Azure 東日本</td>
+<td align="left">Azure 米国中南部</td>
+<td align="left">AzCopy Copy</td>
+<td align="right">N/A</td>
+<td align="right">00:28:55</td>
+</tr>
+
+<tr>
+<td align="left">イメージ　</td>
+<td align="left">Azure 東日本</td>
+<td align="left">Azure 米国中南部</td>
+<td align="left">PowerShell</td>
+<td align="right">N/A</td>
+<td align="right">00:11:11</td>
+</tr>
+
+<tr>
+<td align="left">ファイル　</td>
+<td align="left">Azure 東日本</td>
+<td align="left">Azure ブラジル南部</td>
+<td align="left">AzCopy Copy</td>
+<td align="right">N/A</td>
+<td align="right">00.25:33</td>
+</tr>
+
+<tr>
+<td align="left">イメージ　</td>
+<td align="left">Azure 東日本</td>
+<td align="left">Azure ブラジル南部</td>
+<td align="left">PowerShell</td>
+<td align="right">N/A</td>
+<td align="right">00.09:20</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="考察">考察</h2>
+
+<ul>
+<li><p>アクセス回線の差が大きく影響</p>
+
+<ul>
+<li>自宅パターンでプロバイダから帯域制限されていたかは不明 (自宅からAzure東日本まで16Mbpsくらいは出た)</li>
+<li>アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい</li>
+<li>こまめに送る</li>
+<li>Azure内でデータを生成する</li>
+<li>もしくはExpressRouteを引く (自宅で、とは言っていない)</li>
+</ul></li>
+
+<li><p>アクセス回線が細い場合、AzCopy Uploadの並列数を下げる</p>
+
+<ul>
+<li>AzCopyのデフォルト並列数は実行環境のCPUコア数 *8だが、今回実施した端末での並列数(4コア * 8 = 32)ではかえって性能が劣化した</li>
+<li>アクセス回線に合わせて並列数は調整する</li>
+</ul></li>
+
+<li><p>Azureのリージョン間コピーは早い</p>
+
+<ul>
+<li>Azureバックボーンを通るから</li>
+<li>端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから</li>
+</ul></li>
+
+<li><p>地理的な距離感覚だけで考えてはダメ</p>
+
+<ul>
+<li>地理的な近さではなく、ネットワーク的な近さと太さ</li>
+<li>Azureバックボーンを使うと日本とブラジルの間でもそれなりのスループット</li>
+</ul></li>
+
+<li><p>ファイル数が多いときはイメージで送るのも手</p>
+
+<ul>
+<li>ファイル数がコピー時間に影響する (1 vs 6160)</li>
+<li>そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&hellip;</li>
+<li>もしファイルシステムとして、であれば有効な手段</li>
+<li>エクスポートのひと手間は考慮</li>
+</ul></li>
+
+<li><p>Azureバックボーンを使うと、意外にブラジル近い</p>
+
+<ul>
+<li>土管か(ない</li>
+</ul></li>
+</ul>
+
+<p>Azureバックボーンの帯域にはSLAがありませんが、意識して仕組みを作ると得をします。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">09 Apr 2017, 15:15</h1>
                 <section class="post">
                     <header class="post-header">
@@ -574,58 +841,6 @@ Fri Feb  3 06:43:18 2017
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">20 Nov 2016, 13:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_webapponlinux_dockertag/" class="post-title">Azure App Service on LinuxのコンテナをCLIで更新する方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="cliでコンテナを更新したい">CLIでコンテナを更新したい</h2>
-
-<p>Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が<a href="https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/">発表</a>されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。</p>
-
-<p>さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。</p>
-
-<p>まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。</p>
-
-<h2 id="azure-cli-2-0">Azure CLI 2.0</h2>
-
-<p>Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。</p>
-
-<p>すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。</p>
-
-<pre><code>$ az appservice web config container show -n yourcontainerapp -g YourRG
-{
-  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot;
-}
-</code></pre>
-
-<p>新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。</p>
-
-<pre><code>$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot;
-{
-  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot;
-}
-</code></pre>
-
-<p>これで更新されます。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -635,7 +850,7 @@ Fri Feb  3 06:43:18 2017
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 7</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 8</span>
     
       <a href="/categories/azure/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

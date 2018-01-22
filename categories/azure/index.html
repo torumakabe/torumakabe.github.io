@@ -68,6 +68,170 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">22 Jan 2018, 22:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_rg_contributor/" class="post-title">Azureのリソースグループ限定 共同作成者をいい感じに作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="共同作成者は-ちょっと強い">共同作成者は、ちょっと強い</h2>
+
+<p>Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。</p>
+
+<p>ユースケースのひとつに、&rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。</p>
+
+<p>なのですが、このようなケースで、権限付与の落とし穴があります。</p>
+
+<ul>
+<li>サブスクリプション所有者が開発用リソースグループを作る</li>
+<li>スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる</li>
+<li>開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ</li>
+<li>開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)</li>
+<li>開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない</li>
+<li>詰む</li>
+<li>サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し</li>
+</ul>
+
+<p>共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。</p>
+
+<h2 id="いい感じのカスタムロールを作る">いい感じのカスタムロールを作る</h2>
+
+<p>Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。</p>
+
+<p>シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。</p>
+
+<pre><code>{
+    &quot;Name&quot;: &quot;Resource Group Contributor&quot;,
+    &quot;IsCustom&quot;: true,
+    &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;,
+    &quot;Actions&quot;: [
+        &quot;*&quot;
+    ],
+    &quot;NotActions&quot;: [
+        &quot;Microsoft.Authorization/*/Delete&quot;,
+        &quot;Microsoft.Authorization/*/Write&quot;,
+        &quot;Microsoft.Authorization/elevateAccess/Action&quot;,
+        &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot;
+    ],
+    &quot;AssignableScopes&quot;: [
+        &quot;/subscriptions/your-subscriotion-id&quot;
+    ]
+}
+</code></pre>
+
+<p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
+
+<p>では、カスタムロールを作成します。</p>
+
+<pre><code>$ az role definition create --role-definition ./role.json
+</code></pre>
+
+<p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
+
+<pre><code>&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot;
+</code></pre>
+
+<h2 id="カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
+
+<p>次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。</p>
+
+<pre><code>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
+</code></pre>
+
+<p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
+
+<pre><code>$ az ad sp create-for-rbac -n &quot;rgcontributor&quot; -p &quot;your-password&quot; --role your-customrole-id --scopes &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
+</code></pre>
+
+<p>余談ですが、&rdquo;az ad sp create-for-rbac&rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
+
+<h2 id="試してみる">試してみる</h2>
+
+<p>ログインして試してみましょう。サービスプリンシパルの例です。</p>
+
+<pre><code>$ az login --service-principal -u &quot;http://rgcontributor&quot; -p &quot;your-password&quot; -t &quot;your-tenant-id&quot;
+</code></pre>
+
+<p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
+
+<pre><code>$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+</code></pre>
+
+<p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
+
+<pre><code>$ az vm list -o table
+Name              ResourceGroup     Location
+----------------  ----------------  ----------
+sampledevvm01     sample-dev-rg  japaneast
+</code></pre>
+
+<p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
+
+<pre><code>$ az group create -n rgc-poc-rg -l japaneast
+The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/write' over scope '/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg'.
+</code></pre>
+
+<p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
+
+<pre><code>$ az group delete -n sample-dev-rg
+Are you sure you want to perform this operation? (y/n): y
+The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/delete' over scope '/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg'.
+</code></pre>
+
+<h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
+
+<p>でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。</p>
+
+<p>空テンプレートを、empty.jsonとしましょう。</p>
+
+<pre><code>{
+    &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
+    &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
+    &quot;parameters&quot;: {},
+    &quot;variables&quot;: {},
+    &quot;resources&quot;: [],
+    &quot;outputs&quot;: {}
+}
+</code></pre>
+
+<p>破壊的空砲を打ちます。</p>
+
+<pre><code>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+</code></pre>
+
+<p>リソースグループは残ります。</p>
+
+<pre><code>$ az group list -o table
+Name              Location    Status
+----------------  ----------  ---------
+sample-dev-rg  japaneast   Succeeded
+</code></pre>
+
+<p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
+
+<pre><code>$ az vm list -o table
+
+</code></pre>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">08 Jan 2018, 16:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1149,279 +1313,12 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKE
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">13 Jun 2017, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azureblobcopy_perf/" class="post-title">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="ファイルコピーの需要は根強い">ファイルコピーの需要は根強い</h2>
-
-<p>グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。</p>
-
-<p>でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。</p>
-
-<h2 id="調べてみた">調べてみた</h2>
-
-<p>ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。</p>
-
-<h3 id="ツールと実行環境">ツールと実行環境</h3>
-
-<ul>
-<li>AzCopy 6.1.0</li>
-<li>Azure PowerShell 4.1.0</li>
-<li>Windows 10 1703</li>
-<li>ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory</li>
-</ul>
-
-<h3 id="アクセス回線パターン">アクセス回線パターン</h3>
-
-<ol>
-<li><p>一般的な回線</p>
-
-<ul>
-<li>自宅(川崎)</li>
-<li>OCN光 100M マンションタイプ</li>
-<li>宅内は802.11ac(5GHz)</li>
-<li>川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ</li>
-<li>ゲートウェイ名から推測</li>
-</ul></li>
-
-<li><p>いい感じの回線</p>
-
-<ul>
-<li>日本マイクロソフト 品川オフィス</li>
-<li>1Gbps 有線</li>
-<li>Azureデータセンターへ「ネットワーク的に近くて広帯域」</li>
-</ul></li>
-</ol>
-
-<h3 id="コピーするファイル">コピーするファイル</h3>
-
-<ul>
-<li>総容量: 約60GB
-
-<ul>
-<li>6160ファイル</li>
-<li>1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10</li>
-</ul></li>
-<li>Linux fallocateコマンドで作成</li>
-</ul>
-
-<h3 id="ファイル形式パターン">ファイル形式パターン</h3>
-
-<ol>
-<li>ファイル、Blobそのまま送る (6160ファイル)</li>
-<li>ディスクイメージで送る (1ファイル)
-
-<ul>
-<li>Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置</li>
-<li>転送前にデタッチ、エクスポート(Blob SAS形式)</li>
-<li>AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)</li>
-</ul></li>
-</ol>
-
-<h3 id="対象のazureリージョン">対象のAzureリージョン</h3>
-
-<ul>
-<li>東日本 (マスター、複製元と位置づける)</li>
-<li>米国中南部 (太平洋越え + 米国内を見たい)</li>
-<li>ブラジル南部</li>
-</ul>
-
-<h3 id="転送パターン">転送パターン</h3>
-
-<ul>
-<li>ユーザー拠点の端末からAzureリージョン: AzCopy Upload</li>
-<li>Azureリージョン間 (Storage to Storage)
-
-<ul>
-<li>ファイル: AzCopy Copy</li>
-<li>イメージ: PowerShell Start-AzureStorageBlobCopy</li>
-</ul></li>
-</ul>
-
-<h2 id="結果">結果</h2>
-
-<table>
-<thead>
-<tr>
-<th align="left">形式　</th>
-<th align="left">コピー元　　　　　</th>
-<th align="left">コピー先　　　　　　　　</th>
-<th align="left">コマンド　</th>
-<th align="right">　並列数</th>
-<th align="right">　実行時間(時:分:秒)</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure 東日本</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">07:55:22</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">10:22:30</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">12:46:37</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure 東日本</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">16</td>
-<td align="right">00:20:47</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">16</td>
-<td align="right">00:45.11</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">8</td>
-<td align="right">02:07.58</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Copy</td>
-<td align="right">N/A</td>
-<td align="right">00:28:55</td>
-</tr>
-
-<tr>
-<td align="left">イメージ　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">PowerShell</td>
-<td align="right">N/A</td>
-<td align="right">00:11:11</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Copy</td>
-<td align="right">N/A</td>
-<td align="right">00.25:33</td>
-</tr>
-
-<tr>
-<td align="left">イメージ　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">PowerShell</td>
-<td align="right">N/A</td>
-<td align="right">00.09:20</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="考察">考察</h2>
-
-<ul>
-<li><p>アクセス回線の差が大きく影響</p>
-
-<ul>
-<li>自宅パターンでプロバイダから帯域制限されていたかは不明 (自宅からAzure東日本まで16Mbpsくらいは出た)</li>
-<li>アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい</li>
-<li>こまめに送る</li>
-<li>Azure内でデータを生成する</li>
-<li>もしくはExpressRouteを引く (自宅で、とは言っていない)</li>
-</ul></li>
-
-<li><p>アクセス回線が細い場合、AzCopy Uploadの並列数を下げる</p>
-
-<ul>
-<li>AzCopyのデフォルト並列数は実行環境のCPUコア数 *8だが、今回実施した端末での並列数(4コア * 8 = 32)ではかえって性能が劣化した</li>
-<li>アクセス回線に合わせて並列数は調整する</li>
-</ul></li>
-
-<li><p>Azureのリージョン間コピーは早い</p>
-
-<ul>
-<li>Azureバックボーンを通るから</li>
-<li>端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから</li>
-</ul></li>
-
-<li><p>地理的な距離感覚だけで考えてはダメ</p>
-
-<ul>
-<li>地理的な近さではなく、ネットワーク的な近さと太さ</li>
-<li>Azureバックボーンを使うと日本とブラジルの間でもそれなりのスループット</li>
-</ul></li>
-
-<li><p>ファイル数が多いときはイメージで送るのも手</p>
-
-<ul>
-<li>ファイル数がコピー時間に影響する (1 vs 6160)</li>
-<li>そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&hellip;</li>
-<li>もしファイルシステムとして、であれば有効な手段</li>
-<li>エクスポートのひと手間は考慮</li>
-</ul></li>
-
-<li><p>Azureバックボーンを使うと、意外にブラジル近い</p>
-
-<ul>
-<li>土管か(ない</li>
-</ul></li>
-</ul>
-
-<p>Azureバックボーンの帯域にはSLAがありませんが、意識して仕組みを作ると得をします。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
   <nav role="pagination" class="post-list-pagination">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 7</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 8</span>
     
       <a href="/categories/azure/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>
