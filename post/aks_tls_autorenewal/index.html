@@ -120,7 +120,7 @@
 
 <h2 id="使い方">使い方</h2>
 
-<p>AKS環境と、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
+<p>AKSクラスターと、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
 
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
@@ -147,7 +147,7 @@ nginx                                    NodePort       10.0.73.190    &lt;none&
 <pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
 </code></pre>
 
-<p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKS環境はまだRBACを使っていないので、&rdquo;&ndash;set rbac.create=false&rdquo;オプションを指定しています。</p>
+<p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&rdquo;&ndash;set rbac.create=false&rdquo;オプションを指定しています。</p>
 
 <pre><code>$ git clone https://github.com/jetstack/cert-manager
 $ cd cert-manager/
