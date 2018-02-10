@@ -9,7 +9,272 @@
     <atom:link href="http://torumakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>AKSのNginx Ingress Controllerのデプロイで悩んだら</title>
+      <title>AKSのIngress TLS証明書を自動更新する</title>
+      <link>http://torumakabe.github.io/post/aks_tls_autorenewal/</link>
+      <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <description>
+
+&lt;h2 id=&#34;カジュアルな証明書管理方式が欲しい&#34;&gt;カジュアルな証明書管理方式が欲しい&lt;/h2&gt;
+
+&lt;p&gt;ChromeがHTTPサイトに対する警告を&lt;a href=&#34;https://japan.cnet.com/article/35100589/&#34;&gt;強化するそうです&lt;/a&gt;。非HTTPSサイトには、生きづらい世の中になりました。&lt;/p&gt;
+
+&lt;p&gt;さてそうなると、TLS証明書の入手と管理、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。&lt;/p&gt;
+
+&lt;p&gt;そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;TLSはIngress(NGINX Ingress Controller)でまとめて終端&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://letsencrypt.org/&#34;&gt;Let&amp;rsquo;s Encypt&lt;/a&gt;から証明書を入手&lt;/li&gt;
+&lt;li&gt;Kubenetesのアドオンである&lt;a href=&#34;https://github.com/jetstack/cert-manager/&#34;&gt;cert-manager&lt;/a&gt;で証明書の入手、更新とIngressへの適用を自動化
+
+&lt;ul&gt;
+&lt;li&gt;ACME(Automatic Certificate Management Environment)対応&lt;/li&gt;
+&lt;li&gt;cert-managerはまだ歴史の浅いプロジェクトだが、&lt;a href=&#34;https://github.com/jetstack/cert-manager/&#34;&gt;kube-lego&lt;/a&gt;の後継として期待&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;p&gt;まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。&lt;a href=&#34;http://torumakabe.github.io/post/aks_ingress_quickdeploy/&#34;&gt;この記事&lt;/a&gt;も参考に。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ helm install stable/nginx-ingress --name my-nginx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl get svc
+NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
+kubernetes                               ClusterIP      10.0.0.1       &amp;lt;none&amp;gt;           443/TCP                     79d
+my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
+my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &amp;lt;none&amp;gt;           80/TCP                     6m
+nginx                                    NodePort       10.0.73.190    &amp;lt;none&amp;gt;           80:32625/TCP                 4m
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&amp;rsquo;s Encryptから証明書を取得します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKS環境はまだRBACを使っていないので、&amp;rdquo;&amp;ndash;set rbac.create=false&amp;rdquo;オプションを指定しています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ git clone https://github.com/jetstack/cert-manager
+$ cd cert-manager/
+$ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: default
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: hoge@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    http01: {}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;証明書を発行してもらうLet&amp;rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&amp;rsquo;s Encryptには&lt;a href=&#34;https://letsencrypt.org/docs/rate-limits/&#34;&gt;Rate Limit&lt;/a&gt;があり、失敗した時に痛いからです。Let&amp;rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。&lt;/p&gt;
+
+&lt;p&gt;なお、Let&amp;rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも&lt;a href=&#34;https://github.com/jetstack/cert-manager/pull/246&#34;&gt;いずれ対応する見込み&lt;/a&gt;です。&lt;/p&gt;
+
+&lt;p&gt;では、Issuerを登録します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-issuer-le-staging-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingresClassはnginxです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: example-com
+  namespace: default
+spec:
+  secretName: example-com-tls
+  issuerRef:
+    name: letsencrypt-staging
+  commonName: www.example.com
+  dnsNames:
+  - www.example.com
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - www.example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;証明書設定をデプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-cert-le-staging-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;証明書の取得状況を確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl describe certificate example-com
+Name:         example-com
+Namespace:    default
+[snip]
+Events:
+  Type     Reason                 Age              From                     Message
+  ----     ------                 ----             ----                     -------
+  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &amp;quot;example-com-tls&amp;quot; not found
+  Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
+  Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+  Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
+  Normal   ObtainAuthorization    7m               cert-manager-controller  Obtained authorization for domain www.example.com
+  Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
+  Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
+  Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;無事に証明書を取得し、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。&lt;/p&gt;
+
+&lt;p&gt;ではLet&amp;rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: default
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v01.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: hoge@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    http01: {}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-issuer-le-prod-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: prod-example-com
+  namespace: default
+spec:
+  secretName: prod-example-com-tls
+  issuerRef:
+    name: letsencrypt-prod
+  commonName: www.example.com
+  dnsNames:
+  - www.example.com
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - www.example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-cert-le-prod-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;取得状況を確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl describe certificate prod-example-com
+Name:         prod-example-com
+Namespace:    default
+[snip]
+Events:
+  Type     Reason                 Age              From                     Message
+  ----     ------                 ----             ----                     -------
+  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &amp;quot;prod-example-com-tls&amp;quot; not found
+  Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
+  Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+  Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
+  Normal   IssueCertificate       7s               cert-manager-controller  Issuing certificate...
+  Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
+  Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+  Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;証明書を取得し、1438時間(約60日)内の更新がスケジュールされました。&lt;/p&gt;
+
+&lt;p&gt;ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl run nginx --image nginx --port 80
+$ kubectl expose deployment nginx --type NodePort
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-nginx-sample
+spec:
+  rules:
+    - host: www.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nginx
+              servicePort: 80
+  tls:
+    - hosts:
+      - www.example.com
+      secretName: prod-example-com-tls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f ingress-nginx-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いざ確認。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl https://www.example.com/
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+&amp;lt;style&amp;gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+&amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;便利ですね。Let&amp;rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
       <link>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
@@ -18,20 +283,20 @@
 
 &lt;h2 id=&#34;楽したいならhelmで入れましょう&#34;&gt;楽したいならhelmで入れましょう&lt;/h2&gt;
 
-&lt;p&gt;AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。&lt;/p&gt;
+&lt;p&gt;AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。&lt;/p&gt;
 
-&lt;p&gt;さて、そのNginx Ingress Contrillerのデプロイは&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md&#34;&gt;GitHubのドキュメント&lt;/a&gt;通りに淡々とやればいいのですが、&lt;a href=&#34;https://github.com/kubernetes/helm&#34;&gt;helm&lt;/a&gt;を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。&lt;/p&gt;
+&lt;p&gt;さて、そのNGINX Ingress Controllerのデプロイは&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md&#34;&gt;GitHubのドキュメント&lt;/a&gt;通りに淡々とやればいいのですが、&lt;a href=&#34;https://github.com/kubernetes/helm&#34;&gt;helm&lt;/a&gt;を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。&lt;/p&gt;
 
 &lt;p&gt;せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。&lt;/p&gt;
 
 &lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
-&lt;p&gt;helmでNginx Controllerを導入します。helmを使っていなければ、&lt;a href=&#34;https://github.com/kubernetes/helm#install&#34;&gt;入れておいてください&lt;/a&gt;。デプロイはこれだけ。Chartは&lt;a href=&#34;https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;helmでNGINX Ingress Controllerを導入します。helmを使っていなければ、&lt;a href=&#34;https://github.com/kubernetes/helm#install&#34;&gt;入れておいてください&lt;/a&gt;。デプロイはこれだけ。Chartは&lt;a href=&#34;https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ helm install stable/nginx-ingress --name my-nginx
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NginxとApacheを選びました。&lt;/p&gt;
+&lt;p&gt;バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ kubectl run nginx --image nginx --port 80
 $ kubectl run apache --image httpd --port 80
@@ -54,7 +319,7 @@ my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &amp;lt;n
 nginx                                    NodePort       10.0.191.16    &amp;lt;none&amp;gt;          80:30752/TCP                 14h
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。&lt;/p&gt;
+&lt;p&gt;AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。&lt;/p&gt;
 
 &lt;p&gt;割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。&lt;/p&gt;
 
@@ -66,7 +331,7 @@ nginx                                    NodePort       10.0.191.16    &amp;lt;n
 &lt;pre&gt;&lt;code&gt;$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。&lt;/p&gt;
+&lt;p&gt;ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
 kind: Ingress

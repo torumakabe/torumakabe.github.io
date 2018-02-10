@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine</title>
+    <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら &middot; re-imagine</title>
 
     <meta name="description" content="">
 
     <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
+    <meta name="twitter:title" content="AKSのNGINX Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
     <meta name="twitter:description" content="">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
+    <meta property="og:title" content="AKSのNGINX Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
     <meta property="og:description" content="">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -71,7 +71,7 @@
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNginx Ingress Controllerのデプロイで悩んだら</a>
+                        <a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a>
 
                         <p class="post-meta">
                             
@@ -86,7 +86,7 @@
                     <div class="post-share">
                         <div class="post-share-links">
                             <h4 style="">Share</h4>
-                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-title="AKSのNginx Ingress Controllerのデプロイで悩んだら" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-title="AKSのNGINX Ingress Controllerのデプロイで悩んだら" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
                             <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-description="" class="prettySocial fa fa-google-plus"></a>
                             
                             <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
@@ -99,20 +99,20 @@
 
 <h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
 
-<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。</p>
+<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。</p>
 
-<p>さて、そのNginx Ingress Contrillerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
+<p>さて、そのNGINX Ingress Controllerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
 
 <p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
 
 <h2 id="使い方">使い方</h2>
 
-<p>helmでNginx Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
+<p>helmでNGINX Ingress Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
 
 <pre><code>$ helm install stable/nginx-ingress --name my-nginx
 </code></pre>
 
-<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NginxとApacheを選びました。</p>
+<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
 
 <pre><code>$ kubectl run nginx --image nginx --port 80
 $ kubectl run apache --image httpd --port 80
@@ -135,7 +135,7 @@ my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&
 nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
 </code></pre>
 
-<p>AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
+<p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
 
 <p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
 
@@ -147,7 +147,7 @@ nginx                                    NodePort       10.0.191.16    &lt;none&
 <pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
 </code></pre>
 
-<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
+<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
 
 <pre><code>apiVersion: extensions/v1beta1
 kind: Ingress

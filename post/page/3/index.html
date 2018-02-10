@@ -68,6 +68,136 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">09 Apr 2017, 15:15</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_latency/" class="post-title">Azureユーザー視点のLatency測定 2017/4版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="関東の片隅で遅延を測る">関東の片隅で遅延を測る</h2>
+
+<p>Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。</p>
+
+<p>せっかくなので、</p>
+
+<ul>
+<li>太平洋のそれも測定しましょう</li>
+<li><a href="https://azure.microsoft.com/en-us/blog/how-microsoft-builds-its-fast-and-reliable-global-network/">Azureバックボーンを通るリージョン間通信</a>も測りましょう</li>
+</ul>
+
+<h2 id="計測パターン">計測パターン</h2>
+
+<ol>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</li>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</li>
+<li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</li>
+<li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</li>
+<li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</li>
+</ol>
+
+<h2 id="もろもろの条件">もろもろの条件</h2>
+
+<ul>
+<li>遅延測定ツール
+
+<ul>
+<li><a href="https://technet.microsoft.com/en-us/sysinternals/psping.aspx">PsPing</a></li>
+<li>Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing</li>
+<li>NSGでデフォルト許可されているRDPポートへのPsPing</li>
+<li>VPN接続せず、パブリックIPへPsPing</li>
+<li>リージョン間PsPingは仮想マシンから仮想マシンへ</li>
+</ul></li>
+<li>自宅Wi-Fi環境
+
+<ul>
+<li>802.11ac(5GHz)</li>
+</ul></li>
+<li>自宅加入インターネット接続サービス
+
+<ul>
+<li>OCN 光 マンション 100M</li>
+</ul></li>
+<li>OCNゲートウェイ
+
+<ul>
+<li>(ほげほげ)hodogaya.kanagawa.ocn.ne.jp</li>
+<li>神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです</li>
+</ul></li>
+<li>米国リージョン
+
+<ul>
+<li>US WEST (カリフォルニア)</li>
+</ul></li>
+</ul>
+
+<h2 id="測定結果">測定結果</h2>
+
+<h3 id="1-自宅-神奈川-ocn光-インターネット-azure東日本リージョン">1. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 104.41.187.55:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 11.43ms, Maximum = 15.66ms, Average = 12.88ms
+</code></pre>
+
+<h3 id="2-自宅-神奈川-ocn光-インターネット-azure西日本リージョン">2. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 17.96ms, Maximum = 19.64ms, Average = 18.92ms
+</code></pre>
+
+<h3 id="3-自宅-神奈川-ocn光-インターネット-azure米国西海岸リージョン">3. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</h3>
+
+<pre><code>TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 137.73ms, Maximum = 422.56ms, Average = 218.85ms
+</code></pre>
+
+<h3 id="4-azure東日本リージョン-azureバックボーン-azure西日本リージョン">4. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</h3>
+
+<pre><code>TCP connect statistics for 52.175.148.28:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 8.61ms, Maximum = 9.38ms, Average = 9.00ms
+</code></pre>
+
+<h3 id="5-azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン">5. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</h3>
+
+<pre><code>TCP connect statistics for 40.83.220.19:3389:
+  Sent = 4, Received = 4, Lost = 0 (0% loss),
+  Minimum = 106.38ms, Maximum = 107.38ms, Average = 106.65ms
+</code></pre>
+
+<p>Azureバックボーンを通すと首都圏からの遅延が半分になりました。Wi-Fiの有無など、ちょっと条件は違いますが。</p>
+
+<h2 id="ひとこと">ひとこと</h2>
+
+<p>インターネット、および接続サービスの遅延が性能の上がらない原因になっている場合は、Azureで完結させてみるのも手です。</p>
+
+<p>たとえば、</p>
+
+<ul>
+<li>会社で契約しているインターネット接続サービスが、貧弱</li>
+<li>シリコンバレーの研究所からインターネット経由でデータを取得しているが、遅い</li>
+</ul>
+
+<p>こんなケースではAzureを間に入れると、幸せになれるかもしれません。なったユーザーもいらっしゃいます。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -492,126 +622,6 @@ Fri Feb  3 06:43:18 2017
 </code></pre>
 
 <p>これで更新されます。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">07 Oct 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_chatops_onfunctions/" class="post-title">SlackとAzure FunctionsでChatOpsする</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
-
-<p>Azure上でChatOpsしたい、と相談をいただきました。</p>
-
-<p>AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">サンプル</a>があります。</p>
-
-<p><img src="http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png" alt="Azure Runスラッシュ" title="from fabriccontroller.net" /></p>
-
-<p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
-
-<h2 id="slackからrunbookを実行できて-何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
-
-<ul>
-<li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
-<li>CLIやAPIをRunbookで隠蔽し、おぼえることを減らす</li>
-<li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
-</ul>
-
-<h2 id="ブツ">ブツ</h2>
-
-<p>Githubに上げておきました。</p>
-
-<p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
-
-<h2 id="おおまかな流れ">おおまかな流れ</h2>
-
-<p>手順書つらいのでポイントだけ。</p>
-
-<ul>
-<li><p>SlackのSlash CommandとIncoming Webhookを作る</p>
-
-<ul>
-<li>流れは氏の<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">元ネタ</a>と同じ</li>
-</ul></li>
-
-<li><p>ARM TemplateでFunction Appをデプロイ</p>
-
-<ul>
-<li><p>Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます</p></li>
-
-<li><p>パラメータファイルのサンプルは<a href="https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json">sample.azuredeploy.parameters.json</a>です。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います</p></li>
-
-<li><p>Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください</p></li>
-
-<li><p>GithubからのCIは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/app-service-deploy-complex-application-predictably/">はじめてのケースを考慮し</a>ARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています</p></li>
-
-<li><p>Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)</p></li>
-
-<li><p>Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します</p></li>
-
-<li><p>作成済みのSlack関連パラメータを指定します</p></li>
-</ul></li>
-
-<li><p>ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)</p></li>
-
-<li><p>デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更</p>
-
-<ul>
-<li>kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え</li>
-</ul></li>
-
-<li><p>Slack上で、Slash Commandのリクエスト先URLを変更 (例: <a href="https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken">https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken</a>)</p></li>
-
-<li><p>ファンクションが動いたら、Slackの指定チャンネルでSlash Commandが打てるようになる</p>
-
-<ul>
-<li><p>/runbook [runbook名] [parm1] [parm2] [parm&hellip;]</p></li>
-
-<li><p>パラメータはrunbook次第</p></li>
-</ul></li>
-
-<li><p>Runbookの進捗はIncoming Webhookでslackに通知される</p>
-
-<ul>
-<li>Runbookのステータスが変わったときに通知</li>
-</ul></li>
-</ul>
-
-<h2 id="よもやま話">よもやま話</h2>
-
-<ul>
-<li><p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>
-
-<ul>
-<li><p>ファンクションはトリガーされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。</p></li>
-
-<li><p>Azure FunctionsのWebコンソールログが無活動だと30分で停止するので、coldに入る条件も30分と誤解していたのですが、正しくは5分。ソースは<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">ここ</a>。</p></li>
-
-<li><p>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</p></li>
-
-<li><p>ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。</p></li>
-
-<li><p>でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。</p></li>
-
-<li><p>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</p></li>
-</ul></li>
-</ul>
 
                     </div>
                 </section>
