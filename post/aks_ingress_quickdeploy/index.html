@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.17" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AKSのNginx Ingress Controllerのデプロイで悩んだら &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">10 Feb 2018, 11:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNginx Ingress Controllerのデプロイで悩んだら</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-title="AKSのNginx Ingress Controllerのデプロイで悩んだら" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
+
+<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、L7ルーティングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。</p>
+
+<p>さて、そのNginx Ingress Contrillerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発で入れられます。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
+
+<p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
+
+<h2 id="使い方">使い方</h2>
+
+<p>helmでNginx Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
+
+<pre><code>$ helm install stable/nginx-ingress --name my-nginx
+</code></pre>
+
+<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NginxとApacheを選びました。</p>
+
+<pre><code>$ kubectl run nginx --image nginx --port 80
+$ kubectl run apache --image httpd --port 80
+</code></pre>
+
+<p>サービスとしてexposeします。</p>
+
+<pre><code>$ kubectl expose deployment nginx --type NodePort
+$ kubectl expose deployment apache --type NodePort
+</code></pre>
+
+<p>現時点のサービスたちを確認します。</p>
+
+<pre><code>$ kubectl get svc
+NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
+apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
+kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
+my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
+my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
+nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
+</code></pre>
+
+<p>AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPを見てください。では、Azure DNSで名前解決できるようにしましょう。dev.example.comの例です。</p>
+
+<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
+</code></pre>
+
+<p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
+
+<pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
+</code></pre>
+
+<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetを、忘れずに。</p>
+
+<pre><code>apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-nginx-sample
+spec:
+  rules:
+    - host: dev.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nginx
+              servicePort: 80
+          - path: /apache
+            backend:
+              serviceName: apache
+              servicePort: 80
+  tls:
+    - hosts:
+      - dev.example.com
+      secretName: example-tls
+</code></pre>
+
+<p>あとは反映するだけ。</p>
+
+<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
+</code></pre>
+
+<p>curlで確認します。</p>
+
+<pre><code>$ curl https://dev.example.com
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+&lt;/style&gt;
+&lt;/head&gt;
+[snip]
+</code></pre>
+
+<p>/apacheへのパスも確認します。</p>
+
+<pre><code>$ curl https://dev.example.com/apache
+&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>簡単ですね。</p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

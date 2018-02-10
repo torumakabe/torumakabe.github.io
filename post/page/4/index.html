@@ -68,6 +68,81 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">14 Sep 2016, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/bashonwindows_nvm/" class="post-title">Bash on WindowsでNode開発環境を作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Node" href="http://torumakabe.github.io//categories/node">Node</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="bash-on-windows-現時点での使いどころ">Bash on Windows 現時点での使いどころ</h2>
+
+<p>Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。</p>
+
+<p>たとえばNodeのバージョン管理。Windowsには<a href="https://github.com/marcelklehr/nodist">nodist</a>がありますが、Linux/Macでは動きません。Linux/Macで使ってる<a href="https://github.com/creationix/nvm">NVM</a>がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。</p>
+
+<p>最近、Azure FunctionsでNode v6.4.0が<a href="https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/">使えるようになった</a>ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。</p>
+
+<h2 id="nvmのインストール">NVMのインストール</h2>
+
+<ul>
+<li>Bash on Ubuntu on Windowsを入れます (<a href="http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html">参考</a>)</li>
+<li>Bash on Ubuntu on Windowsを起動します</li>
+<li>build-essentialとlibssl-devを入れます</li>
+</ul>
+
+<pre><code>sudo apt-get install build-essential checkinstall
+sudo apt-get install libssl-dev
+</code></pre>
+
+<ul>
+<li>インストールスクリプトを流します</li>
+</ul>
+
+<pre><code>curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
+</code></pre>
+
+<p>バージョンアップを考慮し、インストールのつど<a href="https://github.com/creationix/nvm">公式ページ</a>を確認してください。</p>
+
+<p>以上。</p>
+
+<h2 id="nvmの使い方">NVMの使い方</h2>
+
+<pre><code>nvm install 6.4.0
+</code></pre>
+
+<p>指定のバージョンをインストールします。</p>
+
+<pre><code>nvm use 6.4.0
+</code></pre>
+
+<p>使うバージョンを指定します。</p>
+
+<p>簡単ですね。</p>
+
+<pre><code>cd /mnt/c/your_work_directory
+node ./index.js
+</code></pre>
+
+<p>なんて感じで、書いたコードをテストしちゃってください。</p>
+
+<p>なお、Visual Studio Code使いの人は<a href="https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/">統合ターミナルをBashにしておく</a>と、さらに幸せになれます。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">13 Sep 2016, 17:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -594,230 +669,6 @@ info:    vm quick-create command OK
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">13 May 2016, 18:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_osstools_iac/" class="post-title">VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
-
-<p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
-
-<h2 id="解決したい課題">解決したい課題</h2>
-
-<p>こんな悩みを解決します。</p>
-
-<ul>
-<li>WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい</li>
-<li>WindowsもMacも使っているので、どちらでも同じ環境を作りたい</li>
-<li>サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー</li>
-<li>2016年にもなって長いコードをVimとかEmacsで書きたくない</li>
-<li>Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい</li>
-<li>仮想マシン起動したあとにターミナル起動-&gt;IP指定-&gt;ID/Passでログインとか、かったるい</li>
-<li>Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか)</li>
-<li>でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい</li>
-<li>新メンバーがチームに入るたび、セットアップが大変</li>
-<li>不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変</li>
-<li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
-</ul>
-
-<h2 id="やり口">やり口</h2>
-
-<p>VagrantとDockerで解決します。</p>
-
-<ul>
-<li>Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る</li>
-<li>Vagrantでセットアップを自動化する</li>
-<li>Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する</li>
-<li>Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する</li>
-<li>公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る</li>
-<li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
-</ul>
-
-<h2 id="セットアップ概要">セットアップ概要</h2>
-
-<p>簡単す。</p>
-
-<ol>
-<li>Virtualboxを<a href="https://www.virtualbox.org/">インストール</a></li>
-<li>Vagrantを<a href="https://www.vagrantup.com/downloads.html">インストール</a></li>
-<li>Vagrant Putty Plugin(vagrant-multi-putty)を<a href="https://github.com/nickryand/vagrant-multi-putty">インストール</a> #Windowsのみ。Puttyは別途入れてください</li>
-<li>作業フォルダを作り、Vagrant ファイルを書く</li>
-</ol>
-
-<p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
-
-<h2 id="サンプル解説">サンプル解説</h2>
-
-<p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
-
-<pre><code># -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
-VAGRANTFILE_API_VERSION = &quot;2&quot;
-
-$bootstrap=&lt;&lt;SCRIPT
-
-#Common tools
-sudo apt-get update
-sudo apt-get -y install wget unzip jq
-
-#Docker Engine
-sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install linux-image-extra-$(uname -r)
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-sudo sh -c &quot;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &gt; /etc/apt/sources.list.d/docker.list&quot;
-sudo apt-get update
-sudo apt-get -y purge lxc-docker
-sudo apt-cache policy docker-engine
-sudo apt-get -y install docker-engine=1.11.1-0~trusty
-sudo gpasswd -a vagrant docker
-sudo service docker restart
-
-#Docker Machine
-sudo sh -c &quot;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &gt;/usr/local/bin/docker-machine &amp;&amp; chmod +x /usr/local/bin/docker-machine&quot;
-
-#Azure CLI
-echo &quot;alias azure='docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure'&quot; &gt;&gt; $HOME/.bashrc
-
-#Terraform
-echo &quot;alias terraform='docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14'&quot; &gt;&gt; $HOME/.bashrc
-
-#Packer
-echo &quot;alias packer='docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest'&quot; &gt;&gt; $HOME/.bashrc
-
-#nodebrew
-curl -L git.io/nodebrew | perl - setup
-echo 'export PATH=$HOME/.nodebrew/current/bin:$PATH' &gt;&gt; $HOME/.bashrc
-$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
-$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
-
-#Python3
-wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
-
-SCRIPT
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-
-  config.vm.box = &quot;ubuntu/trusty64&quot;
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-
-  config.vm.network &quot;private_network&quot;, ip: &quot;192.168.33.10&quot;
-
-  config.vm.provider &quot;virtualbox&quot; do |vb|
-     vb.customize [&quot;modifyvm&quot;, :id, &quot;--memory&quot;, &quot;2048&quot;]
-  end
-
-  config.vm.provision :shell, inline: $bootstrap, privileged: false
-
-end
-</code></pre>
-
-<p>$bootstrap=&lt;&lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
-
-<h3 id="common-tools">Common tools</h3>
-
-<p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
-
-<h3 id="docker-engine-machine">Docker Engine &amp; Machine</h3>
-
-<p>この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。</p>
-
-<h3 id="azure-cli">Azure CLI</h3>
-
-<p>インストールせずに<a href="https://hub.docker.com/r/microsoft/azure-cli/">MS公式のDockerイメージ</a>を引っ張ります。なのでalias設定だけ。
--v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
-また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&ndash;rmで消します。</p>
-
-<h3 id="terraform-packer">Terraform &amp; Packer</h3>
-
-<p>Azure CLIと同様です。Hashicorpが<a href="https://hub.docker.com/u/hashicorp/">公式イメージ</a>を提供しているので、それを活用します。
-方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
--v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。</p>
-
-<p>なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。</p>
-
-<h3 id="nodebrew">nodebrew</h3>
-
-<p>nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。</p>
-
-<h3 id="python3">Python3</h3>
-
-<p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
-
-<p>みなさん他にもいろいろあるでしょう。シェルなのでお好みで。</p>
-
-<p>さて、ここまでがプロビジョニング時の処理です。以降の&rdquo;Vagrant.configure～&rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
-
-<h2 id="どれだけ楽か">どれだけ楽か</h2>
-
-<p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
-
-<pre><code>vagrant up
-</code></pre>
-
-<p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
-
-<p>できましたか。できたら、</p>
-
-<pre><code>vagrant putty
-</code></pre>
-
-<p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
-
-<p>あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら</p>
-
-<pre><code>vagrant destroy
-</code></pre>
-
-<p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
-
-<p>なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。</p>
-
-<p>わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。</p>
-
-<p>ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。</p>
-
-<p>また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。</p>
-
-<ul>
-<li>初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう</li>
-<li>サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
-
-<ul>
-<li>(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json</li>
-</ul></li>
-</ul>
-
-<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
-
-<p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
-
-<p>インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。</p>
-
-<p>夏近し、楽して早く帰ってビール呑みましょう。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -827,7 +678,7 @@ end
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 11</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 4 of 12</span>
     
       <a href="/post/page/5/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

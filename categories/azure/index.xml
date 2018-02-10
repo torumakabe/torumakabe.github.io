@@ -9,6 +9,123 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>AKSのNginx Ingress Controllerのデプロイで悩んだら</title>
+      <link>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <description>
+
+&lt;h2 id=&#34;楽したいならhelmで入れましょう&#34;&gt;楽したいならhelmで入れましょう&lt;/h2&gt;
+
+&lt;p&gt;AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、L7ルーティングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。&lt;/p&gt;
+
+&lt;p&gt;さて、そのNginx Ingress Contrillerのデプロイは&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md&#34;&gt;GitHubのドキュメント&lt;/a&gt;通りに淡々とやればいいのですが、&lt;a href=&#34;https://github.com/kubernetes/helm&#34;&gt;helm&lt;/a&gt;を使えばコマンド一発で入れられます。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。&lt;/p&gt;
+
+&lt;p&gt;せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。&lt;/p&gt;
+
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+
+&lt;p&gt;helmでNginx Controllerを導入します。helmを使っていなければ、&lt;a href=&#34;https://github.com/kubernetes/helm#install&#34;&gt;入れておいてください&lt;/a&gt;。デプロイはこれだけ。Chartは&lt;a href=&#34;https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ helm install stable/nginx-ingress --name my-nginx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NginxとApacheを選びました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl run nginx --image nginx --port 80
+$ kubectl run apache --image httpd --port 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;サービスとしてexposeします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl expose deployment nginx --type NodePort
+$ kubectl expose deployment apache --type NodePort
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;現時点のサービスたちを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl get svc
+NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
+apache                                   NodePort       10.0.244.167   &amp;lt;none&amp;gt;          80:30928/TCP                 14h
+kubernetes                               ClusterIP      10.0.0.1       &amp;lt;none&amp;gt;          443/TCP                  79d
+my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
+my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &amp;lt;none&amp;gt;          80/TCP                  14h
+nginx                                    NodePort       10.0.191.16    &amp;lt;none&amp;gt;          80:30752/TCP                 14h
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPを見てください。では、Azure DNSで名前解決できるようにしましょう。dev.example.comの例です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&amp;rsquo;s Encryptで作っておきました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetを、忘れずに。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-nginx-sample
+spec:
+  rules:
+    - host: dev.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nginx
+              servicePort: 80
+          - path: /apache
+            backend:
+              serviceName: apache
+              servicePort: 80
+  tls:
+    - hosts:
+      - dev.example.com
+      secretName: example-tls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あとは反映するだけ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl apply -f ingress-nginx-sample.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;curlで確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl https://dev.example.com
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+&amp;lt;style&amp;gt;
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+&amp;lt;/style&amp;gt;
+&amp;lt;/head&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;/apacheへのパスも確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl https://dev.example.com/apache
+&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&amp;lt;h1&amp;gt;It works!&amp;lt;/h1&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;簡単ですね。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
       <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
@@ -2280,123 +2397,6 @@ Fri Feb  3 06:43:18 2017
 &lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
 
 &lt;p&gt;なお、フィードバック&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;熱烈歓迎&lt;/a&gt;だそうです。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Docker for WindowsでインストールレスAzure CLI環境を作る</title>
-      <link>http://torumakabe.github.io/post/dockerforwin_azurecli/</link>
-      <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
-      <description>
-
-&lt;h2 id=&#34;舌の根の乾かぬ内に&#34;&gt;舌の根の乾かぬ内に&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_osstools_iac/&#34;&gt;最近&lt;/a&gt;、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows(on Client Hyper-V)のベータが一般開放された&lt;/li&gt;
-&lt;li&gt;Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい&lt;/li&gt;
-&lt;li&gt;月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;azure_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。&lt;/li&gt;
-&lt;li&gt;共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function azure_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data microsoft/azure-cli:latest
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 azure login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\dockereval\arm
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2016/06/22     11:21                subd
--a----       2016/06/22     10:26           8783 azuredeploy.json
--a----       2016/06/22     11:28            690 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルとサブディレクトリがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。azure_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; azure_cli
-root@be41d3389a21:/data#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。公式Azure CLIコンテナは&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/~/dockerfile/&#34;&gt;debianベース&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# ls
-azuredeploy.json  azuredeploy.parameters.json  subd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azureコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# azure -v
-0.10.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
 </description>
     </item>
     
