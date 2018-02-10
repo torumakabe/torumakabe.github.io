@@ -101,7 +101,7 @@
 
 <p>ChromeがHTTPサイトに対する警告を<a href="https://japan.cnet.com/article/35100589/">強化するそうです</a>。非HTTPSサイトには、生きづらい世の中になりました。</p>
 
-<p>さてそうなると、TLS証明書の入手と管理、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。</p>
+<p>さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。</p>
 
 <p>そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。</p>
 
@@ -176,7 +176,7 @@ spec:
 <pre><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
 </code></pre>
 
-<p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingresClassはnginxです。</p>
+<p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
 
 <pre><code>apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
@@ -203,7 +203,7 @@ spec:
 <pre><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
 </code></pre>
 
-<p>証明書の取得状況を確認します。</p>
+<p>証明書の発行状況を確認します。</p>
 
 <pre><code>$ kubectl describe certificate example-com
 Name:         example-com
@@ -222,7 +222,7 @@ Events:
   Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
 </code></pre>
 
-<p>無事に証明書を取得し、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
+<p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
 
 <p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
 
@@ -276,7 +276,7 @@ spec:
 <pre><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
 </code></pre>
 
-<p>取得状況を確認します。</p>
+<p>発行状況を確認します。</p>
 
 <pre><code>$ kubectl describe certificate prod-example-com
 Name:         prod-example-com
@@ -295,7 +295,7 @@ Events:
   Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
 </code></pre>
 
-<p>証明書を取得し、1438時間(約60日)内の更新がスケジュールされました。</p>
+<p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
 
 <p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
 

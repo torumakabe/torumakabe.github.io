@@ -20,7 +20,7 @@
 
 &lt;p&gt;ChromeがHTTPサイトに対する警告を&lt;a href=&#34;https://japan.cnet.com/article/35100589/&#34;&gt;強化するそうです&lt;/a&gt;。非HTTPSサイトには、生きづらい世の中になりました。&lt;/p&gt;
 
-&lt;p&gt;さてそうなると、TLS証明書の入手と管理、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。&lt;/p&gt;
+&lt;p&gt;さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。&lt;/p&gt;
 
 &lt;p&gt;そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。&lt;/p&gt;
 
@@ -95,7 +95,7 @@ spec:
 &lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-issuer-le-staging-sample.yaml
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingresClassはnginxです。&lt;/p&gt;
+&lt;p&gt;次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
@@ -122,7 +122,7 @@ spec:
 &lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-cert-le-staging-sample.yaml
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;証明書の取得状況を確認します。&lt;/p&gt;
+&lt;p&gt;証明書の発行状況を確認します。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ kubectl describe certificate example-com
 Name:         example-com
@@ -141,7 +141,7 @@ Events:
   Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;無事に証明書を取得し、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。&lt;/p&gt;
+&lt;p&gt;無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。&lt;/p&gt;
 
 &lt;p&gt;ではLet&amp;rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。&lt;/p&gt;
 
@@ -195,7 +195,7 @@ spec:
 &lt;pre&gt;&lt;code&gt;$ kubectl apply -f cm-cert-le-prod-sample.yaml
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;取得状況を確認します。&lt;/p&gt;
+&lt;p&gt;発行状況を確認します。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ kubectl describe certificate prod-example-com
 Name:         prod-example-com
@@ -214,7 +214,7 @@ Events:
   Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;証明書を取得し、1438時間(約60日)内の更新がスケジュールされました。&lt;/p&gt;
+&lt;p&gt;証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。&lt;/p&gt;
 
 &lt;p&gt;ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。&lt;/p&gt;
 
