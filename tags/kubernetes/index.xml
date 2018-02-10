@@ -39,6 +39,13 @@
 
 &lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
+&lt;p&gt;AKS環境と、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough&#34;&gt;Azure Container Service (AKS) クラスターのデプロイ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli&#34;&gt;Azure CLI 2.0 で Azure DNS の使用を開始する&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
 &lt;p&gt;まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。&lt;a href=&#34;http://torumakabe.github.io/post/aks_ingress_quickdeploy/&#34;&gt;この記事&lt;/a&gt;も参考に。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ helm install stable/nginx-ingress --name my-nginx
@@ -291,7 +298,14 @@ spec:
 
 &lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
-&lt;p&gt;helmでNGINX Ingress Controllerを導入します。helmを使っていなければ、&lt;a href=&#34;https://github.com/kubernetes/helm#install&#34;&gt;入れておいてください&lt;/a&gt;。デプロイはこれだけ。Chartは&lt;a href=&#34;https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;AKS環境と、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough&#34;&gt;Azure Container Service (AKS) クラスターのデプロイ&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli&#34;&gt;Azure CLI 2.0 で Azure DNS の使用を開始する&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、&lt;a href=&#34;https://github.com/kubernetes/helm#install&#34;&gt;入れておいてください&lt;/a&gt;。デプロイはこれだけ。Chartは&lt;a href=&#34;https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ helm install stable/nginx-ingress --name my-nginx
 &lt;/code&gt;&lt;/pre&gt;

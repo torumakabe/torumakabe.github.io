@@ -120,6 +120,13 @@
 
 <h2 id="使い方">使い方</h2>
 
+<p>AKS環境と、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
+</ul>
+
 <p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
 
 <pre><code>$ helm install stable/nginx-ingress --name my-nginx
