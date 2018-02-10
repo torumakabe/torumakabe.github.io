@@ -18,9 +18,9 @@
 
 &lt;h2 id=&#34;楽したいならhelmで入れましょう&#34;&gt;楽したいならhelmで入れましょう&lt;/h2&gt;
 
-&lt;p&gt;AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、L7ルーティングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。&lt;/p&gt;
+&lt;p&gt;AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNginx Ingress Controllerでしょう。&lt;/p&gt;
 
-&lt;p&gt;さて、そのNginx Ingress Contrillerのデプロイは&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md&#34;&gt;GitHubのドキュメント&lt;/a&gt;通りに淡々とやればいいのですが、&lt;a href=&#34;https://github.com/kubernetes/helm&#34;&gt;helm&lt;/a&gt;を使えばコマンド一発で入れられます。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。&lt;/p&gt;
+&lt;p&gt;さて、そのNginx Ingress Contrillerのデプロイは&lt;a href=&#34;https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md&#34;&gt;GitHubのドキュメント&lt;/a&gt;通りに淡々とやればいいのですが、&lt;a href=&#34;https://github.com/kubernetes/helm&#34;&gt;helm&lt;/a&gt;を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。&lt;/p&gt;
 
 &lt;p&gt;せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。&lt;/p&gt;
 
@@ -54,7 +54,9 @@ my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &amp;lt;n
 nginx                                    NodePort       10.0.191.16    &amp;lt;none&amp;gt;          80:30752/TCP                 14h
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPを見てください。では、Azure DNSで名前解決できるようにしましょう。dev.example.comの例です。&lt;/p&gt;
+&lt;p&gt;AKSの場合はパブリックIPがNginx Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。&lt;/p&gt;
+
+&lt;p&gt;割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
 &lt;/code&gt;&lt;/pre&gt;
@@ -64,7 +66,7 @@ nginx                                    NodePort       10.0.191.16    &amp;lt;n
 &lt;pre&gt;&lt;code&gt;$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetを、忘れずに。&lt;/p&gt;
+&lt;p&gt;ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNginxのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
 kind: Ingress
