@@ -40,7 +40,7 @@
 
 &lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
-&lt;p&gt;AKSクラスターと、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
+&lt;p&gt;AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough&#34;&gt;Azure Container Service (AKS) クラスターのデプロイ&lt;/a&gt;&lt;/li&gt;
@@ -299,7 +299,7 @@ spec:
 
 &lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
 
-&lt;p&gt;AKSクラスターと、Azure DNS上に利用可能なゾーンあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
+&lt;p&gt;AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough&#34;&gt;Azure Container Service (AKS) クラスターのデプロイ&lt;/a&gt;&lt;/li&gt;
