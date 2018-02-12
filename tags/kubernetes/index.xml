@@ -58,7 +58,6 @@ NAME                                     TYPE           CLUSTER-IP     EXTERNAL-
 kubernetes                               ClusterIP      10.0.0.1       &amp;lt;none&amp;gt;           443/TCP                     79d
 my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
 my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &amp;lt;none&amp;gt;           80/TCP                     6m
-nginx                                    NodePort       10.0.73.190    &amp;lt;none&amp;gt;           80:32625/TCP                 4m
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&amp;rsquo;s Encryptから証明書を取得します。&lt;/p&gt;
@@ -265,14 +264,6 @@ spec:
 &amp;lt;html&amp;gt;
 &amp;lt;head&amp;gt;
 &amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
-&amp;lt;style&amp;gt;
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-&amp;lt;/style&amp;gt;
-&amp;lt;/head&amp;gt;
 [snip]
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -385,14 +376,6 @@ spec:
 &amp;lt;html&amp;gt;
 &amp;lt;head&amp;gt;
 &amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
-&amp;lt;style&amp;gt;
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-&amp;lt;/style&amp;gt;
-&amp;lt;/head&amp;gt;
 [snip]
 &lt;/code&gt;&lt;/pre&gt;
 
