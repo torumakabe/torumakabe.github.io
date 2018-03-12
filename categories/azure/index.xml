@@ -99,7 +99,7 @@ spec:
 
 &lt;p&gt;appId、password、tenantを控えておいてください。次でsecretに使います。&lt;/p&gt;
 
-&lt;p&gt;次にExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。&lt;/p&gt;
+&lt;p&gt;ではExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。&lt;/p&gt;
 
 &lt;p&gt;[azure.json]&lt;/p&gt;
 
@@ -204,6 +204,8 @@ Name      ResourceGroup       Ttl  Type    Metadata
 --------  ----------------  -----  ------  ----------
 hogeginx  hoge-dns-rg         300  A
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ゲッツ。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ curl hogeginx.example.com
 &amp;lt;!DOCTYPE html&amp;gt;
