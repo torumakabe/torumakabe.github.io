@@ -9,6 +9,215 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>AKSのService作成時にホスト名を付ける</title>
+      <link>http://torumakabe.github.io/post/aks_dns/</link>
+      <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/aks_dns/</guid>
+      <description>
+
+&lt;h2 id=&#34;2つのやり口&#34;&gt;2つのやり口&lt;/h2&gt;
+
+&lt;p&gt;Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。&lt;/p&gt;
+
+&lt;p&gt;わたしの知る限り、2つの方法があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;AKS(k8s) 1.9で対応した&lt;a href=&#34;https://github.com/kubernetes/kubernetes/pull/47849&#34;&gt;DNSラベル名付与機能&lt;/a&gt;を使う&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/kubernetes-incubator/external-dns&#34;&gt;Kubenetes ExternalDNS&lt;/a&gt;を使ってAzure DNSへAレコードを追加する&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以下、AKS 1.9.2での実現手順です。&lt;/p&gt;
+
+&lt;h2 id=&#34;dnsラベル名付与機能&#34;&gt;DNSラベル名付与機能&lt;/h2&gt;
+
+&lt;p&gt;簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。&lt;/p&gt;
+
+&lt;p&gt;[nginx-label.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
+spec:
+  selector:
+    app: nginx
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプロイ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f nginx-label.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl hogeginx.eastus.cloudapp.azure.com
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。&lt;/p&gt;
+
+&lt;h2 id=&#34;kubenetes-externaldns&#34;&gt;Kubenetes ExternalDNS&lt;/h2&gt;
+
+&lt;p&gt;任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は&lt;a href=&#34;https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。&lt;/p&gt;
+
+&lt;p&gt;さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。&lt;/p&gt;
+
+&lt;p&gt;ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes=&amp;quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&amp;quot; -n hogeExtDnsSp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;appId、password、tenantを控えておいてください。次でsecretに使います。&lt;/p&gt;
+
+&lt;p&gt;次にExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。&lt;/p&gt;
+
+&lt;p&gt;[azure.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;tenantId&amp;quot;: &amp;quot;your-tenant&amp;quot;,
+    &amp;quot;subscriptionId&amp;quot;: &amp;quot;your-subscription-id&amp;quot;,
+    &amp;quot;aadClientId&amp;quot;: &amp;quot;your-appId&amp;quot;,
+    &amp;quot;aadClientSecret&amp;quot;: &amp;quot;your-password&amp;quot;,
+    &amp;quot;resourceGroup&amp;quot;: &amp;quot;hoge-dns-rg&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;JSONファイルを元に、secretを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create secret generic azure-config-file --from-file=azure.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。&lt;/p&gt;
+
+&lt;p&gt;[extdns.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      containers:
+      - name: external-dns
+        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
+        args:
+        - --source=service
+        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
+        - --provider=azure
+        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial&#39;s resource group
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ExternalDNSをデプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f extdns.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。&lt;/p&gt;
+
+&lt;p&gt;[nginx-extdns.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-extdns
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx-extdns
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx-extdns
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
+spec:
+  selector:
+    app: nginx-extdns
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプローイ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f nginx-extdns.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
+Name      ResourceGroup       Ttl  Type    Metadata
+--------  ----------------  -----  ------  ----------
+hogeginx  hoge-dns-rg         300  A
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl hogeginx.example.com
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
       <link>http://torumakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
@@ -2432,160 +2641,6 @@ Fri Feb  3 06:43:18 2017
 &lt;li&gt;&lt;p&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
-      <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
-      <description>
-
-&lt;h2 id=&#34;背景と動機&#34;&gt;背景と動機&lt;/h2&gt;
-
-&lt;p&gt;Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。&lt;/p&gt;
-
-&lt;p&gt;さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。&lt;/li&gt;
-&lt;li&gt;Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(&lt;a href=&#34;https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx&#34;&gt;MS OMS&lt;/a&gt;、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。&lt;/li&gt;
-&lt;li&gt;でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。&lt;/li&gt;
-&lt;li&gt;Azureリソースの使用量データ取得が一例。Azureでは使用量データを&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/&#34;&gt;ポータルからダウンロード&lt;/a&gt;したり、&lt;a href=&#34;https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/&#34;&gt;Power BIで分析&lt;/a&gt;できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。&lt;/li&gt;
-&lt;li&gt;ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。&lt;/li&gt;
-&lt;li&gt;それAzure Functionsで出来るよ。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azure FunctionsのTimer Triggerを使って、日次で実行&lt;/li&gt;
-&lt;li&gt;Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み&lt;/li&gt;
-&lt;li&gt;Nodeで書く (C#のサンプルはたくさんあるので)&lt;/li&gt;
-&lt;li&gt;業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;quick-start&#34;&gt;Quick Start&lt;/h2&gt;
-
-&lt;h3 id=&#34;準備&#34;&gt;準備&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ところでAzure Funtionsって何よ、って人はまず&lt;a href=&#34;https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/&#34;&gt;いい資料1&lt;/a&gt;と&lt;a href=&#34;https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/&#34;&gt;いい資料2&lt;/a&gt;でざっと把握を&lt;/li&gt;
-&lt;li&gt;AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (&lt;a href=&#34;https://doc.co/66mYfB&#34;&gt;ここ&lt;/a&gt;とか&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;ここ&lt;/a&gt;を参考に)
-
-&lt;ul&gt;
-&lt;li&gt;後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください&lt;/li&gt;
-&lt;li&gt;権限はsubscriptionに対するreaderが妥当でしょう&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Githubのリポジトリを作成 (VSTSやBitbucketも使えます)&lt;/li&gt;
-&lt;li&gt;使用量データを貯めるストレージアカウントを作成
-
-&lt;ul&gt;
-&lt;li&gt;後ほど環境変数に設定するので、接続文字列を控えておいてください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;デプロイ&#34;&gt;デプロイ&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを作成
-
-&lt;ul&gt;
-&lt;li&gt;ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App&lt;/li&gt;
-&lt;li&gt;アプリ名は.azurewebsites.net空間でユニークになるように&lt;/li&gt;
-&lt;li&gt;App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行したぶん課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう&lt;/li&gt;
-&lt;li&gt;メモリは128MBあれば十分です&lt;/li&gt;
-&lt;li&gt;他のパラメータはお好みで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;環境変数の設定
-
-&lt;ul&gt;
-&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定&lt;/li&gt;
-&lt;li&gt;先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;サンプルコードを取得
-
-&lt;ul&gt;
-&lt;li&gt;githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; &lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;AZFuncTimerTriggerSample&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;準備済みのGithubリポジトリにpush&lt;/li&gt;
-&lt;li&gt;リポジトリとFunction Appを同期
-
-&lt;ul&gt;
-&lt;li&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ&lt;/li&gt;
-&lt;li&gt;Githubリポジトリとブランチを設定し、同期を待ちます&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Nodeのモジュールをインストール
-
-&lt;ul&gt;
-&lt;li&gt;&lt;del&gt;Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;&lt;del&gt;このディレクトリが、実行する関数、functionの単位です&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;&lt;del&gt;&amp;ldquo;npm install&amp;rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&amp;rdquo;へインストールされます)&lt;/del&gt;&lt;/li&gt;
-&lt;li&gt;deploy.cmd で自動的にインストールするよう変えました&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;これで、指定ストレージアカウントの&amp;rdquo;usagedata&amp;rdquo;コンテナに日次で使用量データファイルができます。&lt;/p&gt;
-
-&lt;h2 id=&#34;コード解説&#34;&gt;コード解説&lt;/h2&gt;
-
-&lt;p&gt;3つのファイルをデプロイしました。簡単な順に、ざっと解説します。&lt;a href=&#34;https://github.com/ToruMakabe/AZFuncTimerTriggerSample&#34;&gt;コード&lt;/a&gt;を眺めながら読み進めてください。&lt;/p&gt;
-
-&lt;h3 id=&#34;package-json&#34;&gt;package.json&lt;/h3&gt;
-
-&lt;p&gt;主となるコードファイルは後述の&amp;rdquo;index.js&amp;rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。&lt;/p&gt;
-
-&lt;h3 id=&#34;function-json&#34;&gt;function.json&lt;/h3&gt;
-
-&lt;p&gt;Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&amp;rdquo;schedule&amp;rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。&lt;/p&gt;
-
-&lt;p&gt;&amp;ldquo;0 0 0 * * *&amp;rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。&lt;/p&gt;
-
-&lt;h3 id=&#34;index-js&#34;&gt;index.js&lt;/h3&gt;
-
-&lt;p&gt;メインロジックです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;先ほど設定した環境変数は、&amp;rdquo;process.env.HOGE&amp;rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。&lt;/li&gt;
-&lt;li&gt;日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。&lt;/li&gt;
-&lt;li&gt;0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx&#34;&gt;こちら&lt;/a&gt;。&lt;/li&gt;
-&lt;li&gt;module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。&lt;/li&gt;
-&lt;li&gt;最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。&lt;/li&gt;
-&lt;li&gt;ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
-
-&lt;ul&gt;
-&lt;li&gt;Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。&lt;/li&gt;
-&lt;li&gt;ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&amp;rdquo;YYYY-MM-DD_n.json&amp;rdquo;です。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;豆知識-node-on-azure-functions&#34;&gt;豆知識 (Node on Azure Functions)&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
-
-&lt;ul&gt;
-&lt;li&gt;NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です&lt;/li&gt;
-&lt;li&gt;Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを&lt;a href=&#34;https://github.com/Azure/azure-sdk-for-node/issues/1450&#34;&gt;サポートしていない&lt;/a&gt;ので、サポートされるまではcallbackで堅く書きましょう&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7&#34;&gt;サポートマトリックス&lt;/a&gt;を確認しましょう&lt;/li&gt;
-&lt;li&gt;なのでサンプルではOutput Binding使わずに書きました&lt;/li&gt;
-&lt;li&gt;Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;豆知識-azure-usage-api&#34;&gt;豆知識 (Azure Usage API)&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/&#34;&gt;Ratecard API&lt;/a&gt;を組み合わせてください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;それでは、幸せな運用管理サーバレス生活を。&lt;/strong&gt;&lt;/p&gt;
 </description>
     </item>
     

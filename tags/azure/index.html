@@ -68,6 +68,227 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">12 Mar 2018, 00:21</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/aks_dns/" class="post-title">AKSのService作成時にホスト名を付ける</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="2つのやり口">2つのやり口</h2>
+
+<p>Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。</p>
+
+<p>わたしの知る限り、2つの方法があります。</p>
+
+<ul>
+<li>AKS(k8s) 1.9で対応した<a href="https://github.com/kubernetes/kubernetes/pull/47849">DNSラベル名付与機能</a>を使う</li>
+<li><a href="https://github.com/kubernetes-incubator/external-dns">Kubenetes ExternalDNS</a>を使ってAzure DNSへAレコードを追加する</li>
+</ul>
+
+<p>以下、AKS 1.9.2での実現手順です。</p>
+
+<h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
+
+<p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
+
+<p>[nginx-label.yaml]</p>
+
+<pre><code>apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
+spec:
+  selector:
+    app: nginx
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+</code></pre>
+
+<p>デプロイ。</p>
+
+<pre><code>$ kubectl create -f nginx-label.yaml
+</code></pre>
+
+<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
+
+<pre><code>$ curl hogeginx.eastus.cloudapp.azure.com
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
+
+<h2 id="kubenetes-externaldns">Kubenetes ExternalDNS</h2>
+
+<p>任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は<a href="https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md">こちら</a>。</p>
+
+<p>Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。</p>
+
+<p>さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。</p>
+
+<p>ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。</p>
+
+<pre><code>$ az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&quot; -n hogeExtDnsSp
+</code></pre>
+
+<p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
+
+<p>次にExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。</p>
+
+<p>[azure.json]</p>
+
+<pre><code>{
+    &quot;tenantId&quot;: &quot;your-tenant&quot;,
+    &quot;subscriptionId&quot;: &quot;your-subscription-id&quot;,
+    &quot;aadClientId&quot;: &quot;your-appId&quot;,
+    &quot;aadClientSecret&quot;: &quot;your-password&quot;,
+    &quot;resourceGroup&quot;: &quot;hoge-dns-rg&quot;
+}
+</code></pre>
+
+<p>JSONファイルを元に、secretを作ります。</p>
+
+<pre><code>$ kubectl create secret generic azure-config-file --from-file=azure.json
+</code></pre>
+
+<p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
+
+<p>[extdns.yaml]</p>
+
+<pre><code>apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      containers:
+      - name: external-dns
+        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
+        args:
+        - --source=service
+        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
+        - --provider=azure
+        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial's resource group
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
+</code></pre>
+
+<p>ExternalDNSをデプロイします。</p>
+
+<pre><code>$ kubectl create -f extdns.yaml
+</code></pre>
+
+<p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
+
+<p>[nginx-extdns.yaml]</p>
+
+<pre><code>apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-extdns
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx-extdns
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx-extdns
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
+spec:
+  selector:
+    app: nginx-extdns
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+</code></pre>
+
+<p>デプローイ。</p>
+
+<pre><code>$ kubectl create -f nginx-extdns.yaml
+</code></pre>
+
+<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
+
+<pre><code>$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
+Name      ResourceGroup       Ttl  Type    Metadata
+--------  ----------------  -----  ------  ----------
+hogeginx  hoge-dns-rg         300  A
+</code></pre>
+
+<pre><code>$ curl hogeginx.example.com
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">11 Feb 2018, 00:20</h1>
                 <section class="post">
                     <header class="post-header">
@@ -924,127 +1145,6 @@ terraform apply
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>
 <li><a href="https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples">サンプル集 on GitHub</a></li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Nov 2017, 08:45</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azblob_golang/" class="post-title">Azure Blob アップローダーをGoで書いた、そしてその理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
-
-<p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
-
-<h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
-
-<p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
-
-<p>ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。</p>
-
-<pre><code>package main
-
-import (
-	&quot;context&quot;
-	&quot;flag&quot;
-	&quot;fmt&quot;
-	&quot;log&quot;
-	&quot;net/url&quot;
-	&quot;os&quot;
-
-	&quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&quot;
-)
-
-var (
-	accountName    string
-	accountKey     string
-	containerName  string
-	fileName       string
-	blockSize      int64
-	blockSizeBytes int64
-)
-
-func init() {
-	flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;)
-	flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;)
-	flag.StringVar(&amp;containerName, &quot;c&quot;, &quot;&quot;, &quot;(Required - short option) Blob Container Name&quot;)
-	flag.StringVar(&amp;containerName, &quot;container-name&quot;, &quot;&quot;, &quot;(Required) Blob Container Name&quot;)
-	flag.StringVar(&amp;fileName, &quot;f&quot;, &quot;&quot;, &quot;(Required - short option) Upload filename&quot;)
-	flag.StringVar(&amp;fileName, &quot;file&quot;, &quot;&quot;, &quot;(Required) Upload filename&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;b&quot;, 4, &quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;blocksize&quot;, 4, &quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Parse()
-
-	if (blockSize &lt; 1) || (blockSize) &gt; 100 {
-		fmt.Println(&quot;Blocksize must be from 1MB to 100MB&quot;)
-		os.Exit(1)
-	}
-	blockSizeBytes = blockSize * 1024 * 1024
-}
-
-func main() {
-	file, err := os.Open(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	fileSize, err := file.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	u, _ := url.Parse(fmt.Sprintf(&quot;https://%s.blob.core.windows.net/%s/%s&quot;, accountName, containerName, fileName))
-	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
-
-	ctx := context.Background()
-
-	fmt.Println(&quot;Uploading block blob...&quot;)
-	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
-		azblob.UploadStreamToBlockBlobOptions{
-			BlockSize: blockSizeBytes,
-			Progress: func(bytesTransferred int64) {
-				fmt.Printf(&quot;Uploaded %d of %d bytes.\n&quot;, bytesTransferred, fileSize.Size())
-			},
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = putBlockList // Avoid compiler's &quot;declared and not used&quot; error
-
-	fmt.Println(&quot;Done&quot;)
-}
-</code></pre>
-
-<p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
-
-<p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
-
-<h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
-
-<p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
-
-<p>たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。</p>
-
-<p>ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。</p>
-
-<p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
-
-<p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
 
                     </div>
                 </section>

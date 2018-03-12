@@ -9,6 +9,215 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>AKSのService作成時にホスト名を付ける</title>
+      <link>http://torumakabe.github.io/post/aks_dns/</link>
+      <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/aks_dns/</guid>
+      <description>
+
+&lt;h2 id=&#34;2つのやり口&#34;&gt;2つのやり口&lt;/h2&gt;
+
+&lt;p&gt;Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。&lt;/p&gt;
+
+&lt;p&gt;わたしの知る限り、2つの方法があります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;AKS(k8s) 1.9で対応した&lt;a href=&#34;https://github.com/kubernetes/kubernetes/pull/47849&#34;&gt;DNSラベル名付与機能&lt;/a&gt;を使う&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/kubernetes-incubator/external-dns&#34;&gt;Kubenetes ExternalDNS&lt;/a&gt;を使ってAzure DNSへAレコードを追加する&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以下、AKS 1.9.2での実現手順です。&lt;/p&gt;
+
+&lt;h2 id=&#34;dnsラベル名付与機能&#34;&gt;DNSラベル名付与機能&lt;/h2&gt;
+
+&lt;p&gt;簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。&lt;/p&gt;
+
+&lt;p&gt;[nginx-label.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
+spec:
+  selector:
+    app: nginx
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプロイ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f nginx-label.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl hogeginx.eastus.cloudapp.azure.com
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。&lt;/p&gt;
+
+&lt;h2 id=&#34;kubenetes-externaldns&#34;&gt;Kubenetes ExternalDNS&lt;/h2&gt;
+
+&lt;p&gt;任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は&lt;a href=&#34;https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。&lt;/p&gt;
+
+&lt;p&gt;さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。&lt;/p&gt;
+
+&lt;p&gt;ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac --role=&amp;quot;Contributor&amp;quot; --scopes=&amp;quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&amp;quot; -n hogeExtDnsSp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;appId、password、tenantを控えておいてください。次でsecretに使います。&lt;/p&gt;
+
+&lt;p&gt;次にExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。&lt;/p&gt;
+
+&lt;p&gt;[azure.json]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;tenantId&amp;quot;: &amp;quot;your-tenant&amp;quot;,
+    &amp;quot;subscriptionId&amp;quot;: &amp;quot;your-subscription-id&amp;quot;,
+    &amp;quot;aadClientId&amp;quot;: &amp;quot;your-appId&amp;quot;,
+    &amp;quot;aadClientSecret&amp;quot;: &amp;quot;your-password&amp;quot;,
+    &amp;quot;resourceGroup&amp;quot;: &amp;quot;hoge-dns-rg&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;JSONファイルを元に、secretを作ります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create secret generic azure-config-file --from-file=azure.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。&lt;/p&gt;
+
+&lt;p&gt;[extdns.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      containers:
+      - name: external-dns
+        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
+        args:
+        - --source=service
+        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
+        - --provider=azure
+        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial&#39;s resource group
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ExternalDNSをデプロイします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f extdns.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。&lt;/p&gt;
+
+&lt;p&gt;[nginx-extdns.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-extdns
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx-extdns
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hogeginx-extdns
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
+spec:
+  selector:
+    app: nginx-extdns
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;デプローイ。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl create -f nginx-extdns.yaml
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
+Name      ResourceGroup       Ttl  Type    Metadata
+--------  ----------------  -----  ------  ----------
+hogeginx  hoge-dns-rg         300  A
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;$ curl hogeginx.example.com
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
       <link>http://torumakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
@@ -2431,81 +2640,6 @@ Fri Feb  3 06:43:18 2017
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;strong&gt;それでは、幸せな運用管理サーバレス生活を。&lt;/strong&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>http://torumakabe.github.io/post/oms_container_linux/</link>
-      <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
-      <description>
-
-&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
-
-&lt;p&gt;OMS Container Solution for Linuxのプレビューが&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;はじまりました&lt;/a&gt;。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。&lt;/p&gt;
-
-&lt;p&gt;さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。&lt;/p&gt;
-
-&lt;h2 id=&#34;何ができるか-とその特徴&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
-
-&lt;ul&gt;
-&lt;li&gt;収集データの詳細 - &lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details&#34;&gt;Containers data collection details&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;導入が楽ちん
-
-&lt;ol&gt;
-&lt;li&gt;OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる&lt;/li&gt;
-&lt;li&gt;コンテナホストに直接OMS Agentを導入することもできる&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;1がコンテナ的でいいですよね。実現イメージはこんな感じです。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png&#34; alt=&#34;OMS Agent Installation Type&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。&lt;/p&gt;
-
-&lt;p&gt;では試しに、1のやり口でUbuntuへ導入してみましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;手順&#34;&gt;手順&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/&#34;&gt;参考&lt;/a&gt;)
-
-&lt;ul&gt;
-&lt;li&gt;Azureのサブスクリプションを持っている場合、&amp;rdquo;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure&#34;&gt;Microsoft Azure を使用した迅速なサインアップ&lt;/a&gt;&amp;ldquo;から読むと、話が早いです&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加&lt;/li&gt;
-&lt;li&gt;UbuntuにDockerを導入
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/installation/linux/ubuntulinux/&#34;&gt;参考&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;OMSエージェントコンテナを導入
-
-&lt;ul&gt;
-&lt;li&gt;先ほど入手したOMSのワークスペースIDとKeyを入れてください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&amp;quot;omsagent&amp;quot; --log-driver=none --restart=always microsoft/oms
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。これでOMSポータルからログ分析ができます。こんな感じで。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png&#34; alt=&#34;Dashboard1&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png&#34; alt=&#34;Dashboard2&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
-
-&lt;p&gt;なお、フィードバック&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;熱烈歓迎&lt;/a&gt;だそうです。&lt;/p&gt;
 </description>
     </item>
     
