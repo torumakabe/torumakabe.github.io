@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.17" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="AzureのAvailability Zonesへ分散するVMSSをTerraformで作る &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="AzureのAvailability Zonesへ分散するVMSSをTerraformで作る &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">26 Mar 2018, 00:08</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/az_vmss_terraform/" class="post-title">AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/az_vmss_terraform/" data-title="AzureのAvailability Zonesへ分散するVMSSをTerraformで作る" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/az_vmss_terraform/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/az_vmss_terraform/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="動機">動機</h2>
+
+<p>Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように<a href="https://github.com/terraform-providers/terraform-provider-azurerm/pull/811">なりました</a>。Availability Zonesはインフラの根っこの仕組みなので、現在(<sup>2018</sup>&frasl;<sub>3</sub>)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。</p>
+
+<h2 id="前提条件">前提条件</h2>
+
+<ul>
+<li>Availability Zones対応リージョンを選びます。現在は<a href="https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#regions-that-support-availability-zones">5リージョン</a>です。この記事ではEast US 2とします。</li>
+<li>Availability Zonesのプレビューに<a href="https://docs.microsoft.com/ja-jp/azure/availability-zones/az-overview">サインアップ</a>済みとします。</li>
+<li>bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。</li>
+<li>動作確認した環境は以下です。
+
+<ul>
+<li>Terraform 0.11.2</li>
+<li>Terraform Azure Provider 1.3.0</li>
+<li>WSL (ubuntu 16.04)</li>
+<li>macos (High Sierra 10.13.3)</li>
+</ul></li>
+</ul>
+
+<h2 id="コード">コード</h2>
+
+<p>以下のファイルを同じディレクトリに作成します。</p>
+
+<h3 id="terraform-メインコード">Terraform メインコード</h3>
+
+<p>VMSSと周辺リソースを作ります。</p>
+
+<ul>
+<li>最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。</li>
+<li>クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。</li>
+</ul>
+
+<p>[main.tf]</p>
+
+<pre><code>resource &quot;azurerm_resource_group&quot; &quot;poc&quot; {
+  name     = &quot;${var.resource_group_name}&quot;
+  location = &quot;East US 2&quot;
+}
+
+resource &quot;azurerm_virtual_network&quot; &quot;poc&quot; {
+  name                = &quot;vnet01&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  location            = &quot;${azurerm_resource_group.poc.location}&quot;
+  address_space       = [&quot;10.0.0.0/16&quot;]
+}
+
+resource &quot;azurerm_subnet&quot; &quot;poc&quot; {
+  name                      = &quot;subnet01&quot;
+  resource_group_name       = &quot;${azurerm_resource_group.poc.name}&quot;
+  virtual_network_name      = &quot;${azurerm_virtual_network.poc.name}&quot;
+  address_prefix            = &quot;10.0.2.0/24&quot;
+  network_security_group_id = &quot;${azurerm_network_security_group.poc.id}&quot;
+}
+
+resource &quot;azurerm_network_security_group&quot; &quot;poc&quot; {
+  name                = &quot;nsg01&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  location            = &quot;${azurerm_resource_group.poc.location}&quot;
+
+  security_rule = [
+    {
+      name                       = &quot;allow_http&quot;
+      priority                   = 100
+      direction                  = &quot;Inbound&quot;
+      access                     = &quot;Allow&quot;
+      protocol                   = &quot;Tcp&quot;
+      source_port_range          = &quot;*&quot;
+      destination_port_range     = &quot;80&quot;
+      source_address_prefix      = &quot;*&quot;
+      destination_address_prefix = &quot;*&quot;
+    },
+    {
+      name                       = &quot;allow_ssh&quot;
+      priority                   = 101
+      direction                  = &quot;Inbound&quot;
+      access                     = &quot;Allow&quot;
+      protocol                   = &quot;Tcp&quot;
+      source_port_range          = &quot;*&quot;
+      destination_port_range     = &quot;22&quot;
+      source_address_prefix      = &quot;*&quot;
+      destination_address_prefix = &quot;*&quot;
+    },
+  ]
+}
+
+resource &quot;azurerm_public_ip&quot; &quot;poc&quot; {
+  name                         = &quot;pip01&quot;
+  resource_group_name          = &quot;${azurerm_resource_group.poc.name}&quot;
+  location                     = &quot;${azurerm_resource_group.poc.location}&quot;
+  public_ip_address_allocation = &quot;static&quot;
+  domain_name_label            = &quot;${var.scaleset_name}&quot;
+
+  sku = &quot;Standard&quot;
+}
+
+resource &quot;azurerm_lb&quot; &quot;poc&quot; {
+  name                = &quot;lb01&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  location            = &quot;${azurerm_resource_group.poc.location}&quot;
+
+  frontend_ip_configuration {
+    name                 = &quot;fipConf01&quot;
+    public_ip_address_id = &quot;${azurerm_public_ip.poc.id}&quot;
+  }
+
+  sku = &quot;Standard&quot;
+}
+
+resource &quot;azurerm_lb_backend_address_pool&quot; &quot;poc&quot; {
+  name                = &quot;bePool01&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  loadbalancer_id     = &quot;${azurerm_lb.poc.id}&quot;
+}
+
+resource &quot;azurerm_lb_rule&quot; &quot;poc&quot; {
+  name                           = &quot;lbRule&quot;
+  resource_group_name            = &quot;${azurerm_resource_group.poc.name}&quot;
+  loadbalancer_id                = &quot;${azurerm_lb.poc.id}&quot;
+  protocol                       = &quot;Tcp&quot;
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = &quot;fipConf01&quot;
+  backend_address_pool_id        = &quot;${azurerm_lb_backend_address_pool.poc.id}&quot;
+  probe_id                       = &quot;${azurerm_lb_probe.poc.id}&quot;
+}
+
+resource &quot;azurerm_lb_probe&quot; &quot;poc&quot; {
+  name                = &quot;http-probe&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  loadbalancer_id     = &quot;${azurerm_lb.poc.id}&quot;
+  port                = 80
+}
+
+resource &quot;azurerm_lb_nat_pool&quot; &quot;poc&quot; {
+  count                          = 3
+  name                           = &quot;ssh&quot;
+  resource_group_name            = &quot;${azurerm_resource_group.poc.name}&quot;
+  loadbalancer_id                = &quot;${azurerm_lb.poc.id}&quot;
+  protocol                       = &quot;Tcp&quot;
+  frontend_port_start            = 50000
+  frontend_port_end              = 50119
+  backend_port                   = 22
+  frontend_ip_configuration_name = &quot;fipConf01&quot;
+}
+
+data &quot;template_cloudinit_config&quot; &quot;poc&quot; {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = &quot;text/cloud-config&quot;
+    content      = &quot;${file(&quot;${path.module}/cloud-config.yaml&quot;)}&quot;
+  }
+}
+
+resource &quot;azurerm_virtual_machine_scale_set&quot; &quot;poc&quot; {
+  name                = &quot;${var.scaleset_name}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
+  location            = &quot;${azurerm_resource_group.poc.location}&quot;
+  upgrade_policy_mode = &quot;Manual&quot;
+
+  sku {
+    name     = &quot;Standard_B1s&quot;
+    tier     = &quot;Standard&quot;
+    capacity = 3
+  }
+
+  storage_profile_image_reference {
+    publisher = &quot;Canonical&quot;
+    offer     = &quot;UbuntuServer&quot;
+    sku       = &quot;16.04-LTS&quot;
+    version   = &quot;latest&quot;
+  }
+
+  storage_profile_os_disk {
+    name              = &quot;&quot;
+    caching           = &quot;ReadWrite&quot;
+    create_option     = &quot;FromImage&quot;
+    managed_disk_type = &quot;Standard_LRS&quot;
+  }
+
+  os_profile {
+    computer_name_prefix = &quot;pocvmss&quot;
+    admin_username       = &quot;${var.admin_username}&quot;
+    admin_password       = &quot;&quot;
+    custom_data          = &quot;${data.template_cloudinit_config.poc.rendered}&quot;
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+
+    ssh_keys {
+      path     = &quot;/home/${var.admin_username}/.ssh/authorized_keys&quot;
+      key_data = &quot;${file(&quot;~/.ssh/id_rsa.pub&quot;)}&quot;
+    }
+  }
+
+  network_profile {
+    name    = &quot;terraformnetworkprofile&quot;
+    primary = true
+
+    ip_configuration {
+      name                                   = &quot;PoCIPConfiguration&quot;
+      subnet_id                              = &quot;${azurerm_subnet.poc.id}&quot;
+      load_balancer_backend_address_pool_ids = [&quot;${azurerm_lb_backend_address_pool.poc.id}&quot;]
+      load_balancer_inbound_nat_rules_ids    = [&quot;${element(azurerm_lb_nat_pool.poc.*.id, count.index)}&quot;]
+    }
+  }
+
+  zones = [1, 2, 3]
+}
+</code></pre>
+
+<h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
+
+<p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
+
+<p>[cloud-config.yaml]</p>
+
+<pre><code>#cloud-config
+package_upgrade: true
+packages:
+  - nginx
+runcmd:
+  - 'echo &quot;[Instance Name]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;format=text&quot;`    [Zone]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;format=text&quot;`&quot; &gt; /var/www/html/index.nginx-debian.html'
+</code></pre>
+
+<p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer">Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl">Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する</a></li>
+</ul>
+
+<h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
+
+<p>変数は別ファイルへ。</p>
+
+<p>[variables.tf]</p>
+
+<pre><code>variable &quot;resource_group_name&quot; {
+  default = &quot;your-rg&quot;
+}
+
+variable &quot;scaleset_name&quot; {
+  default = &quot;yourvmss01&quot;
+}
+
+variable &quot;admin_username&quot; {
+  default = &quot;yourname&quot;
+}
+</code></pre>
+
+<h2 id="実行">実行</h2>
+
+<p>では実行。</p>
+
+<pre><code>$ terraform init
+$ terraform plan
+$ terraform apply
+</code></pre>
+
+<p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
+
+<p>インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。</p>
+
+<pre><code>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
+$ tail -f /var/log/cloud-init-output.log
+Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
+</code></pre>
+
+<p>ではWebサーバーにアクセスしてみましょう。</p>
+
+<pre><code>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
+[Instance Name]: yourvmss01_2    [Zone]: 3
+[Instance Name]: yourvmss01_0    [Zone]: 1
+[Instance Name]: yourvmss01_2    [Zone]: 3
+[Instance Name]: yourvmss01_1    [Zone]: 2
+</code></pre>
+
+<p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
+
+<p>では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。</p>
+
+<pre><code>[Instance Name]: yourvmss01_1    [Zone]: 2
+[Instance Name]: yourvmss01_3    [Zone]: 1
+[Instance Name]: yourvmss01_3    [Zone]: 1
+[Instance Name]: yourvmss01_1    [Zone]: 2
+[Instance Name]: yourvmss01_3    [Zone]: 1
+</code></pre>
+
+<p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

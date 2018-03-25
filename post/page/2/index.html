@@ -68,6 +68,297 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">08 Jan 2018, 16:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/" class="post-title">TerraformでAzure サンプル 2018/1版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="サンプルのアップデート">サンプルのアップデート</h2>
+
+<p>年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの<a href="http://torumakabe.github.io/post/azure_tf_fundamental_rules/">記事</a>に目が止まりました。原則はいいとして、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">サンプル</a>は2年物で腐りかけです。ということでアップデートします。</p>
+
+<h2 id="インパクトの大きな変更点">インパクトの大きな変更点</h2>
+
+<p>Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。</p>
+
+<ol>
+<li>BackendにAzure Blobを使えるようになった</li>
+<li>Workspaceで同一コード・複数環境管理ができるようになった</li>
+<li>対応リソースが増えた</li>
+<li><a href="https://registry.terraform.io/">Terraform Module Registry</a>が公開された</li>
+</ol>
+
+<h2 id="更新版サンプルの方針">更新版サンプルの方針</h2>
+
+<p>重要アップデートをふまえ、以下の方針で新サンプルを作りました。</p>
+
+<h3 id="チーム-複数端末での運用">チーム、複数端末での運用</h3>
+
+<p>BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。</p>
+
+<h3 id="workspaceの導入">Workspaceの導入</h3>
+
+<p>従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。</p>
+
+<p>要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。</p>
+
+<h3 id="module-terraform-module-registryの活用">Module、Terraform Module Registryの活用</h3>
+
+<p>TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。</p>
+
+<h3 id="リソースグループは環境ごとに準備し-管理をterraformから分離">リソースグループは環境ごとに準備し、管理をTerraformから分離</h3>
+
+<p>AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。</p>
+
+<p>TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。</p>
+
+<p>ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。</p>
+
+<pre><code>terraform workspace select prod
+</code></pre>
+
+<p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
+
+<h2 id="サンプル解説">サンプル解説</h2>
+
+<p>サンプルは<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801">GitHub</a>に置きました。合わせてご確認ください。</p>
+
+<p>このコードをapplyすると、以下のリソースが出来上がります。</p>
+
+<ul>
+<li>NGINX on Ubuntu Webサーバー VMスケールセット</li>
+<li>VMスケールセット向けロードバランサー</li>
+<li>踏み台サーバー</li>
+<li>上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)</li>
+</ul>
+
+<h3 id="リポジトリ構造">リポジトリ構造</h3>
+
+<p>サンプルのリポジトリ構造です。</p>
+
+<pre><code>├── modules
+│   ├── computegroup
+│   │   ├── main.tf
+│   │   ├── os
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── loadbalancer
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── network
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── projects
+    ├── project_a
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   └── variables.tf
+    └── shared
+        ├── backend.tf
+        ├── main.tf
+        ├── outputs.tf
+        └── variables.tf
+</code></pre>
+
+<p>/modulesには<a href="https://registry.terraform.io/browse?provider=azurerm">Terraform Module Registry</a>でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。</p>
+
+<p>そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。</p>
+
+<p>このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。</p>
+
+<ul>
+<li>アプリ開発者がproject_a下でアプリ関連リソースに集中したい</li>
+<li>性能観点で分割したい (Terraformはリソース量につれて重くなりがち)</li>
+<li>有事を考慮し影響範囲を分割したい</li>
+</ul>
+
+<p>プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1">output</a>し、project_aで参照できるよう<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10">定義</a>しています。</p>
+
+<h2 id="使い方">使い方</h2>
+
+<h3 id="前提">前提</h3>
+
+<ul>
+<li>Linux、WSL、macOSなどbash環境の実行例です</li>
+<li>SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください</li>
+</ul>
+
+<h3 id="管理者向けのサービスプリンシパルを用意する">管理者向けのサービスプリンシパルを用意する</h3>
+
+<p>インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。</p>
+
+<p>もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。<a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html">Terraformのドキュメント</a>も参考に。</p>
+
+<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/SUBSCRIPTION_ID&quot;
+</code></pre>
+
+<p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
+
+<p>なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go">使う</a>からです。</p>
+
+<p>そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが<a href="https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go">使われません</a>。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。</p>
+
+<p>サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも<a href="https://www.terraform.io/docs/backends/types/azurerm.html">対応できます</a>。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。</p>
+
+<h3 id="管理者の環境変数を設定する">管理者の環境変数を設定する</h3>
+
+<p>Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。</p>
+
+<pre><code>export ARM_SUBSCRIPTION_ID=&quot;&lt;your subscription id&gt;&quot;
+export ARM_CLIENT_ID=&quot;&lt;your servicce principal appid&gt;&quot;
+export ARM_CLIENT_SECRET=&quot;&lt;your service principal password&gt;&quot;
+export ARM_TENANT_ID=&quot;&lt;your service principal tenant&gt;&quot;
+</code></pre>
+
+<h3 id="workspaceを作る">Workspaceを作る</h3>
+
+<p>開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。</p>
+
+<pre><code>terraform workspace new dev
+terraform workspace new stage
+terraform workspace new prod
+</code></pre>
+
+<h3 id="リソースグループを作る">リソースグループを作る</h3>
+
+<p>まずWorkspace別にリソースグループを作ります。</p>
+
+<pre><code>az group create -n tf-sample-dev-rg -l japaneast
+az group create -n tf-sample-stage-rg -l japaneast
+az group create -n tf-sample-prod-rg -l japaneast
+</code></pre>
+
+<p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
+
+<pre><code>data &quot;azurerm_resource_group&quot; &quot;resource_group&quot; {
+  name = &quot;${var.resource_group_name}-${terraform.workspace}-rg&quot;
+}
+</code></pre>
+
+<p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&rdquo;tf-sample&rdquo;と指定しています。</p>
+
+<p>次にBackend、state共有向けリソースグループを作ります。</p>
+
+<pre><code>az group create -n tf-sample-state-rg -l japaneast
+</code></pre>
+
+<p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
+
+<pre><code>terraform {
+  backend &quot;azurerm&quot; {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-project-a&quot;
+    key                  = &quot;terraform.tfstate&quot;
+  }
+}
+</code></pre>
+
+<p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
+
+<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&quot; &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&quot;
+</code></pre>
+
+<p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
+
+<h3 id="backendを準備する">Backendを準備する</h3>
+
+<p>project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに</p>
+
+<ul>
+<li>ストレージアカウント (名前は任意)</li>
+<li>コンテナー *2 (tfstate-project-a, tfstate-shared)</li>
+</ul>
+
+<p>を作ってください。GUIでもCLIでも、お好きなやり方で。</p>
+
+<p>その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。</p>
+
+<pre><code>terraform {
+  backend &quot;azurerm&quot; {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-project-a&quot;
+    key                  = &quot;terraform.tfstate&quot;
+  }
+}
+
+data &quot;terraform_remote_state&quot; &quot;shared&quot; {
+  backend = &quot;azurerm&quot;
+
+  config {
+    resource_group_name  = &quot;tf-sample-state-rg&quot;
+    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
+    container_name       = &quot;tfstate-shared&quot;
+    key                  = &quot;terraform.tfstateenv:${terraform.workspace}&quot;
+  }
+}
+</code></pre>
+
+<p>これで準備完了です。</p>
+
+<h3 id="実行">実行</h3>
+
+<p>Workspaceをdevに切り替えます。</p>
+
+<pre><code>terraform workspace select dev
+</code></pre>
+
+<p>まずは土台となるリソースを作成するsharedから。</p>
+
+<pre><code>cd shared
+terraform init
+terraform plan
+terraform apply
+</code></pre>
+
+<p>土台となるリソースが作成されたら、次はproject_aを。</p>
+
+<pre><code>cd ../project_a
+terraform init
+terraform plan
+terraform apply
+</code></pre>
+
+<p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
+
+<p>dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。</p>
+
+<pre><code>terraform workspace select stage
+[以下devと同様の操作]
+</code></pre>
+
+<p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
+
+<h2 id="参考情報">参考情報</h2>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>
+<li><a href="https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples">サンプル集 on GitHub</a></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">04 Dec 2017, 22:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -690,352 +981,6 @@ Install-WindowsUpdate -acceptEula
 <li>VpnGw2がコストパフォーマンス的に最適という人が多いかもしれませんね 知らんけど</li>
 </ul></li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_blobevent/" class="post-title">Azure Event GridでBlobイベントを拾う</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
-
-<p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
-
-<p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-
-<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
-
-<p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
-
-<p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
-
-<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept" /></p>
-
-<p>Event Gridに期待する理由はいくつかあります。</p>
-
-<ul>
-<li>フィルタ
-
-<ul>
-<li>特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます</li>
-</ul></li>
-<li>信頼性
-
-<ul>
-<li>リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます</li>
-</ul></li>
-<li>スケールと高スループット
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings">Azure Functions Blobトリガー</a>のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった</li>
-<li>具体的な数値はプレビュー後に期待しましょう</li>
-</ul></li>
-<li>ファンアウト
-
-<ul>
-<li>ひとつのイベントを複数のHandlerに紐づけられます</li>
-</ul></li>
-<li>Azureの外やサードパーティーとの連携
-
-<ul>
-<li>Webhookでシンプルにできます</li>
-</ul></li>
-</ul>
-
-<h2 id="前提条件">前提条件</h2>
-
-<ul>
-<li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
-<li>現時点ではWest Central USリージョンのみで提供しています</li>
-<li>プライベートプレビューは申請が必要です</li>
-</ul>
-
-<p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-
-<pre><code>az provider register --namespace  Microsoft.EventGrid
-az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<p>以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。</p>
-
-<pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<h2 id="使い方">使い方</h2>
-
-<p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre>
-
-<p>Blobストレージアカウントを作ります。</p>
-
-<pre><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre>
-
-<p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
-ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
--g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre>
-
-<p>以下はパラメーターの補足です。</p>
-
-<ul>
-<li>&ndash;endpoint
-
-<ul>
-<li>Handlerのエンドポイントを指定します。ここではテストのために<a href="https://requestb.in/">RequestBin</a>に作ったエンドポイントを指定します</li>
-</ul></li>
-<li>&ndash;included-event-types
-
-<ul>
-<li>イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します</li>
-</ul></li>
-<li>&ndash;subject-ends-with
-
-<ul>
-<li>対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました</li>
-</ul></li>
-</ul>
-
-<p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
-
-<p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:25:15.2635962Z&quot;,
-  &quot;id&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1A9D8A6703A&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060986&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&quot;
-    }
-  }
-}]
-</code></pre>
-
-<p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
-vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
-g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre>
-
-<p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:36:33.827967Z&quot;,
-  &quot;id&quot;: &quot;e8b036ee-001e-00e7-4994-23740d06225b&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;e8b036ee-001e-00e7-4994-23740d000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1AB6D1B24F6&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060D42&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;9ec5c091-061d-4111-ad82-52d9803ce373&quot;
-    }
-  }
-}]
-</code></pre>
-
-<h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
-
-<p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-
-<h3 id="概要">概要</h3>
-
-<p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings" /></p>
-
-<p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>
-
-<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&rdquo;path&rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
-
-<p>入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。</p>
-
-<p>そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。</p>
-
-<p>なお、この悩みはAzureの開発チームも認識しており、Functions側で対応する方針とのことです。</p>
-
-<h3 id="handler">Handler</h3>
-
-<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>#r &quot;Newtonsoft.json&quot;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-
-public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
-{
-    string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
-    outputQueueItem = System.IO.Path.GetFileName(imageUrl);
-}
-</code></pre>
-
-<p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&quot;: &quot;1.0.0-beta1-10006&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;eventGridTrigger&quot;,
-      &quot;name&quot;: &quot;eventGridEvent&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;type&quot;: &quot;queue&quot;,
-      &quot;name&quot;: &quot;outputQueueItem&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<h3 id="resizer">Resizer</h3>
-
-<p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>using ImageResizer;
-
-public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
-{
-  var imageBuilder = ImageResizer.ImageBuilder.Current;
-  var size = imageDimensionsTable[ImageSize.Small];
-
-  imageBuilder.Build(inputBlob, outputBlob,
-    new ResizeSettings(size.Item1, size.Item2, FitMode.Max, null), false);
-
-}
-
-public enum ImageSize
-{
-  Small
-}
-
-private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimensionsTable = new Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt;()
-{
-  { ImageSize.Small, Tuple.Create(100, 100) }
-};
-</code></pre>
-
-<p>ImageResizerのパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;ImageResizer&quot;: &quot;4.1.9&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
-
-<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&rdquo;images-s&rdquo;として別途作成しました。コンテナー&rdquo;images&rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;name&quot;: &quot;myQueueItem&quot;,
-      &quot;type&quot;: &quot;queueTrigger&quot;,
-      &quot;direction&quot;: &quot;in&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;
-    },
-    {
-      &quot;name&quot;: &quot;inputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;name&quot;: &quot;outputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images-s/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
-nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre>
-
-<p>これで、コンテナー&rdquo;images&rdquo;にjpgファイルがアップロードされると、コンテナー&rdquo;images-s&rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
 
                     </div>
                 </section>

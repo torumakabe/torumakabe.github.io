@@ -9,6 +9,310 @@
     <atom:link href="http://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
+      <link>http://torumakabe.github.io/post/az_vmss_terraform/</link>
+      <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/az_vmss_terraform/</guid>
+      <description>
+
+&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
+
+&lt;p&gt;Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/pull/811&#34;&gt;なりました&lt;/a&gt;。Availability Zonesはインフラの根っこの仕組みなので、現在(&lt;sup&gt;2018&lt;/sup&gt;&amp;frasl;&lt;sub&gt;3&lt;/sub&gt;)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;前提条件&#34;&gt;前提条件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Availability Zones対応リージョンを選びます。現在は&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#regions-that-support-availability-zones&#34;&gt;5リージョン&lt;/a&gt;です。この記事ではEast US 2とします。&lt;/li&gt;
+&lt;li&gt;Availability Zonesのプレビューに&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/availability-zones/az-overview&#34;&gt;サインアップ&lt;/a&gt;済みとします。&lt;/li&gt;
+&lt;li&gt;bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。&lt;/li&gt;
+&lt;li&gt;動作確認した環境は以下です。
+
+&lt;ul&gt;
+&lt;li&gt;Terraform 0.11.2&lt;/li&gt;
+&lt;li&gt;Terraform Azure Provider 1.3.0&lt;/li&gt;
+&lt;li&gt;WSL (ubuntu 16.04)&lt;/li&gt;
+&lt;li&gt;macos (High Sierra 10.13.3)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;コード&#34;&gt;コード&lt;/h2&gt;
+
+&lt;p&gt;以下のファイルを同じディレクトリに作成します。&lt;/p&gt;
+
+&lt;h3 id=&#34;terraform-メインコード&#34;&gt;Terraform メインコード&lt;/h3&gt;
+
+&lt;p&gt;VMSSと周辺リソースを作ります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;最終行近くの &amp;ldquo;zones = [1, 2, 3]&amp;rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。&lt;/li&gt;
+&lt;li&gt;クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;[main.tf]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;poc&amp;quot; {
+  name     = &amp;quot;${var.resource_group_name}&amp;quot;
+  location = &amp;quot;East US 2&amp;quot;
+}
+
+resource &amp;quot;azurerm_virtual_network&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;vnet01&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  location            = &amp;quot;${azurerm_resource_group.poc.location}&amp;quot;
+  address_space       = [&amp;quot;10.0.0.0/16&amp;quot;]
+}
+
+resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;poc&amp;quot; {
+  name                      = &amp;quot;subnet01&amp;quot;
+  resource_group_name       = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  virtual_network_name      = &amp;quot;${azurerm_virtual_network.poc.name}&amp;quot;
+  address_prefix            = &amp;quot;10.0.2.0/24&amp;quot;
+  network_security_group_id = &amp;quot;${azurerm_network_security_group.poc.id}&amp;quot;
+}
+
+resource &amp;quot;azurerm_network_security_group&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;nsg01&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  location            = &amp;quot;${azurerm_resource_group.poc.location}&amp;quot;
+
+  security_rule = [
+    {
+      name                       = &amp;quot;allow_http&amp;quot;
+      priority                   = 100
+      direction                  = &amp;quot;Inbound&amp;quot;
+      access                     = &amp;quot;Allow&amp;quot;
+      protocol                   = &amp;quot;Tcp&amp;quot;
+      source_port_range          = &amp;quot;*&amp;quot;
+      destination_port_range     = &amp;quot;80&amp;quot;
+      source_address_prefix      = &amp;quot;*&amp;quot;
+      destination_address_prefix = &amp;quot;*&amp;quot;
+    },
+    {
+      name                       = &amp;quot;allow_ssh&amp;quot;
+      priority                   = 101
+      direction                  = &amp;quot;Inbound&amp;quot;
+      access                     = &amp;quot;Allow&amp;quot;
+      protocol                   = &amp;quot;Tcp&amp;quot;
+      source_port_range          = &amp;quot;*&amp;quot;
+      destination_port_range     = &amp;quot;22&amp;quot;
+      source_address_prefix      = &amp;quot;*&amp;quot;
+      destination_address_prefix = &amp;quot;*&amp;quot;
+    },
+  ]
+}
+
+resource &amp;quot;azurerm_public_ip&amp;quot; &amp;quot;poc&amp;quot; {
+  name                         = &amp;quot;pip01&amp;quot;
+  resource_group_name          = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  location                     = &amp;quot;${azurerm_resource_group.poc.location}&amp;quot;
+  public_ip_address_allocation = &amp;quot;static&amp;quot;
+  domain_name_label            = &amp;quot;${var.scaleset_name}&amp;quot;
+
+  sku = &amp;quot;Standard&amp;quot;
+}
+
+resource &amp;quot;azurerm_lb&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;lb01&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  location            = &amp;quot;${azurerm_resource_group.poc.location}&amp;quot;
+
+  frontend_ip_configuration {
+    name                 = &amp;quot;fipConf01&amp;quot;
+    public_ip_address_id = &amp;quot;${azurerm_public_ip.poc.id}&amp;quot;
+  }
+
+  sku = &amp;quot;Standard&amp;quot;
+}
+
+resource &amp;quot;azurerm_lb_backend_address_pool&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;bePool01&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  loadbalancer_id     = &amp;quot;${azurerm_lb.poc.id}&amp;quot;
+}
+
+resource &amp;quot;azurerm_lb_rule&amp;quot; &amp;quot;poc&amp;quot; {
+  name                           = &amp;quot;lbRule&amp;quot;
+  resource_group_name            = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  loadbalancer_id                = &amp;quot;${azurerm_lb.poc.id}&amp;quot;
+  protocol                       = &amp;quot;Tcp&amp;quot;
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = &amp;quot;fipConf01&amp;quot;
+  backend_address_pool_id        = &amp;quot;${azurerm_lb_backend_address_pool.poc.id}&amp;quot;
+  probe_id                       = &amp;quot;${azurerm_lb_probe.poc.id}&amp;quot;
+}
+
+resource &amp;quot;azurerm_lb_probe&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;http-probe&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  loadbalancer_id     = &amp;quot;${azurerm_lb.poc.id}&amp;quot;
+  port                = 80
+}
+
+resource &amp;quot;azurerm_lb_nat_pool&amp;quot; &amp;quot;poc&amp;quot; {
+  count                          = 3
+  name                           = &amp;quot;ssh&amp;quot;
+  resource_group_name            = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  loadbalancer_id                = &amp;quot;${azurerm_lb.poc.id}&amp;quot;
+  protocol                       = &amp;quot;Tcp&amp;quot;
+  frontend_port_start            = 50000
+  frontend_port_end              = 50119
+  backend_port                   = 22
+  frontend_ip_configuration_name = &amp;quot;fipConf01&amp;quot;
+}
+
+data &amp;quot;template_cloudinit_config&amp;quot; &amp;quot;poc&amp;quot; {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = &amp;quot;text/cloud-config&amp;quot;
+    content      = &amp;quot;${file(&amp;quot;${path.module}/cloud-config.yaml&amp;quot;)}&amp;quot;
+  }
+}
+
+resource &amp;quot;azurerm_virtual_machine_scale_set&amp;quot; &amp;quot;poc&amp;quot; {
+  name                = &amp;quot;${var.scaleset_name}&amp;quot;
+  resource_group_name = &amp;quot;${azurerm_resource_group.poc.name}&amp;quot;
+  location            = &amp;quot;${azurerm_resource_group.poc.location}&amp;quot;
+  upgrade_policy_mode = &amp;quot;Manual&amp;quot;
+
+  sku {
+    name     = &amp;quot;Standard_B1s&amp;quot;
+    tier     = &amp;quot;Standard&amp;quot;
+    capacity = 3
+  }
+
+  storage_profile_image_reference {
+    publisher = &amp;quot;Canonical&amp;quot;
+    offer     = &amp;quot;UbuntuServer&amp;quot;
+    sku       = &amp;quot;16.04-LTS&amp;quot;
+    version   = &amp;quot;latest&amp;quot;
+  }
+
+  storage_profile_os_disk {
+    name              = &amp;quot;&amp;quot;
+    caching           = &amp;quot;ReadWrite&amp;quot;
+    create_option     = &amp;quot;FromImage&amp;quot;
+    managed_disk_type = &amp;quot;Standard_LRS&amp;quot;
+  }
+
+  os_profile {
+    computer_name_prefix = &amp;quot;pocvmss&amp;quot;
+    admin_username       = &amp;quot;${var.admin_username}&amp;quot;
+    admin_password       = &amp;quot;&amp;quot;
+    custom_data          = &amp;quot;${data.template_cloudinit_config.poc.rendered}&amp;quot;
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = true
+
+    ssh_keys {
+      path     = &amp;quot;/home/${var.admin_username}/.ssh/authorized_keys&amp;quot;
+      key_data = &amp;quot;${file(&amp;quot;~/.ssh/id_rsa.pub&amp;quot;)}&amp;quot;
+    }
+  }
+
+  network_profile {
+    name    = &amp;quot;terraformnetworkprofile&amp;quot;
+    primary = true
+
+    ip_configuration {
+      name                                   = &amp;quot;PoCIPConfiguration&amp;quot;
+      subnet_id                              = &amp;quot;${azurerm_subnet.poc.id}&amp;quot;
+      load_balancer_backend_address_pool_ids = [&amp;quot;${azurerm_lb_backend_address_pool.poc.id}&amp;quot;]
+      load_balancer_inbound_nat_rules_ids    = [&amp;quot;${element(azurerm_lb_nat_pool.poc.*.id, count.index)}&amp;quot;]
+    }
+  }
+
+  zones = [1, 2, 3]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;cloud-init-configファイル&#34;&gt;cloud-init configファイル&lt;/h3&gt;
+
+&lt;p&gt;各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。&lt;/p&gt;
+
+&lt;p&gt;[cloud-config.yaml]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#cloud-config
+package_upgrade: true
+packages:
+  - nginx
+runcmd:
+  - &#39;echo &amp;quot;[Instance Name]: `curl -H Metadata:true &amp;quot;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;amp;format=text&amp;quot;`    [Zone]: `curl -H Metadata:true &amp;quot;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;amp;format=text&amp;quot;`&amp;quot; &amp;gt; /var/www/html/index.nginx-debian.html&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer&#34;&gt;Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl&#34;&gt;Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;terraform-変数ファイル&#34;&gt;Terraform 変数ファイル&lt;/h3&gt;
+
+&lt;p&gt;変数は別ファイルへ。&lt;/p&gt;
+
+&lt;p&gt;[variables.tf]&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;variable &amp;quot;resource_group_name&amp;quot; {
+  default = &amp;quot;your-rg&amp;quot;
+}
+
+variable &amp;quot;scaleset_name&amp;quot; {
+  default = &amp;quot;yourvmss01&amp;quot;
+}
+
+variable &amp;quot;admin_username&amp;quot; {
+  default = &amp;quot;yourname&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;実行&#34;&gt;実行&lt;/h2&gt;
+
+&lt;p&gt;では実行。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform init
+$ terraform plan
+$ terraform apply
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。&lt;/p&gt;
+
+&lt;p&gt;インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
+$ tail -f /var/log/cloud-init-output.log
+Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではWebサーバーにアクセスしてみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
+[Instance Name]: yourvmss01_2    [Zone]: 3
+[Instance Name]: yourvmss01_0    [Zone]: 1
+[Instance Name]: yourvmss01_2    [Zone]: 3
+[Instance Name]: yourvmss01_1    [Zone]: 2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;VMSSのインスタンスがゾーンに分散されたことが分かります。&lt;/p&gt;
+
+&lt;p&gt;では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[Instance Name]: yourvmss01_1    [Zone]: 2
+[Instance Name]: yourvmss01_3    [Zone]: 1
+[Instance Name]: yourvmss01_3    [Zone]: 1
+[Instance Name]: yourvmss01_1    [Zone]: 2
+[Instance Name]: yourvmss01_3    [Zone]: 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
       <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
