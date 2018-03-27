@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dns &middot; re-imagine</title>
+    <title>Azure DNS Private Zonesの動きを確認する &middot; re-imagine</title>
 
-    <meta name="description" content="my life is the sum of my imagination">
+    <meta name="description" content="">
 
     <meta name="generator" content="Hugo 0.17" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Dns &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+    <meta name="twitter:title" content="Azure DNS Private Zonesの動きを確認する &middot; re-imagine">
+    <meta name="twitter:description" content="">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Dns &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
+    <meta property="og:title" content="Azure DNS Private Zonesの動きを確認する &middot; re-imagine">
+    <meta property="og:description" content="">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
@@ -67,7 +67,6 @@
         <div>
             
             <div class="posts">
-                
                 <h1 class="content-subhead">27 Mar 2018, 00:10</h1>
                 <section class="post">
                     <header class="post-header">
@@ -84,6 +83,17 @@
                         </p>
                     </header>
 
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/azure_private_dns_preview/" data-title="Azure DNS Private Zonesの動きを確認する" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/azure_private_dns_preview/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/azure_private_dns_preview/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
                     <div class="post-description">
                         
 
@@ -322,234 +332,9 @@ Address:        168.63.129.16#53
 <p>ドメイン名あり、なしに関わらず、名前解決できません。VNETが別なのでVNETの内部DNSで解決できない、また、Resolution VNETのVMはレコードがプライベートゾーンに自動登録されないことが分かります。</p>
 
                     </div>
+                    
                 </section>
-                
-                <h1 class="content-subhead">12 Mar 2018, 00:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/aks_dns/" class="post-title">AKSのService作成時にホスト名を付ける</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="2つのやり口">2つのやり口</h2>
-
-<p>Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。</p>
-
-<p>わたしの知る限り、2つの方法があります。</p>
-
-<ul>
-<li>AKS(k8s) 1.9で対応した<a href="https://github.com/kubernetes/kubernetes/pull/47849">DNSラベル名付与機能</a>を使う</li>
-<li><a href="https://github.com/kubernetes-incubator/external-dns">Kubenetes ExternalDNS</a>を使ってAzure DNSへAレコードを追加する</li>
-</ul>
-
-<p>以下、AKS 1.9.2での実現手順です。</p>
-
-<h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
-
-<p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
-
-<p>[nginx-label.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx
-  annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
-spec:
-  selector:
-    app: nginx
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプロイ。</p>
-
-<pre><code>$ kubectl create -f nginx-label.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
-
-<pre><code>$ curl hogeginx.eastus.cloudapp.azure.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
-
-<h2 id="kubenetes-externaldns">Kubenetes ExternalDNS</h2>
-
-<p>任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は<a href="https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md">こちら</a>。</p>
-
-<p>Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。</p>
-
-<p>さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。</p>
-
-<p>ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。</p>
-
-<pre><code>$ az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&quot; -n hogeExtDnsSp
-</code></pre>
-
-<p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
-
-<p>ではExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。</p>
-
-<p>[azure.json]</p>
-
-<pre><code>{
-    &quot;tenantId&quot;: &quot;your-tenant&quot;,
-    &quot;subscriptionId&quot;: &quot;your-subscription-id&quot;,
-    &quot;aadClientId&quot;: &quot;your-appId&quot;,
-    &quot;aadClientSecret&quot;: &quot;your-password&quot;,
-    &quot;resourceGroup&quot;: &quot;hoge-dns-rg&quot;
-}
-</code></pre>
-
-<p>JSONファイルを元に、secretを作ります。</p>
-
-<pre><code>$ kubectl create secret generic azure-config-file --from-file=azure.json
-</code></pre>
-
-<p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
-
-<p>[extdns.yaml]</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: external-dns
-spec:
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: external-dns
-    spec:
-      containers:
-      - name: external-dns
-        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
-        args:
-        - --source=service
-        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
-        - --provider=azure
-        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial's resource group
-        volumeMounts:
-        - name: azure-config-file
-          mountPath: /etc/kubernetes
-          readOnly: true
-      volumes:
-      - name: azure-config-file
-        secret:
-          secretName: azure-config-file
-</code></pre>
-
-<p>ExternalDNSをデプロイします。</p>
-
-<pre><code>$ kubectl create -f extdns.yaml
-</code></pre>
-
-<p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
-
-<p>[nginx-extdns.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx-extdns
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx-extdns
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx-extdns
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
-spec:
-  selector:
-    app: nginx-extdns
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプローイ。</p>
-
-<pre><code>$ kubectl create -f nginx-extdns.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
-
-<pre><code>$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
-Name      ResourceGroup       Ttl  Type    Metadata
---------  ----------------  -----  ------  ----------
-hogeginx  hoge-dns-rg         300  A
-</code></pre>
-
-<p>ゲッツ。</p>
-
-<pre><code>$ curl hogeginx.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
-
-                    </div>
-                </section>
-                
             </div>
-            
-
             <div class="footer">
     <div class="pure-menu pure-menu-horizontal pure-menu-open">
         <ul>
@@ -561,6 +346,7 @@ hogeginx  hoge-dns-rg         300  A
         </div>
     </div>
 </div>
+
 
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

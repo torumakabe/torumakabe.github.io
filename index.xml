@@ -6,8 +6,252 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Mon, 26 Mar 2018 00:08:30 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 27 Mar 2018 00:10:30 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure DNS Private Zonesの動きを確認する</title>
+      <link>http://torumakabe.github.io/post/azure_private_dns_preview/</link>
+      <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_private_dns_preview/</guid>
+      <description>
+
+&lt;h2 id=&#34;プライベートゾーンのパブリックプレビュー開始&#34;&gt;プライベートゾーンのパブリックプレビュー開始&lt;/h2&gt;
+
+&lt;p&gt;Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。&lt;/p&gt;
+
+&lt;p&gt;さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNET)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Split-Horizonに対応します。VNET内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。&lt;/li&gt;
+&lt;li&gt;仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。&lt;/li&gt;
+&lt;li&gt;プライベートゾーンとVNETをリンクして利用します。複数のVNETをリンクすることが可能です。&lt;/li&gt;
+&lt;li&gt;リンクの種類として、仮想マシンホスト名の自動登録が行われるVNETをRegistration VNET、名前解決(正引き)のみ可能なResolution VNETがあります。&lt;/li&gt;
+&lt;li&gt;プライベートゾーンあたり、Registration VNETの現時点の上限数は1、Resolution VNETは10です。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;公式ドキュメントは&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview&#34;&gt;こちら&lt;/a&gt;。現時点の&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations&#34;&gt;制約もまとまっている&lt;/a&gt;ので、目を通しておきましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;動きを見てみよう&#34;&gt;動きを見てみよう&lt;/h2&gt;
+
+&lt;p&gt;公式ドキュメントには&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-scenarios&#34;&gt;想定シナリオ&lt;/a&gt;があり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。&lt;/p&gt;
+
+&lt;h3 id=&#34;事前に準備する環境&#34;&gt;事前に準備する環境&lt;/h3&gt;
+
+&lt;p&gt;下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VNET *2
+
+&lt;ul&gt;
+&lt;li&gt;vnet01&lt;/li&gt;
+&lt;li&gt;subnet01
+
+&lt;ul&gt;
+&lt;li&gt;subnet01-nsg (allow ssh)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;vnet02&lt;/li&gt;
+&lt;li&gt;subnet01
+
+&lt;ul&gt;
+&lt;li&gt;subnet01-nsg (allow ssh)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azure DNS Public Zone
+
+&lt;ul&gt;
+&lt;li&gt;example.com&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;azure-cliへdns拡張を導入&#34;&gt;Azure CLIへDNS拡張を導入&lt;/h3&gt;
+
+&lt;p&gt;プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-getstarted-cli#to-installuse-azure-dns-private-zones-feature-public-preview&#34;&gt;公式ドキュメント&lt;/a&gt;で確認してください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az extension add --name dns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;プライベートゾーンの作成&#34;&gt;プライベートゾーンの作成&lt;/h3&gt;
+
+&lt;p&gt;既存のゾーンを確認します。パブリックゾーンがあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プライベートゾーンを作成します。Registration VNETとしてvnet01をリンクします。&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations&#34;&gt;現時点の制約&lt;/a&gt;で、リンク時にはVNET上にVMが無い状態にする必要があります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同じ名前のゾーンが2つになりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+example.com   private-dns-poc-ejp-rg             1             5000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;registration-vnetへvmを作成&#34;&gt;Registration VNETへVMを作成&lt;/h3&gt;
+
+&lt;p&gt;VMを2つ作ります。1つにはインターネット経由でsshするので、パブリックIPを割り当てます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ BASE_NAME=&amp;quot;private-dns-poc-ejp&amp;quot;
+$ az network public-ip create -n vm01-pip -g ${BASE_NAME}-rg
+$ az network nic create -g ${BASE_NAME}-rg -n vm01-nic --public-ip-address vm01-pip --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm01 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm01-nic
+$ az network nic create -g ${BASE_NAME}-rg -n vm02-nic --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm02 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm02-nic
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;パブリックipをパブリックゾーンへ登録&#34;&gt;パブリックIPをパブリックゾーンへ登録&lt;/h3&gt;
+
+&lt;p&gt;Split-Horizonの動きを確認したいので、パブリックIPをパブリックゾーンへ登録します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network public-ip show -g private-dns-poc-ejp-rg -n vm01-pip --query ipAddress
+&amp;quot;13.78.84.84&amp;quot;
+$ az network dns record-set a add-record -g common-global-rg -z example.com -n vm01 -a 13.78.84.84
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックゾーンで名前解決できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nslookup vm01.example.com
+Server:         103.5.140.1
+Address:        103.5.140.1#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 13.78.84.84
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;registration-vnetの動きを確認&#34;&gt;Registration VNETの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;vnet01のvm01へ、パブリックIP経由でsshします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh vm01.example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同じRegistration VNET上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNETの内部ドメイン名がSuffixになります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm02
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.aioh0amlfdze5drhlpb1ktqwxd.lx.internal.cloudapp.net
+Address: 10.0.0.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名をつけてみましょう。Nameはvnet01にリンクしたプライベートゾーンのドメイン名になりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm02.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.example.com
+Address: 10.0.0.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;逆引きもできます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup 10.0.0.5
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+5.0.0.10.in-addr.arpa   name = vm02.example.com.
+
+Authoritative answers can be found from:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;split-horizonの動きを確認&#34;&gt;Split-Horizonの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNET内でnslookupするとどうなるでしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プライベートゾーンで解決されました。Split-Horizonが機能していることが分かります。&lt;/p&gt;
+
+&lt;p&gt;あ、どうでもいいことですが、Split-Horizonって戦隊モノの必殺技みたいなネーミングですね。叫びながら地面に拳を叩きつけたい感じ。&lt;/p&gt;
+
+&lt;h3 id=&#34;resolution-vnetの動きを確認&#34;&gt;Resolution VNETの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;vnet02を作成し、Resolution VNETとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ BASE_NAME=&amp;quot;private-dns-poc-ejp&amp;quot;
+$ az network vnet create -g ${BASE_NAME}-rg -n vnet02 --address-prefix 10.1.0.0/16 --subnet-name subnet01
+$ az network vnet subnet update -g ${BASE_NAME}-rg -n subnet01 --vnet-name vnet02 --network-security-group subnet01-nsg
+$ az network public-ip create -n vm03-pip -g ${BASE_NAME}-rg
+$ az network dns zone update -g private-dns-poc-ejp-rg -n example.com --resolution-vnets vnet02
+$ az network nic create -g ${BASE_NAME}-rg -n vm03-nic --public-ip-address vm03-pip --vnet vnet02 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm03 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm03-nic
+$ az network public-ip show -g private-dns-poc-ejp-rg -n vm03-pip --query ipAddress
+&amp;quot;13.78.54.133&amp;quot;
+$ ssh 13.78.54.133
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;名前解決の確認が目的なので、vnet01/02間はPeeringしません。&lt;/p&gt;
+
+&lt;p&gt;では、vnet01上のvm01を正引きします。ドメイン名を指定しないと、解決できません。vnet02上にvm01がある、と指定されたと判断するからです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup vm01
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm01: SERVFAIL
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではプライベートゾーンのドメイン名をつけてみます。解決できました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Resolution VNETからは、逆引きできません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup 10.0.0.4
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find 4.0.0.10.in-addr.arpa: NXDOMAIN
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ところでRegistration VNETからResolution VNETのホスト名をnslookupするとどうなるでしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh vm01.example.com
+vm01:~$ nslookup vm03
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm03: SERVFAIL
+
+vm01:~$ nslookup vm03.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm03.example.com: NXDOMAIN
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名あり、なしに関わらず、名前解決できません。VNETが別なのでVNETの内部DNSで解決できない、また、Resolution VNETのVMはレコードがプライベートゾーンに自動登録されないことが分かります。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
@@ -2713,161 +2957,6 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;amp;code=token
 
 Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
-      <link>http://torumakabe.github.io/post/dockerforwin_azurecli2/</link>
-      <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/dockerforwin_azurecli2/</guid>
-      <description>
-
-&lt;h2 id=&#34;azure-cli-2-0版です&#34;&gt;Azure CLI 2.0版です&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/dockerforwin_azurecli/&#34;&gt;Docker for WindowsでインストールレスAzure CLI環境を作る&lt;/a&gt;、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows、もっと活用しようぜ&lt;/li&gt;
-&lt;li&gt;がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;az_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;az_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/install/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]&lt;/li&gt;
-&lt;li&gt;ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &amp;gt; [Shared Drives]&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。az_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; az_cli
-bash-4.3#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは&lt;a href=&#34;https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/&#34;&gt;alpine linux&lt;/a&gt;ベースです。&lt;/p&gt;
-
-&lt;p&gt;カレントディレクトリを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# pwd
-/data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;タブで補完も効きます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az a
-account     acr         acs         ad          appservice
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
 </description>
     </item>
     

@@ -9,6 +9,250 @@
     <atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Azure DNS Private Zonesの動きを確認する</title>
+      <link>http://torumakabe.github.io/post/azure_private_dns_preview/</link>
+      <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_private_dns_preview/</guid>
+      <description>
+
+&lt;h2 id=&#34;プライベートゾーンのパブリックプレビュー開始&#34;&gt;プライベートゾーンのパブリックプレビュー開始&lt;/h2&gt;
+
+&lt;p&gt;Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。&lt;/p&gt;
+
+&lt;p&gt;さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNET)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Split-Horizonに対応します。VNET内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。&lt;/li&gt;
+&lt;li&gt;仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。&lt;/li&gt;
+&lt;li&gt;プライベートゾーンとVNETをリンクして利用します。複数のVNETをリンクすることが可能です。&lt;/li&gt;
+&lt;li&gt;リンクの種類として、仮想マシンホスト名の自動登録が行われるVNETをRegistration VNET、名前解決(正引き)のみ可能なResolution VNETがあります。&lt;/li&gt;
+&lt;li&gt;プライベートゾーンあたり、Registration VNETの現時点の上限数は1、Resolution VNETは10です。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;公式ドキュメントは&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview&#34;&gt;こちら&lt;/a&gt;。現時点の&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations&#34;&gt;制約もまとまっている&lt;/a&gt;ので、目を通しておきましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;動きを見てみよう&#34;&gt;動きを見てみよう&lt;/h2&gt;
+
+&lt;p&gt;公式ドキュメントには&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-scenarios&#34;&gt;想定シナリオ&lt;/a&gt;があり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。&lt;/p&gt;
+
+&lt;h3 id=&#34;事前に準備する環境&#34;&gt;事前に準備する環境&lt;/h3&gt;
+
+&lt;p&gt;下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;VNET *2
+
+&lt;ul&gt;
+&lt;li&gt;vnet01&lt;/li&gt;
+&lt;li&gt;subnet01
+
+&lt;ul&gt;
+&lt;li&gt;subnet01-nsg (allow ssh)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;vnet02&lt;/li&gt;
+&lt;li&gt;subnet01
+
+&lt;ul&gt;
+&lt;li&gt;subnet01-nsg (allow ssh)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Azure DNS Public Zone
+
+&lt;ul&gt;
+&lt;li&gt;example.com&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;azure-cliへdns拡張を導入&#34;&gt;Azure CLIへDNS拡張を導入&lt;/h3&gt;
+
+&lt;p&gt;プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-getstarted-cli#to-installuse-azure-dns-private-zones-feature-public-preview&#34;&gt;公式ドキュメント&lt;/a&gt;で確認してください。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az extension add --name dns
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;プライベートゾーンの作成&#34;&gt;プライベートゾーンの作成&lt;/h3&gt;
+
+&lt;p&gt;既存のゾーンを確認します。パブリックゾーンがあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プライベートゾーンを作成します。Registration VNETとしてvnet01をリンクします。&lt;a href=&#34;https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations&#34;&gt;現時点の制約&lt;/a&gt;で、リンク時にはVNET上にVMが無い状態にする必要があります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同じ名前のゾーンが2つになりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+example.com   private-dns-poc-ejp-rg             1             5000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;registration-vnetへvmを作成&#34;&gt;Registration VNETへVMを作成&lt;/h3&gt;
+
+&lt;p&gt;VMを2つ作ります。1つにはインターネット経由でsshするので、パブリックIPを割り当てます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ BASE_NAME=&amp;quot;private-dns-poc-ejp&amp;quot;
+$ az network public-ip create -n vm01-pip -g ${BASE_NAME}-rg
+$ az network nic create -g ${BASE_NAME}-rg -n vm01-nic --public-ip-address vm01-pip --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm01 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm01-nic
+$ az network nic create -g ${BASE_NAME}-rg -n vm02-nic --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm02 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm02-nic
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;パブリックipをパブリックゾーンへ登録&#34;&gt;パブリックIPをパブリックゾーンへ登録&lt;/h3&gt;
+
+&lt;p&gt;Split-Horizonの動きを確認したいので、パブリックIPをパブリックゾーンへ登録します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az network public-ip show -g private-dns-poc-ejp-rg -n vm01-pip --query ipAddress
+&amp;quot;13.78.84.84&amp;quot;
+$ az network dns record-set a add-record -g common-global-rg -z example.com -n vm01 -a 13.78.84.84
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パブリックゾーンで名前解決できることを確認します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ nslookup vm01.example.com
+Server:         103.5.140.1
+Address:        103.5.140.1#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 13.78.84.84
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;registration-vnetの動きを確認&#34;&gt;Registration VNETの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;vnet01のvm01へ、パブリックIP経由でsshします。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh vm01.example.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;同じRegistration VNET上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNETの内部ドメイン名がSuffixになります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm02
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.aioh0amlfdze5drhlpb1ktqwxd.lx.internal.cloudapp.net
+Address: 10.0.0.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名をつけてみましょう。Nameはvnet01にリンクしたプライベートゾーンのドメイン名になりました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm02.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.example.com
+Address: 10.0.0.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;逆引きもできます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup 10.0.0.5
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+5.0.0.10.in-addr.arpa   name = vm02.example.com.
+
+Authoritative answers can be found from:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;split-horizonの動きを確認&#34;&gt;Split-Horizonの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNET内でnslookupするとどうなるでしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm01:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;プライベートゾーンで解決されました。Split-Horizonが機能していることが分かります。&lt;/p&gt;
+
+&lt;p&gt;あ、どうでもいいことですが、Split-Horizonって戦隊モノの必殺技みたいなネーミングですね。叫びながら地面に拳を叩きつけたい感じ。&lt;/p&gt;
+
+&lt;h3 id=&#34;resolution-vnetの動きを確認&#34;&gt;Resolution VNETの動きを確認&lt;/h3&gt;
+
+&lt;p&gt;vnet02を作成し、Resolution VNETとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ BASE_NAME=&amp;quot;private-dns-poc-ejp&amp;quot;
+$ az network vnet create -g ${BASE_NAME}-rg -n vnet02 --address-prefix 10.1.0.0/16 --subnet-name subnet01
+$ az network vnet subnet update -g ${BASE_NAME}-rg -n subnet01 --vnet-name vnet02 --network-security-group subnet01-nsg
+$ az network public-ip create -n vm03-pip -g ${BASE_NAME}-rg
+$ az network dns zone update -g private-dns-poc-ejp-rg -n example.com --resolution-vnets vnet02
+$ az network nic create -g ${BASE_NAME}-rg -n vm03-nic --public-ip-address vm03-pip --vnet vnet02 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm03 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm03-nic
+$ az network public-ip show -g private-dns-poc-ejp-rg -n vm03-pip --query ipAddress
+&amp;quot;13.78.54.133&amp;quot;
+$ ssh 13.78.54.133
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;名前解決の確認が目的なので、vnet01/02間はPeeringしません。&lt;/p&gt;
+
+&lt;p&gt;では、vnet01上のvm01を正引きします。ドメイン名を指定しないと、解決できません。vnet02上にvm01がある、と指定されたと判断するからです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup vm01
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm01: SERVFAIL
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ではプライベートゾーンのドメイン名をつけてみます。解決できました。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Resolution VNETからは、逆引きできません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vm03:~$ nslookup 10.0.0.4
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find 4.0.0.10.in-addr.arpa: NXDOMAIN
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ところでRegistration VNETからResolution VNETのホスト名をnslookupするとどうなるでしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh vm01.example.com
+vm01:~$ nslookup vm03
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm03: SERVFAIL
+
+vm01:~$ nslookup vm03.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can&#39;t find vm03.example.com: NXDOMAIN
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドメイン名あり、なしに関わらず、名前解決できません。VNETが別なのでVNETの内部DNSで解決できない、また、Resolution VNETのVMはレコードがプライベートゾーンに自動登録されないことが分かります。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
       <link>http://torumakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
@@ -2684,114 +2928,6 @@ Fri Feb  3 06:43:18 2017
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;これで更新されます。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>http://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
-      <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
-      <description>
-
-&lt;h2 id=&#34;azure-functionsでやってみよう&#34;&gt;Azure Functionsでやってみよう&lt;/h2&gt;
-
-&lt;p&gt;Azure上でChatOpsしたい、と相談をいただきました。&lt;/p&gt;
-
-&lt;p&gt;AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;サンプル&lt;/a&gt;があります。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png&#34; alt=&#34;Azure Runスラッシュ&#34; title=&#34;from fabriccontroller.net&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。&lt;/p&gt;
-
-&lt;h2 id=&#34;slackからrunbookを実行できて-何がうれしいか&#34;&gt;SlackからRunbookを実行できて、何がうれしいか&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;誰がいつ、どんな文脈でRunbookを実行したかを可視化する&lt;/li&gt;
-&lt;li&gt;CLIやAPIをRunbookで隠蔽し、おぼえることを減らす&lt;/li&gt;
-&lt;li&gt;CLIやAPIをRunbookで隠蔽し、できることを制限する&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;ブツ&#34;&gt;ブツ&lt;/h2&gt;
-
-&lt;p&gt;Githubに上げておきました。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample&#34;&gt;AZChatOpsSample&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;おおまかな流れ&#34;&gt;おおまかな流れ&lt;/h2&gt;
-
-&lt;p&gt;手順書つらいのでポイントだけ。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;SlackのSlash CommandとIncoming Webhookを作る&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;流れは氏の&lt;a href=&#34;http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/&#34;&gt;元ネタ&lt;/a&gt;と同じ&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ARM TemplateでFunction Appをデプロイ&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;パラメータファイルのサンプルは&lt;a href=&#34;https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json&#34;&gt;sample.azuredeploy.parameters.json&lt;/a&gt;です。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;GithubからのCIは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/app-service-deploy-complex-application-predictably/&#34;&gt;はじめてのケースを考慮し&lt;/a&gt;ARM Templateのリソースプロパティ&amp;rdquo;IsManualIntegration&amp;rdquo;をtrueにしています&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;作成済みのSlack関連パラメータを指定します&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Slack上で、Slash Commandのリクエスト先URLを変更 (例: &lt;a href=&#34;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&#34;&gt;https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ファンクションが動いたら、Slackの指定チャンネルでSlash Commandが打てるようになる&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;/runbook [runbook名] [parm1] [parm2] [parm&amp;hellip;]&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;パラメータはrunbook次第&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Runbookの進捗はIncoming Webhookでslackに通知される&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Runbookのステータスが変わったときに通知&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;よもやま話&#34;&gt;よもやま話&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;ファンクションはトリガーされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Azure FunctionsのWebコンソールログが無活動だと30分で停止するので、coldに入る条件も30分と誤解していたのですが、正しくは5分。ソースは&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;Azure Functionsはまだプレビューなので、&lt;a href=&#34;https://github.com/Azure/azure-webjobs-sdk-script/issues/529&#34;&gt;議論されているとおり&lt;/a&gt;改善の余地が多くあります。期待しましょう。&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </description>
     </item>
     
