@@ -101,14 +101,14 @@
 
 <p>Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。</p>
 
-<p>さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNET)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。</p>
+<p>さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNet)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。</p>
 
 <ul>
-<li>Split-Horizonに対応します。VNET内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。</li>
+<li>Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。</li>
 <li>仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。</li>
-<li>プライベートゾーンとVNETをリンクして利用します。複数のVNETをリンクすることが可能です。</li>
-<li>リンクの種類として、仮想マシンホスト名の自動登録が行われるVNETをRegistration VNET、名前解決(正引き)のみ可能なResolution VNETがあります。</li>
-<li>プライベートゾーンあたり、Registration VNETの現時点の上限数は1、Resolution VNETは10です。</li>
+<li>プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。</li>
+<li>リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。</li>
+<li>プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。</li>
 </ul>
 
 <p>公式ドキュメントは<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview">こちら</a>。現時点の<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">制約もまとまっている</a>ので、目を通しておきましょう。</p>
@@ -122,7 +122,7 @@
 <p>下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。</p>
 
 <ul>
-<li>VNET *2
+<li>VNet *2
 
 <ul>
 <li>vnet01</li>
@@ -162,7 +162,7 @@ ZoneName      ResourceGroup             RecordSets    MaxRecordSets
 example.com   common-global-rg                   2             5000
 </code></pre>
 
-<p>プライベートゾーンを作成します。Registration VNETとしてvnet01をリンクします。<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">現時点の制約</a>で、リンク時にはVNET上にVMが無い状態にする必要があります。</p>
+<p>プライベートゾーンを作成します。Registration VNetとしてvnet01をリンクします。<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">現時点の制約</a>で、リンク時にはVNet上にVMが無い状態にする必要があります。</p>
 
 <pre><code>$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
 </code></pre>
@@ -176,7 +176,7 @@ example.com   common-global-rg                   2             5000
 example.com   private-dns-poc-ejp-rg             1             5000
 </code></pre>
 
-<h3 id="registration-vnetへvmを作成">Registration VNETへVMを作成</h3>
+<h3 id="registration-vnetへvmを作成">Registration VNetへVMを作成</h3>
 
 <p>VMを2つ作ります。1つにはインターネット経由でsshするので、パブリックIPを割り当てます。</p>
 
@@ -208,14 +208,14 @@ Name:   vm01.example.com
 Address: 13.78.84.84
 </code></pre>
 
-<h3 id="registration-vnetの動きを確認">Registration VNETの動きを確認</h3>
+<h3 id="registration-vnetの動きを確認">Registration VNetの動きを確認</h3>
 
 <p>vnet01のvm01へ、パブリックIP経由でsshします。</p>
 
 <pre><code>$ ssh vm01.example.com
 </code></pre>
 
-<p>同じRegistration VNET上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNETの内部ドメイン名がSuffixになります。</p>
+<p>同じRegistration VNet上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNetの内部ドメイン名がSuffixになります。</p>
 
 <pre><code>vm01:~$ nslookup vm02
 Server:         168.63.129.16
@@ -251,7 +251,7 @@ Authoritative answers can be found from:
 
 <h3 id="split-horizonの動きを確認">Split-Horizonの動きを確認</h3>
 
-<p>さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNET内でnslookupするとどうなるでしょう。</p>
+<p>さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNet内でnslookupするとどうなるでしょう。</p>
 
 <pre><code>vm01:~$ nslookup vm01.example.com
 Server:         168.63.129.16
@@ -266,9 +266,9 @@ Address: 10.0.0.4
 
 <p>あ、どうでもいいことですが、Split-Horizonって戦隊モノの必殺技みたいなネーミングですね。叫びながら地面に拳を叩きつけたい感じ。</p>
 
-<h3 id="resolution-vnetの動きを確認">Resolution VNETの動きを確認</h3>
+<h3 id="resolution-vnetの動きを確認">Resolution VNetの動きを確認</h3>
 
-<p>vnet02を作成し、Resolution VNETとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。</p>
+<p>vnet02を作成し、Resolution VNetとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。</p>
 
 <pre><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
 $ az network vnet create -g ${BASE_NAME}-rg -n vnet02 --address-prefix 10.1.0.0/16 --subnet-name subnet01
@@ -304,7 +304,7 @@ Name:   vm01.example.com
 Address: 10.0.0.4
 </code></pre>
 
-<p>Resolution VNETからは、逆引きできません。</p>
+<p>Resolution VNetからは、逆引きできません。</p>
 
 <pre><code>vm03:~$ nslookup 10.0.0.4
 Server:         168.63.129.16
@@ -313,7 +313,7 @@ Address:        168.63.129.16#53
 ** server can't find 4.0.0.10.in-addr.arpa: NXDOMAIN
 </code></pre>
 
-<p>ところでRegistration VNETからResolution VNETのホスト名をnslookupするとどうなるでしょう。</p>
+<p>ところでRegistration VNetからResolution VNetのホスト名をnslookupするとどうなるでしょう。</p>
 
 <pre><code>$ ssh vm01.example.com
 vm01:~$ nslookup vm03
@@ -329,7 +329,7 @@ Address:        168.63.129.16#53
 ** server can't find vm03.example.com: NXDOMAIN
 </code></pre>
 
-<p>ドメイン名あり、なしに関わらず、名前解決できません。VNETが別なのでVNETの内部DNSで解決できない、また、Resolution VNETのVMはレコードがプライベートゾーンに自動登録されないことが分かります。</p>
+<p>ドメイン名あり、なしに関わらず、名前解決できません。VNetが別なのでVNetの内部DNSで解決できない、また、Resolution VNetのVMはレコードがプライベートゾーンに自動登録されないことが分かります。</p>
 
                     </div>
                     
