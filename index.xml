@@ -237,7 +237,7 @@ terraform {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Soft Delete設定は、別途 &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update&#34;&gt;az storage blob service-properties delete-policy update&lt;/a&gt; コマンドで行ってください。&lt;/p&gt;
+&lt;p&gt;soft delete設定は、別途 &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update&#34;&gt;az storage blob service-properties delete-policy update&lt;/a&gt; コマンドで行ってください。&lt;/p&gt;
 
 &lt;h3 id=&#34;プロビジョニングしてみる&#34;&gt;プロビジョニングしてみる&lt;/h3&gt;
 
