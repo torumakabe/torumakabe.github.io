@@ -68,6 +68,136 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">10 Feb 2018, 11:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
+
+<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。</p>
+
+<p>さて、そのNGINX Ingress Controllerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
+
+<p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
+
+<h2 id="使い方">使い方</h2>
+
+<p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
+</ul>
+
+<p>ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
+
+<pre><code>$ helm install stable/nginx-ingress --name my-nginx
+</code></pre>
+
+<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
+
+<pre><code>$ kubectl run nginx --image nginx --port 80
+$ kubectl run apache --image httpd --port 80
+</code></pre>
+
+<p>サービスとしてexposeします。</p>
+
+<pre><code>$ kubectl expose deployment nginx --type NodePort
+$ kubectl expose deployment apache --type NodePort
+</code></pre>
+
+<p>現時点のサービスたちを確認します。</p>
+
+<pre><code>$ kubectl get svc
+NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
+apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
+kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
+my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
+my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
+nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
+</code></pre>
+
+<p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
+
+<p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
+
+<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
+</code></pre>
+
+<p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
+
+<pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
+</code></pre>
+
+<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
+
+<pre><code>apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-nginx-sample
+spec:
+  rules:
+    - host: dev.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nginx
+              servicePort: 80
+          - path: /apache
+            backend:
+              serviceName: apache
+              servicePort: 80
+  tls:
+    - hosts:
+      - dev.example.com
+      secretName: example-tls
+</code></pre>
+
+<p>あとは反映するだけ。</p>
+
+<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
+</code></pre>
+
+<p>curlで確認します。</p>
+
+<pre><code>$ curl https://dev.example.com
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<p>/apacheへのパスも確認します。</p>
+
+<pre><code>$ curl https://dev.example.com/apache
+&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>簡単ですね。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">22 Jan 2018, 22:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -963,352 +1093,6 @@ func main() {
 <li>VpnGw2がコストパフォーマンス的に最適という人が多いかもしれませんね 知らんけど</li>
 </ul></li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_blobevent/" class="post-title">Azure Event GridでBlobイベントを拾う</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
-
-<p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
-
-<p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-
-<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
-
-<p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
-
-<p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
-
-<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept" /></p>
-
-<p>Event Gridに期待する理由はいくつかあります。</p>
-
-<ul>
-<li>フィルタ
-
-<ul>
-<li>特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます</li>
-</ul></li>
-<li>信頼性
-
-<ul>
-<li>リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます</li>
-</ul></li>
-<li>スケールと高スループット
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings">Azure Functions Blobトリガー</a>のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった</li>
-<li>具体的な数値はプレビュー後に期待しましょう</li>
-</ul></li>
-<li>ファンアウト
-
-<ul>
-<li>ひとつのイベントを複数のHandlerに紐づけられます</li>
-</ul></li>
-<li>Azureの外やサードパーティーとの連携
-
-<ul>
-<li>Webhookでシンプルにできます</li>
-</ul></li>
-</ul>
-
-<h2 id="前提条件">前提条件</h2>
-
-<ul>
-<li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
-<li>現時点ではWest Central USリージョンのみで提供しています</li>
-<li>プライベートプレビューは申請が必要です</li>
-</ul>
-
-<p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-
-<pre><code>az provider register --namespace  Microsoft.EventGrid
-az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<p>以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。</p>
-
-<pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<h2 id="使い方">使い方</h2>
-
-<p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre>
-
-<p>Blobストレージアカウントを作ります。</p>
-
-<pre><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre>
-
-<p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
-ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
--g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre>
-
-<p>以下はパラメーターの補足です。</p>
-
-<ul>
-<li>&ndash;endpoint
-
-<ul>
-<li>Handlerのエンドポイントを指定します。ここではテストのために<a href="https://requestb.in/">RequestBin</a>に作ったエンドポイントを指定します</li>
-</ul></li>
-<li>&ndash;included-event-types
-
-<ul>
-<li>イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します</li>
-</ul></li>
-<li>&ndash;subject-ends-with
-
-<ul>
-<li>対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました</li>
-</ul></li>
-</ul>
-
-<p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
-
-<p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:25:15.2635962Z&quot;,
-  &quot;id&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1A9D8A6703A&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060986&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&quot;
-    }
-  }
-}]
-</code></pre>
-
-<p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
-vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
-g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre>
-
-<p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:36:33.827967Z&quot;,
-  &quot;id&quot;: &quot;e8b036ee-001e-00e7-4994-23740d06225b&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;e8b036ee-001e-00e7-4994-23740d000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1AB6D1B24F6&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060D42&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;9ec5c091-061d-4111-ad82-52d9803ce373&quot;
-    }
-  }
-}]
-</code></pre>
-
-<h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
-
-<p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-
-<h3 id="概要">概要</h3>
-
-<p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings" /></p>
-
-<p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>
-
-<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&rdquo;path&rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
-
-<p>入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。</p>
-
-<p>そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。</p>
-
-<p>なお、この悩みはAzureの開発チームも認識しており、Functions側で対応する方針とのことです。</p>
-
-<h3 id="handler">Handler</h3>
-
-<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>#r &quot;Newtonsoft.json&quot;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-
-public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
-{
-    string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
-    outputQueueItem = System.IO.Path.GetFileName(imageUrl);
-}
-</code></pre>
-
-<p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&quot;: &quot;1.0.0-beta1-10006&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;eventGridTrigger&quot;,
-      &quot;name&quot;: &quot;eventGridEvent&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;type&quot;: &quot;queue&quot;,
-      &quot;name&quot;: &quot;outputQueueItem&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<h3 id="resizer">Resizer</h3>
-
-<p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>using ImageResizer;
-
-public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
-{
-  var imageBuilder = ImageResizer.ImageBuilder.Current;
-  var size = imageDimensionsTable[ImageSize.Small];
-
-  imageBuilder.Build(inputBlob, outputBlob,
-    new ResizeSettings(size.Item1, size.Item2, FitMode.Max, null), false);
-
-}
-
-public enum ImageSize
-{
-  Small
-}
-
-private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimensionsTable = new Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt;()
-{
-  { ImageSize.Small, Tuple.Create(100, 100) }
-};
-</code></pre>
-
-<p>ImageResizerのパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;ImageResizer&quot;: &quot;4.1.9&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
-
-<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&rdquo;images-s&rdquo;として別途作成しました。コンテナー&rdquo;images&rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;name&quot;: &quot;myQueueItem&quot;,
-      &quot;type&quot;: &quot;queueTrigger&quot;,
-      &quot;direction&quot;: &quot;in&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;
-    },
-    {
-      &quot;name&quot;: &quot;inputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;name&quot;: &quot;outputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images-s/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
-nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre>
-
-<p>これで、コンテナー&rdquo;images&rdquo;にjpgファイルがアップロードされると、コンテナー&rdquo;images-s&rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
 
                     </div>
                 </section>

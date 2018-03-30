@@ -68,6 +68,329 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">30 Mar 2018, 16:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_msi_terraform/" class="post-title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
+
+<p>Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは<a href="https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code">この資料</a>も参考に。</p>
+
+<p>さて、先日Azure Marketplaceから<a href="https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform">Terraform入りの仮想マシン</a>をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。</p>
+
+<ul>
+<li>Terraform (latest)</li>
+<li>Azure CLI 2.0</li>
+<li>Managed Service Identity (MSI) VM Extension</li>
+<li>Unzip</li>
+<li>JQ</li>
+<li>apt-transport-https</li>
+</ul>
+
+<p>いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。</p>
+
+<h2 id="シークレットをコードにベタ書きする問題">シークレットをコードにベタ書きする問題</h2>
+
+<p>MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-service-identity/overview">Azure リソースの管理対象サービス ID (MSI)</a></p>
+
+<p>詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると</p>
+
+<p><strong>アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ</strong></p>
+
+<p>です。</p>
+
+<p>GitHub上に疑わしいシークレットがないかスキャンする<a href="https://azure.microsoft.com/ja-jp/blog/managing-azure-secrets-on-github-repositories/">取り組み</a>もはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。</p>
+
+<h2 id="terraformはmsiに対応している">TerraformはMSIに対応している</h2>
+
+<p>TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。</p>
+
+<p>ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。</p>
+
+<p><a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_msi.html">Authenticating to Azure Resource Manager using Managed Service Identity</a></p>
+
+<p>Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。</p>
+
+<h2 id="試してみよう">試してみよう</h2>
+
+<p>実は、すでに使い方を解説した公式ドキュメントがあります。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-vm-msi">Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する</a></p>
+
+<p>手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。</p>
+
+<h3 id="marketplaceからterraform入り仮想マシンを作る">MarketplaceからTerraform入り仮想マシンを作る</h3>
+
+<p>まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。</p>
+
+<ul>
+<li>MSI VM拡張の導入</li>
+<li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
+<li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
+</ul>
+
+<pre><code>[snip]
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
+                &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;port&quot;: 50342
+                },
+                &quot;protectedSettings&quot;: {}
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
+            &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
+            &quot;properties&quot;: {
+                &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
+                &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
+                &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
+                &quot;type&quot;: &quot;CustomScript&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;fileUris&quot;: [
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
+                    ]
+                },
+                &quot;protectedSettings&quot;: {
+                    &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
+                }
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
+            ]
+        }
+[snip]
+</code></pre>
+
+<h3 id="vmにログインし-環境を確認">VMにログインし、環境を確認</h3>
+
+<p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
+
+<pre><code>$ ssh your-vm-public-ip
+</code></pre>
+
+<p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
+
+<pre><code>$ terraform -v
+Terraform v0.11.5
+</code></pre>
+
+<p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
+
+<pre><code>$ echo $ARM_USE_MSI
+true
+</code></pre>
+
+<p>MSIも有効化されています(SystemAssigned)。</p>
+
+<pre><code>$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
+{
+  &quot;additionalProperties&quot;: {},
+  &quot;identityIds&quot;: null,
+  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
+  &quot;tenantId&quot;: &quot;tttt-tttt-tttt-tttt&quot;,
+  &quot;type&quot;: &quot;SystemAssigned&quot;
+}
+</code></pre>
+
+<p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
+
+<pre><code>$ ls
+tfEnv.sh  tfTemplate
+
+$ cat tfEnv.sh
+az login
+az role assignment create  --assignee &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot; --role 'b24988ac-6180-42a0-ab88-20f7382dd24c'  --scope /subscriptions/&quot;cccc-cccc-cccc-cccc&quot;
+
+$ . ~/tfEnv.sh
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
+[snip]
+{
+  &quot;additionalProperties&quot;: {},
+  &quot;canDelegate&quot;: null,
+  &quot;id&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&quot;,
+  &quot;name&quot;: &quot;ffff-ffff-ffff-ffff&quot;,
+  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
+  &quot;roleDefinitionId&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&quot;,
+  &quot;scope&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc&quot;,
+  &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;
+}
+</code></pre>
+
+<p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&rdquo;はConributorを指します。</p>
+
+<p>tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。</p>
+
+<pre><code>$ ls tfTemplate/
+azureProviderAndCreds.tf  remoteState.tf
+</code></pre>
+
+<p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
+
+<pre><code>$ cat tfTemplate/azureProviderAndCreds.tf
+#
+#
+# Provider and credential snippet to add to configurations
+# Assumes that there's a terraform.tfvars file with the var values
+#
+# Uncomment the creds variables if using service principal auth
+# Leave them commented to use MSI auth
+#
+#variable subscription_id {}
+#variable tenant_id {}
+#variable client_id {}
+#variable client_secret {}
+
+provider &quot;azurerm&quot; {
+#    subscription_id = &quot;${var.subscription_id}&quot;
+#    tenant_id = &quot;${var.tenant_id}&quot;
+#    client_id = &quot;${var.client_id}&quot;
+#    client_secret = &quot;${var.client_secret}&quot;
+}
+</code></pre>
+
+<p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
+
+<pre><code>$ cat tfTemplate/remoteState.tf
+terraform {
+ backend &quot;azurerm&quot; {
+  storage_account_name = &quot;storestaterandomid&quot;
+  container_name       = &quot;terraform-state&quot;
+  key                  = &quot;prod.terraform.tfstate&quot;
+  access_key           = &quot;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&quot;
+  }
+}
+</code></pre>
+
+<p>Soft Delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
+
+<h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
+
+<p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
+
+<pre><code>$ mkdir sample
+$ cd sample/
+</code></pre>
+
+<p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
+
+<pre><code>$ cp ../tfTemplate/remoteState.tf ./
+</code></pre>
+
+<p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
+
+<p>ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。</p>
+
+<pre><code>$ vim main.tf
+resource &quot;azurerm_resource_group&quot; &quot;tf-msi-poc&quot; {
+    name     = &quot;tf-msi-poc-aci-wus-rg&quot;
+    location = &quot;West US&quot;
+}
+
+resource &quot;random_integer&quot; &quot;random_int&quot; {
+    min = 100
+    max = 999
+}
+
+resource &quot;azurerm_container_group&quot; &quot;aci-example&quot; {
+    name                = &quot;aci-cg-${random_integer.random_int.result}&quot;
+    location            = &quot;${azurerm_resource_group.tf-msi-poc.location}&quot;
+    resource_group_name = &quot;${azurerm_resource_group.tf-msi-poc.name}&quot;
+    ip_address_type     = &quot;public&quot;
+    dns_name_label      = &quot;tomakabe-aci-cg-${random_integer.random_int.result}&quot;
+    os_type             = &quot;linux&quot;
+
+    container {
+        name    = &quot;nginx&quot;
+        image   = &quot;nginx&quot;
+        cpu     = &quot;0.5&quot;
+        memory  = &quot;1.0&quot;
+        port    = &quot;80&quot;
+    }
+}
+</code></pre>
+
+<p>init、plan、アプラーイ。アプライ王子。</p>
+
+<pre><code>$ terraform init
+$ terraform plan
+$ terraform apply -auto-approve
+[snip]
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+</code></pre>
+
+<p>できたか確認。</p>
+
+<pre><code>$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
+Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
+----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
+aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
+$ curl 13.91.90.117
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<h2 id="おまけ">おまけ</h2>
+
+<p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
+
+<p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
+
+<pre><code>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
+Resource 'aaaa-aaaa-aaaa-aaaa-aaaa' does not exist or one of its queried reference-property objects are not present.
+</code></pre>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">26 Mar 2018, 00:08</h1>
                 <section class="post">
                     <header class="post-header">
@@ -887,216 +1210,6 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
 <p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
 
 <p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">09 Mar 2016, 16:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_tf_fundamental_rules/" class="post-title">Terraform &amp; Azure デプロイ設計4原則</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p>注: 2018/1/8にサンプルを更新しました。更新エントリは<a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/">こちら</a>。</p>
-
-<h2 id="情報がありそうでない">情報がありそうでない</h2>
-
-<p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
-
-<p>今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。</p>
-
-<p>なお、考え方は他のクラウドやデプロイツールでも応用できるかと。</p>
-
-<h2 id="4原則">4原則</h2>
-
-<ol>
-<li>セキュリティファースト</li>
-<li>手順書をなくそう</li>
-<li>分割境界にこだわりすぎない</li>
-<li>早すぎる最適化は悪</li>
-</ol>
-
-<p>なお、サンプルのTerraformファイル群を、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">Githubに置いて</a>おきました。</p>
-
-<p>今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。</p>
-
-<pre><code>.
-├── .gitignore
-├── main.tf
-├── availability_set
-│   ├── avset_web.tf
-│   ├── avset_db.tf
-│   └── variables.tf
-├── network
-│   ├── sg_backend.tf
-│   ├── sg_frontend.tf
-│   ├── variables.tf
-│   └── vnets.tf
-├── storage
-│   ├── storage_backend.tf
-│   ├── storage_frontend.tf
-│   └── variables.tf
-└── terraform.tfvars
-</code></pre>
-
-<p>Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。</p>
-
-<h2 id="1-セキュリティファースト">1. セキュリティファースト</h2>
-
-<p>セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。</p>
-
-<ul>
-<li><p>認証情報は変数指定し、設定ファイルから読み込む</p>
-
-<ul>
-<li>サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない</li>
-<li>terraform.tfvarsなどにまとめて書く</li>
-</ul></li>
-
-<li><p>認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する</p>
-
-<ul>
-<li>Gitなら.gitignoreに指定する</li>
-<li>.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
-
-<ul>
-<li>チームで使う場合はファイルではなく、Consulなどのリモートバックエンドを使うと思いますが、念のため</li>
-</ul></li>
-</ul></li>
-
-<li><p>RBACで必要最小限の権限を付与する</p>
-
-<ul>
-<li>Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう</li>
-<li>身内がリソースをうっかり壊したら、それは管理者の責任です
-<br /></li>
-</ul></li>
-
-<li><p>ネットワークセキュリティグループはサブネットに指定しておく</p>
-
-<ul>
-<li>個々のVMの管理者に任せず、サブネットで絞っておきましょう
-
-<ul>
-<li>VMはアドホックに作られるケースが多く、ルーズになりがちです</li>
-</ul></li>
-<li>サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
-
-<ul>
-<li>フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)</li>
-<li>バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2 id="2-手順書をなくそう">2. 手順書をなくそう</h2>
-
-<p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
-
-<p>ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。</p>
-
-<h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
-
-<p>TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。</p>
-
-<p>グルーピング、分割する目的は、</p>
-
-<ul>
-<li>main.tfの肥大化を防止し、コードの見通しを良くする</li>
-<li>再利用しやすくする</li>
-<li>責任範囲を明確化し、オーナー意識を醸成する</li>
-<li>権限とコードを一致させる</li>
-</ul>
-
-<p>などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。</p>
-
-<p>以下が分割単位、境界ポリシーの例です。</p>
-
-<ul>
-<li><p>リソースタイプで分割する</p>
-
-<ul>
-<li>サンプルはその例
-
-<ul>
-<li>ネットワーク、ストレージ、VM Availability Setで分割</li>
-</ul></li>
-<li>直観的</li>
-<li>デプロイに関わる人数が少ない間はこれがおすすめ
-<br /></li>
-</ul></li>
-
-<li><p>組織単位で分割する</p>
-
-<ul>
-<li><a href="https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4">コンウェイの法則</a></li>
-<li>リソースタイプ = 組織 という場合もある
-
-<ul>
-<li>ネットワーク管理者が別グループ、など</li>
-</ul></li>
-</ul></li>
-
-<li><p>地理的に分割する</p>
-
-<ul>
-<li>リージョンやロケーションで分割</li>
-<li>リソースタイプと組み合わせる手もある
-
-<ul>
-<li>&ldquo;Network_JapanEast&rdquo;など
-<br /></li>
-</ul></li>
-</ul></li>
-
-<li><p>静的なリソースと動的なリソースを分ける</p>
-
-<ul>
-<li>変化の頻度で分ける
-
-<ul>
-<li>ネットワークが頻繁に変わることはまれ</li>
-<li>VMは増減が激しい</li>
-</ul></li>
-<li>動的なリソースは対象から外す、別手段とする手も
-<br /></li>
-</ul></li>
-</ul>
-
-<p>スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。</p>
-
-<h2 id="4-早すぎる最適化は悪">4. 早すぎる最適化は悪</h2>
-
-<p>最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。</p>
-
-<p>なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。</p>
-
-<p>ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。</p>
-
-<p>そして、</p>
-
-<ul>
-<li>リファクタリングできるなら、する</li>
-<li>リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす</li>
-<li>はじめに作った人へマサカリを投げない</li>
-</ul>
-
-<p>完璧を求めずにいきましょう。</p>
-
-<p>でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。</p>
 
                     </div>
                 </section>

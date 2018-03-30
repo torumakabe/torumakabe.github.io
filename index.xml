@@ -6,8 +6,319 @@
     <description>Recent content on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 27 Mar 2018 00:10:30 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 30 Mar 2018 16:30:00 +0900</lastBuildDate>
     <atom:link href="http://torumakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
+      <link>http://torumakabe.github.io/post/azure_msi_terraform/</link>
+      <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_msi_terraform/</guid>
+      <description>
+
+&lt;h2 id=&#34;terraformのプロビジョニングがmarketplaceから可能に&#34;&gt;TerraformのプロビジョニングがMarketplaceから可能に&lt;/h2&gt;
+
+&lt;p&gt;Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは&lt;a href=&#34;https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code&#34;&gt;この資料&lt;/a&gt;も参考に。&lt;/p&gt;
+
+&lt;p&gt;さて、先日Azure Marketplaceから&lt;a href=&#34;https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform&#34;&gt;Terraform入りの仮想マシン&lt;/a&gt;をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Terraform (latest)&lt;/li&gt;
+&lt;li&gt;Azure CLI 2.0&lt;/li&gt;
+&lt;li&gt;Managed Service Identity (MSI) VM Extension&lt;/li&gt;
+&lt;li&gt;Unzip&lt;/li&gt;
+&lt;li&gt;JQ&lt;/li&gt;
+&lt;li&gt;apt-transport-https&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。&lt;/p&gt;
+
+&lt;h2 id=&#34;シークレットをコードにベタ書きする問題&#34;&gt;シークレットをコードにベタ書きする問題&lt;/h2&gt;
+
+&lt;p&gt;MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/active-directory/managed-service-identity/overview&#34;&gt;Azure リソースの管理対象サービス ID (MSI)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;です。&lt;/p&gt;
+
+&lt;p&gt;GitHub上に疑わしいシークレットがないかスキャンする&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/managing-azure-secrets-on-github-repositories/&#34;&gt;取り組み&lt;/a&gt;もはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。&lt;/p&gt;
+
+&lt;h2 id=&#34;terraformはmsiに対応している&#34;&gt;TerraformはMSIに対応している&lt;/h2&gt;
+
+&lt;p&gt;TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。&lt;/p&gt;
+
+&lt;p&gt;ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/authenticating_via_msi.html&#34;&gt;Authenticating to Azure Resource Manager using Managed Service Identity&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。&lt;/p&gt;
+
+&lt;h2 id=&#34;試してみよう&#34;&gt;試してみよう&lt;/h2&gt;
+
+&lt;p&gt;実は、すでに使い方を解説した公式ドキュメントがあります。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/terraform/terraform-vm-msi&#34;&gt;Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。&lt;/p&gt;
+
+&lt;h3 id=&#34;marketplaceからterraform入り仮想マシンを作る&#34;&gt;MarketplaceからTerraform入り仮想マシンを作る&lt;/h3&gt;
+
+&lt;p&gt;まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;MSI VM拡張の導入&lt;/li&gt;
+&lt;li&gt;VMに対してリソースグループスコープでContributorロールを割り当て&lt;/li&gt;
+&lt;li&gt;スクリプト実行 VM拡張でTerraform関連のプロビジョニング&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code&gt;[snip]
+        {
+            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
+            &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&amp;quot;,
+            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-12-01&amp;quot;,
+            &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
+            &amp;quot;properties&amp;quot;: {
+                &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.ManagedIdentity&amp;quot;,
+                &amp;quot;type&amp;quot;: &amp;quot;ManagedIdentityExtensionForLinux&amp;quot;,
+                &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;1.0&amp;quot;,
+                &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
+                &amp;quot;settings&amp;quot;: {
+                    &amp;quot;port&amp;quot;: 50342
+                },
+                &amp;quot;protectedSettings&amp;quot;: {}
+            },
+            &amp;quot;dependsOn&amp;quot;: [
+                &amp;quot;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&amp;quot;
+            ]
+        },
+        {
+            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Authorization/roleAssignments&amp;quot;,
+            &amp;quot;name&amp;quot;: &amp;quot;[variables(&#39;resourceGuid&#39;)]&amp;quot;,
+            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-09-01&amp;quot;,
+            &amp;quot;properties&amp;quot;: {
+                &amp;quot;roleDefinitionId&amp;quot;: &amp;quot;[variables(&#39;contributor&#39;)]&amp;quot;,
+                &amp;quot;principalId&amp;quot;: &amp;quot;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&amp;quot;,
+                &amp;quot;scope&amp;quot;: &amp;quot;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&amp;quot;
+            },
+            &amp;quot;dependsOn&amp;quot;: [
+                &amp;quot;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&amp;quot;
+            ]
+        },
+        {
+            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
+            &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&amp;quot;,
+            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-03-30&amp;quot;,
+            &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
+            &amp;quot;properties&amp;quot;: {
+                &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.Azure.Extensions&amp;quot;,
+                &amp;quot;type&amp;quot;: &amp;quot;CustomScript&amp;quot;,
+                &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;2.0&amp;quot;,
+                &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
+                &amp;quot;settings&amp;quot;: {
+                    &amp;quot;fileUris&amp;quot;: [
+                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
+                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
+                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;
+                    ]
+                },
+                &amp;quot;protectedSettings&amp;quot;: {
+                    &amp;quot;commandToExecute&amp;quot;: &amp;quot;[concat(&#39;bash infra.sh &amp;amp;&amp;amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&amp;quot;
+                }
+            },
+            &amp;quot;dependsOn&amp;quot;: [
+                &amp;quot;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&amp;quot;
+            ]
+        }
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;vmにログインし-環境を確認&#34;&gt;VMにログインし、環境を確認&lt;/h3&gt;
+
+&lt;p&gt;では出来上がったVMにsshし、いろいろのぞいてみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ssh your-vm-public-ip
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Terraformのバージョンは、現時点で最新の0.11.5が入っています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform -v
+Terraform v0.11.5
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;環境変数ARM_USE_MSIはtrueに設定されています。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ echo $ARM_USE_MSI
+true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;MSIも有効化されています(SystemAssigned)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
+{
+  &amp;quot;additionalProperties&amp;quot;: {},
+  &amp;quot;identityIds&amp;quot;: null,
+  &amp;quot;principalId&amp;quot;: &amp;quot;aaaa-aaaa-aaaa-aaaa-aaaa&amp;quot;,
+  &amp;quot;tenantId&amp;quot;: &amp;quot;tttt-tttt-tttt-tttt&amp;quot;,
+  &amp;quot;type&amp;quot;: &amp;quot;SystemAssigned&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ls
+tfEnv.sh  tfTemplate
+
+$ cat tfEnv.sh
+az login
+az role assignment create  --assignee &amp;quot;aaaa-aaaa-aaaa-aaaa-aaaa&amp;quot; --role &#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;  --scope /subscriptions/&amp;quot;cccc-cccc-cccc-cccc&amp;quot;
+
+$ . ~/tfEnv.sh
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
+[snip]
+{
+  &amp;quot;additionalProperties&amp;quot;: {},
+  &amp;quot;canDelegate&amp;quot;: null,
+  &amp;quot;id&amp;quot;: &amp;quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&amp;quot;,
+  &amp;quot;name&amp;quot;: &amp;quot;ffff-ffff-ffff-ffff&amp;quot;,
+  &amp;quot;principalId&amp;quot;: &amp;quot;aaaa-aaaa-aaaa-aaaa-aaaa&amp;quot;,
+  &amp;quot;roleDefinitionId&amp;quot;: &amp;quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&amp;quot;,
+  &amp;quot;scope&amp;quot;: &amp;quot;/subscriptions/cccc-cccc-cccc-cccc&amp;quot;,
+  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Authorization/roleAssignments&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ちなみに、role id &amp;ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&amp;rdquo;はConributorを指します。&lt;/p&gt;
+
+&lt;p&gt;tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ls tfTemplate/
+azureProviderAndCreds.tf  remoteState.tf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat tfTemplate/azureProviderAndCreds.tf
+#
+#
+# Provider and credential snippet to add to configurations
+# Assumes that there&#39;s a terraform.tfvars file with the var values
+#
+# Uncomment the creds variables if using service principal auth
+# Leave them commented to use MSI auth
+#
+#variable subscription_id {}
+#variable tenant_id {}
+#variable client_id {}
+#variable client_secret {}
+
+provider &amp;quot;azurerm&amp;quot; {
+#    subscription_id = &amp;quot;${var.subscription_id}&amp;quot;
+#    tenant_id = &amp;quot;${var.tenant_id}&amp;quot;
+#    client_id = &amp;quot;${var.client_id}&amp;quot;
+#    client_secret = &amp;quot;${var.client_secret}&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/&#34;&gt;soft delete&lt;/a&gt;が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat tfTemplate/remoteState.tf
+terraform {
+ backend &amp;quot;azurerm&amp;quot; {
+  storage_account_name = &amp;quot;storestaterandomid&amp;quot;
+  container_name       = &amp;quot;terraform-state&amp;quot;
+  key                  = &amp;quot;prod.terraform.tfstate&amp;quot;
+  access_key           = &amp;quot;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&amp;quot;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Soft Delete設定は、別途 &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update&#34;&gt;az storage blob service-properties delete-policy update&lt;/a&gt; コマンドで行ってください。&lt;/p&gt;
+
+&lt;h3 id=&#34;プロビジョニングしてみる&#34;&gt;プロビジョニングしてみる&lt;/h3&gt;
+
+&lt;p&gt;ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ mkdir sample
+$ cd sample/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cp ../tfTemplate/remoteState.tf ./
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は&lt;a href=&#34;https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su&#34;&gt;対応がはじまったので&lt;/a&gt;、いずれ解決するはずです。&lt;/p&gt;
+
+&lt;p&gt;ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ vim main.tf
+resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;tf-msi-poc&amp;quot; {
+    name     = &amp;quot;tf-msi-poc-aci-wus-rg&amp;quot;
+    location = &amp;quot;West US&amp;quot;
+}
+
+resource &amp;quot;random_integer&amp;quot; &amp;quot;random_int&amp;quot; {
+    min = 100
+    max = 999
+}
+
+resource &amp;quot;azurerm_container_group&amp;quot; &amp;quot;aci-example&amp;quot; {
+    name                = &amp;quot;aci-cg-${random_integer.random_int.result}&amp;quot;
+    location            = &amp;quot;${azurerm_resource_group.tf-msi-poc.location}&amp;quot;
+    resource_group_name = &amp;quot;${azurerm_resource_group.tf-msi-poc.name}&amp;quot;
+    ip_address_type     = &amp;quot;public&amp;quot;
+    dns_name_label      = &amp;quot;tomakabe-aci-cg-${random_integer.random_int.result}&amp;quot;
+    os_type             = &amp;quot;linux&amp;quot;
+
+    container {
+        name    = &amp;quot;nginx&amp;quot;
+        image   = &amp;quot;nginx&amp;quot;
+        cpu     = &amp;quot;0.5&amp;quot;
+        memory  = &amp;quot;1.0&amp;quot;
+        port    = &amp;quot;80&amp;quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;init、plan、アプラーイ。アプライ王子。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ terraform init
+$ terraform plan
+$ terraform apply -auto-approve
+[snip]
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;できたか確認。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
+Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
+----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
+aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
+$ curl 13.91.90.117
+&amp;lt;!DOCTYPE html&amp;gt;
+&amp;lt;html&amp;gt;
+&amp;lt;head&amp;gt;
+&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+[snip]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;おまけ&#34;&gt;おまけ&lt;/h2&gt;
+
+&lt;p&gt;サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。&lt;/p&gt;
+
+&lt;p&gt;MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
+Resource &#39;aaaa-aaaa-aaaa-aaaa-aaaa&#39; does not exist or one of its queried reference-property objects are not present.
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>Azure DNS Private Zonesの動きを確認する</title>
@@ -2862,101 +3173,6 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;amp;code=token
 &lt;/ul&gt;
 
 &lt;p&gt;こんなケースではAzureを間に入れると、幸せになれるかもしれません。なったユーザーもいらっしゃいます。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
-      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
-      <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
-      <description>
-
-&lt;h2 id=&#34;お伝えしたいこと&#34;&gt;お伝えしたいこと&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/li&gt;
-&lt;li&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/li&gt;
-&lt;li&gt;ARMテンプレートでManaged Diskを作る時のコツ&lt;/li&gt;
-&lt;li&gt;可用性セットを意識しよう&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;armテンプレートのドキュメントが使いやすくなった&#34;&gt;ARMテンプレートのドキュメントが使いやすくなった&lt;/h2&gt;
-
-&lt;p&gt;docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/&#34;&gt;使いやすくなりました&lt;/a&gt;。ARMテンプレート使いのみなさまは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/&#34;&gt;https://docs.microsoft.com/ja-jp/azure/templates/&lt;/a&gt; をブックマークして、サクサク調べちゃってください。&lt;/p&gt;
-
-&lt;h2 id=&#34;visual-studio-codeとazure-resource-manager-toolsを使おう&#34;&gt;Visual Studio CodeとAzure Resource Manager Toolsを使おう&lt;/h2&gt;
-
-&lt;p&gt;これがあまり知られてないようなのでアピールしておきます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png&#34; alt=&#34;コードアシスト&#34; title=&#34;コードアシスト&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;コードアシストしてくれます。&lt;/p&gt;
-
-&lt;p&gt;画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension&#34;&gt;Get VS Code and extension&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;armテンプレートでmanaged-diskを作る時のコツ&#34;&gt;ARMテンプレートでManaged Diskを作る時のコツ&lt;/h2&gt;
-
-&lt;p&gt;Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。&lt;/p&gt;
-
-&lt;p&gt;Managed Diskは &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks&#34;&gt;Microsoft.Compute/disks&lt;/a&gt;  で個別に定義できますが、省略もできます。&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines&#34;&gt;Microsoft.Compute/virtualMachines&lt;/a&gt; の中に書いてしまうやり口です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;osDisk&amp;quot;: {
-  &amp;quot;name&amp;quot;: &amp;quot;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&amp;quot;,
-  &amp;quot;createOption&amp;quot;: &amp;quot;FromImage&amp;quot;,
-  &amp;quot;managedDisk&amp;quot;: {
-    &amp;quot;storageAccountType&amp;quot;: &amp;quot;Standard_LRS&amp;quot;
-  },
-  &amp;quot;diskSizeGB&amp;quot;: 128
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんな感じで書けます。ポイントはサイズ指定 &amp;ldquo;diskSizeGB&amp;rdquo; の位置です。&amp;rdquo;managedDisk&amp;rdquo;の下ではありません。おじさんちょっと悩みました。&lt;/p&gt;
-
-&lt;h2 id=&#34;可用性セットを意識しよう&#34;&gt;可用性セットを意識しよう&lt;/h2&gt;
-
-&lt;p&gt;Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。&lt;/p&gt;
-
-&lt;p&gt;Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf&#34;&gt;参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;可用性セットは、電源とネットワークを共有するグループである&amp;rdquo;障害ドメイン(FD: Fault Domain)&amp;ldquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg&#34; alt=&#34;Unmanaged vs Managed&#34; title=&#34;Unmanaged vs Managed&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。&lt;/p&gt;
-
-&lt;p&gt;さて、この場合の可用性セット定義ですが、以下のように書きます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/availabilitySets&amp;quot;,
-  &amp;quot;name&amp;quot;: &amp;quot;AvSet01&amp;quot;,
-  &amp;quot;apiVersion&amp;quot;: &amp;quot;2016-04-30-preview&amp;quot;,
-  &amp;quot;location&amp;quot;: &amp;quot;[resourceGroup().location]&amp;quot;,
-  &amp;quot;properties&amp;quot;: {
-    &amp;quot;managed&amp;quot;: true,
-    &amp;quot;platformFaultDomainCount&amp;quot;: 2,
-    &amp;quot;platformUpdateDomainCount&amp;quot;: 5
-  }
-},
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets&#34;&gt;Microsoft.Compute/availabilitySets&lt;/a&gt; を読むと、Managed Diskを使う場合は&amp;rdquo;propaties&amp;rdquo;の&amp;rdquo;managed&amp;rdquo;をtrueにすべし、とあります。なるほど。&lt;/p&gt;
-
-&lt;p&gt;そしてポイントです。合わせて&amp;rdquo;platformFaultDomainCount&amp;rdquo;を指定してください。managedにする場合は必須パラメータです。&lt;/p&gt;
-
-&lt;p&gt;なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks&#34;&gt;Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問&lt;/a&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
-
-Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
-&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
