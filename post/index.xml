@@ -192,7 +192,7 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ちなみに、role id &amp;ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&amp;rdquo;はConributorを指します。&lt;/p&gt;
+&lt;p&gt;ちなみに、role id &amp;ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&amp;rdquo;はContributorを指します。&lt;/p&gt;
 
 &lt;p&gt;tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。&lt;/p&gt;
 
