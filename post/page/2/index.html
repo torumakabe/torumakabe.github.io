@@ -68,6 +68,281 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">11 Feb 2018, 00:20</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/aks_tls_autorenewal/" class="post-title">AKSのIngress TLS証明書を自動更新する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="カジュアルな証明書管理方式が欲しい">カジュアルな証明書管理方式が欲しい</h2>
+
+<p>ChromeがHTTPサイトに対する警告を<a href="https://japan.cnet.com/article/35100589/">強化するそうです</a>。非HTTPSサイトには、生きづらい世の中になりました。</p>
+
+<p>さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。</p>
+
+<p>そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。</p>
+
+<ul>
+<li>TLSはIngress(NGINX Ingress Controller)でまとめて終端</li>
+<li><a href="https://letsencrypt.org/">Let&rsquo;s Encypt</a>から証明書を入手</li>
+<li>Kubenetesのアドオンである<a href="https://github.com/jetstack/cert-manager/">cert-manager</a>で証明書の入手、更新とIngressへの適用を自動化
+
+<ul>
+<li>ACME(Automatic Certificate Management Environment)対応</li>
+<li>cert-managerはまだ歴史の浅いプロジェクトだが、<a href="https://github.com/jetstack/cert-manager/">kube-lego</a>の後継として期待</li>
+</ul></li>
+</ul>
+
+<p>なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
+
+<h2 id="使い方">使い方</h2>
+
+<p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
+</ul>
+
+<p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
+
+<pre><code>$ helm install stable/nginx-ingress --name my-nginx
+</code></pre>
+
+<p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
+
+<pre><code>$ kubectl get svc
+NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
+kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
+my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
+my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
+</code></pre>
+
+<p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
+
+<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
+</code></pre>
+
+<p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&rdquo;&ndash;set rbac.create=false&rdquo;オプションを指定しています。</p>
+
+<pre><code>$ git clone https://github.com/jetstack/cert-manager
+$ cd cert-manager/
+$ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
+</code></pre>
+
+<p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
+
+<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: default
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: hoge@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    # Enable the HTTP-01 challenge provider
+    http01: {}
+</code></pre>
+
+<p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
+
+<p>なお、Let&rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも<a href="https://github.com/jetstack/cert-manager/pull/246">いずれ対応する見込み</a>です。</p>
+
+<p>では、Issuerを登録します。</p>
+
+<pre><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
+</code></pre>
+
+<p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
+
+<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: example-com
+  namespace: default
+spec:
+  secretName: example-com-tls
+  issuerRef:
+    name: letsencrypt-staging
+  commonName: www.example.com
+  dnsNames:
+  - www.example.com
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - www.example.com
+</code></pre>
+
+<p>証明書設定をデプロイします。</p>
+
+<pre><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
+</code></pre>
+
+<p>証明書の発行状況を確認します。</p>
+
+<pre><code>$ kubectl describe certificate example-com
+Name:         example-com
+Namespace:    default
+[snip]
+Events:
+  Type     Reason                 Age              From                     Message
+  ----     ------                 ----             ----                     -------
+  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &quot;example-com-tls&quot; not found
+  Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
+  Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+  Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
+  Normal   ObtainAuthorization    7m               cert-manager-controller  Obtained authorization for domain www.example.com
+  Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
+  Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
+  Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+</code></pre>
+
+<p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
+
+<p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
+
+<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+  namespace: default
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v01.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: hoge@example.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    http01: {}
+</code></pre>
+
+<p>デプロイします。</p>
+
+<pre><code>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
+</code></pre>
+
+<p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
+
+<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: prod-example-com
+  namespace: default
+spec:
+  secretName: prod-example-com-tls
+  issuerRef:
+    name: letsencrypt-prod
+  commonName: www.example.com
+  dnsNames:
+  - www.example.com
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - www.example.com
+</code></pre>
+
+<p>デプロイします。</p>
+
+<pre><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
+</code></pre>
+
+<p>発行状況を確認します。</p>
+
+<pre><code>$ kubectl describe certificate prod-example-com
+Name:         prod-example-com
+Namespace:    default
+[snip]
+Events:
+  Type     Reason                 Age              From                     Message
+  ----     ------                 ----             ----                     -------
+  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &quot;prod-example-com-tls&quot; not found
+  Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
+  Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+  Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
+  Normal   IssueCertificate       7s               cert-manager-controller  Issuing certificate...
+  Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
+  Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+  Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
+</code></pre>
+
+<p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
+
+<p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
+
+<pre><code>$ kubectl run nginx --image nginx --port 80
+$ kubectl expose deployment nginx --type NodePort
+</code></pre>
+
+<p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
+
+<pre><code>apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: ingress-nginx-sample
+spec:
+  rules:
+    - host: www.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: nginx
+              servicePort: 80
+  tls:
+    - hosts:
+      - www.example.com
+      secretName: prod-example-com-tls
+</code></pre>
+
+<p>デプロイします。</p>
+
+<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
+</code></pre>
+
+<p>いざ確認。</p>
+
+<pre><code>$ curl https://www.example.com/
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">10 Feb 2018, 11:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -699,127 +974,6 @@ terraform apply
 <li>-v オプションでのマウントは<a href="https://docs.docker.com/engine/admin/volumes/bind-mounts/">非推奨</a>になったので &ndash;mount で</li>
 <li>スタティックリンク</li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Nov 2017, 08:45</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azblob_golang/" class="post-title">Azure Blob アップローダーをGoで書いた、そしてその理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
-
-<p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
-
-<h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
-
-<p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
-
-<p>ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。</p>
-
-<pre><code>package main
-
-import (
-	&quot;context&quot;
-	&quot;flag&quot;
-	&quot;fmt&quot;
-	&quot;log&quot;
-	&quot;net/url&quot;
-	&quot;os&quot;
-
-	&quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&quot;
-)
-
-var (
-	accountName    string
-	accountKey     string
-	containerName  string
-	fileName       string
-	blockSize      int64
-	blockSizeBytes int64
-)
-
-func init() {
-	flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;)
-	flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;)
-	flag.StringVar(&amp;containerName, &quot;c&quot;, &quot;&quot;, &quot;(Required - short option) Blob Container Name&quot;)
-	flag.StringVar(&amp;containerName, &quot;container-name&quot;, &quot;&quot;, &quot;(Required) Blob Container Name&quot;)
-	flag.StringVar(&amp;fileName, &quot;f&quot;, &quot;&quot;, &quot;(Required - short option) Upload filename&quot;)
-	flag.StringVar(&amp;fileName, &quot;file&quot;, &quot;&quot;, &quot;(Required) Upload filename&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;b&quot;, 4, &quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;blocksize&quot;, 4, &quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Parse()
-
-	if (blockSize &lt; 1) || (blockSize) &gt; 100 {
-		fmt.Println(&quot;Blocksize must be from 1MB to 100MB&quot;)
-		os.Exit(1)
-	}
-	blockSizeBytes = blockSize * 1024 * 1024
-}
-
-func main() {
-	file, err := os.Open(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	fileSize, err := file.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	u, _ := url.Parse(fmt.Sprintf(&quot;https://%s.blob.core.windows.net/%s/%s&quot;, accountName, containerName, fileName))
-	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
-
-	ctx := context.Background()
-
-	fmt.Println(&quot;Uploading block blob...&quot;)
-	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
-		azblob.UploadStreamToBlockBlobOptions{
-			BlockSize: blockSizeBytes,
-			Progress: func(bytesTransferred int64) {
-				fmt.Printf(&quot;Uploaded %d of %d bytes.\n&quot;, bytesTransferred, fileSize.Size())
-			},
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = putBlockList // Avoid compiler's &quot;declared and not used&quot; error
-
-	fmt.Println(&quot;Done&quot;)
-}
-</code></pre>
-
-<p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
-
-<p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
-
-<h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
-
-<p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
-
-<p>たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。</p>
-
-<p>ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。</p>
-
-<p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
-
-<p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
 
                     </div>
                 </section>

@@ -68,6 +68,329 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">08 Oct 2017, 10:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_vpngw_act_act_perf/" class="post-title">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="動機">動機</h2>
+
+<p><a href="https://kogelog.com/">焦げlogさん</a>で、とても興味深いエントリを拝見しました。</p>
+
+<ul>
+<li><a href="https://kogelog.com/2017/10/06/20171006-01/">Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました</a></li>
+</ul>
+
+<p>確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは</p>
+
+<blockquote>
+<p>※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…</p>
+</blockquote>
+
+<p>ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。</p>
+
+<p>そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる</p>
+
+<ul>
+<li>遅延</li>
+<li>リージョン間通信に関するサムシング</li>
+</ul>
+
+<p>を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。</p>
+
+<h2 id="検証方針">検証方針</h2>
+
+<ul>
+<li>同一リージョン(東日本)に、2つのVNETを作る</li>
+<li>それぞれのVNETにVPN Gatewayを配置し、接続する</li>
+<li>比較しやすいよう、焦げlogさんの検証と条件を合わせる
+
+<ul>
+<li>同じ仮想マシンサイズ: DS3_V2</li>
+<li>同じストレージ: Premium Storage Managed Disk</li>
+<li>同じOS: Ubuntu 16.04</li>
+<li>同じツール: ntttcp</li>
+<li>同じパラメータ: ntttcp -r -m 16,*,<IP> -t 300</li>
+</ul></li>
+<li>送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る</li>
+<li>スループットのポテンシャルを引き出す検証はしない</li>
+</ul>
+
+<h2 id="結果">結果</h2>
+
+<h3 id="vpngw1-650mbps">VpnGW1(650Mbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">677.48Mbps</td>
+<td align="right">676.38Mbps</td>
+<td align="right">676.93Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">674.34Mbps</td>
+<td align="right">673.85Mbps</td>
+<td align="right">674.10Mbps</td>
+<td align="right">99%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">701.19Mbps</td>
+<td align="right">699.91Mbps</td>
+<td align="right">700.55Mbps</td>
+<td align="right">103%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="vpngw2-1gbps">VpnGW2(1Gbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">813.09Mbps</td>
+<td align="right">805.60Mbps</td>
+<td align="right">809.35Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">1.18Gbps</td>
+<td align="right">1.18Gbps</td>
+<td align="right">1.18Gbps</td>
+<td align="right">149%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">2.03Gbps</td>
+<td align="right">2.02Gbps</td>
+<td align="right">2.03Gbps</td>
+<td align="right">256%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="vpngw3-1-25gbps">VpnGW3(1.25Gbps)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">パターン　</th>
+<th align="left">送信側GW構成　　　　　</th>
+<th align="left">受信側GW構成　　　　　　　　</th>
+<th align="right">送信側スループット　</th>
+<th align="right">　受信側スループット</th>
+<th align="right">　スループット平均</th>
+<th align="right">　パターン1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">パターン1　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Stb</td>
+<td align="right">958.56Mbps</td>
+<td align="right">953.72Mbps</td>
+<td align="right">956.14Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">パターン2　</td>
+<td align="left">Act/Stb</td>
+<td align="left">Act/Act</td>
+<td align="right">1.39Gbps</td>
+<td align="right">1.39Gbps</td>
+<td align="right">1.39Gbps</td>
+<td align="right">149%</td>
+</tr>
+
+<tr>
+<td align="left">パターン3　</td>
+<td align="left">Act/Act</td>
+<td align="left">Act/Act</td>
+<td align="right">2.19Gbps</td>
+<td align="right">2.19Gbps</td>
+<td align="right">2.19Gbps</td>
+<td align="right">234%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン1-act-stb-to-act-stb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">676.93Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">809.35Mbps</td>
+<td align="right">119%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">956.14Mbps</td>
+<td align="right">141%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン2-act-stb-to-act-act">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">674.10Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">1.18Gbps</td>
+<td align="right">179%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">1.39Gbps</td>
+<td align="right">211%</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sku視点-パターン3-act-act-to-act-act">SKU視点 パターン3(Act/Act to Act/Act)</h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">SKU　</th>
+<th align="right">　スループット平均</th>
+<th align="right">　VpnGw1との比較</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">VpnGw1　</td>
+<td align="right">700.55Mbps</td>
+<td align="right">-</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw2　</td>
+<td align="right">2.03Gbps</td>
+<td align="right">297%</td>
+</tr>
+
+<tr>
+<td align="left">VpnGw3　</td>
+<td align="right">2.19Gbps</td>
+<td align="right">320%</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="考察と推奨">考察と推奨</h2>
+
+<ul>
+<li>リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
+
+<ul>
+<li>Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる</li>
+</ul></li>
+<li>公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
+
+<ul>
+<li>期待しちゃうのが人情ではありますが</li>
+<li>VpnGw2がコストパフォーマンス的に最適という人が多いかもしれませんね 知らんけど</li>
+</ul></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -918,108 +1241,6 @@ Managed Disks を使用する可用性セットでサポートされる障害ド
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">03 Feb 2017, 18:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/paintschainer_on_azure/" class="post-title">Azure N-SeriesでPaintsChainerを動かす</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="paintschainer面白い">PaintsChainer面白い</h2>
-
-<p>クラスメソッドさんのDevelopers.IOでのエントリ<a href="http://dev.classmethod.jp/cloud/paintschainer-on-ec2/">&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;</a>が、とても面白いです。</p>
-
-<p>畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。</p>
-
-<p>せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。</p>
-
-<h2 id="試した環境">試した環境</h2>
-
-<ul>
-<li>米国中南部リージョン</li>
-<li>Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)</li>
-<li>Ubuntu 16.04</li>
-<li>NSGはSSH(22)の他にHTTP(80)を受信許可</li>
-</ul>
-
-<h2 id="導入手順">導入手順</h2>
-
-<h3 id="nvidia-tesla-driversのインストール">NVIDIA Tesla driversのインストール</h3>
-
-<p>マイクロソフト公式ドキュメントの通りに導入します。</p>
-
-<p><a href="https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-n-series-driver-setup">Set up GPU drivers for N-series VMs</a></p>
-
-<h3 id="dockerのインストール">Dockerのインストール</h3>
-
-<p>Docker公式ドキュメントの通りに導入します。</p>
-
-<p><a href="https://docs.docker.com/engine/installation/linux/ubuntu/">Get Docker for Ubuntu</a></p>
-
-<h3 id="nvidia-dockerのインストール">NVIDIA Dockerのインストール</h3>
-
-<p>GitHub上のNVIDIAのドキュメント通りに導入します。</p>
-
-<p><a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Docker</a></p>
-
-<p>ここまでの作業に問題がないか、確認します。</p>
-
-<pre><code>$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
-Using default tag: latest
-latest: Pulling from nvidia/cuda
-8aec416115fd: Pull complete
-[...]
-Status: Downloaded newer image for nvidia/cuda:latest
-Fri Feb  3 06:43:18 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
-| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-</code></pre>
-
-<h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
-
-<p>Liam Jones氏が公開している<a href="https://github.com/liamjones/PaintsChainer-Docker">PaintsChainer-Docker</a>を使って、PaintsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。</p>
-
-<pre><code>$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
-</code></pre>
-
-<h2 id="paintschainerを使ってみる">PaintsChainerを使ってみる</h2>
-
-<p>VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintsChainerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia" /></p>
-
-<p>PaintsChainer、すごいなぁ。
-クラウディアさん、おなか寒そうだけど。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -1029,7 +1250,7 @@ Fri Feb  3 06:43:18 2017
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 8</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 9</span>
     
       <a href="/tags/azure/page/4/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

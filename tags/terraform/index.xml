@@ -9,6 +9,53 @@
     <atom:link href="http://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
+      <link>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <description>
+
+&lt;h2 id=&#34;カスタムイメージではlatest指定できない&#34;&gt;カスタムイメージではlatest指定できない&lt;/h2&gt;
+
+&lt;p&gt;Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。&lt;/p&gt;
+
+&lt;p&gt;ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;最新のイメージ名を確認のうえ、手で指定する&lt;/li&gt;
+&lt;li&gt;自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。&lt;/p&gt;
+
+&lt;h2 id=&#34;terraformではイメージ名取得に正規表現とソートが可能&#34;&gt;Terraformではイメージ名取得に正規表現とソートが可能&lt;/h2&gt;
+
+&lt;p&gt;Terraformでは見出しの通り、捗る表現ができます。&lt;/p&gt;
+
+&lt;p&gt;イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/data_source_image.go#L164&#34;&gt;文字列比較&lt;/a&gt;なので、末尾の番号の決めた桁は埋めること。&lt;/p&gt;
+
+&lt;p&gt;ということで降順で最上位、つまり最新のイメージ名を取得できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; {
+  name_regex          = &amp;quot;ubuntu1604-[0-9]*&amp;quot;
+  sort_descending     = true
+  resource_group_name = &amp;quot;${var.managed_image_resource_group_name}&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  storage_profile_image_reference {
+    id = &amp;quot;${data.azurerm_image.poc.id}&amp;quot;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;便利である。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
       <link>http://torumakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>

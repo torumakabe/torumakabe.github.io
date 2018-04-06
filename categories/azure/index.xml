@@ -9,6 +9,53 @@
     <atom:link href="http://torumakabe.github.io/categories/azure/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
+      <link>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <description>
+
+&lt;h2 id=&#34;カスタムイメージではlatest指定できない&#34;&gt;カスタムイメージではlatest指定できない&lt;/h2&gt;
+
+&lt;p&gt;Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。&lt;/p&gt;
+
+&lt;p&gt;ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;最新のイメージ名を確認のうえ、手で指定する&lt;/li&gt;
+&lt;li&gt;自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。&lt;/p&gt;
+
+&lt;h2 id=&#34;terraformではイメージ名取得に正規表現とソートが可能&#34;&gt;Terraformではイメージ名取得に正規表現とソートが可能&lt;/h2&gt;
+
+&lt;p&gt;Terraformでは見出しの通り、捗る表現ができます。&lt;/p&gt;
+
+&lt;p&gt;イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の&lt;a href=&#34;https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/data_source_image.go#L164&#34;&gt;文字列比較&lt;/a&gt;なので、末尾の番号の決めた桁は埋めること。&lt;/p&gt;
+
+&lt;p&gt;ということで降順で最上位、つまり最新のイメージ名を取得できます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; {
+  name_regex          = &amp;quot;ubuntu1604-[0-9]*&amp;quot;
+  sort_descending     = true
+  resource_group_name = &amp;quot;${var.managed_image_resource_group_name}&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  storage_profile_image_reference {
+    id = &amp;quot;${data.azurerm_image.poc.id}&amp;quot;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;便利である。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
       <link>http://torumakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
@@ -3109,161 +3156,6 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;amp;code=token
 
 Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
-      <link>http://torumakabe.github.io/post/dockerforwin_azurecli2/</link>
-      <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
-      
-      <guid>http://torumakabe.github.io/post/dockerforwin_azurecli2/</guid>
-      <description>
-
-&lt;h2 id=&#34;azure-cli-2-0版です&#34;&gt;Azure CLI 2.0版です&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/dockerforwin_azurecli/&#34;&gt;Docker for WindowsでインストールレスAzure CLI環境を作る&lt;/a&gt;、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows、もっと活用しようぜ&lt;/li&gt;
-&lt;li&gt;がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;az_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;az_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/install/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]&lt;/li&gt;
-&lt;li&gt;ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &amp;gt; [Shared Drives]&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。az_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; az_cli
-bash-4.3#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは&lt;a href=&#34;https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/&#34;&gt;alpine linux&lt;/a&gt;ベースです。&lt;/p&gt;
-
-&lt;p&gt;カレントディレクトリを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# pwd
-/data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;タブで補完も効きます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az a
-account     acr         acs         ad          appservice
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
 </description>
     </item>
     
