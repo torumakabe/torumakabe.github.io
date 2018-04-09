@@ -68,6 +68,127 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">28 Nov 2017, 08:45</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azblob_golang/" class="post-title">Azure Blob アップローダーをGoで書いた、そしてその理由</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
+
+<p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
+
+<h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
+
+<p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
+
+<p>ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。</p>
+
+<pre><code>package main
+
+import (
+	&quot;context&quot;
+	&quot;flag&quot;
+	&quot;fmt&quot;
+	&quot;log&quot;
+	&quot;net/url&quot;
+	&quot;os&quot;
+
+	&quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&quot;
+)
+
+var (
+	accountName    string
+	accountKey     string
+	containerName  string
+	fileName       string
+	blockSize      int64
+	blockSizeBytes int64
+)
+
+func init() {
+	flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;)
+	flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;)
+	flag.StringVar(&amp;containerName, &quot;c&quot;, &quot;&quot;, &quot;(Required - short option) Blob Container Name&quot;)
+	flag.StringVar(&amp;containerName, &quot;container-name&quot;, &quot;&quot;, &quot;(Required) Blob Container Name&quot;)
+	flag.StringVar(&amp;fileName, &quot;f&quot;, &quot;&quot;, &quot;(Required - short option) Upload filename&quot;)
+	flag.StringVar(&amp;fileName, &quot;file&quot;, &quot;&quot;, &quot;(Required) Upload filename&quot;)
+	flag.Int64Var(&amp;blockSize, &quot;b&quot;, 4, &quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
+	flag.Int64Var(&amp;blockSize, &quot;blocksize&quot;, 4, &quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
+	flag.Parse()
+
+	if (blockSize &lt; 1) || (blockSize) &gt; 100 {
+		fmt.Println(&quot;Blocksize must be from 1MB to 100MB&quot;)
+		os.Exit(1)
+	}
+	blockSizeBytes = blockSize * 1024 * 1024
+}
+
+func main() {
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	fileSize, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u, _ := url.Parse(fmt.Sprintf(&quot;https://%s.blob.core.windows.net/%s/%s&quot;, accountName, containerName, fileName))
+	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
+
+	ctx := context.Background()
+
+	fmt.Println(&quot;Uploading block blob...&quot;)
+	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
+		azblob.UploadStreamToBlockBlobOptions{
+			BlockSize: blockSizeBytes,
+			Progress: func(bytesTransferred int64) {
+				fmt.Printf(&quot;Uploaded %d of %d bytes.\n&quot;, bytesTransferred, fileSize.Size())
+			},
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = putBlockList // Avoid compiler's &quot;declared and not used&quot; error
+
+	fmt.Println(&quot;Done&quot;)
+}
+</code></pre>
+
+<p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
+
+<p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
+
+<h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
+
+<p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
+
+<p>たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。</p>
+
+<p>ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。</p>
+
+<p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
+
+<p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">08 Oct 2017, 10:30</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1130,113 +1251,6 @@ nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKE
 </ul>
 
 <p>こんなケースではAzureを間に入れると、幸せになれるかもしれません。なったユーザーもいらっしゃいます。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
-
-<ul>
-<li>ARMテンプレートのドキュメントが使いやすくなった</li>
-<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
-<li>ARMテンプレートでManaged Diskを作る時のコツ</li>
-<li>可用性セットを意識しよう</li>
-</ul>
-
-<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
-
-<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
-
-<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
-
-<p>これがあまり知られてないようなのでアピールしておきます。</p>
-
-<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
-
-<p>コードアシストしてくれます。</p>
-
-<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
-
-<h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
-
-<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
-
-<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
-
-<pre><code>&quot;osDisk&quot;: {
-  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
-  &quot;createOption&quot;: &quot;FromImage&quot;,
-  &quot;managedDisk&quot;: {
-    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
-  },
-  &quot;diskSizeGB&quot;: 128
-}
-</code></pre>
-
-<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
-
-<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
-
-<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
-
-<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
-
-<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
-
-<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン(FD: Fault Domain)&ldquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
-
-<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
-
-<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
-
-<pre><code>{
-  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
-  &quot;name&quot;: &quot;AvSet01&quot;,
-  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
-  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
-  &quot;properties&quot;: {
-    &quot;managed&quot;: true,
-    &quot;platformFaultDomainCount&quot;: 2,
-    &quot;platformUpdateDomainCount&quot;: 5
-  }
-},
-</code></pre>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
-
-<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
-
-<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
-
-<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
-
-Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
-</code></pre>
 
                     </div>
                 </section>

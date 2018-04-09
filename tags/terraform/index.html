@@ -68,6 +68,174 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">09 Apr 2018, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/myazurecli201804/" class="post-title">俺のAzure CLI 2018春版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="春の環境リフレッシュ祭り">春の環境リフレッシュ祭り</h2>
+
+<p>最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。</p>
+
+<h2 id="俺のおすすめ-3選">俺のおすすめ 3選</h2>
+
+<ul>
+<li>デフォルト設定
+
+<ul>
+<li>リソースグループやロケーション、出力形式などのデフォルト設定ができる</li>
+</ul></li>
+<li>エイリアス
+
+<ul>
+<li>サブコマンドにエイリアスを付けられる</li>
+<li>引数付きの込み入った表現もできる</li>
+</ul></li>
+<li>VS Code プラグイン
+
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Toolsプラグイン</a> でazコマンドの編集をコードアシストしてくれる</li>
+<li>編集画面上でコマンド選択して実行できる</li>
+</ul></li>
+</ul>
+
+<h2 id="デフォルト設定">デフォルト設定</h2>
+
+<p>$AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-configuration?view=azure-cli-latest">Azure CLI 2.0 の構成</a></p>
+
+<p>まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。</p>
+
+<pre><code>[core]
+output = table
+</code></pre>
+
+<p>そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。</p>
+
+<pre><code>[defaults]
+group = default-ejp-rg
+</code></pre>
+
+<p>他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。</p>
+
+<p>ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。</p>
+
+<p>デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。</p>
+
+<pre><code>az vm create -n yoursmplvm01 --image UbuntuLTS
+</code></pre>
+
+<h2 id="エイリアス">エイリアス</h2>
+
+<p>$AZURE_CONFIG_DIR/aliasにエイリアスを書けます。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest">Azure CLI 2.0 のエイリアス拡張機能</a></p>
+
+<p>前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</p>
+
+<pre><code>az extension add --name alias
+</code></pre>
+
+<p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
+
+<h3 id="頻繁に打つからできる限り短くしたい系">頻繁に打つからできる限り短くしたい系</h3>
+
+<pre><code>[ls]
+command = list
+
+[nw]
+command = network
+
+[pip]
+command = public-ip
+
+[fa]
+command = functionapp
+</code></pre>
+
+<p>例えばデフォルトリソースグループでパブリックIP公開してるか確認したいな、と思った時は、az network public-ip listじゃなくて、こう打てます。</p>
+
+<pre><code>$ az nw pip ls
+Name                  ResourceGroup    Location    Zones    AddressVersion    AllocationMethod      IdleTimeoutInMinutes
+ProvisioningState
+--------------------  ---------------  ----------  -------  ----------------  ------------------  ----------------------
+-------------------
+yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
+Succeeded
+</code></pre>
+
+<h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
+
+<p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
+
+<pre><code>[get-vm-pip]
+command = vm list-ip-addresses --query [0].virtualMachine.network.publicIpAddresses[0].ipAddress
+</code></pre>
+
+<p>実行すると。</p>
+
+<pre><code>$ az get-vm-pip -n yoursmplvm01
+Result
+-------------
+52.185.133.68
+</code></pre>
+
+<h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
+
+<p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
+
+<pre><code>[empty-rg]
+command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
+</code></pre>
+
+<p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
+
+<pre><code>$ az empty-rg
+</code></pre>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
+
+<h2 id="vs-code-プラグイン-azure-cli-tools">VS Code プラグイン (Azure CLI Tools )</h2>
+
+<p>Azure CLIのVS Code向けプラグインがあります。コードアシストと編集画面からの実行が2大機能。紹介ページのGifアニメを見るのが分かりやすいです。</p>
+
+<p><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Tools</a></p>
+
+<p>プラグインを入れて、拡張子.azcliでファイルを作ればプラグインが効きます。長いコマンドを補完支援付きでコーディングしたい、スクリプトを各行実行して確認しながら作りたい、なんて場合におすすめです。</p>
+
+<h2 id="注意点">注意点</h2>
+
+<ul>
+<li>エイリアスには補完が効かない
+
+<ul>
+<li>bashでのCLI実行、VS Code Azure CLI Toolsともに、現時点(<sup>2018</sup>&frasl;<sub>4</sub>)でエイリアスには補完が効きません</li>
+</ul></li>
+<li>ソースコード管理に不要なファイルを含めない
+
+<ul>
+<li>$AZURE_CONFIG_DIR/ 下には、aliasやconfigの他に、認証トークンやプロファイルといったシークレット情報が置かれます。なのでGitなどでソースコード管理する場合は、aliasとconfig以外は除外したほうがいいでしょう</li>
+</ul></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">06 Apr 2018, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1053,138 +1221,6 @@ terraform apply
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>
 <li><a href="https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples">サンプル集 on GitHub</a></li>
 </ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
-
-<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
-
-<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
-
-<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
-
-<ol>
-<li>ARMテンプレートリソースは分離して使う</li>
-<li>リソース競合したら依存関係を定義する</li>
-<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
-</ol>
-
-<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
-
-<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
-
-<p>でも、現時点の実装では、おすすめしません。</p>
-
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
-
-<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
-
-<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
-
-<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
-
-<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
-
-<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
-
-<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
-
-<h3 id="読みづらい">読みづらい</h3>
-
-<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
-
-<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
-
-<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
-
-<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
-
-<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
-
-<ul>
-<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
-<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
-</ul>
-
-<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフでうまく表現できないようです。</p>
-
-<p>そのような場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
-
-<pre><code># Create a frontend subnet
-# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
-    name = &quot;frontend&quot;
-    resource_group_name = &quot;${var.resource_group_name}&quot;
-    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
-    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
-    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
-    depends_on = [
-        &quot;azurerm_network_security_rule.fe_web80&quot;,
-        &quot;azurerm_network_security_rule.fe_web443&quot;,
-        &quot;azurerm_network_security_rule.fe_ssh&quot;
-    ]
-}
-</code></pre>
-
-<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
-
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
-
-<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
-
-<pre><code>os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
-        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
-    }
-}
-</code></pre>
-
-<p>が、エラーが返ってきます。</p>
-
-<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
-</code></pre>
-
-<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
-
-<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
-
-<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
 
                     </div>
                 </section>

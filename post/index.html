@@ -68,6 +68,174 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">09 Apr 2018, 15:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/myazurecli201804/" class="post-title">俺のAzure CLI 2018春版</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="春の環境リフレッシュ祭り">春の環境リフレッシュ祭り</h2>
+
+<p>最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。</p>
+
+<h2 id="俺のおすすめ-3選">俺のおすすめ 3選</h2>
+
+<ul>
+<li>デフォルト設定
+
+<ul>
+<li>リソースグループやロケーション、出力形式などのデフォルト設定ができる</li>
+</ul></li>
+<li>エイリアス
+
+<ul>
+<li>サブコマンドにエイリアスを付けられる</li>
+<li>引数付きの込み入った表現もできる</li>
+</ul></li>
+<li>VS Code プラグイン
+
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Toolsプラグイン</a> でazコマンドの編集をコードアシストしてくれる</li>
+<li>編集画面上でコマンド選択して実行できる</li>
+</ul></li>
+</ul>
+
+<h2 id="デフォルト設定">デフォルト設定</h2>
+
+<p>$AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-configuration?view=azure-cli-latest">Azure CLI 2.0 の構成</a></p>
+
+<p>まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。</p>
+
+<pre><code>[core]
+output = table
+</code></pre>
+
+<p>そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。</p>
+
+<pre><code>[defaults]
+group = default-ejp-rg
+</code></pre>
+
+<p>他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。</p>
+
+<p>ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。</p>
+
+<p>デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。</p>
+
+<pre><code>az vm create -n yoursmplvm01 --image UbuntuLTS
+</code></pre>
+
+<h2 id="エイリアス">エイリアス</h2>
+
+<p>$AZURE_CONFIG_DIR/aliasにエイリアスを書けます。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest">Azure CLI 2.0 のエイリアス拡張機能</a></p>
+
+<p>前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</p>
+
+<pre><code>az extension add --name alias
+</code></pre>
+
+<p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
+
+<h3 id="頻繁に打つからできる限り短くしたい系">頻繁に打つからできる限り短くしたい系</h3>
+
+<pre><code>[ls]
+command = list
+
+[nw]
+command = network
+
+[pip]
+command = public-ip
+
+[fa]
+command = functionapp
+</code></pre>
+
+<p>例えばデフォルトリソースグループでパブリックIP公開してるか確認したいな、と思った時は、az network public-ip listじゃなくて、こう打てます。</p>
+
+<pre><code>$ az nw pip ls
+Name                  ResourceGroup    Location    Zones    AddressVersion    AllocationMethod      IdleTimeoutInMinutes
+ProvisioningState
+--------------------  ---------------  ----------  -------  ----------------  ------------------  ----------------------
+-------------------
+yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
+Succeeded
+</code></pre>
+
+<h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
+
+<p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
+
+<pre><code>[get-vm-pip]
+command = vm list-ip-addresses --query [0].virtualMachine.network.publicIpAddresses[0].ipAddress
+</code></pre>
+
+<p>実行すると。</p>
+
+<pre><code>$ az get-vm-pip -n yoursmplvm01
+Result
+-------------
+52.185.133.68
+</code></pre>
+
+<h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
+
+<p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
+
+<pre><code>[empty-rg]
+command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
+</code></pre>
+
+<p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
+
+<pre><code>$ az empty-rg
+</code></pre>
+
+<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
+
+<h2 id="vs-code-プラグイン-azure-cli-tools">VS Code プラグイン (Azure CLI Tools )</h2>
+
+<p>Azure CLIのVS Code向けプラグインがあります。コードアシストと編集画面からの実行が2大機能。紹介ページのGifアニメを見るのが分かりやすいです。</p>
+
+<p><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Tools</a></p>
+
+<p>プラグインを入れて、拡張子.azcliでファイルを作ればプラグインが効きます。長いコマンドを補完支援付きでコーディングしたい、スクリプトを各行実行して確認しながら作りたい、なんて場合におすすめです。</p>
+
+<h2 id="注意点">注意点</h2>
+
+<ul>
+<li>エイリアスには補完が効かない
+
+<ul>
+<li>bashでのCLI実行、VS Code Azure CLI Toolsともに、現時点(<sup>2018</sup>&frasl;<sub>4</sub>)でエイリアスには補完が効きません</li>
+</ul></li>
+<li>ソースコード管理に不要なファイルを含めない
+
+<ul>
+<li>$AZURE_CONFIG_DIR/ 下には、aliasやconfigの他に、認証トークンやプロファイルといったシークレット情報が置かれます。なのでGitなどでソースコード管理する場合は、aliasとconfig以外は除外したほうがいいでしょう</li>
+</ul></li>
+</ul>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">06 Apr 2018, 18:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1018,229 +1186,6 @@ Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataS
 </code></pre>
 
 <p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">12 Mar 2018, 00:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/aks_dns/" class="post-title">AKSのService作成時にホスト名を付ける</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="2つのやり口">2つのやり口</h2>
-
-<p>Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。</p>
-
-<p>わたしの知る限り、2つの方法があります。</p>
-
-<ul>
-<li>AKS(k8s) 1.9で対応した<a href="https://github.com/kubernetes/kubernetes/pull/47849">DNSラベル名付与機能</a>を使う</li>
-<li><a href="https://github.com/kubernetes-incubator/external-dns">Kubenetes ExternalDNS</a>を使ってAzure DNSへAレコードを追加する</li>
-</ul>
-
-<p>以下、AKS 1.9.2での実現手順です。</p>
-
-<h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
-
-<p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
-
-<p>[nginx-label.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx
-  annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
-spec:
-  selector:
-    app: nginx
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプロイ。</p>
-
-<pre><code>$ kubectl create -f nginx-label.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
-
-<pre><code>$ curl hogeginx.eastus.cloudapp.azure.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
-
-<h2 id="kubenetes-externaldns">Kubenetes ExternalDNS</h2>
-
-<p>任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は<a href="https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md">こちら</a>。</p>
-
-<p>Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。</p>
-
-<p>さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。</p>
-
-<p>ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。</p>
-
-<pre><code>$ az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&quot; -n hogeExtDnsSp
-</code></pre>
-
-<p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
-
-<p>ではExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。</p>
-
-<p>[azure.json]</p>
-
-<pre><code>{
-    &quot;tenantId&quot;: &quot;your-tenant&quot;,
-    &quot;subscriptionId&quot;: &quot;your-subscription-id&quot;,
-    &quot;aadClientId&quot;: &quot;your-appId&quot;,
-    &quot;aadClientSecret&quot;: &quot;your-password&quot;,
-    &quot;resourceGroup&quot;: &quot;hoge-dns-rg&quot;
-}
-</code></pre>
-
-<p>JSONファイルを元に、secretを作ります。</p>
-
-<pre><code>$ kubectl create secret generic azure-config-file --from-file=azure.json
-</code></pre>
-
-<p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
-
-<p>[extdns.yaml]</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: external-dns
-spec:
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: external-dns
-    spec:
-      containers:
-      - name: external-dns
-        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
-        args:
-        - --source=service
-        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
-        - --provider=azure
-        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial's resource group
-        volumeMounts:
-        - name: azure-config-file
-          mountPath: /etc/kubernetes
-          readOnly: true
-      volumes:
-      - name: azure-config-file
-        secret:
-          secretName: azure-config-file
-</code></pre>
-
-<p>ExternalDNSをデプロイします。</p>
-
-<pre><code>$ kubectl create -f extdns.yaml
-</code></pre>
-
-<p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
-
-<p>[nginx-extdns.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx-extdns
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx-extdns
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx-extdns
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
-spec:
-  selector:
-    app: nginx-extdns
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプローイ。</p>
-
-<pre><code>$ kubectl create -f nginx-extdns.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
-
-<pre><code>$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
-Name      ResourceGroup       Ttl  Type    Metadata
---------  ----------------  -----  ------  ----------
-hogeginx  hoge-dns-rg         300  A
-</code></pre>
-
-<p>ゲッツ。</p>
-
-<pre><code>$ curl hogeginx.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
 
                     </div>
                 </section>
