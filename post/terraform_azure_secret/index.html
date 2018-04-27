@@ -169,10 +169,13 @@
 
 <h2 id="aciの場合">ACIの場合</h2>
 
-<p>ざっと以下の流れです。
-1. リソースグループ作成
-2. Cosmos DBアカウント作成
-3. ACIコンテナーグループ作成 (Cosmos DB属性から接続文字列を生成)</p>
+<p>ざっと以下の流れです。</p>
+
+<ol>
+<li>リソースグループ作成</li>
+<li>Cosmos DBアカウント作成</li>
+<li>ACIコンテナーグループ作成 (Cosmos DB属性から接続文字列を生成)</li>
+</ol>
 
 <p>var.で参照している変数は、別ファイルに書いています。</p>
 
@@ -240,12 +243,15 @@ resource &quot;azurerm_container_group&quot; &quot;aci-todo&quot; {
 
 <h2 id="aks">AKS</h2>
 
-<p>AKSの場合、流れは以下の通りです。
-1. リソースグループ作成
-2. Cosmos DBアカウント作成
-3. AKSクラスター作成
-4. k8s Secretを作成 (Cosmos DB属性から接続文字列生成)
-5. k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</p>
+<p>AKSの場合、流れは以下の通りです。</p>
+
+<ol>
+<li>リソースグループ作成</li>
+<li>Cosmos DBアカウント作成</li>
+<li>AKSクラスター作成</li>
+<li>k8s Secretを作成 (Cosmos DB属性から接続文字列生成)</li>
+<li>k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</li>
+</ol>
 
 <p>[main.tf]</p>
 
