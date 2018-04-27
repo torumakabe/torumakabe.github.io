@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.17" />
+    <meta name="generator" content="Hugo 0.39" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Azure &middot; re-imagine">
@@ -67,6 +67,313 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">27 Apr 2018, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/terraform_azure_secret/" class="post-title">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="動機">動機</h2>
+
+<p>システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。</p>
+
+<ul>
+<li>いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない
+
+<ul>
+<li>めんどくさいし手が滑る</li>
+</ul></li>
+<li>データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない
+
+<ul>
+<li>メールとかチャットとかファイルサーバーとか勘弁</li>
+</ul></li>
+<li>もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない
+
+<ul>
+<li>本番でも、それやる？</li>
+</ul></li>
+<li>kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない
+
+<ul>
+<li>Base64符号化とか、うっかり忘れる</li>
+</ul></li>
+</ul>
+
+<p>つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。</p>
+
+<h2 id="シナリオ">シナリオ</h2>
+
+<p>Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。</p>
+
+<ul>
+<li>Nodeとデータストアを組み合わせた、<a href="https://github.com/ToruMakabe/ImpressAzureBookNode">Todoアプリケーション</a></li>
+<li>コンテナーイメージは<a href="https://hub.docker.com/r/torumakabe/nodetodo/">Docker Hub</a>にある</li>
+<li>コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う</li>
+<li>データストアはCosmos DB(MongoDB API)</li>
+<li>Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る
+
+<ul>
+<li>接続文字列の渡し方はACI/AKSで異なる</li>
+<li>ACI
+
+<ul>
+<li>コンテナー作成時に環境変数として接続文字列を渡す</li>
+</ul></li>
+<li>AKS
+
+<ul>
+<li>k8sのSecretとして接続文字列をストアする</li>
+<li>コンテナー作成時にSecretを参照し、環境変数として渡す</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="検証環境">検証環境</h2>
+
+<ul>
+<li>Azure Cloud Shell
+
+<ul>
+<li>Terraform v0.11.7</li>
+<li>Terraformの認証はCloud Shell組み込み</li>
+</ul></li>
+<li>Terraform Azure Provider v1.4</li>
+<li>Terraform kubernetes Provider v1.1</li>
+<li>AKS kubernetes 1.9.6</li>
+</ul>
+
+<h2 id="aciの場合">ACIの場合</h2>
+
+<p>ざっと以下の流れです。
+1. リソースグループ作成
+2. Cosmos DBアカウント作成
+3. ACIコンテナーグループ作成 (Cosmos DB属性から接続文字列を生成)</p>
+
+<p>var.で参照している変数は、別ファイルに書いています。</p>
+
+<p>[main.tf]</p>
+
+<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+  name     = &quot;${var.resource_group_name}&quot;
+  location = &quot;${var.resource_group_location}&quot;
+}
+
+resource &quot;random_integer&quot; &quot;ri&quot; {
+  min = 10000
+  max = 99999
+}
+
+resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
+  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  offer_type          = &quot;Standard&quot;
+  kind                = &quot;MongoDB&quot;
+
+  enable_automatic_failover = true
+
+  consistency_policy {
+    consistency_level       = &quot;BoundedStaleness&quot;
+    max_interval_in_seconds = 10
+    max_staleness_prefix    = 200
+  }
+
+  geo_location {
+    location          = &quot;${azurerm_resource_group.rg.location}&quot;
+    failover_priority = 0
+  }
+
+  geo_location {
+    location          = &quot;${var.failover_location}&quot;
+    failover_priority = 1
+  }
+}
+
+resource &quot;azurerm_container_group&quot; &quot;aci-todo&quot; {
+  name                = &quot;aci-todo&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  ip_address_type     = &quot;public&quot;
+  dns_name_label      = &quot;yourtodo&quot;
+  os_type             = &quot;linux&quot;
+
+  container {
+    name   = &quot;hw&quot;
+    image  = &quot;torumakabe/nodetodo&quot;
+    cpu    = &quot;1&quot;
+    memory = &quot;1.5&quot;
+    port   = &quot;8080&quot;
+
+    environment_variables {
+      &quot;MONGO_URL&quot; = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
+    }
+  }
+}
+</code></pre>
+
+<p>containerのenvironment_variablesブロックでCosmos DBの属性を参照し、接続文字列を生成しています。簡単ですね。これで接続文字列コピペ作業から解放されます。</p>
+
+<h2 id="aks">AKS</h2>
+
+<p>AKSの場合、流れは以下の通りです。
+1. リソースグループ作成
+2. Cosmos DBアカウント作成
+3. AKSクラスター作成
+4. k8s Secretを作成 (Cosmos DB属性から接続文字列生成)
+5. k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</p>
+
+<p>[main.tf]</p>
+
+<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+  name     = &quot;${var.resource_group_name}&quot;
+  location = &quot;${var.resource_group_location}&quot;
+}
+
+resource &quot;random_integer&quot; &quot;ri&quot; {
+  min = 10000
+  max = 99999
+}
+
+resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
+  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  offer_type          = &quot;Standard&quot;
+  kind                = &quot;MongoDB&quot;
+
+  enable_automatic_failover = true
+
+  consistency_policy {
+    consistency_level       = &quot;BoundedStaleness&quot;
+    max_interval_in_seconds = 10
+    max_staleness_prefix    = 200
+  }
+
+  geo_location {
+    location          = &quot;${azurerm_resource_group.rg.location}&quot;
+    failover_priority = 0
+  }
+
+  geo_location {
+    location          = &quot;${var.failover_location}&quot;
+    failover_priority = 1
+  }
+}
+
+resource &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
+  name                = &quot;yourakstf&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  dns_prefix          = &quot;yourakstf&quot;
+  kubernetes_version  = &quot;1.9.6&quot;
+
+  linux_profile {
+    admin_username = &quot;${var.admin_username}&quot;
+
+    ssh_key {
+      key_data = &quot;${var.key_data}&quot;
+    }
+  }
+
+  agent_pool_profile {
+    name            = &quot;default&quot;
+    count           = 3
+    vm_size         = &quot;Standard_B2ms&quot;
+    os_type         = &quot;Linux&quot;
+    os_disk_size_gb = 30
+  }
+
+  service_principal {
+    client_id     = &quot;${var.client_id}&quot;
+    client_secret = &quot;${var.client_secret}&quot;
+  }
+}
+
+provider &quot;kubernetes&quot; {
+  host = &quot;${azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
+
+  client_certificate     = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&quot;
+  client_key             = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&quot;
+  cluster_ca_certificate = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
+}
+
+resource &quot;kubernetes_secret&quot; &quot;cosmosdb_secret&quot; {
+  metadata {
+    name = &quot;cosmosdb-secret&quot;
+  }
+
+  data {
+    MONGO_URL = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
+  }
+}
+</code></pre>
+
+<p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
+
+<p>そしてアプリのデプロイ時に、登録したSecretを指定します。ここからはkubernetesワールドなので、kubectlなどを使います。マニフェストは以下のように。</p>
+
+<p>[todo.yaml]</p>
+
+<pre><code>apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: todoapp
+spec:
+  selector:
+    matchLabels:
+      app: todoapp
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: todoapp
+    spec:
+      containers:
+        - name: todoapp
+          image: torumakabe/nodetodo
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cosmosdb-secret
+                  key: MONGO_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapp
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: todoapp
+</code></pre>
+
+<p>シークレットの中身を見ることなく、コピペもせず、もちろんメールやチャットやファイルも使わず、アプリからCosmos DBへ接続できました。</p>
+
+<p>シークレットに限らず、Terraformの属性参照、変数表現は強力ですので、ぜひ活用してみてください。数多くの<a href="https://www.terraform.io/docs/providers/azurerm/">Azureリソース</a>が対応しています。</p>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">09 Apr 2018, 15:00</h1>
                 <section class="post">
@@ -870,322 +1177,6 @@ Address:        168.63.129.16#53
 </code></pre>
 
 <p>ドメイン名あり、なしに関わらず、名前解決できません。VNetが別なのでVNetの内部DNSで解決できない、また、Resolution VNetのVMはレコードがプライベートゾーンに自動登録されないことが分かります。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">26 Mar 2018, 00:08</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/az_vmss_terraform/" class="post-title">AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="動機">動機</h2>
-
-<p>Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように<a href="https://github.com/terraform-providers/terraform-provider-azurerm/pull/811">なりました</a>。Availability Zonesはインフラの根っこの仕組みなので、現在(<sup>2018</sup>&frasl;<sub>3</sub>)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。</p>
-
-<h2 id="前提条件">前提条件</h2>
-
-<ul>
-<li>Availability Zones対応リージョンを選びます。現在は<a href="https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#regions-that-support-availability-zones">5リージョン</a>です。この記事ではEast US 2とします。</li>
-<li>Availability Zonesのプレビューに<a href="https://docs.microsoft.com/ja-jp/azure/availability-zones/az-overview">サインアップ</a>済みとします。</li>
-<li>bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。</li>
-<li>動作確認した環境は以下です。
-
-<ul>
-<li>Terraform 0.11.2</li>
-<li>Terraform Azure Provider 1.3.0</li>
-<li>WSL (ubuntu 16.04)</li>
-<li>macos (High Sierra 10.13.3)</li>
-</ul></li>
-</ul>
-
-<h2 id="コード">コード</h2>
-
-<p>以下のファイルを同じディレクトリに作成します。</p>
-
-<h3 id="terraform-メインコード">Terraform メインコード</h3>
-
-<p>VMSSと周辺リソースを作ります。</p>
-
-<ul>
-<li>最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。</li>
-<li>クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。</li>
-</ul>
-
-<p>[main.tf]</p>
-
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;poc&quot; {
-  name     = &quot;${var.resource_group_name}&quot;
-  location = &quot;East US 2&quot;
-}
-
-resource &quot;azurerm_virtual_network&quot; &quot;poc&quot; {
-  name                = &quot;vnet01&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  location            = &quot;${azurerm_resource_group.poc.location}&quot;
-  address_space       = [&quot;10.0.0.0/16&quot;]
-}
-
-resource &quot;azurerm_subnet&quot; &quot;poc&quot; {
-  name                      = &quot;subnet01&quot;
-  resource_group_name       = &quot;${azurerm_resource_group.poc.name}&quot;
-  virtual_network_name      = &quot;${azurerm_virtual_network.poc.name}&quot;
-  address_prefix            = &quot;10.0.2.0/24&quot;
-  network_security_group_id = &quot;${azurerm_network_security_group.poc.id}&quot;
-}
-
-resource &quot;azurerm_network_security_group&quot; &quot;poc&quot; {
-  name                = &quot;nsg01&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  location            = &quot;${azurerm_resource_group.poc.location}&quot;
-
-  security_rule = [
-    {
-      name                       = &quot;allow_http&quot;
-      priority                   = 100
-      direction                  = &quot;Inbound&quot;
-      access                     = &quot;Allow&quot;
-      protocol                   = &quot;Tcp&quot;
-      source_port_range          = &quot;*&quot;
-      destination_port_range     = &quot;80&quot;
-      source_address_prefix      = &quot;*&quot;
-      destination_address_prefix = &quot;*&quot;
-    },
-    {
-      name                       = &quot;allow_ssh&quot;
-      priority                   = 101
-      direction                  = &quot;Inbound&quot;
-      access                     = &quot;Allow&quot;
-      protocol                   = &quot;Tcp&quot;
-      source_port_range          = &quot;*&quot;
-      destination_port_range     = &quot;22&quot;
-      source_address_prefix      = &quot;*&quot;
-      destination_address_prefix = &quot;*&quot;
-    },
-  ]
-}
-
-resource &quot;azurerm_public_ip&quot; &quot;poc&quot; {
-  name                         = &quot;pip01&quot;
-  resource_group_name          = &quot;${azurerm_resource_group.poc.name}&quot;
-  location                     = &quot;${azurerm_resource_group.poc.location}&quot;
-  public_ip_address_allocation = &quot;static&quot;
-  domain_name_label            = &quot;${var.scaleset_name}&quot;
-
-  sku = &quot;Standard&quot;
-}
-
-resource &quot;azurerm_lb&quot; &quot;poc&quot; {
-  name                = &quot;lb01&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  location            = &quot;${azurerm_resource_group.poc.location}&quot;
-
-  frontend_ip_configuration {
-    name                 = &quot;fipConf01&quot;
-    public_ip_address_id = &quot;${azurerm_public_ip.poc.id}&quot;
-  }
-
-  sku = &quot;Standard&quot;
-}
-
-resource &quot;azurerm_lb_backend_address_pool&quot; &quot;poc&quot; {
-  name                = &quot;bePool01&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  loadbalancer_id     = &quot;${azurerm_lb.poc.id}&quot;
-}
-
-resource &quot;azurerm_lb_rule&quot; &quot;poc&quot; {
-  name                           = &quot;lbRule&quot;
-  resource_group_name            = &quot;${azurerm_resource_group.poc.name}&quot;
-  loadbalancer_id                = &quot;${azurerm_lb.poc.id}&quot;
-  protocol                       = &quot;Tcp&quot;
-  frontend_port                  = 80
-  backend_port                   = 80
-  frontend_ip_configuration_name = &quot;fipConf01&quot;
-  backend_address_pool_id        = &quot;${azurerm_lb_backend_address_pool.poc.id}&quot;
-  probe_id                       = &quot;${azurerm_lb_probe.poc.id}&quot;
-}
-
-resource &quot;azurerm_lb_probe&quot; &quot;poc&quot; {
-  name                = &quot;http-probe&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  loadbalancer_id     = &quot;${azurerm_lb.poc.id}&quot;
-  port                = 80
-}
-
-resource &quot;azurerm_lb_nat_pool&quot; &quot;poc&quot; {
-  count                          = 3
-  name                           = &quot;ssh&quot;
-  resource_group_name            = &quot;${azurerm_resource_group.poc.name}&quot;
-  loadbalancer_id                = &quot;${azurerm_lb.poc.id}&quot;
-  protocol                       = &quot;Tcp&quot;
-  frontend_port_start            = 50000
-  frontend_port_end              = 50119
-  backend_port                   = 22
-  frontend_ip_configuration_name = &quot;fipConf01&quot;
-}
-
-data &quot;template_cloudinit_config&quot; &quot;poc&quot; {
-  gzip          = true
-  base64_encode = true
-
-  part {
-    content_type = &quot;text/cloud-config&quot;
-    content      = &quot;${file(&quot;${path.module}/cloud-config.yaml&quot;)}&quot;
-  }
-}
-
-resource &quot;azurerm_virtual_machine_scale_set&quot; &quot;poc&quot; {
-  name                = &quot;${var.scaleset_name}&quot;
-  resource_group_name = &quot;${azurerm_resource_group.poc.name}&quot;
-  location            = &quot;${azurerm_resource_group.poc.location}&quot;
-  upgrade_policy_mode = &quot;Manual&quot;
-
-  sku {
-    name     = &quot;Standard_B1s&quot;
-    tier     = &quot;Standard&quot;
-    capacity = 3
-  }
-
-  storage_profile_image_reference {
-    publisher = &quot;Canonical&quot;
-    offer     = &quot;UbuntuServer&quot;
-    sku       = &quot;16.04-LTS&quot;
-    version   = &quot;latest&quot;
-  }
-
-  storage_profile_os_disk {
-    name              = &quot;&quot;
-    caching           = &quot;ReadWrite&quot;
-    create_option     = &quot;FromImage&quot;
-    managed_disk_type = &quot;Standard_LRS&quot;
-  }
-
-  os_profile {
-    computer_name_prefix = &quot;pocvmss&quot;
-    admin_username       = &quot;${var.admin_username}&quot;
-    admin_password       = &quot;&quot;
-    custom_data          = &quot;${data.template_cloudinit_config.poc.rendered}&quot;
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = true
-
-    ssh_keys {
-      path     = &quot;/home/${var.admin_username}/.ssh/authorized_keys&quot;
-      key_data = &quot;${file(&quot;~/.ssh/id_rsa.pub&quot;)}&quot;
-    }
-  }
-
-  network_profile {
-    name    = &quot;terraformnetworkprofile&quot;
-    primary = true
-
-    ip_configuration {
-      name                                   = &quot;PoCIPConfiguration&quot;
-      subnet_id                              = &quot;${azurerm_subnet.poc.id}&quot;
-      load_balancer_backend_address_pool_ids = [&quot;${azurerm_lb_backend_address_pool.poc.id}&quot;]
-      load_balancer_inbound_nat_rules_ids    = [&quot;${element(azurerm_lb_nat_pool.poc.*.id, count.index)}&quot;]
-    }
-  }
-
-  zones = [1, 2, 3]
-}
-</code></pre>
-
-<h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
-
-<p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
-
-<p>[cloud-config.yaml]</p>
-
-<pre><code>#cloud-config
-package_upgrade: true
-packages:
-  - nginx
-runcmd:
-  - 'echo &quot;[Instance Name]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;format=text&quot;`    [Zone]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;format=text&quot;`&quot; &gt; /var/www/html/index.nginx-debian.html'
-</code></pre>
-
-<p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer">Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法</a></li>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl">Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する</a></li>
-</ul>
-
-<h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
-
-<p>変数は別ファイルへ。</p>
-
-<p>[variables.tf]</p>
-
-<pre><code>variable &quot;resource_group_name&quot; {
-  default = &quot;your-rg&quot;
-}
-
-variable &quot;scaleset_name&quot; {
-  default = &quot;yourvmss01&quot;
-}
-
-variable &quot;admin_username&quot; {
-  default = &quot;yourname&quot;
-}
-</code></pre>
-
-<h2 id="実行">実行</h2>
-
-<p>では実行。</p>
-
-<pre><code>$ terraform init
-$ terraform plan
-$ terraform apply
-</code></pre>
-
-<p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
-
-<p>インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。</p>
-
-<pre><code>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
-$ tail -f /var/log/cloud-init-output.log
-Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
-</code></pre>
-
-<p>ではWebサーバーにアクセスしてみましょう。</p>
-
-<pre><code>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
-[Instance Name]: yourvmss01_2    [Zone]: 3
-[Instance Name]: yourvmss01_0    [Zone]: 1
-[Instance Name]: yourvmss01_2    [Zone]: 3
-[Instance Name]: yourvmss01_1    [Zone]: 2
-</code></pre>
-
-<p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
-
-<p>では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。</p>
-
-<pre><code>[Instance Name]: yourvmss01_1    [Zone]: 2
-[Instance Name]: yourvmss01_3    [Zone]: 1
-[Instance Name]: yourvmss01_3    [Zone]: 1
-[Instance Name]: yourvmss01_1    [Zone]: 2
-[Instance Name]: yourvmss01_3    [Zone]: 1
-</code></pre>
-
-<p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
 
                     </div>
                 </section>

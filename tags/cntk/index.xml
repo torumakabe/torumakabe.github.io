@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/cntk/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Cntk on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/cntk/</link>
+    <description>Recent content in Cntk on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/cntk/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 17 Apr 2016 10:30:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/cntk/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
@@ -14,105 +17,12 @@
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
-      <description>
-
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
-
-&lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
-
-&lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
-
-&lt;ul&gt;
-&lt;li&gt;Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-&lt;ul&gt;
-&lt;li&gt;Dockerfileの元ネタは&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Tools/docker&#34;&gt;ここ&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;GPUむけもあるけどグッと我慢、今回はCPUで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Hub上のリポジトリは &lt;a href=&#34;https://hub.docker.com/r/torumakabe/cntk-cpu/&#34;&gt;torumakabe/cntk-cpu&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-&lt;ul&gt;
-&lt;li&gt;docker extensionでdocker engineを導入&lt;/li&gt;
-&lt;li&gt;custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
-
-&lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
-
-&lt;p&gt;リソースグループを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json&#34;&gt;azuredeploy.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;編集不要です&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json&#34;&gt;azuredeploy.parameters.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;うし、デプロイ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。&lt;/p&gt;
-
-&lt;p&gt;docker engine入ってますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKビルド済みのdockerイメージ、pullできてますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;問題なし。ではエンジョイ Deep Learning。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
-
-&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
-
-&lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
-
-&lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
-
-&lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
-</description>
+      <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
+試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+リソースグループを作ります。
+C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
+ azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください    うし、デプロイ。</description>
     </item>
     
   </channel>

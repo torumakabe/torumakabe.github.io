@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/windows/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Windows on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/windows/</link>
+    <description>Recent content in Windows on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
@@ -14,36 +17,9 @@
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;小ネタです&#34;&gt;小ネタです&lt;/h2&gt;
-
-&lt;p&gt;Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。&lt;/p&gt;
-
-&lt;h2 id=&#34;条件&#34;&gt;条件&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows
-
-&lt;ul&gt;
-&lt;li&gt;Linuxモード&lt;/li&gt;
-&lt;li&gt;ドライブ共有&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershell窓で実行&#34;&gt;PowerShell窓で実行&lt;/h2&gt;
-
-&lt;p&gt;ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;golang:1.9.2-alpine DockerイメージはGOPATHに/goを&lt;a href=&#34;https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile&#34;&gt;設定して&lt;/a&gt;ビルドされていますが、念のため実行時にも設定&lt;/li&gt;
-&lt;li&gt;-v オプションでのマウントは&lt;a href=&#34;https://docs.docker.com/engine/admin/volumes/bind-mounts/&#34;&gt;非推奨&lt;/a&gt;になったので &amp;ndash;mount で&lt;/li&gt;
-&lt;li&gt;スタティックリンク&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <description> 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
     </item>
     
     <item>
@@ -52,118 +28,17 @@
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/intro_boxstarter/</guid>
-      <description>
-
-&lt;h2 id=&#34;windowsのセットアップどうする問題&#34;&gt;Windowsのセットアップどうする問題&lt;/h2&gt;
-
-&lt;p&gt;そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。&lt;/p&gt;
-
-&lt;p&gt;でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://boxstarter.org/&#34;&gt;Boxstarter&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;わたしはマイクロソフトの仲間、Jessieの&lt;a href=&#34;https://blog.jessfraz.com/post/windows-for-linux-nerds/&#34;&gt;ポスト&lt;/a&gt;で知りました。サンクスJessie。&lt;/p&gt;
-
-&lt;h2 id=&#34;boxstarterで出来ること&#34;&gt;Boxstarterで出来ること&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;シンプルなスクリプトで
-
-&lt;ul&gt;
-&lt;li&gt;Windowsの各種設定&lt;/li&gt;
-&lt;li&gt;Chocolateyパッケージの導入&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;設定ファイルをネットワーク経由で読み込める
-
-&lt;ul&gt;
-&lt;li&gt;Gistから&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベアメタルでも仮想マシンでもOK&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;実行手順&#34;&gt;実行手順&lt;/h2&gt;
-
-&lt;p&gt;手順は&lt;a href=&#34;http://boxstarter.org/Learn/WebLauncher&#34;&gt;Boxstarterのサイト&lt;/a&gt;で紹介されています。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;スクリプトを作る&lt;/li&gt;
-&lt;li&gt;Gistに上げる&lt;/li&gt;
-&lt;li&gt;Boxstarterを導入する&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;PowerShell 3以降であれば&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Gist上のスクリプトを指定して実行する&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Install-BoxstarterPackage -PackageName &amp;quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&amp;quot; -DisableReboots
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。&lt;/p&gt;
-
-&lt;h2 id=&#34;サンプルスクリプト&#34;&gt;サンプルスクリプト&lt;/h2&gt;
-
-&lt;p&gt;スクリプトは&lt;a href=&#34;https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac&#34;&gt;こんな感じ&lt;/a&gt;に書きます。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Learn more: http://boxstarter.org/Learn/WebLauncher
-
-# Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
-# Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)
-
-#---- TEMPORARY ---
-Disable-UAC
-
-#--- Fonts ---
-choco install inconsolata
-  
-#--- Windows Settings ---
-# 可能な設定はここで確認 --&amp;gt; [Boxstarter WinConfig Features](http://boxstarter.org/WinConfig)
-Disable-GameBarTips
-
-Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowFileExtensions
-Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
-
-Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name NavPaneShowAllFolders -Value 1
-
-#--- Windows Subsystems/Features ---
-choco install Microsoft-Hyper-V-All -source windowsFeatures
-choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
-choco install containers -source windowsfeatures
-
-#--- Tools ---
-choco install git.install
-choco install yarn
-choco install sysinternals
-choco install 7zip
-
-#--- Apps ---
-choco install googlechrome
-choco install docker-for-windows
-choco install microsoft-teams
-choco install slack
-choco install putty
-choco install visualstudiocode
-
-#--- Restore Temporary Settings ---
-Enable-UAC
-Enable-MicrosoftUpdate
-Install-WindowsUpdate -acceptEula
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;便利。&lt;/p&gt;
-
-&lt;p&gt;ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio Code &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync&#34;&gt;Settings Sync拡張&lt;/a&gt;を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。&lt;/p&gt;
-
-&lt;p&gt;新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。&lt;/p&gt;
-</description>
+      <description>Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
+でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
+Boxstarter
+わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
+Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入  設定ファイルをネットワーク経由で読み込める  Gistから  ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
+ スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force   Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
+Install-BoxstarterPackage -PackageName &amp;quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&amp;quot; -DisableReboots  以上。
+サンプルスクリプト スクリプトはこんな感じに書きます。
+ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
+# Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&amp;gt; [Boxstarter WinConfig Features](http://boxstarter.</description>
     </item>
     
     <item>
@@ -172,61 +47,15 @@ Install-WindowsUpdate -acceptEula
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/bashonwindows_nvm/</guid>
-      <description>
-
-&lt;h2 id=&#34;bash-on-windows-現時点での使いどころ&#34;&gt;Bash on Windows 現時点での使いどころ&lt;/h2&gt;
-
-&lt;p&gt;Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。&lt;/p&gt;
-
-&lt;p&gt;たとえばNodeのバージョン管理。Windowsには&lt;a href=&#34;https://github.com/marcelklehr/nodist&#34;&gt;nodist&lt;/a&gt;がありますが、Linux/Macでは動きません。Linux/Macで使ってる&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;NVM&lt;/a&gt;がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。&lt;/p&gt;
-
-&lt;p&gt;最近、Azure FunctionsでNode v6.4.0が&lt;a href=&#34;https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/&#34;&gt;使えるようになった&lt;/a&gt;ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。&lt;/p&gt;
-
-&lt;h2 id=&#34;nvmのインストール&#34;&gt;NVMのインストール&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Bash on Ubuntu on Windowsを入れます (&lt;a href=&#34;http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html&#34;&gt;参考&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Bash on Ubuntu on Windowsを起動します&lt;/li&gt;
-&lt;li&gt;build-essentialとlibssl-devを入れます&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo apt-get install build-essential checkinstall
-sudo apt-get install libssl-dev
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;インストールスクリプトを流します&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;バージョンアップを考慮し、インストールのつど&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;公式ページ&lt;/a&gt;を確認してください。&lt;/p&gt;
-
-&lt;p&gt;以上。&lt;/p&gt;
-
-&lt;h2 id=&#34;nvmの使い方&#34;&gt;NVMの使い方&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;nvm install 6.4.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;指定のバージョンをインストールします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;nvm use 6.4.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;使うバージョンを指定します。&lt;/p&gt;
-
-&lt;p&gt;簡単ですね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd /mnt/c/your_work_directory
-node ./index.js
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なんて感じで、書いたコードをテストしちゃってください。&lt;/p&gt;
-
-&lt;p&gt;なお、Visual Studio Code使いの人は&lt;a href=&#34;https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/&#34;&gt;統合ターミナルをBashにしておく&lt;/a&gt;と、さらに幸せになれます。&lt;/p&gt;
-</description>
+      <description>Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。
+たとえばNodeのバージョン管理。Windowsにはnodistがありますが、Linux/Macでは動きません。Linux/Macで使ってるNVMがWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。
+最近、Azure FunctionsでNode v6.4.0が使えるようになったので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。
+NVMのインストール  Bash on Ubuntu on Windowsを入れます (参考) Bash on Ubuntu on Windowsを起動します build-essentialとlibssl-devを入れます  sudo apt-get install build-essential checkinstall sudo apt-get install libssl-dev   インストールスクリプトを流します  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash  バージョンアップを考慮し、インストールのつど公式ページを確認してください。
+以上。
+NVMの使い方 nvm install 6.4.0  指定のバージョンをインストールします。
+nvm use 6.4.0  使うバージョンを指定します。
+簡単ですね。
+cd /mnt/c/your_work_directory node .</description>
     </item>
     
   </channel>

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/rbac/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Rbac on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/rbac/</link>
+    <description>Recent content in Rbac on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 22 Jan 2018 22:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
@@ -14,150 +17,16 @@
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
-      <description>
-
-&lt;h2 id=&#34;共同作成者は-ちょっと強い&#34;&gt;共同作成者は、ちょっと強い&lt;/h2&gt;
-
-&lt;p&gt;Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。&lt;/p&gt;
-
-&lt;p&gt;ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。&lt;/p&gt;
-
-&lt;p&gt;なのですが、このようなケースで、権限付与の落とし穴があります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サブスクリプション所有者が開発用リソースグループを作る&lt;/li&gt;
-&lt;li&gt;スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる&lt;/li&gt;
-&lt;li&gt;開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ&lt;/li&gt;
-&lt;li&gt;開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)&lt;/li&gt;
-&lt;li&gt;開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない&lt;/li&gt;
-&lt;li&gt;詰む&lt;/li&gt;
-&lt;li&gt;サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;いい感じのカスタムロールを作る&#34;&gt;いい感じのカスタムロールを作る&lt;/h2&gt;
-
-&lt;p&gt;Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。&lt;/p&gt;
-
-&lt;p&gt;シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    &amp;quot;Name&amp;quot;: &amp;quot;Resource Group Contributor&amp;quot;,
-    &amp;quot;IsCustom&amp;quot;: true,
-    &amp;quot;Description&amp;quot;: &amp;quot;Lets you manage everything except access to resources, but can not delete Resouce Group&amp;quot;,
-    &amp;quot;Actions&amp;quot;: [
-        &amp;quot;*&amp;quot;
-    ],
-    &amp;quot;NotActions&amp;quot;: [
-        &amp;quot;Microsoft.Authorization/*/Delete&amp;quot;,
-        &amp;quot;Microsoft.Authorization/*/Write&amp;quot;,
-        &amp;quot;Microsoft.Authorization/elevateAccess/Action&amp;quot;,
-        &amp;quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&amp;quot;
-    ],
-    &amp;quot;AssignableScopes&amp;quot;: [
-        &amp;quot;/subscriptions/your-subscriotion-id&amp;quot;
-    ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。&lt;/p&gt;
-
-&lt;p&gt;では、カスタムロールを作成します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az role definition create --role-definition ./role.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;出力にカスタムロールのIDが入っていますので、控えておきます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;id&amp;quot;: &amp;quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる&#34;&gt;カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる&lt;/h2&gt;
-
-&lt;p&gt;次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;サービスプリンシパル作成時に割り当てる場合は、以下のように。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az ad sp create-for-rbac -n &amp;quot;rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; --role your-customrole-id --scopes &amp;quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;余談ですが、&amp;rdquo;az ad sp create-for-rbac&amp;rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。&lt;/p&gt;
-
-&lt;h2 id=&#34;試してみる&#34;&gt;試してみる&lt;/h2&gt;
-
-&lt;p&gt;ログインして試してみましょう。サービスプリンシパルの例です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az login --service-principal -u &amp;quot;http://rgcontributor&amp;quot; -p &amp;quot;your-password&amp;quot; -t &amp;quot;your-tenant-id&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az vm list -o table
-Name              ResourceGroup     Location
-----------------  ----------------  ----------
-sampledevvm01     sample-dev-rg  japaneast
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az group create -n rgc-poc-rg -l japaneast
-The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;リソースグループを消してみます。消すかい？ -&amp;gt; y -&amp;gt; ダメ、という、持ち上げて落とす怒り方です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az group delete -n sample-dev-rg
-Are you sure you want to perform this operation? (y/n): y
-The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;でもリソースグループのリソースを一括削除したい&#34;&gt;でもリソースグループのリソースを一括削除したい&lt;/h2&gt;
-
-&lt;p&gt;でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。&lt;/p&gt;
-
-&lt;p&gt;空テンプレートを、empty.jsonとしましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-    &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&amp;quot;,
-    &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
-    &amp;quot;parameters&amp;quot;: {},
-    &amp;quot;variables&amp;quot;: {},
-    &amp;quot;resources&amp;quot;: [],
-    &amp;quot;outputs&amp;quot;: {}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;破壊的空砲を打ちます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;リソースグループは残ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az vm list -o table
-
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <description>共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
+ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
+なのですが、このようなケースで、権限付与の落とし穴があります。
+ サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
+いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
+シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
+{ &amp;quot;Name&amp;quot;: &amp;quot;Resource Group Contributor&amp;quot;, &amp;quot;IsCustom&amp;quot;: true, &amp;quot;Description&amp;quot;: &amp;quot;Lets you manage everything except access to resources, but can not delete Resouce Group&amp;quot;, &amp;quot;Actions&amp;quot;: [ &amp;quot;*&amp;quot; ], &amp;quot;NotActions&amp;quot;: [ &amp;quot;Microsoft.Authorization/*/Delete&amp;quot;, &amp;quot;Microsoft.Authorization/*/Write&amp;quot;, &amp;quot;Microsoft.Authorization/elevateAccess/Action&amp;quot;, &amp;quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&amp;quot; ], &amp;quot;AssignableScopes&amp;quot;: [ &amp;quot;/subscriptions/your-subscriotion-id&amp;quot; ] }  組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
+では、カスタムロールを作成します。
+$ az role definition create --role-definition ./role.json  出力にカスタムロールのIDが入っていますので、控えておきます。
+&amp;quot;id&amp;quot;: &amp;quot;/subscriptions/your-subscriotion-id/providers/Microsoft.</description>
     </item>
     
   </channel>

@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.17" />
+    <meta name="generator" content="Hugo 0.39" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="re-imagine &middot; re-imagine">
@@ -67,6 +67,67 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">06 Sep 2014, 00:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/vagrant-openstack/" class="post-title">Vagrant-hpからVagrant-openstack-pluginへ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h3 id="ツールやsdkはボチボチ集約したほうが">ツールやSDKはボチボチ集約したほうが</h3>
+
+<p>これまでHP Public Cloudむけの<a href="http://www.vagrantup.com/">Vagrant</a>は、<a href="https://github.com/mohitsethi/vagrant-hp">vagrant-hp plug-in</a>を<a href="http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/">使って</a>ました。でも最近、より汎用的で開発が活発な<a href="https://github.com/cloudbau/vagrant-openstack-plugin">vagrant-openstack-plugin</a>へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。</p>
+
+<p>多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。</p>
+
+<p>さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。</p>
+
+<h3 id="前提条件">前提条件</h3>
+
+<ul>
+<li>Vagrant 1.6.3</li>
+<li>vagrant-openstack-plugin 0.8.0</li>
+<li>HP Public Cloud (2014/9/6)</li>
+</ul>
+
+<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
+
+<p><a href="https://github.com/cloudbau/vagrant-openstack-plugin">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
+
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
+
+<script type="text/javascript" src="http://gist.github.com/c9de20c61752864aca86.js"></script>
+
+<p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
+
+<ul>
+<li>フレーバーとイメージ名は正規表現で指定できます。</li>
+<li>OpenStack CLI群と同じ環境変数を使ってます。</li>
+<li>Floating IPは&rdquo;:auto&rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。</li>
+</ul>
+
+<p>で、ふつーに動きます。乗り換え決定です。</p>
+
+<h3 id="スナップショット便利">スナップショット便利</h3>
+
+<p>vagrant-hpでは使えなかったはず。こいつは便利だ。</p>
+
+<pre><code>$ vagrant openstack snapshot -n lab01_snap
+==&gt; default: This server instance is snapshoting!
+==&gt; default: Snapshot is ok
+</code></pre>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">06 May 2014, 00:00</h1>
                 <section class="post">
@@ -225,7 +286,7 @@ test.txt
                 <section class="post">
                     <header class="post-header">
 
-                        <a href="http://torumakabe.github.io/post/OpenStack-3primer/" class="post-title">OpenStack超入門シリーズ 初期3部作完結</a>
+                        <a href="http://torumakabe.github.io/post/openstack-3primer/" class="post-title">OpenStack超入門シリーズ 初期3部作完結</a>
 
                         <p class="post-meta">
                             
@@ -287,35 +348,6 @@ test.txt
 <p>ビジネス上、難しいことは重々承知で書いています。でも、クラウドサービスが本当に「ユーティリティ」を目指すのなら、いつか問われる課題ではないかと。</p>
 
 <p>みなさんは、どう思われますか?</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">27 Mar 2014, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/OpenStack-primer/" class="post-title">OpenStack超入門シリーズ</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="基本的な質問が増えてきた">基本的な質問が増えてきた</h3>
-
-<p>OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。</p>
-
-<h3 id="よく聞かれることはまとめておこう">よく聞かれることはまとめておこう</h3>
-
-<p>もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。</p>
-
-<p>第一弾
-<a href="http://www.slideshare.net/ToruMakabe/openstack-nova">OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り</a></p>
 
                     </div>
                 </section>

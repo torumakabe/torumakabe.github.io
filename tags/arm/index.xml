@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/arm/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Arm on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/arm/</link>
+    <description>Recent content in Arm on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 25 Mar 2016 22:50:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
@@ -14,118 +17,20 @@
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
-      <description>
-
-&lt;h2 id=&#34;俺の屍を越えていけ&#34;&gt;俺の屍を越えていけ&lt;/h2&gt;
-
-&lt;p&gt;今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。この週末お楽しみ、という人も多いかもしれません。&lt;/p&gt;
-
-&lt;p&gt;小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。&lt;/p&gt;
-
-&lt;h2 id=&#34;この3つは触る前から意識しよう&#34;&gt;この3つは触る前から意識しよう&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;ARMテンプレートリソースは分離して使う&lt;/li&gt;
-&lt;li&gt;リソース競合したら依存関係を定義する&lt;/li&gt;
-&lt;li&gt;公開鍵認証SSH指定でエラーが出ても驚かない&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&#34;1-armテンプレートリソースは分離して使う&#34;&gt;1. ARMテンプレートリソースは分離して使う&lt;/h2&gt;
-
-&lt;p&gt;v0.6.14で、リソース&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html&#34;&gt;&amp;ldquo;azurerm_template_deployment&amp;rdquo;&lt;/a&gt;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。&lt;/p&gt;
-
-&lt;p&gt;でも、現時点の実装では、おすすめしません。&lt;/p&gt;
-
-&lt;h3 id=&#34;armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす&#34;&gt;ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす&lt;/h3&gt;
-
-&lt;p&gt;避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。&lt;/p&gt;
-
-&lt;h3 id=&#34;タイムアウトしがち&#34;&gt;タイムアウトしがち&lt;/h3&gt;
-
-&lt;p&gt;それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96&#34;&gt;割れ窓理論&lt;/a&gt;的によろしくないです。&lt;/p&gt;
-
-&lt;h3 id=&#34;せっかくのリソースグラフを活用できない&#34;&gt;せっかくのリソースグラフを活用できない&lt;/h3&gt;
-
-&lt;p&gt;Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。&lt;/p&gt;
-
-&lt;h3 id=&#34;読みづらい&#34;&gt;読みづらい&lt;/h3&gt;
-
-&lt;p&gt;Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。&lt;/p&gt;
-
-&lt;p&gt;それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。&lt;/p&gt;
-
-&lt;h2 id=&#34;2-リソース競合したら依存関係を定義する&#34;&gt;2. リソース競合したら依存関係を定義する&lt;/h2&gt;
-
-&lt;p&gt;Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&lt;a href=&#34;https://www.terraform.io/intro/getting-started/dependencies.html&#34;&gt;&amp;ldquo;depends_on&amp;rdquo;&lt;/a&gt;で明示してあげましょう。&lt;/p&gt;
-
-&lt;p&gt;例えば、&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_429_workaround/&#34;&gt;以前のエントリ&lt;/a&gt;で紹介した下記の問題。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい&lt;/li&gt;
-&lt;li&gt;セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを&lt;strong&gt;作成したら/存在したら&lt;/strong&gt;次にすすむ」というTerraformのグラフでうまく表現できないようです。&lt;/p&gt;
-
-&lt;p&gt;そのような場合、明示的に依存関係を&amp;rdquo;depends_on&amp;rdquo;で定義します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Create a frontend subnet
-# &amp;quot;depends_on&amp;quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
-    name = &amp;quot;frontend&amp;quot;
-    resource_group_name = &amp;quot;${var.resource_group_name}&amp;quot;
-    virtual_network_name = &amp;quot;${azurerm_virtual_network.vnet1.name}&amp;quot;
-    address_prefix = &amp;quot;${var.vnet1_frontend_address_prefix}&amp;quot;
-    network_security_group_id = &amp;quot;${azurerm_network_security_group.frontend.id}&amp;quot;
-    depends_on = [
-        &amp;quot;azurerm_network_security_rule.fe_web80&amp;quot;,
-        &amp;quot;azurerm_network_security_rule.fe_web443&amp;quot;,
-        &amp;quot;azurerm_network_security_rule.fe_ssh&amp;quot;
-    ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。&lt;/p&gt;
-
-&lt;h2 id=&#34;3-公開鍵認証ssh指定でエラーが出ても驚かない&#34;&gt;3. 公開鍵認証SSH指定でエラーが出ても驚かない&lt;/h2&gt;
-
-&lt;p&gt;TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &amp;quot;/home/${var.adminuser}/.ssh/authorized_keys&amp;quot;
-        key_data = &amp;quot;${file(&amp;quot;/Users/you/.ssh/yourkey.pem&amp;quot;)}&amp;quot;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;が、エラーが返ってきます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;amp;errors.errorString{s:&amp;quot;Invalid address to set: []string{\&amp;quot;os_profile_linux_config\&amp;quot;, \&amp;quot;12345678\&amp;quot;, \&amp;quot;ssh_keys\&amp;quot;}&amp;quot;}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。&lt;/p&gt;
-
-&lt;p&gt;妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5793&#34;&gt;Issueとして認識&lt;/a&gt;されていますので、修正を待ちましょう。&lt;/p&gt;
-</description>
+      <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
+小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
+この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&amp;ldquo;azurerm_template_deployment&amp;rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
+でも、現時点の実装では、おすすめしません。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
+タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
+せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
+読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
+それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&amp;ldquo;depends_on&amp;rdquo;で明示してあげましょう。
+例えば、以前のエントリで紹介した下記の問題。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.</description>
     </item>
     
     <item>
@@ -134,70 +39,21 @@ resource &amp;quot;azurerm_subnet&amp;quot; &amp;quot;frontend&amp;quot; {
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
-      <description>
-
-&lt;h2 id=&#34;terraformer増加に備えて&#34;&gt;Terraformer増加に備えて&lt;/h2&gt;
-
-&lt;p&gt;2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが&lt;a href=&#34;https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md&#34;&gt;追加&lt;/a&gt;されました。待っていた人も多いのではないでしょうか。&lt;/p&gt;
-
-&lt;p&gt;追って&lt;a href=&#34;https://www.hashicorp.com/partners.html#sipart&#34;&gt;Hashicorp認定パートナー&lt;/a&gt;のクリエーションラインさんから導入・サポートサービスが&lt;a href=&#34;http://www.creationline.com/lab/13268&#34;&gt;アナウンス&lt;/a&gt;されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。&lt;/p&gt;
-
-&lt;h2 id=&#34;エラーコード429&#34;&gt;エラーコード429&lt;/h2&gt;
-
-&lt;p&gt;さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;autorestがステータスコード429をキャッチしました。&lt;a href=&#34;https://tools.ietf.org/html/rfc6585#section-4&#34;&gt;RFC上で429は&lt;/a&gt;&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。&lt;/p&gt;
-
-&lt;h2 id=&#34;対処法&#34;&gt;対処法&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。&lt;/p&gt;
-
-&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;
-
-&lt;p&gt;エラーになった背景ですが、2つの可能性があります。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;APIリクエスト数上限に達した&lt;/li&gt;
-&lt;li&gt;リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&#34;1-apiリクエスト数上限に達した&#34;&gt;1. APIリクエスト数上限に達した&lt;/h3&gt;
-
-&lt;p&gt;Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/&#34;&gt;Azure サブスクリプションとサービスの制限、クォータ、制約&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。&lt;/p&gt;
-
-&lt;p&gt;長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。&lt;/p&gt;
-
-&lt;p&gt;ひとまずプロダクトの方針は確認したいので、Issueに質問を&lt;a href=&#34;https://github.com/hashicorp/terraform/issues/5704&#34;&gt;あげておきました&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した&#34;&gt;2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した&lt;/h3&gt;
-
-&lt;p&gt;Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。&lt;/p&gt;
-
-&lt;p&gt;わたしが経験したエラーの中に、こんなものがありました。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。&lt;/p&gt;
-
-&lt;p&gt;Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして&lt;a href=&#34;https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429&#34;&gt;あがっています&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;でも安心してください。&lt;strong&gt;もう一度applyしてください&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;(2016/3/25 追記) 回避策を&lt;a href=&#34;http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/&#34;&gt;別エントリ&lt;/a&gt;に書きました&lt;/strong&gt;&lt;/p&gt;
-</description>
+      <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
+追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
+エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。
+対処法 もう一度applyしてください
+冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
+背景 エラーになった背景ですが、2つの可能性があります。
+ APIリクエスト数上限に達した リソースの作成や更新に時間がかかっており、Azure側で処理を中断した  1. APIリクエスト数上限に達した Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。
+Azure サブスクリプションとサービスの制限、クォータ、制約
+Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。
+長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。
+ひとまずプロダクトの方針は確認したいので、Issueに質問をあげておきました。
+2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。
+わたしが経験したエラーの中に、こんなものがありました。
+Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation.</description>
     </item>
     
     <item>
@@ -206,91 +62,11 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
-      <description>
-
-&lt;h2 id=&#34;いつの間に&#34;&gt;いつの間に&lt;/h2&gt;
-
-&lt;p&gt;ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか&lt;a href=&#34;https://www.packer.io/docs/builders/azure.html&#34;&gt;Azure ARM対応のBuilder&lt;/a&gt;が出ておりました。0.10からかな。早く言ってください。&lt;/p&gt;
-
-&lt;h2 id=&#34;ansible-localと組み合わせたサンプル&#34;&gt;ansible_localと組み合わせたサンプル&lt;/h2&gt;
-
-&lt;p&gt;さっそく試してそつなく動くことを確認しました。サンプルを&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Githubにあげておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。&lt;/p&gt;
-
-&lt;h3 id=&#34;前準備&#34;&gt;前準備&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。&lt;/li&gt;
-&lt;li&gt;認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。&lt;/li&gt;
-&lt;li&gt;Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
-
-&lt;ul&gt;
-&lt;li&gt;Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ansibleはapache2をインストール、サービスEnableするサンプルにしました。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;サンプル&#34;&gt;サンプル&lt;/h3&gt;
-
-&lt;p&gt;ubuntu.jsonはこんな感じです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;variables&amp;quot;: {
-    &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot;
-  },
-  &amp;quot;builders&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;,
-
-    &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;,
-    &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;,
-    &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;,
-    &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;,
-    &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;,
-    &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;,
-
-    &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;,
-    &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;,
-
-    &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;,
-    &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;,
-    &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;,
-
-    &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;,
-    &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot;
-  }],
-  &amp;quot;provisioners&amp;quot;: [{
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/provision.sh&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;ansible-local&amp;quot;,
-    &amp;quot;playbook_file&amp;quot;: &amp;quot;../ansible/baseimage.yml&amp;quot;,
-    &amp;quot;inventory_file&amp;quot;: &amp;quot;../ansible/hosts&amp;quot;,
-    &amp;quot;role_paths&amp;quot;: [
-      &amp;quot;../ansible/roles/baseimage&amp;quot;
-    ]
-  },
-  {
-    &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;,
-      &amp;quot;scripts&amp;quot;: [
-        &amp;quot;../script/ubuntu/deprovision.sh&amp;quot;
-    ]
-  }]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは&lt;a href=&#34;https://github.com/ToruMakabe/Packer_Azure_Sample&#34;&gt;Github&lt;/a&gt;でご確認を。&lt;/p&gt;
-
-&lt;p&gt;これで手順書&amp;amp;目視&amp;amp;指差し確認でイメージ作るのを、やめられそうですね。&lt;/p&gt;
-</description>
+      <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
+ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
+手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
+前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。  ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
+{ &amp;quot;variables&amp;quot;: { &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot; }, &amp;quot;builders&amp;quot;: [{ &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;, &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;, &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;, &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;, &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;, &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;, &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;, &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;, &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;, &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;, &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;, &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;, &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;, &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot; }], &amp;quot;provisioners&amp;quot;: [{ &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;, &amp;quot;scripts&amp;quot;: [ &amp;quot;.</description>
     </item>
     
     <item>
@@ -299,196 +75,15 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
-      <description>
-
-&lt;p&gt;注: 2018/1/8にサンプルを更新しました。更新エントリは&lt;a href=&#34;http://torumakabe.github.io/post/terraform_azure_sample_201801/&#34;&gt;こちら&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h2 id=&#34;情報がありそうでない&#34;&gt;情報がありそうでない&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_tf_arm_sp/&#34;&gt;以前のエントリ&lt;/a&gt;で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。&lt;/p&gt;
-
-&lt;p&gt;今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。&lt;/p&gt;
-
-&lt;p&gt;なお、考え方は他のクラウドやデプロイツールでも応用できるかと。&lt;/p&gt;
-
-&lt;h2 id=&#34;4原則&#34;&gt;4原則&lt;/h2&gt;
-
-&lt;ol&gt;
-&lt;li&gt;セキュリティファースト&lt;/li&gt;
-&lt;li&gt;手順書をなくそう&lt;/li&gt;
-&lt;li&gt;分割境界にこだわりすぎない&lt;/li&gt;
-&lt;li&gt;早すぎる最適化は悪&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;なお、サンプルのTerraformファイル群を、&lt;a href=&#34;https://github.com/ToruMakabe/Terraform_Azure_Sample&#34;&gt;Githubに置いて&lt;/a&gt;おきました。&lt;/p&gt;
-
-&lt;p&gt;今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── .gitignore
-├── main.tf
-├── availability_set
-│   ├── avset_web.tf
-│   ├── avset_db.tf
-│   └── variables.tf
-├── network
-│   ├── sg_backend.tf
-│   ├── sg_frontend.tf
-│   ├── variables.tf
-│   └── vnets.tf
-├── storage
-│   ├── storage_backend.tf
-│   ├── storage_frontend.tf
-│   └── variables.tf
-└── terraform.tfvars
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。&lt;/p&gt;
-
-&lt;h2 id=&#34;1-セキュリティファースト&#34;&gt;1. セキュリティファースト&lt;/h2&gt;
-
-&lt;p&gt;セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;認証情報は変数指定し、設定ファイルから読み込む&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない&lt;/li&gt;
-&lt;li&gt;terraform.tfvarsなどにまとめて書く&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Gitなら.gitignoreに指定する&lt;/li&gt;
-&lt;li&gt;.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
-
-&lt;ul&gt;
-&lt;li&gt;チームで使う場合はファイルではなく、Consulなどのリモートバックエンドを使うと思いますが、念のため&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;RBACで必要最小限の権限を付与する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう&lt;/li&gt;
-&lt;li&gt;身内がリソースをうっかり壊したら、それは管理者の責任です
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ネットワークセキュリティグループはサブネットに指定しておく&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;個々のVMの管理者に任せず、サブネットで絞っておきましょう
-
-&lt;ul&gt;
-&lt;li&gt;VMはアドホックに作られるケースが多く、ルーズになりがちです&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
-
-&lt;ul&gt;
-&lt;li&gt;フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)&lt;/li&gt;
-&lt;li&gt;バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;2-手順書をなくそう&#34;&gt;2. 手順書をなくそう&lt;/h2&gt;
-
-&lt;p&gt;どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。&lt;/p&gt;
-
-&lt;p&gt;ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。&lt;/p&gt;
-
-&lt;h2 id=&#34;3-分割境界にこだわりすぎない&#34;&gt;3. 分割境界にこだわりすぎない&lt;/h2&gt;
-
-&lt;p&gt;TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。&lt;/p&gt;
-
-&lt;p&gt;グルーピング、分割する目的は、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;main.tfの肥大化を防止し、コードの見通しを良くする&lt;/li&gt;
-&lt;li&gt;再利用しやすくする&lt;/li&gt;
-&lt;li&gt;責任範囲を明確化し、オーナー意識を醸成する&lt;/li&gt;
-&lt;li&gt;権限とコードを一致させる&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。&lt;/p&gt;
-
-&lt;p&gt;以下が分割単位、境界ポリシーの例です。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;リソースタイプで分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;サンプルはその例
-
-&lt;ul&gt;
-&lt;li&gt;ネットワーク、ストレージ、VM Availability Setで分割&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;直観的&lt;/li&gt;
-&lt;li&gt;デプロイに関わる人数が少ない間はこれがおすすめ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;組織単位で分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4&#34;&gt;コンウェイの法則&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;リソースタイプ = 組織 という場合もある
-
-&lt;ul&gt;
-&lt;li&gt;ネットワーク管理者が別グループ、など&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;地理的に分割する&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リージョンやロケーションで分割&lt;/li&gt;
-&lt;li&gt;リソースタイプと組み合わせる手もある
-
-&lt;ul&gt;
-&lt;li&gt;&amp;ldquo;Network_JapanEast&amp;rdquo;など
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;静的なリソースと動的なリソースを分ける&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;変化の頻度で分ける
-
-&lt;ul&gt;
-&lt;li&gt;ネットワークが頻繁に変わることはまれ&lt;/li&gt;
-&lt;li&gt;VMは増減が激しい&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動的なリソースは対象から外す、別手段とする手も
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。&lt;/p&gt;
-
-&lt;h2 id=&#34;4-早すぎる最適化は悪&#34;&gt;4. 早すぎる最適化は悪&lt;/h2&gt;
-
-&lt;p&gt;最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。&lt;/p&gt;
-
-&lt;p&gt;なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。&lt;/p&gt;
-
-&lt;p&gt;ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。&lt;/p&gt;
-
-&lt;p&gt;そして、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;リファクタリングできるなら、する&lt;/li&gt;
-&lt;li&gt;リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす&lt;/li&gt;
-&lt;li&gt;はじめに作った人へマサカリを投げない&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;完璧を求めずにいきましょう。&lt;/p&gt;
-
-&lt;p&gt;でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。&lt;/p&gt;
-</description>
+      <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
+情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
+今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
+なお、考え方は他のクラウドやデプロイツールでも応用できるかと。
+4原則  セキュリティファースト 手順書をなくそう 分割境界にこだわりすぎない 早すぎる最適化は悪  なお、サンプルのTerraformファイル群を、Githubに置いておきました。
+今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
+. ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
+1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
+ 認証情報は変数指定し、設定ファイルから読み込む</description>
     </item>
     
     <item>
@@ -497,158 +92,16 @@ azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
-      <description>
-
-&lt;h2 id=&#34;高まってまいりました&#34;&gt;高まってまいりました&lt;/h2&gt;
-
-&lt;p&gt;全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。&lt;/p&gt;
-
-&lt;p&gt;Terraformのマイナーバージョンアップのたびに、&lt;a href=&#34;https://www.terraform.io/docs/providers/azurerm/index.html&#34;&gt;Azure Resource Manager Providerのリソース&lt;/a&gt;が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。&lt;/p&gt;
-
-&lt;p&gt;そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。&lt;/p&gt;
-
-&lt;h2 id=&#34;client-id-client-secret-って何よ&#34;&gt;client_id/client_secret って何よ&lt;/h2&gt;
-
-&lt;p&gt;以下がARM向けのProvider設定です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
-provider &amp;quot;azurerm&amp;quot; {
-  subscription_id = &amp;quot;...&amp;quot;
-  client_id       = &amp;quot;...&amp;quot;
-  client_secret   = &amp;quot;...&amp;quot;
-  tenant_id       = &amp;quot;...&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、&lt;strong&gt;client_id/client_secret って何よ&lt;/strong&gt;。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;おっとそういうことか。OAuth。&lt;/p&gt;
-
-&lt;h2 id=&#34;サービスプリンシパルを使おう&#34;&gt;サービスプリンシパルを使おう&lt;/h2&gt;
-
-&lt;p&gt;Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/&#34;&gt;&amp;ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/&#34;&gt;&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。&lt;/p&gt;
-
-&lt;p&gt;まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&amp;ndash;passwordはclient_secretになるので、おぼえておきましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure ad app create --name &amp;quot;My Terraform&amp;quot; --home-page &amp;quot;http://tftest.makabe.info&amp;quot; --identifier-uris &amp;quot;http://tftest.makabe.info&amp;quot; --password pAssw0rd%
-info:    Executing command ad app create
-+ Creating application My Terraform
-data:    AppId:                   AppId-AppId-AppId-AppId-AppId
-data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
-data:    DisplayName:             My Terraform
-data:    IdentifierUris:          0=http://tftest.makabe.info
-data:    ReplyUrls:
-data:    AvailableToOtherTenants:  False
-data:    AppPermissions:
-data:                             claimValue:  user_impersonation
-data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
-data:                             directAccessGrantTypes:
-data:                             displayName:  Access My Terraform
-data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
-data:                             isDisabled:
-data:                             origin:  Application
-data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
-data:                             resourceScopeType:  Personal
-data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
-data:                             userConsentDisplayName:  Access My Terraform
-data:                             lang:
-info:    ad app create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure ad sp create AppId-AppId-AppId-AppId-AppId
-info:    Executing command ad sp create
-+ Creating service principal for application AppId-AppId-AppId-AppId-AppId
-data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
-data:    Display Name:            My Terraform
-data:    Service Principal Names:
-data:                             AppId-AppId-AppId-AppId-AppId
-data:                             http://tftest.makabe.info
-info:    ad sp create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;サービスプリンシパルの役割を設定します。&amp;ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。&lt;/p&gt;
-
-&lt;p&gt;この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
-info:    Executing command role assignment create
-+ Finding role with specified name
-/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
-data:    RoleDefinitionName   : Contributor
-data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
-data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
-data:    Display Name         : My Terraform
-data:    SignInName           :
-data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
-data:    ObjectType           : ServicePrincipal
-data:
-+
-info:    role assignment create command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;サービスプリンシパルまわりの設定は以上です。&lt;/p&gt;
-
-&lt;p&gt;テナントIDを確認しておきましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ azure account list --json
-[
-  {
-    &amp;quot;id&amp;quot;: &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;,
-    &amp;quot;name&amp;quot;: &amp;quot;Your Subscription Name&amp;quot;,
-    &amp;quot;user&amp;quot;: {
-      &amp;quot;name&amp;quot;: &amp;quot;abc@microsoft.com&amp;quot;,
-      &amp;quot;type&amp;quot;: &amp;quot;user&amp;quot;
-    },
-    &amp;quot;tenantId&amp;quot;: &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;,
-    &amp;quot;state&amp;quot;: &amp;quot;Enabled&amp;quot;,
-    &amp;quot;isDefault&amp;quot;: true,
-    &amp;quot;registeredProviders&amp;quot;: [],
-    &amp;quot;environmentName&amp;quot;: &amp;quot;AzureCloud&amp;quot;
-  }
-]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Configure the Azure Resource Manager Provider
-provider &amp;quot;azurerm&amp;quot; {
-  subscription_id = &amp;quot;SubId-SubId-SubId-SubId-SubId&amp;quot;
-  client_id       = &amp;quot;AppId-AppId-AppId-AppId-AppId&amp;quot;
-  client_secret   = &amp;quot;pAssw0rd%&amp;quot;
-  tenant_id       = &amp;quot;TenantId-TenantId-TenantId-TenantId-TenantId&amp;quot;
-}
-
-# Create a resource group
-resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;test&amp;quot; {
-    name     = &amp;quot;test&amp;quot;
-    location = &amp;quot;Japan West&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;apply。もちろんplanしましたよ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ terraform apply
-azurerm_resource_group.test: Creating...
-  location: &amp;quot;&amp;quot; =&amp;gt; &amp;quot;japanwest&amp;quot;
-  name:     &amp;quot;&amp;quot; =&amp;gt; &amp;quot;test&amp;quot;
-azurerm_resource_group.test: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これで、ARM認証難民がうまれなくなりますように。&lt;/p&gt;
-</description>
+      <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
+Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
+そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
+client_id/client_secret って何よ 以下がARM向けのProvider設定です。
+# Configure the Azure Resource Manager Provider provider &amp;quot;azurerm&amp;quot; { subscription_id = &amp;quot;...&amp;quot; client_id = &amp;quot;...&amp;quot; client_secret = &amp;quot;...&amp;quot; tenant_id = &amp;quot;...&amp;quot; }  subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、client_id/client_secret って何よ。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。
+&amp;quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&amp;quot;  おっとそういうことか。OAuth。
+サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
+&amp;ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&amp;rdquo;
+&amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;
+以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</description>
     </item>
     
     <item>
@@ -657,128 +110,28 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
       <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
-      <description>
-
-&lt;h2 id=&#34;ケースバイケースだけど&#34;&gt;ケースバイケースだけど&lt;/h2&gt;
-
-&lt;p&gt;Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。&lt;/p&gt;
-
-&lt;p&gt;特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。&lt;/p&gt;
-
-&lt;p&gt;なので「ケースバイケース。以上」とは、言いにくい。&lt;/p&gt;
-
-&lt;p&gt;私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。&lt;/p&gt;
-
-&lt;h2 id=&#34;書く前に前提など&#34;&gt;書く前に前提など&lt;/h2&gt;
-
-&lt;p&gt;対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。&lt;/p&gt;
-
-&lt;p&gt;レイヤリングや用語は、 @gosukenator さんの&lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;&amp;ldquo;インフラ系技術の流れ&amp;rdquo;&lt;/a&gt;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。&lt;/p&gt;
-
-&lt;p&gt;では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;そもそもツールで自動化すべきかを考える&#34;&gt;そもそもツールで自動化すべきかを考える&lt;/h2&gt;
-
-&lt;p&gt;いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。&lt;/p&gt;
-
-&lt;p&gt;なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。&lt;/p&gt;
-
-&lt;h2 id=&#34;使い捨てられないかを考える&#34;&gt;使い捨てられないかを考える&lt;/h2&gt;
-
-&lt;p&gt;次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。&lt;/p&gt;
-
-&lt;p&gt;ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。&lt;/p&gt;
-
-&lt;p&gt;変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。&lt;/p&gt;
-
-&lt;p&gt;変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;優先事項や制約条件を洗い出す&#34;&gt;優先事項や制約条件を洗い出す&lt;/h2&gt;
-
-&lt;p&gt;アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;社内/プロジェクト標準&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;他レイヤでの優先ツール&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;規模&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;チーム or ひとり&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;Windows or Linux&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。&lt;/p&gt;
-
-&lt;h2 id=&#34;マネージドサービス-機能を活用する&#34;&gt;マネージドサービス、機能を活用する&lt;/h2&gt;
-
-&lt;p&gt;マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。&lt;/p&gt;
-
-&lt;p&gt;また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。&lt;/p&gt;
-
-&lt;p&gt;ですが、&lt;a href=&#34;http://torumakabe.github.io/post/arm_idempotent/&#34;&gt;以前のエントリ&lt;/a&gt;で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。&lt;/p&gt;
-
-&lt;p&gt;よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。&lt;/p&gt;
-
-&lt;p&gt;ARM Templateでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARM TemplateにはDSCやシェルを実行するエクステンションが使えるので、活用します。&lt;/p&gt;
-
-&lt;p&gt;また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。&lt;/p&gt;
-
-&lt;p&gt;以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。&lt;/p&gt;
-
-&lt;h2 id=&#34;汎用的-リファレンスアーキテクチャ&#34;&gt;汎用的 リファレンスアーキテクチャ&lt;/h2&gt;
-
-&lt;p&gt;具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f&#34;&gt;&amp;ldquo;Automating Deployment with Azure &amp;amp; Chef&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;ARM TemplateでBootstrapping&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMを4つ作成、1つはLinux、他はWindows&lt;/li&gt;
-&lt;li&gt;ストレージ、ネットワークの作成&lt;/li&gt;
-&lt;li&gt;VMのストレージ、ネットワーク設定&lt;/li&gt;
-&lt;li&gt;OSの導入&lt;/li&gt;
-&lt;li&gt;ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)&lt;/li&gt;
-&lt;li&gt;LinuxへChefサーバを導入、各種設定 (Shell Extension)
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;ChefでConfiguration&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;各ノードのChef bootstrap(言葉が混同しやすいので注意)&lt;/li&gt;
-&lt;li&gt;Chef Clientサービスの起動設定&lt;/li&gt;
-&lt;li&gt;DBサーバのDB領域ディスク作成、フォーマット&lt;/li&gt;
-&lt;li&gt;DBサーバへSQL Server 2014のインストール&lt;/li&gt;
-&lt;li&gt;ChefがDBサーバが設定通りになるよう維持し続ける
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。&lt;/p&gt;
-
-&lt;p&gt;書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。&lt;/p&gt;
-</description>
+      <description>ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。
+特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。
+なので「ケースバイケース。以上」とは、言いにくい。
+私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。
+書く前に前提など 対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。
+レイヤリングや用語は、 @gosukenator さんの&amp;ldquo;インフラ系技術の流れ&amp;rdquo;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。
+では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。
+そもそもツールで自動化すべきかを考える いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。
+なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。
+使い捨てられないかを考える 次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。
+ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。
+変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。
+変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。
+優先事項や制約条件を洗い出す アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。
+ 社内/プロジェクト標準  　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。
+ 他レイヤでの優先ツール  　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。
+ 規模  　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。
+ チーム or ひとり  　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。
+ Windows or Linux  　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。
+マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
+また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
+ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。</description>
     </item>
     
     <item>
@@ -787,262 +140,30 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
       <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/arm_idempotent/</guid>
-      <description>
-
-&lt;h2 id=&#34;宣言的に-冪等に&#34;&gt;宣言的に、冪等に&lt;/h2&gt;
-
-&lt;p&gt;ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。&lt;/p&gt;
-
-&lt;p&gt;さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。&lt;/p&gt;
-
-&lt;h3 id=&#34;azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview&#34;&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/&#34;&gt;Azure リソース マネージャーの概要&lt;/a&gt;&lt;/h3&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&amp;rdquo;&lt;/p&gt;
-
-&lt;p&gt;&amp;ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&amp;rdquo;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;冪等と言い切ってはいませんが、目的は似ています。&lt;/p&gt;
-
-&lt;p&gt;なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。&lt;/p&gt;
-
-&lt;p&gt;残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;増分デプロイと完全デプロイ&#34;&gt;増分デプロイと完全デプロイ&lt;/h2&gt;
-
-&lt;p&gt;まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える&lt;a href=&#34;https://github.com/Azure/azure-xplat-cli&#34;&gt;クロスプラットフォームCLI&lt;/a&gt;もあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。&lt;/p&gt;
-
-&lt;p&gt;今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/&#34;&gt;ドキュメント&lt;/a&gt;で確認してください。&lt;/p&gt;
-
-&lt;p&gt;さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。&lt;/p&gt;
-
-&lt;p&gt;コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します&lt;/p&gt;
-
-&lt;p&gt;・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します&lt;/p&gt;
-
-&lt;p&gt;・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。&lt;/p&gt;
-
-&lt;p&gt;いっぽうで、完全モードです。&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します&lt;/p&gt;
-
-&lt;p&gt;・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します&lt;/p&gt;
-
-&lt;p&gt;・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;動きをつかむ&#34;&gt;動きをつかむ&lt;/h2&gt;
-
-&lt;p&gt;では動きを見ていきましょう。テンプレートはGithubに公開されている&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux&#34;&gt;Very simple deployment of an Linux VM&lt;/a&gt;を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を&lt;a href=&#34;https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json&#34;&gt;リンク先&lt;/a&gt;でざっと確認してください。&lt;/p&gt;
-
-&lt;p&gt;パラメータファイル(azuredeploy.parameters.json)は以下とします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&amp;quot;,
-  &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;,
-  &amp;quot;parameters&amp;quot;: {
-    &amp;quot;adminUsername&amp;quot;: {
-      &amp;quot;value&amp;quot;: &amp;quot;azureUser&amp;quot;
-    },
-    &amp;quot;adminPassword&amp;quot;: {
-      &amp;quot;value&amp;quot;: &amp;quot;password1234!&amp;quot;
-    },
-    &amp;quot;dnsLabelPrefix&amp;quot;: {
-      &amp;quot;value&amp;quot;: &amp;quot;armpocps&amp;quot;
-    },
-    &amp;quot;ubuntuOSVersion&amp;quot;: {
-      &amp;quot;value&amp;quot;: &amp;quot;14.04.2-LTS&amp;quot;
-    }    
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;まず、1回目の実行です。リソースグループ &amp;ldquo;ARMEval&amp;rdquo;に対しデプロイします。このリソースグループは前もって作っておいた空の箱です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 11:46:41
-Mode              : Incremental
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できあがりです。空のリソースグループ にLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどがデプロイされました。Modeを指定しない場合は増分(Incremental)となります。&lt;/p&gt;
-
-&lt;p&gt;この環境にじわじわと変更を入れていきましょう。まずはazuredeploy.parameter.json上のパラメータ、DNS名のPrefix(dnsLabelPrefix)をarmpocps -&amp;gt; armpocps2と変えます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;quot;dnsLabelPrefix&amp;quot;: {
-  &amp;quot;value&amp;quot;: &amp;quot;armpocps2&amp;quot;
-},
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;では再投入です。パラメータファイルの内容は変えましたが、コマンドは同じです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-[snip]
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;変更内容の確認です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; Get-AzureRmPublicIpAddress
-[snip]
-DnsSettings              : {
-                             &amp;quot;DomainNameLabel&amp;quot;: &amp;quot;armpocps2&amp;quot;,
-                             &amp;quot;Fqdn&amp;quot;: &amp;quot;armpocps2.japanwest.cloudapp.azure.com&amp;quot;
-                           }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;問題なく変わっていますね。冪等チックです。この例ではシンプルにDNS名のPrefixを変えましたが、VMインスタンス数やsubnet名を変えたりもできます。関心のある方は&lt;a href=&#34;https://gallery.technet.microsoft.com/Cloud-Consistency-with-0b79b775&#34;&gt;ドキュメント&lt;/a&gt;を。&lt;/p&gt;
-
-&lt;p&gt;増分モードによる変更は期待できそうです。が、さて、ここからが探検です。リソース削除が可能な完全モードを試してみましょう。
-リソース定義ファイル(azuredeploy.json)から、大胆にVMの定義を削ってみます。下記リソースをファイルからごっそり消します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;apiVersion&amp;quot;: &amp;quot;[variables(&#39;apiVersion&#39;)]&amp;quot;,
-  &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot;,
-  &amp;quot;name&amp;quot;: &amp;quot;[variables(&#39;vmName&#39;)]&amp;quot;,
-[snip]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;では、完全モード &amp;ldquo;-Mode complete&amp;rdquo;付きでコマンドを再投入します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group &#39;ARMEval&#39; which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &amp;quot;Y&amp;quot;): Y
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 12:01:00
-Mode              : Complete
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;あっさり完了しました。本当にVMが消えているが確認します。出力が冗長ですがご容赦ください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; Find-AzureRmResource -ResourceGroupNameContains ARMEval
-
-Name              : myPublicIP
-ResourceId        :     /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/publicIPAddresses/myPublicIP
-ResourceName      : myPublicIP
-ResourceType      : Microsoft.Network/publicIPAddresses
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : myVMNic
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/networkInterfaces/myVMNic
-ResourceName      : myVMNic
-ResourceType      : Microsoft.Network/networkInterfaces
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : MyVNET
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/virtualNetworks/MyVNET
-ResourceName      : MyVNET
-ResourceType      : Microsoft.Network/virtualNetworks
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : yourstorageaccount
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Storage/storageAccounts/yourstorageaccount
-ResourceName      : yourstorageaccount
-ResourceType      : Microsoft.Storage/storageAccounts
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-Tags              : {}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;VMだけが消えています。定義からリソースがなくなれば、存在するリソースも消す、これが完全モードです。&lt;/p&gt;
-
-&lt;p&gt;さらに検証。冪等さを求めるのであれば、またリソース定義にVMを加えて再投入したら、涼しい顔で復活してほしい。先ほどazuredeploy.jsonから消したVMリソース定義を、そのまま書き戻して再投入してみます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group &#39;ARMEval&#39; which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &amp;quot;Y&amp;quot;): Y
-
-New-AzureRmResourceGroupDeployment : 21:05:52 - Resource Microsoft.Compute/virtualMachines &#39;MyUbuntuVM&#39; failed with message &#39;The resource operation completed with terminal provisioning state &#39;Failed&#39;.&#39;
-[snip]
-New-AzureRmResourceGroupDeployment : 21:05:52 - One or more errors occurred while preparing VM disks. See disk instance view for details.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;残念ながら失敗しました。どうやらdiskまわりのエラーが発生したようです。&lt;/p&gt;
-
-&lt;p&gt;これは、完全モードでのリソース削除の仕様が原因です。ARMは該当のVMリソースは消すのですが、VMが格納されているストレージを削除しません。リソース作成時は依存関係が考慮されますが、削除時は異なります。&lt;/p&gt;
-
-&lt;p&gt;試しにストレージを消して再実行してみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-[snip]
-ProvisioningState : Succeeded
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
-
-&lt;p&gt;冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。&lt;/p&gt;
-
-&lt;p&gt;そこで、ARM Templateをデプロイに組み込む際、ARMによるデプロイはBootstrap用途に限定し、より構成頻度が高いConfiguration用途には、冪等性を持った別のツールを組み合わせるのが現実解と考えます。&lt;/p&gt;
-
-&lt;p&gt;Bootstrap用途では、プラットフォームの提供機能を使ったほうが、機能も多いし最適化されています。Azureで今後この層を担当していくのはARMです。そして、この用途ではChefやAnsibleなど汎用ツールに物足りなさがあります。&lt;/p&gt;
-
-&lt;p&gt;また、Bootstrapは1回切りであるケースが多いので、失敗したらリソースグループをばっさり消して再作成する、と割り切りやすいです。それならば冪等でなくともいいでしょう。&lt;/p&gt;
-
-&lt;p&gt;長くなったので、デプロイツールの組み合わせについては、あたらめて書きたいと思います。&lt;/p&gt;
-
-&lt;p&gt;参考: &lt;a href=&#34;http://mizzy.org/blog/2013/10/29/1/&#34;&gt;インフラ系技術の流れ Bootstrapping/Configuration/Orchestration&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
+さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
+Azure リソース マネージャーの概要  &amp;ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&amp;rdquo;
+&amp;ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&amp;rdquo;
+ 冪等と言い切ってはいませんが、目的は似ています。
+なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
+残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
+増分デプロイと完全デプロイ まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使えるクロスプラットフォームCLIもあります。
+PS C:\&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。
+今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途ドキュメントで確認してください。
+さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
+コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
+・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
+いっぽうで、完全モードです。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ 2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
+動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
+パラメータファイル(azuredeploy.parameters.json)は以下とします。
+{ &amp;quot;$schema&amp;quot;: &amp;quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&amp;quot;, &amp;quot;contentVersion&amp;quot;: &amp;quot;1.0.0.0&amp;quot;, &amp;quot;parameters&amp;quot;: { &amp;quot;adminUsername&amp;quot;: { &amp;quot;value&amp;quot;: &amp;quot;azureUser&amp;quot; }, &amp;quot;adminPassword&amp;quot;: { &amp;quot;value&amp;quot;: &amp;quot;password1234!</description>
     </item>
     
   </channel>

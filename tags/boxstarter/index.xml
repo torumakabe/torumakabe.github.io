@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/boxstarter/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Boxstarter on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/boxstarter/</link>
+    <description>Recent content in Boxstarter on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/boxstarter/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 13 Oct 2017 14:30:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/boxstarter/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>自動化を愛するWindows使いへ Boxstarterのすすめ</title>
@@ -14,118 +17,17 @@
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/intro_boxstarter/</guid>
-      <description>
-
-&lt;h2 id=&#34;windowsのセットアップどうする問題&#34;&gt;Windowsのセットアップどうする問題&lt;/h2&gt;
-
-&lt;p&gt;そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。&lt;/p&gt;
-
-&lt;p&gt;でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://boxstarter.org/&#34;&gt;Boxstarter&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;わたしはマイクロソフトの仲間、Jessieの&lt;a href=&#34;https://blog.jessfraz.com/post/windows-for-linux-nerds/&#34;&gt;ポスト&lt;/a&gt;で知りました。サンクスJessie。&lt;/p&gt;
-
-&lt;h2 id=&#34;boxstarterで出来ること&#34;&gt;Boxstarterで出来ること&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;シンプルなスクリプトで
-
-&lt;ul&gt;
-&lt;li&gt;Windowsの各種設定&lt;/li&gt;
-&lt;li&gt;Chocolateyパッケージの導入&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;設定ファイルをネットワーク経由で読み込める
-
-&lt;ul&gt;
-&lt;li&gt;Gistから&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベアメタルでも仮想マシンでもOK&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;実行手順&#34;&gt;実行手順&lt;/h2&gt;
-
-&lt;p&gt;手順は&lt;a href=&#34;http://boxstarter.org/Learn/WebLauncher&#34;&gt;Boxstarterのサイト&lt;/a&gt;で紹介されています。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;スクリプトを作る&lt;/li&gt;
-&lt;li&gt;Gistに上げる&lt;/li&gt;
-&lt;li&gt;Boxstarterを導入する&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;PowerShell 3以降であれば&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Gist上のスクリプトを指定して実行する&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Install-BoxstarterPackage -PackageName &amp;quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&amp;quot; -DisableReboots
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。&lt;/p&gt;
-
-&lt;h2 id=&#34;サンプルスクリプト&#34;&gt;サンプルスクリプト&lt;/h2&gt;
-
-&lt;p&gt;スクリプトは&lt;a href=&#34;https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac&#34;&gt;こんな感じ&lt;/a&gt;に書きます。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# Learn more: http://boxstarter.org/Learn/WebLauncher
-
-# Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
-# Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)
-
-#---- TEMPORARY ---
-Disable-UAC
-
-#--- Fonts ---
-choco install inconsolata
-  
-#--- Windows Settings ---
-# 可能な設定はここで確認 --&amp;gt; [Boxstarter WinConfig Features](http://boxstarter.org/WinConfig)
-Disable-GameBarTips
-
-Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowFileExtensions
-Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
-
-Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name NavPaneShowAllFolders -Value 1
-
-#--- Windows Subsystems/Features ---
-choco install Microsoft-Hyper-V-All -source windowsFeatures
-choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
-choco install containers -source windowsfeatures
-
-#--- Tools ---
-choco install git.install
-choco install yarn
-choco install sysinternals
-choco install 7zip
-
-#--- Apps ---
-choco install googlechrome
-choco install docker-for-windows
-choco install microsoft-teams
-choco install slack
-choco install putty
-choco install visualstudiocode
-
-#--- Restore Temporary Settings ---
-Enable-UAC
-Enable-MicrosoftUpdate
-Install-WindowsUpdate -acceptEula
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;便利。&lt;/p&gt;
-
-&lt;p&gt;ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio Code &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync&#34;&gt;Settings Sync拡張&lt;/a&gt;を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。&lt;/p&gt;
-
-&lt;p&gt;新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。&lt;/p&gt;
-</description>
+      <description>Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
+でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
+Boxstarter
+わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
+Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入  設定ファイルをネットワーク経由で読み込める  Gistから  ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
+ スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force   Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
+Install-BoxstarterPackage -PackageName &amp;quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&amp;quot; -DisableReboots  以上。
+サンプルスクリプト スクリプトはこんな感じに書きます。
+ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
+# Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&amp;gt; [Boxstarter WinConfig Features](http://boxstarter.</description>
     </item>
     
   </channel>

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/bot/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Bot on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/bot/</link>
+    <description>Recent content in Bot on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/bot/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 08 May 2016 14:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/bot/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
@@ -14,238 +17,13 @@
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
-      <description>
-
-&lt;h2 id=&#34;まだ好みなんて聞いてないぜ&#34;&gt;まだ好みなんて聞いてないぜ&lt;/h2&gt;
-
-&lt;p&gt;Build 2016で、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/services/functions/&#34;&gt;Azure Functions&lt;/a&gt;が発表されました。&lt;/p&gt;
-
-&lt;p&gt;Azure Functionsは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう&lt;/li&gt;
-&lt;li&gt;利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表&lt;/li&gt;
-&lt;li&gt;Azure内外機能との、容易なイベント連動。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;が特徴です。AWSのLambdaと似てるっちゃ似ています。&lt;/p&gt;
-
-&lt;p&gt;何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;基本方針&#34;&gt;基本方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;FunctionsはAzure内の様々な機能と&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings&#34;&gt;イベント連動&lt;/a&gt;できるが、あえてサンプルの少ないAzure外とつないでみる&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIを使って、webhook連動する&lt;/li&gt;
-&lt;li&gt;Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す&lt;/li&gt;
-&lt;li&gt;ビールは&lt;a href=&#34;http://beertaster.org/beerstyle/web/beerstyle_main_j.html&#34;&gt;Craft Beer Association&lt;/a&gt;の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す&lt;/li&gt;
-&lt;li&gt;Botらしく、それらしい文末表現をランダムで返す&lt;/li&gt;
-&lt;li&gt;好みとか文脈は全く聞かないぜSorry&lt;/li&gt;
-&lt;li&gt;アプリはNodeで書く。C#のサンプルは増えてきたので&lt;/li&gt;
-&lt;li&gt;静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う&lt;/li&gt;
-&lt;li&gt;DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #&lt;a href=&#34;https://gist.github.com/murdockcrc/12266f9d844be416a6a0&#34;&gt;サンプル&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る&lt;/li&gt;
-&lt;li&gt;拡張性はひとまず目をつぶる  #&lt;a href=&#34;http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f&#34;&gt;この辺の話&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。&lt;/p&gt;
-
-&lt;h2 id=&#34;必要な作業&#34;&gt;必要な作業&lt;/h2&gt;
-
-&lt;p&gt;以下が必要な作業の流れです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Azureで
-
-&lt;ul&gt;
-&lt;li&gt;Function Appの作成  #1&lt;/li&gt;
-&lt;li&gt;Bot用Functionの作成 #2&lt;/li&gt;
-&lt;li&gt;Facebook Messenger APIとの接続検証  #6&lt;/li&gt;
-&lt;li&gt;Facebook Messenger API接続用Tokenの設定  #8&lt;/li&gt;
-&lt;li&gt;DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9&lt;/li&gt;
-&lt;li&gt;DocumentDBのストアドプロシージャ作成  #10&lt;/li&gt;
-&lt;li&gt;Function Appを書く  #11&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入 #12&lt;/li&gt;
-&lt;li&gt;Function AppのGithub連携設定  #13&lt;/li&gt;
-&lt;li&gt;Function Appのデプロイ (GithubへのPush)  #14&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Facebookで
-
-&lt;ul&gt;
-&lt;li&gt;Facebook for Developersへの登録  #3&lt;/li&gt;
-&lt;li&gt;Botをひも付けるFacebook Pageの作成  #4&lt;/li&gt;
-&lt;li&gt;Bot用マイアプリの作成  #5&lt;/li&gt;
-&lt;li&gt;Azure Functionsからのcallback URLを登録、接続検証  #6&lt;/li&gt;
-&lt;li&gt;Azure Functions向けTokenを生成 #7&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Function Appを書くまで、#1〜2、#5〜8は、&lt;a href=&#34;http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/&#34;&gt;こちらのブログエントリ&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;li&gt;Facebook for Developersへの登録、#3は、&lt;a href=&#34;https://developers.facebook.com/&#34;&gt;https://developers.facebook.com/&lt;/a&gt; から。いきなり迷子の人は、&lt;a href=&#34;http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8&#34;&gt;こちら&lt;/a&gt;も参考に。&lt;/li&gt;
-&lt;li&gt;Facebook Pageの作成は、&lt;a href=&#34;http://allabout.co.jp/gm/gc/387840/&#34;&gt;ここ&lt;/a&gt;を。Botで楽しむだけなら細かい設定は後回しでいいです。&lt;/li&gt;
-&lt;li&gt;DocumentDBについては、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/&#34;&gt;公式&lt;/a&gt;を。
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/&#34;&gt;DBアカウント〜コレクション作成&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/&#34;&gt;ドキュメントインポート&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/&#34;&gt;ストアドプロシージャ&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;FunctionsのサイトにDocumentDB Node SDKを導入する#12は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/05/043723&#34;&gt;こちら&lt;/a&gt;を。コンソールからnpm installできます。&lt;br /&gt;&lt;/li&gt;
-&lt;li&gt;Github連携設定、#13〜14は、&lt;a href=&#34;http://tech.guitarrapc.com/entry/2016/04/03/051552&#34;&gt;こちら&lt;/a&gt;がとても参考になります。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;function-appのサンプル&#34;&gt;Function Appのサンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/MakabeerBot&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;p&gt;ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。&lt;/p&gt;
-
-&lt;p&gt;ではFunction Appの実体、index.jsを見てみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var https = require(&#39;https&#39;);
-var documentClient = require(&amp;quot;documentdb&amp;quot;).DocumentClient;
-const databaseUrl = &amp;quot;dbs/&amp;quot; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &amp;quot;masterKey&amp;quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &amp;quot; &amp;quot; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &amp;quot;attachment&amp;quot;:{
-          &amp;quot;type&amp;quot;:&amp;quot;template&amp;quot;,
-          &amp;quot;payload&amp;quot;:{
-            &amp;quot;template_type&amp;quot;:&amp;quot;button&amp;quot;,
-            &amp;quot;text&amp;quot;:msgAll,
-            &amp;quot;buttons&amp;quot;:[
-              {
-                &amp;quot;type&amp;quot;:&amp;quot;web_url&amp;quot;,
-                &amp;quot;url&amp;quot;:value[0].randomDocument.url,
-                &amp;quot;title&amp;quot;:&amp;quot;詳しく&amp;quot;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: &#39;graph.facebook.com&#39;,
-      port: 443,
-      path: &#39;/v2.6/me/messages&#39;,
-      method: &#39;POST&#39;,
-      headers: {
-        &#39;Content-Type&#39;: &#39;application/json&#39;,
-        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/beer&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &amp;quot;/colls/eom&amp;quot;;
-    var sprocUrl = collectionUrl + &amp;quot;/sprocs/GetRandomDoc&amp;quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &amp;lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;amp;&amp;amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;最下部のmodule.export以降のブロックで、webhookイベントを受け取ります&lt;/li&gt;
-&lt;li&gt;それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
-
-&lt;ul&gt;
-&lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
-
-&lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
-  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;&amp;ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
-</description>
+      <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
+Azure Functionsは、
+ アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。
+何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。
+基本方針  FunctionsはAzure内の様々な機能とイベント連動できるが、あえてサンプルの少ないAzure外とつないでみる Facebook Messenger APIを使って、webhook連動する Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す ビールはCraft Beer Associationの分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す Botらしく、それらしい文末表現をランダムで返す 好みとか文脈は全く聞かないぜSorry アプリはNodeで書く。C#のサンプルは増えてきたので 静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する #サンプル FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る 拡張性はひとまず目をつぶる #この辺の話  ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。
+必要な作業 以下が必要な作業の流れです。
+ Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14  Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7   アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</description>
     </item>
     
   </channel>

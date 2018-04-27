@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/linux/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Linux on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/linux/</link>
+    <description>Recent content in Linux on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
@@ -14,38 +17,13 @@
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
-      <description>
-
-&lt;h2 id=&#34;cliでコンテナを更新したい&#34;&gt;CLIでコンテナを更新したい&lt;/h2&gt;
-
-&lt;p&gt;Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
-
-&lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
-
-&lt;p&gt;まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
-
-&lt;p&gt;Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。&lt;/p&gt;
-
-&lt;p&gt;すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az appservice web config container show -n yourcontainerapp -g YourRG
-{
-  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
-{
-  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これで更新されます。&lt;/p&gt;
-</description>
+      <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
+さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
+まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
+Azure CLI 2.0 Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。
+すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; }  これで更新されます。</description>
     </item>
     
     <item>
@@ -54,171 +32,13 @@
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
-      <description>
-
-&lt;h2 id=&#34;定義領域全てが課金されるわけではありません&#34;&gt;定義領域全てが課金されるわけではありません&lt;/h2&gt;
-
-&lt;p&gt;AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。&lt;/p&gt;
-
-&lt;p&gt;なお、Premium Storageは例外です。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/pricing/details/storage/&#34;&gt;FAQ&lt;/a&gt;を確認してみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
-
-空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;詳細な定義は、以下で。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/&#34;&gt;Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;書き込み方はosやファイルシステム次第&#34;&gt;書き込み方はOSやファイルシステム次第&lt;/h2&gt;
-
-&lt;p&gt;じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;RHEL 7.2 on Azure&lt;/li&gt;
-&lt;li&gt;XFS &amp;amp; Ext4&lt;/li&gt;
-&lt;li&gt;10GBytesのPage Blobの上にファイルシステムを作成&lt;/li&gt;
-&lt;li&gt;mkfsはデフォルト&lt;/li&gt;
-&lt;li&gt;mountはデフォルトとdiscardオプションありの2パターン&lt;/li&gt;
-&lt;li&gt;MD、LVM構成にしない&lt;/li&gt;
-&lt;li&gt;以下のタイミングで課金対象容量を確認
-
-&lt;ul&gt;
-&lt;li&gt;Page BlobのVMアタッチ時&lt;/li&gt;
-&lt;li&gt;ファイルシステム作成時&lt;/li&gt;
-&lt;li&gt;マウント時&lt;/li&gt;
-&lt;li&gt;約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)&lt;/li&gt;
-&lt;li&gt;5GBytesのファイル削除時&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;課金対象容量は、以下のPowerShellで取得します。リファレンスは&lt;a href=&#34;https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802&#34;&gt;ここ&lt;/a&gt;。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
-
-$blobSizeInBytes = 124 + $Blob.Name.Length * 2
-
-$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
-while ($metadataEnumerator.MoveNext())
-{
-    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
-}
-
-$Blob.ICloudBlob.GetPageRanges() | 
-    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
-
-return $blobSizeInBytes
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ストレージコンテキストの作り方は&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/&#34;&gt;ここ&lt;/a&gt;を参考にしてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;結果&#34;&gt;結果&lt;/h2&gt;
-
-&lt;h3 id=&#34;xfs&#34;&gt;XFS&lt;/h3&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,791,949&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,253,590,051&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;10,710,029&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;h3 id=&#34;ext4&#34;&gt;Ext4&lt;/h3&gt;
-
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th align=&#34;left&#34;&gt;　確認タイミング　&lt;/th&gt;
-&lt;th align=&#34;right&#34;&gt;　課金対象容量(Bytes)　&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;Page BlobのVMアタッチ時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;960&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;ファイルシステム作成時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;138,683,592&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;マウント時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;306,451,689&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5GBytesのデータ書き込み時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;5,549,470,887&lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-&lt;td align=&#34;left&#34;&gt;5Gbytesのファイル削除時 (discard)&lt;/td&gt;
-&lt;td align=&#34;right&#34;&gt;306,586,780&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;この結果から、以下のことがわかります。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;10GBytesのBlobを作成しても、全てが課金対象ではない&lt;/li&gt;
-&lt;li&gt;当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる&lt;/li&gt;
-&lt;li&gt;discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
-
-&lt;ul&gt;
-&lt;li&gt;OSがPage Blobに&amp;rdquo;消した&amp;rdquo;と伝えないから&lt;/li&gt;
-&lt;li&gt;discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)&lt;/li&gt;
-&lt;li&gt;discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が&lt;a href=&#34;https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html&#34;&gt;おすすめ&lt;/a&gt;
-
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。&lt;/p&gt;
-</description>
+      <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。
+なお、Premium Storageは例外です。FAQを確認してみましょう。
+仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
+Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
+書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
+ RHEL 7.2 on Azure XFS &amp;amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+$Blob = Get-AzureStorageBlob yourDataDisk.</description>
     </item>
     
     <item>
@@ -227,115 +47,19 @@ return $blobSizeInBytes
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
-      <description>
-
-&lt;h2 id=&#34;ファイル共有-あまりおすすめしないです&#34;&gt;ファイル共有、あまりおすすめしないです&lt;/h2&gt;
-
-&lt;p&gt;いきなりタイトルを否定しました。ロック。&lt;/p&gt;
-
-&lt;p&gt;さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。&lt;/p&gt;
-
-&lt;p&gt;ですが&lt;strong&gt;個人的には&lt;/strong&gt;あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。&lt;/p&gt;
-
-&lt;p&gt;でも、否定はしません。アプリの作りを変えられないケースもあるかと思います。&lt;/p&gt;
-
-&lt;p&gt;そこで、もしAzureでファイル共有が必要であれば、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-introduction/&#34;&gt;Azure File Storage&lt;/a&gt;を検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。&lt;/p&gt;
-
-&lt;p&gt;対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。&lt;/p&gt;
-
-&lt;p&gt;使い方は公式ドキュメントを。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares&#34;&gt;&amp;ldquo;Azure Storage での Azure CLI の使用&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/&#34;&gt;&amp;ldquo;Linux で Azure File Storage を使用する方法&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;もうちょっと情報欲しいですね。補足のためにわたしも流します。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-cliでストレージアカウントを作成し-ファイル共有を設定&#34;&gt;Azure CLIでストレージアカウントを作成し、ファイル共有を設定&lt;/h2&gt;
-
-&lt;p&gt;ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;local$ azure storage account create tomakabefspoc -l &amp;quot;Japan East&amp;quot; --type LRS -g fspoc
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;local$ azure storage account connectionstring show tomakabefspoc -g fspoc
-info:    Executing command storage account connectionstring show
-+ Getting storage account keys
-data:    connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==
-info:    storage account connectionstring show command OK
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;shareを作成します。share名はfspocshareとしました。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;local$ azure storage share create -a tomakabefspoc -k qwertyuiopasdfghjklzxcvbnm== fspocshare
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;エンドポイントを確認しておきましょう。VMからのマウントの際に必要です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;local$ azure storage account show tomakabefspoc -g fspoc
-[snip]
-data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;linux-2vmで共有&#34;&gt;Linux * 2VMで共有&lt;/h2&gt;
-
-&lt;p&gt;Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。&lt;a href=&#34;https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/&#34;&gt;Marketplace提供の14.04 LTS&lt;/a&gt;であれば、すでに入ってるはずです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo apt-get install cifs-utils
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;マウントポイントを作り、マウントします。接続先の指定はエンドポイント+share名で。usernameはストレージアカウント名。パスワードはストレージアカウントのキーです。
-パーミッションは要件に合わせてください。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm01:~$ sudo mkdir -p /mnt/fspoc
-fspocvm01:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;マウント完了。確認用のファイルを作っておきます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm01:~$ echo &amp;quot;test&amp;quot; &amp;gt; /mnt/fspoc/test.txt
-fspocvm01:~$ cat /mnt/fspoc/test.txt
-test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2台目のVMでも同様のマウント作業を。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm02:~$ sudo apt-get install cifs-utils
-fspocvm02:~$ sudo mkdir -p /mnt/fspoc
-fspocvm02:~$ sudo mount -t cifs //tomakabefspoc.file.core.windows.net/fspocshare /mnt/fspoc -o vers=3.0,username=tomakabefspoc,password=qwertyuiopasdfghjklzxcvbnm==,dir_mode=0777,file_mode=0777
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;1台目で作ったファイルが見えますね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm02:~$ ls /mnt/fspoc
-test.txt
-fspocvm02:~$ cat /mnt/fspoc/test.txt
-test
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ファイルをいじりましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm02:~$ echo &amp;quot;onemoretest&amp;quot; &amp;gt;&amp;gt; /mnt/fspoc/test.txt
-fspocvm02:~$ cat /mnt/fspoc/test.txt
-test
-onemoretest
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;1台目から確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fspocvm01:~$ cat /mnt/fspoc/test.txt
-test
-onemoretest
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;ご利用は計画的に&#34;&gt;ご利用は計画的に&lt;/h2&gt;
-
-&lt;p&gt;2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、&lt;a href=&#34;https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/&#34;&gt;Lustre&lt;/a&gt;など別の共有方法を検討してください。&lt;/p&gt;
-
-&lt;p&gt;なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。&lt;/p&gt;
-</description>
+      <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。
+さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。
+ですが個人的にはあまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。
+でも、否定はしません。アプリの作りを変えられないケースもあるかと思います。
+そこで、もしAzureでファイル共有が必要であれば、Azure File Storageを検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。
+対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。
+使い方は公式ドキュメントを。
+&amp;ldquo;Azure Storage での Azure CLI の使用&amp;rdquo;
+&amp;ldquo;Linux で Azure File Storage を使用する方法&amp;rdquo;
+もうちょっと情報欲しいですね。補足のためにわたしも流します。
+Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
+local$ azure storage account create tomakabefspoc -l &amp;quot;Japan East&amp;quot; --type LRS -g fspoc  ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
+local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: Executing command storage account connectionstring show + Getting storage account keys data: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm== info: storage account connectionstring show command OK  shareを作成します。share名はfspocshareとしました。</description>
     </item>
     
     <item>
@@ -344,150 +68,18 @@ onemoretest
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
-      <description>
-
-&lt;h2 id=&#34;俺の鉄板-ができるまで&#34;&gt;&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで&lt;/h2&gt;
-
-&lt;p&gt;前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。&lt;/p&gt;
-
-&lt;p&gt;クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。&lt;/p&gt;
-
-&lt;p&gt;ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する
-
-&lt;ul&gt;
-&lt;li&gt;やみくもに調べものしないように&lt;/li&gt;
-&lt;li&gt;経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベンダの公式資料を確認する
-
-&lt;ul&gt;
-&lt;li&gt;「この使い方を推奨/サポートしています」と明記されていれば安心&lt;/li&gt;
-&lt;li&gt;でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない&lt;/li&gt;
-&lt;li&gt;不明確なら早めに問い合わせる&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ベンダが運営しているコミュニティ上の情報を確認する
-
-&lt;ul&gt;
-&lt;li&gt;ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;コミュニティや有識者の情報を確認する
-
-&lt;ul&gt;
-&lt;li&gt;OSSでは特に&lt;/li&gt;
-&lt;li&gt;専門性を感じるサイト、人はリストしておく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;動かす
-
-&lt;ul&gt;
-&lt;li&gt;やっぱり動かしてみないと&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;提案する
-
-&lt;ul&gt;
-&lt;li&gt;リスクがあれば明示します&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;問題なければ実績になる、問題があればリカバリする
-
-&lt;ul&gt;
-&lt;li&gt;提案しっぱなしにせずフォローすることで、自信とパターンが増える&lt;/li&gt;
-&lt;li&gt;次の案件で活きる
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。&lt;/p&gt;
-
-&lt;h2 id=&#34;linux-on-azureでdisk-io性能を確保する方法&#34;&gt;Linux on AzureでDisk IO性能を確保する方法&lt;/h2&gt;
-
-&lt;p&gt;さて今回の主題です。&lt;/p&gt;
-
-&lt;p&gt;結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。&lt;/p&gt;
-
-&lt;p&gt;Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。&lt;/p&gt;
-
-&lt;p&gt;サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。&lt;/p&gt;
-
-&lt;p&gt;Linuxで使える代表的なストライプ実装は、LVMとMD。&lt;/p&gt;
-
-&lt;p&gt;ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。&lt;/p&gt;
-
-&lt;p&gt;前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-configure-raid/&#34;&gt;&amp;ldquo;Configure Software RAID on Linux&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/&#34;&gt;&amp;ldquo;Premium Storage: Azure 仮想マシン ワークロード向けの高パフォーマンス ストレージ&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://blogs.msdn.com/b/igorpag/archive/2014/10/23/azure-storage-secrets-and-linux-i-o-optimizations.aspx&#34;&gt;&amp;ldquo;Azure Storage secrets and Linux I/O optimizations&amp;rdquo;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;得られた情報の中で大事なのは、&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;公式ドキュメントで
-
-&lt;ul&gt;
-&lt;li&gt;LVMではなくMDを使った構成例が紹介されている&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;マイクロソフトがホストするブログ(MSDN)で、エキスパートが
-
-&lt;ul&gt;
-&lt;li&gt;LVMと比較したうえで、MDをすすめている&lt;/li&gt;
-&lt;li&gt;MDのChunkサイズについて推奨値を紹介している&lt;/li&gt;
-&lt;li&gt;そのほか、ファイルシステムやスケジューラに関する有益な情報あり&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;なるほど。わたしのこの時点での方針はこうです。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;LVMを使う必然性はないため、MDに絞る
-
-&lt;ul&gt;
-&lt;li&gt;LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを&lt;/li&gt;
-&lt;li&gt;物理障害対策はAzureに任せる (3コピー)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;MDのChunkをデフォルトの512KBから64KBに変更する (ここは結果によって調整)&lt;/li&gt;
-&lt;li&gt;Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;上記シナリオで、ディスク当たり5,000IOPS、ストライプ数に比例した性能が実際出れば提案価値あり、ということになります。
-ですが、ズバリな実績値が見つからない。ダラダラ探すのは時間の無駄。これは自分でやるしかない。&lt;/p&gt;
-
-&lt;p&gt;構成手順は前述のリンク先にありますが、ポイントを抜き出します。OS=Ubuntu、ファイルシステム=ext4の場合です。&lt;/p&gt;
-
-&lt;p&gt;MDでストライプを作る際、チャンクを64KBに変更します。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo mdadm --create /dev/md127 --level 0 --raid-devices 2  /dev/sdc1 /dev/sdd1 -c 64k
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;マウント時にバリアを無効にします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo mount /dev/md127 /mnt -o barrier=0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;では、Premium Storage(P30)をMDで2つ束ねたストライプにfioを実行してみましょう。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;100% Random Read&lt;/li&gt;
-&lt;li&gt;キャッシュ効果のないデータをとるため、Premium StorageのキャッシュはNone、fio側もdirect=1&lt;/li&gt;
-&lt;li&gt;ブロックサイズは小さめの値が欲しかったので、1K&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;結果。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;randread: (g=0): rw=randread, bs=1K-1K/1K-1K/1K-1K, ioengine=libaio, iodepth=32
-fio-2.1.3
-Starting 1 process
-
-randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
-  read : io=102400KB, bw=9912.9KB/s, iops=9912, runt= 10330msec
-[snip]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2本束ねて9,912IOPS。1本あたりほぼ5,000IOPS。ほぼ期待値。&lt;/p&gt;
-</description>
+      <description>&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
+クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
+ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
+ 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い  ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる  ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある  コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく  動かす  やっぱり動かしてみないと  提案する  リスクがあれば明示します  問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
+Linux on AzureでDisk IO性能を確保する方法 さて今回の主題です。
+結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。
+Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。
+サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。
+Linuxで使える代表的なストライプ実装は、LVMとMD。
+ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。
+前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。
+&amp;ldquo;Configure Software RAID on Linux&amp;rdquo;</description>
     </item>
     
   </channel>

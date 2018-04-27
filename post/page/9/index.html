@@ -7,7 +7,7 @@
 
     <meta name="description" content="my life is the sum of my imagination">
 
-    <meta name="generator" content="Hugo 0.17" />
+    <meta name="generator" content="Hugo 0.39" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
     <meta name="twitter:title" content="Posts &middot; re-imagine">
@@ -67,6 +67,93 @@
         <div>
             
             <div class="posts">
+                
+                <h1 class="content-subhead">15 Feb 2016, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_ddosprotection/" class="post-title">Azure DDoS対策ことはじめ</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="すこぶるfaq">すこぶるFAQ</h2>
+
+<p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
+
+<h2 id="公式ホワイトペーパー">公式ホワイトペーパー</h2>
+
+<p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
+
+<p>今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。</p>
+
+<p><strong>2016//3/4 追記 <a href="http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf">日本語訳</a>がありました</strong></p>
+
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+
+<pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
+</code></pre>
+
+<p>MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
+
+<h2 id="azureがやってくれること">Azureがやってくれること</h2>
+
+<p>では、具体的に。</p>
+
+<pre><code>&quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&quot;
+</code></pre>
+
+<p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。</p>
+
+<h2 id="お客様対応が必要なこと">お客様対応が必要なこと</h2>
+
+<p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
+
+<pre><code>&quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&quot;
+</code></pre>
+
+<p>以下のような対処が有効です。</p>
+
+<pre><code>&quot;Running multiple VM instances behind a load-balanced Public IP address.&quot;
+</code></pre>
+
+<p>攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのDDoS防御システムで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。</p>
+
+<pre><code>&quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&quot;
+</code></pre>
+
+<p>WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃などです。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。</p>
+
+<pre><code>&quot; Web Server add-ons that protect against certain DoS attacks.&quot;
+</code></pre>
+
+<p>Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが<a href="http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx">ここ</a>が参考になります。</p>
+
+<pre><code>&quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&quot;
+</code></pre>
+
+<p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
+
+<h2 id="ホワイトペーパーに加えて">ホワイトペーパーに加えて</h2>
+
+<p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後<a href="https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/">提供される予定</a>です。</p>
+
+<p>CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。</p>
+
+<p>最後に。攻撃されている感があれば、カスタマーサポートまで。</p>
+
+                    </div>
+                </section>
                 
                 <h1 class="content-subhead">11 Feb 2016, 12:00</h1>
                 <section class="post">
@@ -870,148 +957,6 @@ randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
 <p>なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。</p>
 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">&ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&rdquo;</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Jan 2016, 00:20</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_infradeployment_selection/" class="post-title">Azureでインフラデプロイツールを選ぶ時に考えていること</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="ケースバイケースだけど">ケースバイケースだけど</h2>
-
-<p>Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。</p>
-
-<p>特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。</p>
-
-<p>なので「ケースバイケース。以上」とは、言いにくい。</p>
-
-<p>私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。</p>
-
-<h2 id="書く前に前提など">書く前に前提など</h2>
-
-<p>対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。</p>
-
-<p>レイヤリングや用語は、 @gosukenator さんの<a href="http://mizzy.org/blog/2013/10/29/1/">&ldquo;インフラ系技術の流れ&rdquo;</a>が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。</p>
-
-<p>では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。</p>
-
-<h2 id="そもそもツールで自動化すべきかを考える">そもそもツールで自動化すべきかを考える</h2>
-
-<p>いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。</p>
-
-<p>なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。</p>
-
-<h2 id="使い捨てられないかを考える">使い捨てられないかを考える</h2>
-
-<p>次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。</p>
-
-<p>ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。</p>
-
-<p>変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。</p>
-
-<p>変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。</p>
-
-<h2 id="優先事項や制約条件を洗い出す">優先事項や制約条件を洗い出す</h2>
-
-<p>アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。</p>
-
-<ul>
-<li><em>社内/プロジェクト標準</em></li>
-</ul>
-
-<p>　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。</p>
-
-<ul>
-<li><em>他レイヤでの優先ツール</em></li>
-</ul>
-
-<p>　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。</p>
-
-<ul>
-<li><em>規模</em></li>
-</ul>
-
-<p>　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。</p>
-
-<ul>
-<li><em>チーム or ひとり</em></li>
-</ul>
-
-<p>　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。</p>
-
-<ul>
-<li><em>Windows or Linux</em></li>
-</ul>
-
-<p>　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。</p>
-
-<h2 id="マネージドサービス-機能を活用する">マネージドサービス、機能を活用する</h2>
-
-<p>マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。</p>
-
-<p>また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。</p>
-
-<p>ですが、<a href="http://torumakabe.github.io/post/arm_idempotent/">以前のエントリ</a>で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。</p>
-
-<p>よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。</p>
-
-<p>ARM Templateでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARM TemplateにはDSCやシェルを実行するエクステンションが使えるので、活用します。</p>
-
-<p>また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。</p>
-
-<p>以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。</p>
-
-<h2 id="汎用的-リファレンスアーキテクチャ">汎用的 リファレンスアーキテクチャ</h2>
-
-<p>具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。</p>
-
-<p><a href="https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f">&ldquo;Automating Deployment with Azure &amp; Chef&rdquo;</a></p>
-
-<ul>
-<li><p>ARM TemplateでBootstrapping</p>
-
-<ul>
-<li>VMを4つ作成、1つはLinux、他はWindows</li>
-<li>ストレージ、ネットワークの作成</li>
-<li>VMのストレージ、ネットワーク設定</li>
-<li>OSの導入</li>
-<li>ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)</li>
-<li>他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)</li>
-<li>LinuxへChefサーバを導入、各種設定 (Shell Extension)
-<br /></li>
-</ul></li>
-
-<li><p>ChefでConfiguration</p>
-
-<ul>
-<li>各ノードのChef bootstrap(言葉が混同しやすいので注意)</li>
-<li>Chef Clientサービスの起動設定</li>
-<li>DBサーバのDB領域ディスク作成、フォーマット</li>
-<li>DBサーバへSQL Server 2014のインストール</li>
-<li>ChefがDBサーバが設定通りになるよう維持し続ける
-<br /></li>
-</ul></li>
-</ul>
-
-<p>どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。</p>
-
-<p>書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。</p>
 
                     </div>
                 </section>

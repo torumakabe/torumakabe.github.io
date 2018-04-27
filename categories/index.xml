@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on re-imagine</title>
+    <link>http://torumakabe.github.io/categories/</link>
+    <description>Recent content in Categories on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Fri, 27 Apr 2018 17:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Azure</title>
+      <link>http://torumakabe.github.io/categories/azure/</link>
+      <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/categories/azure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Blog</title>
+      <link>http://torumakabe.github.io/categories/blog/</link>
+      <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/categories/blog/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Book</title>
+      <link>http://torumakabe.github.io/categories/book/</link>
+      <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/categories/book/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Node</title>
+      <link>http://torumakabe.github.io/categories/node/</link>
+      <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/categories/node/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Windows</title>
+      <link>http://torumakabe.github.io/categories/windows/</link>
+      <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/categories/windows/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

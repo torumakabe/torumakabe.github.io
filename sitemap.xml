@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2018-04-09T15:00:00+09:00</lastmod>
+    <loc>http://torumakabe.github.io/post/terraform_azure_secret/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
   </url>
   
   <url>
@@ -292,7 +293,7 @@
   </url>
   
   <url>
-    <loc>http://torumakabe.github.io/post/OpenStack-3primer/</loc>
+    <loc>http://torumakabe.github.io/post/openstack-3primer/</loc>
     <lastmod>2014-05-01T00:00:00+09:00</lastmod>
   </url>
   
@@ -302,7 +303,7 @@
   </url>
   
   <url>
-    <loc>http://torumakabe.github.io/post/OpenStack-primer/</loc>
+    <loc>http://torumakabe.github.io/post/openstack-primer/</loc>
     <lastmod>2014-03-27T00:00:00+09:00</lastmod>
   </url>
   
@@ -319,6 +320,432 @@
   <url>
     <loc>http://torumakabe.github.io/post/transparency-is-noisy/</loc>
     <lastmod>2014-02-02T00:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/aks/</loc>
+    <lastmod>2018-03-12T00:21:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/ansible/</loc>
+    <lastmod>2014-09-14T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/arm/</loc>
+    <lastmod>2016-03-25T22:50:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/arm-template/</loc>
+    <lastmod>2017-03-23T15:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/automation/</loc>
+    <lastmod>2017-10-13T14:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/az/</loc>
+    <lastmod>2018-03-26T00:08:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/azure/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/azure/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/azure-cli/</loc>
+    <lastmod>2017-02-28T08:00:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/bash/</loc>
+    <lastmod>2016-09-14T15:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/batch/</loc>
+    <lastmod>2016-04-29T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/blob/</loc>
+    <lastmod>2017-09-05T12:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/blog/</loc>
+    <lastmod>2015-09-20T15:27:03+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/book/</loc>
+    <lastmod>2016-03-27T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/book/</loc>
+    <lastmod>2016-03-27T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/bot/</loc>
+    <lastmod>2016-05-08T14:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/boxstarter/</loc>
+    <lastmod>2017-10-13T14:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/chatops/</loc>
+    <lastmod>2016-10-07T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/cli/</loc>
+    <lastmod>2016-05-21T11:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/cloud/</loc>
+    <lastmod>2016-01-24T00:19:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/cntk/</loc>
+    <lastmod>2016-04-17T10:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/copy/</loc>
+    <lastmod>2017-06-13T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/ddos/</loc>
+    <lastmod>2016-02-15T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/deep-learning/</loc>
+    <lastmod>2016-04-17T10:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/disk/</loc>
+    <lastmod>2016-01-27T00:19:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/dns/</loc>
+    <lastmod>2018-03-27T00:10:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/docker/</loc>
+    <lastmod>2017-12-04T22:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/docker-for-windows/</loc>
+    <lastmod>2017-02-28T08:00:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/eventgrid/</loc>
+    <lastmod>2017-09-05T12:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/facebook/</loc>
+    <lastmod>2016-05-08T14:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/fileshare/</loc>
+    <lastmod>2016-02-07T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/functions/</loc>
+    <lastmod>2017-09-05T12:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/golang/</loc>
+    <lastmod>2017-12-04T22:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/google/</loc>
+    <lastmod>2016-03-27T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/hp-public-cloud/</loc>
+    <lastmod>2014-09-06T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/hugo/</loc>
+    <lastmod>2015-09-20T15:27:03+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/icehouse/</loc>
+    <lastmod>2014-05-06T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/kubernetes/</loc>
+    <lastmod>2018-03-12T00:21:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/latency/</loc>
+    <lastmod>2017-04-09T15:15:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/linux/</loc>
+    <lastmod>2016-11-20T13:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/managed-disk/</loc>
+    <lastmod>2017-03-23T15:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/msi/</loc>
+    <lastmod>2018-03-30T16:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/network/</loc>
+    <lastmod>2017-10-08T10:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/node/</loc>
+    <lastmod>2016-09-14T15:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/node/</loc>
+    <lastmod>2016-09-14T15:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/nvidia/</loc>
+    <lastmod>2017-02-03T18:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/oms/</loc>
+    <lastmod>2016-08-25T16:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/opensource/</loc>
+    <lastmod>2014-02-02T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/openstack/</loc>
+    <lastmod>2015-12-19T00:01:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/ops/</loc>
+    <lastmod>2016-03-27T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/packer/</loc>
+    <lastmod>2016-03-17T23:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/paintschainer/</loc>
+    <lastmod>2017-02-03T18:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/performance/</loc>
+    <lastmod>2016-01-27T00:19:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/post/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/rbac/</loc>
+    <lastmod>2018-01-22T22:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/resource-policy/</loc>
+    <lastmod>2016-05-21T11:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/securty/</loc>
+    <lastmod>2016-02-15T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/slack/</loc>
+    <lastmod>2016-10-07T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/storage/</loc>
+    <lastmod>2017-11-28T08:45:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/swift/</loc>
+    <lastmod>2014-03-23T00:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/</loc>
+    <lastmod>2018-03-12T00:21:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/terraform/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/upload/</loc>
+    <lastmod>2016-02-11T12:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/vagrant/</loc>
+    <lastmod>2016-05-13T18:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/vmss/</loc>
+    <lastmod>2018-03-26T00:08:30+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/vpn-gateway/</loc>
+    <lastmod>2017-10-08T10:30:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/webapp/</loc>
+    <lastmod>2016-11-20T13:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/windows/</loc>
+    <lastmod>2017-12-04T22:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/tags/windows/</loc>
+    <lastmod>2017-12-04T22:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/</loc>
+    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>

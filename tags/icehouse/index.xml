@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/icehouse/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Icehouse on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/icehouse/</link>
+    <description>Recent content in Icehouse on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/icehouse/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 06 May 2014 00:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/icehouse/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
@@ -14,42 +17,11 @@
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
-      <description>
-
-&lt;h3 id=&#34;あえて言おう-これは甘えであると&#34;&gt;あえて言おう、これは甘えであると&lt;/h3&gt;
-
-&lt;p&gt;現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。&lt;/p&gt;
-
-&lt;p&gt;では始めましょう。&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;OpenStack Cloud Computing Cookbook&lt;/a&gt;の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。&lt;/p&gt;
-
-&lt;h3 id=&#34;ほんと-これだけ&#34;&gt;ほんと、これだけ&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;このページ&lt;/a&gt;で確認&lt;/li&gt;
-&lt;li&gt;$ vagrant plugin install vagrant-cachier&lt;/li&gt;
-&lt;li&gt;$ git clone &lt;a href=&#34;https://github.com/OpenStackCookbook/OpenStackCookbook.git&#34;&gt;https://github.com/OpenStackCookbook/OpenStackCookbook.git&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;$ cd OpenStackCookbook&lt;/li&gt;
-&lt;li&gt;$ git checkout icehouse&lt;/li&gt;
-&lt;li&gt;$ vagrant up&lt;/li&gt;
-&lt;li&gt;何度か管理者パスワードを入力&lt;/li&gt;
-&lt;li&gt;$ vagrant ssh controller&lt;/li&gt;
-&lt;li&gt;$ . /vagrant/openrc&lt;/li&gt;
-&lt;li&gt;$/vagrant/demo.sh&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;以上。Horizonコンソールは &lt;a href=&#34;http://172.16.0.200/&#34;&gt;http://172.16.0.200/&lt;/a&gt; から。&lt;/p&gt;
-
-&lt;h3 id=&#34;この環境だと30分でできた&#34;&gt;この環境だと30分でできた&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
-&lt;li&gt;VirtualBox 4.3.10&lt;/li&gt;
-&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;デモや新機能の試用くらいであればこれで十分ですね。&lt;br /&gt;
-著者に感謝。わたしは買いました。 &amp;ndash; &lt;a href=&#34;http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/&#34;&gt;OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
+では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
+ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
+この環境だと30分でできた  Vagrant 1.5.4 VirtualBox 4.3.10 Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB  デモや新機能の試用くらいであればこれで十分ですね。
+著者に感謝。わたしは買いました。 &amp;ndash; OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)</description>
     </item>
     
   </channel>

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/vagrant/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Vagrant on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/vagrant/</link>
+    <description>Recent content in Vagrant on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 13 May 2016 18:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
@@ -14,210 +17,13 @@
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
-      <description>
-
-&lt;h2 id=&#34;端末だってコード化されたい&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
-
-&lt;p&gt;Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。&lt;/p&gt;
-
-&lt;h2 id=&#34;解決したい課題&#34;&gt;解決したい課題&lt;/h2&gt;
-
-&lt;p&gt;こんな悩みを解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい&lt;/li&gt;
-&lt;li&gt;WindowsもMacも使っているので、どちらでも同じ環境を作りたい&lt;/li&gt;
-&lt;li&gt;サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー&lt;/li&gt;
-&lt;li&gt;2016年にもなって長いコードをVimとかEmacsで書きたくない&lt;/li&gt;
-&lt;li&gt;Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい&lt;/li&gt;
-&lt;li&gt;仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい&lt;/li&gt;
-&lt;li&gt;Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか)&lt;/li&gt;
-&lt;li&gt;でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい&lt;/li&gt;
-&lt;li&gt;新メンバーがチームに入るたび、セットアップが大変&lt;/li&gt;
-&lt;li&gt;不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変&lt;/li&gt;
-&lt;li&gt;毎度作業のどこかが抜ける、漏れる、間違う 人間だもの&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;p&gt;VagrantとDockerで解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る&lt;/li&gt;
-&lt;li&gt;Vagrantでセットアップを自動化する&lt;/li&gt;
-&lt;li&gt;Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する&lt;/li&gt;
-&lt;li&gt;Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する&lt;/li&gt;
-&lt;li&gt;公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る&lt;/li&gt;
-&lt;li&gt;Windows/MacのいまどきなIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;セットアップ概要&#34;&gt;セットアップ概要&lt;/h2&gt;
-
-&lt;p&gt;簡単す。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Virtualboxを&lt;a href=&#34;https://www.virtualbox.org/&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrantを&lt;a href=&#34;https://www.vagrantup.com/downloads.html&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrant Putty Plugin(vagrant-multi-putty)を&lt;a href=&#34;https://github.com/nickryand/vagrant-multi-putty&#34;&gt;インストール&lt;/a&gt; #Windowsのみ。Puttyは別途入れてください&lt;/li&gt;
-&lt;li&gt;作業フォルダを作り、Vagrant ファイルを書く&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。&lt;/p&gt;
-
-&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
-
-&lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
-VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot;
-
-$bootstrap=&amp;lt;&amp;lt;SCRIPT
-
-#Common tools
-sudo apt-get update
-sudo apt-get -y install wget unzip jq
-
-#Docker Engine
-sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install linux-image-extra-$(uname -r)
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-sudo sh -c &amp;quot;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &amp;gt; /etc/apt/sources.list.d/docker.list&amp;quot;
-sudo apt-get update
-sudo apt-get -y purge lxc-docker
-sudo apt-cache policy docker-engine
-sudo apt-get -y install docker-engine=1.11.1-0~trusty
-sudo gpasswd -a vagrant docker
-sudo service docker restart
-
-#Docker Machine
-sudo sh -c &amp;quot;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &amp;gt;/usr/local/bin/docker-machine &amp;amp;&amp;amp; chmod +x /usr/local/bin/docker-machine&amp;quot;
-
-#Azure CLI
-echo &amp;quot;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Terraform
-echo &amp;quot;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Packer
-echo &amp;quot;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#nodebrew
-curl -L git.io/nodebrew | perl - setup
-echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &amp;gt;&amp;gt; $HOME/.bashrc
-$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
-$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
-
-#Python3
-wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
-
-SCRIPT
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-
-  config.vm.box = &amp;quot;ubuntu/trusty64&amp;quot;
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-
-  config.vm.network &amp;quot;private_network&amp;quot;, ip: &amp;quot;192.168.33.10&amp;quot;
-
-  config.vm.provider &amp;quot;virtualbox&amp;quot; do |vb|
-     vb.customize [&amp;quot;modifyvm&amp;quot;, :id, &amp;quot;--memory&amp;quot;, &amp;quot;2048&amp;quot;]
-  end
-
-  config.vm.provision :shell, inline: $bootstrap, privileged: false
-
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;$bootstrap=&amp;lt;&amp;lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。&lt;/p&gt;
-
-&lt;h3 id=&#34;common-tools&#34;&gt;Common tools&lt;/h3&gt;
-
-&lt;p&gt;一般的なツールをaptでインストールします。wgetとかjqとか。&lt;/p&gt;
-
-&lt;h3 id=&#34;docker-engine-machine&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
-
-&lt;p&gt;この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。&lt;/p&gt;
-
-&lt;h3 id=&#34;azure-cli&#34;&gt;Azure CLI&lt;/h3&gt;
-
-&lt;p&gt;インストールせずに&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/&#34;&gt;MS公式のDockerイメージ&lt;/a&gt;を引っ張ります。なのでalias設定だけ。
--v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
-また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&amp;ndash;rmで消します。&lt;/p&gt;
-
-&lt;h3 id=&#34;terraform-packer&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
-
-&lt;p&gt;Azure CLIと同様です。Hashicorpが&lt;a href=&#34;https://hub.docker.com/u/hashicorp/&#34;&gt;公式イメージ&lt;/a&gt;を提供しているので、それを活用します。
-方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
--v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。&lt;/p&gt;
-
-&lt;p&gt;なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。&lt;/p&gt;
-
-&lt;h3 id=&#34;nodebrew&#34;&gt;nodebrew&lt;/h3&gt;
-
-&lt;p&gt;nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。&lt;/p&gt;
-
-&lt;h3 id=&#34;python3&#34;&gt;Python3&lt;/h3&gt;
-
-&lt;p&gt;Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。&lt;/p&gt;
-
-&lt;p&gt;みなさん他にもいろいろあるでしょう。シェルなのでお好みで。&lt;/p&gt;
-
-&lt;p&gt;さて、ここまでがプロビジョニング時の処理です。以降の&amp;rdquo;Vagrant.configure～&amp;rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。&lt;/p&gt;
-
-&lt;h2 id=&#34;どれだけ楽か&#34;&gt;どれだけ楽か&lt;/h2&gt;
-
-&lt;p&gt;では、環境を作ってみましょう。Vagrantfileがあるフォルダで&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant up
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;仮想マシンが作成されます。初回はプロビジョニング処理も走ります。&lt;/p&gt;
-
-&lt;p&gt;できましたか。できたら、&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant putty
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
-
-&lt;p&gt;あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant destroy
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。&lt;/p&gt;
-
-&lt;p&gt;なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。&lt;/p&gt;
-
-&lt;p&gt;わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。&lt;/p&gt;
-
-&lt;p&gt;また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう&lt;/li&gt;
-&lt;li&gt;サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
-
-&lt;ul&gt;
-&lt;li&gt;(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
-
-&lt;p&gt;「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。&lt;/p&gt;
-
-&lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
-
-&lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
-</description>
+      <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
+解決したい課題 こんな悩みを解決します。
+ WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
+ Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
+ Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
+サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing! VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot; $bootstrap=&amp;lt;&amp;lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.</description>
     </item>
     
     <item>
@@ -226,136 +32,18 @@ end
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
-      <description>
-
-&lt;h3 id=&#34;タイトルは釣りです&#34;&gt;タイトルは釣りです&lt;/h3&gt;
-
-&lt;p&gt;すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。&lt;/p&gt;
-
-&lt;h3 id=&#34;なぜ必要か&#34;&gt;なぜ必要か?&lt;/h3&gt;
-
-&lt;p&gt;いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。&lt;/p&gt;
-
-&lt;h3 id=&#34;やりたいこと&#34;&gt;やりたいこと&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい&lt;/li&gt;
-&lt;li&gt;Windows、Macどちらでも同様の環境にしたい&lt;/li&gt;
-&lt;li&gt;相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収&lt;/li&gt;
-&lt;li&gt;Windows、Mac環境を汚さない、また、汚されない&lt;/li&gt;
-&lt;li&gt;コマンド2、3発程度で、気軽に作って消せる&lt;/li&gt;
-&lt;li&gt;VMできたらすぐログイン、即OpenStack CLIが使える&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;方針&#34;&gt;方針&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る&lt;/li&gt;
-&lt;li&gt;VagrantでWindows/Macの違いを吸収する&lt;/li&gt;
-&lt;li&gt;VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う&lt;/li&gt;
-&lt;li&gt;構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows 8.1 &amp;amp; VMware Worksation 10.0.3&lt;/li&gt;
-&lt;li&gt;OSX 10.9.4 &amp;amp; VirtualBox 4.3.16&lt;/li&gt;
-&lt;li&gt;Vagrant 1.6.5  (VMware用ライセンス買いました)&lt;/li&gt;
-&lt;li&gt;ひとまずOpenStack CLIを使えるところまで作る&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/a470e86a1477cd76d4f4.js&#34;&gt;&lt;/script&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの&lt;a href=&#34;https://github.com/opscode/bento&#34;&gt;Bento&lt;/a&gt;で、事前にboxファイルを作ってます。ubuntu14.04としました。&lt;/li&gt;
-&lt;li&gt;実行ディレクトリにprovision.shを置きます。&lt;/li&gt;
-&lt;li&gt;provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。&lt;/li&gt;
-&lt;li&gt;実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;hostsファイルには以下のようにlocalhostを定義します。&lt;/p&gt;
-
-&lt;p&gt;[localhost]&lt;br /&gt;
-127.0.0.1 ansible_connection=local&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&#34;provision-sh解説&#34;&gt;provision.sh解説&lt;/h4&gt;
-
-&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/57ae9f8edbe6cf30cd16.js&#34;&gt;&lt;/script&gt;
-
-&lt;p&gt;ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。&lt;/p&gt;
-
-&lt;h4 id=&#34;playbook-site-yml-解説&#34;&gt;playbook(site.yml)解説&lt;/h4&gt;
-
-&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/6c5d8ae296948b8d4070.js&#34;&gt;&lt;/script&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。&lt;/p&gt;
-
-&lt;p&gt;OS_TENANT_NAME: your_tenant_name&lt;br /&gt;
-OS_USERNAME: your_username&lt;br /&gt;
-&amp;hellip;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;という感じで並べてください。.bashrcに追加されます。
-- タイムゾーンをAsia/Tokyoにします。
-- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。&lt;/p&gt;
-
-&lt;h3 id=&#34;windowsでの実行例&#34;&gt;Windowsでの実行例&lt;/h3&gt;
-
-&lt;p&gt;Vagrant &amp;amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant up
-Bringing machine &#39;default&#39; up with &#39;vmware_workstation&#39; provider...
-==&amp;gt; default: Cloning VMware VM: &#39;opscode-ubuntu1404&#39;. This can take some time...
-(snip)
-==&amp;gt; default: TASK: [install OpenStack CLIs] ************************************************
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-neutronclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-novaclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-cinderclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-swiftclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-keystoneclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-glanceclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-troveclient)
-==&amp;gt; default: changed: [127.0.0.1] =&amp;gt; (item=python-designateclient)
-==&amp;gt; default:
-==&amp;gt; default: PLAY RECAP ********************************************************************
-==&amp;gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;うまく動いたようです。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Users\hoge&amp;gt; vagrant ssh
-cygwin warning:
-  MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
-  Preferred POSIX equivalent is: /cygdrive/c/Users/hoge/.vagrant.d/insecure_private_key
-  CYGWIN environment variable option &amp;quot;nodosfilewarning&amp;quot; turns off this warning.
-  Consult the user&#39;s guide for more details about POSIX paths:
-    http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant@vagrant:~$ nova list
-+----+------+--------+------------+-------------+----------+
-| ID | Name | Status | Task State | Power State | Networks |
-+----+------+--------+------------+-------------+----------+
-+----+------+--------+------------+-------------+----------+
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いきなりnovaコマンド使えます。&lt;/p&gt;
-
-&lt;p&gt;なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。&lt;/p&gt;
-</description>
+      <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
+なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
+やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp;amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp;amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
+ VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。 実行ディレクトリにprovision.shを置きます。 provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。 実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。 hostsファイルには以下のようにlocalhostを定義します。
+[localhost]
+127.0.0.1 ansible_connection=local
+  provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
+playbook(site.yml)解説   varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。
+OS_TENANT_NAME: your_tenant_name
+OS_USERNAME: your_username
+&amp;hellip;.
+  という感じで並べてください。.</description>
     </item>
     
     <item>
@@ -364,51 +52,14 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
-      <description>
-
-&lt;h3 id=&#34;ツールやsdkはボチボチ集約したほうが&#34;&gt;ツールやSDKはボチボチ集約したほうが&lt;/h3&gt;
-
-&lt;p&gt;これまでHP Public Cloudむけの&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;は、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;vagrant-hp plug-in&lt;/a&gt;を&lt;a href=&#34;http://torumakabe.github.io/tips/2014/05/05/vagrant-hpcloud/&#34;&gt;使って&lt;/a&gt;ました。でも最近、より汎用的で開発が活発な&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;vagrant-openstack-plugin&lt;/a&gt;へ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。&lt;/p&gt;
-
-&lt;p&gt;多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。&lt;/p&gt;
-
-&lt;p&gt;さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。&lt;/p&gt;
-
-&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.6.3&lt;/li&gt;
-&lt;li&gt;vagrant-openstack-plugin 0.8.0&lt;/li&gt;
-&lt;li&gt;HP Public Cloud (2014/9/6)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;プラグインのインストールと前準備&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/cloudbau/vagrant-openstack-plugin&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/c9de20c61752864aca86.js&#34;&gt;&lt;/script&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;フレーバーとイメージ名は正規表現で指定できます。&lt;/li&gt;
-&lt;li&gt;OpenStack CLI群と同じ環境変数を使ってます。&lt;/li&gt;
-&lt;li&gt;Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;で、ふつーに動きます。乗り換え決定です。&lt;/p&gt;
-
-&lt;h3 id=&#34;スナップショット便利&#34;&gt;スナップショット便利&lt;/h3&gt;
-
-&lt;p&gt;vagrant-hpでは使えなかったはず。こいつは便利だ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant openstack snapshot -n lab01_snap
-==&amp;gt; default: This server instance is snapshoting!
-==&amp;gt; default: Snapshot is ok
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <description> ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
+多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
+さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
+前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
+ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
+ フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
+スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
+$ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server instance is snapshoting! ==&amp;gt; default: Snapshot is ok  </description>
     </item>
     
     <item>
@@ -417,42 +68,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
-      <description>
-
-&lt;h3 id=&#34;あえて言おう-これは甘えであると&#34;&gt;あえて言おう、これは甘えであると&lt;/h3&gt;
-
-&lt;p&gt;現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。&lt;/p&gt;
-
-&lt;p&gt;では始めましょう。&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;OpenStack Cloud Computing Cookbook&lt;/a&gt;の著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。&lt;/p&gt;
-
-&lt;h3 id=&#34;ほんと-これだけ&#34;&gt;ほんと、これだけ&lt;/h3&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順を&lt;a href=&#34;http://openstackr.wordpress.com/2014/05/01/openstack-cloud-computing-cookbook-the-icehouse-scripts/&#34;&gt;このページ&lt;/a&gt;で確認&lt;/li&gt;
-&lt;li&gt;$ vagrant plugin install vagrant-cachier&lt;/li&gt;
-&lt;li&gt;$ git clone &lt;a href=&#34;https://github.com/OpenStackCookbook/OpenStackCookbook.git&#34;&gt;https://github.com/OpenStackCookbook/OpenStackCookbook.git&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;$ cd OpenStackCookbook&lt;/li&gt;
-&lt;li&gt;$ git checkout icehouse&lt;/li&gt;
-&lt;li&gt;$ vagrant up&lt;/li&gt;
-&lt;li&gt;何度か管理者パスワードを入力&lt;/li&gt;
-&lt;li&gt;$ vagrant ssh controller&lt;/li&gt;
-&lt;li&gt;$ . /vagrant/openrc&lt;/li&gt;
-&lt;li&gt;$/vagrant/demo.sh&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;以上。Horizonコンソールは &lt;a href=&#34;http://172.16.0.200/&#34;&gt;http://172.16.0.200/&lt;/a&gt; から。&lt;/p&gt;
-
-&lt;h3 id=&#34;この環境だと30分でできた&#34;&gt;この環境だと30分でできた&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
-&lt;li&gt;VirtualBox 4.3.10&lt;/li&gt;
-&lt;li&gt;Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;デモや新機能の試用くらいであればこれで十分ですね。&lt;br /&gt;
-著者に感謝。わたしは買いました。 &amp;ndash; &lt;a href=&#34;http://www.amazon.co.jp/OpenStack-Computing-Cookbook-Second-Edition-ebook/dp/B00FZMREUM/&#34;&gt;OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)&lt;/a&gt;&lt;/p&gt;
-</description>
+      <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
+では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
+ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
+この環境だと30分でできた  Vagrant 1.5.4 VirtualBox 4.3.10 Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB  デモや新機能の試用くらいであればこれで十分ですね。
+著者に感謝。わたしは買いました。 &amp;ndash; OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)</description>
     </item>
     
     <item>
@@ -461,91 +81,11 @@ Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
       <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/vagrant-hpcloud/</guid>
-      <description>
-
-&lt;h3 id=&#34;みんな大好きhashicorp&#34;&gt;みんな大好きHashiCorp&lt;/h3&gt;
-
-&lt;p&gt;クラウド界隈のデベロッパーから熱く注目されているHashiCorp。&lt;a href=&#34;http://www.packer.io/&#34;&gt;Packer&lt;/a&gt;、&lt;a href=&#34;http://www.serfdom.io/&#34;&gt;Serf&lt;/a&gt;、&lt;a href=&#34;http://www.consul.io/&#34;&gt;Consul&lt;/a&gt;と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は&lt;a href=&#34;http://www.vagrantup.com/&#34;&gt;Vagrant&lt;/a&gt;でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。&lt;/p&gt;
-
-&lt;p&gt;VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。&lt;/p&gt;
-
-&lt;h3 id=&#34;前提条件&#34;&gt;前提条件&lt;/h3&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Vagrant 1.5.4&lt;/li&gt;
-&lt;li&gt;vagrant-hp 0.1.4&lt;/li&gt;
-&lt;li&gt;HP Public Cloud (2014/5/5)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;プラグインのインストールと前準備&#34;&gt;プラグインのインストールと前準備&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。&lt;/p&gt;
-
-&lt;h3 id=&#34;ではvagrantfileを見てみましょう&#34;&gt;ではVagrantfileを見てみましょう&lt;/h3&gt;
-
-&lt;script type=&#34;text/javascript&#34; src=&#34;http://gist.github.com/25a33c679492676bb626.js&#34;&gt;&lt;/script&gt;
-
-&lt;p&gt;これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、&lt;a href=&#34;https://github.com/mohitsethi/vagrant-hp&#34;&gt;Github&lt;/a&gt;の説明には若干のトラップがありますのでご注意を。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;イメージにUbuntu 14.04 LTSを使う例です。&lt;/li&gt;
-&lt;li&gt;Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。&lt;/li&gt;
-&lt;li&gt;Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。&lt;/li&gt;
-&lt;li&gt;Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。&lt;/li&gt;
-&lt;li&gt;ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;それではさっそくvagrant-up&#34;&gt;それではさっそくvagrant up&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant up --provider=hp
-Bringing machine &#39;default&#39; up with &#39;hp&#39; provider...
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-==&amp;gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant
-==&amp;gt; default: high-level network configurations (`config.vm.network`). They
-==&amp;gt; default: will be silently ignored.
-==&amp;gt; default: Finding flavor for server...
-==&amp;gt; default: Finding image for server...
-==&amp;gt; default: Finding floating-ip...
-==&amp;gt; default: Launching a server with the following settings...
-==&amp;gt; default:  -- Flavor: standard.xsmall
-==&amp;gt; default:  -- Image: Ubuntu Server 14.04 LTS (amd64 20140416.1) - Partner Image
-==&amp;gt; default:  -- Name: hogehoge
-==&amp;gt; default:  -- Key-name: your_keypair_name
-==&amp;gt; default:  -- Security Groups: [&amp;quot;default&amp;quot;, &amp;quot;http&amp;quot;]
-==&amp;gt; default: Finding network...
-==&amp;gt; default: Waiting for the server to be built...
-==&amp;gt; default: Waiting for SSH to become available...
-==&amp;gt; default: Machine is booted and ready for use!
-==&amp;gt; default: Rsyncing folder: /your_path/data/ =&amp;gt; /vagrant/data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できたっぽい。&amp;ndash;provider=hpを忘れずに。&lt;/p&gt;
-
-&lt;h3 id=&#34;間髪入れずにvagrant-ssh&#34;&gt;間髪入れずにvagrant ssh&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;$ vagrant ssh
-WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
-Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
-
-* Documentation:  https://help.ubuntu.com/
-
-System information disabled due to load higher than 1.0
-
-Get cloud support with Ubuntu Advantage Cloud Guest:
-    http://www.ubuntu.com/business/services/cloud
-
-0 packages can be updated.
-0 updates are security updates.
-
-
-ubuntu@hogehoge:~$ ls /vagrant/data
-test.txt
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;フォルダ同期も効いてますね。んー、楽ちん。&lt;/p&gt;
-
-&lt;p&gt;それではお楽しみ下さい。&lt;/p&gt;
-</description>
+      <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作はVagrantでしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。
+VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。
+前提条件  Vagrant 1.5.4 vagrant-hp 0.1.4 HP Public Cloud (2014/5/5)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
+ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、Githubの説明には若干のトラップがありますのでご注意を。
+ イメージにUbuntu 14.04 LTSを使う例です。 Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。 Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。 Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。 ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。  それではさっそくvagrant up $ vagrant up --provider=hp Bringing machine &#39;default&#39; up with &#39;hp&#39; provider... WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1 ==&amp;gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant ==&amp;gt; default: high-level network configurations (`config.</description>
     </item>
     
   </channel>

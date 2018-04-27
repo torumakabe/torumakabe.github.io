@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/docker-for-windows/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Docker for Windows on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/docker-for-windows/</link>
+    <description>Recent content in Docker for Windows on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/docker-for-windows/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 28 Feb 2017 08:00:30 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/docker-for-windows/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
@@ -14,153 +17,8 @@
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/dockerforwin_azurecli2/</guid>
-      <description>
-
-&lt;h2 id=&#34;azure-cli-2-0版です&#34;&gt;Azure CLI 2.0版です&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/dockerforwin_azurecli/&#34;&gt;Docker for WindowsでインストールレスAzure CLI環境を作る&lt;/a&gt;、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows、もっと活用しようぜ&lt;/li&gt;
-&lt;li&gt;がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;az_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;az_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/install/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]&lt;/li&gt;
-&lt;li&gt;ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &amp;gt; [Shared Drives]&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。az_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\ARM&amp;gt; az_cli
-bash-4.3#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは&lt;a href=&#34;https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/&#34;&gt;alpine linux&lt;/a&gt;ベースです。&lt;/p&gt;
-
-&lt;p&gt;カレントディレクトリを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# pwd
-/data
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;タブで補完も効きます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bash-4.3# az a
-account     acr         acs         ad          appservice
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
-</description>
+      <description>Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。
+動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;az_cli&amp;rdquo; を作る &amp;ldquo;az_cli&amp;rdquo;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &amp;gt; [Shared Drives]  PowerShell functionを作成  のちほど詳しく   PowerShellのfunctionを作る ここが作業のハイライト。</description>
     </item>
     
     <item>
@@ -169,115 +27,9 @@ account     acr         acs         ad          appservice
       <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
-      <description>
-
-&lt;h2 id=&#34;舌の根の乾かぬ内に&#34;&gt;舌の根の乾かぬ内に&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://torumakabe.github.io/post/azure_osstools_iac/&#34;&gt;最近&lt;/a&gt;、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。&lt;/p&gt;
-
-&lt;h2 id=&#34;動機&#34;&gt;動機&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows(on Client Hyper-V)のベータが一般開放された&lt;/li&gt;
-&lt;li&gt;Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい&lt;/li&gt;
-&lt;li&gt;月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい&lt;/li&gt;
-&lt;li&gt;開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい&lt;/li&gt;
-&lt;li&gt;○○レスって言ってみたかった&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;もちろんDocker for Windows (on Client Hyper-V) を使う&lt;/li&gt;
-&lt;li&gt;いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る&lt;/li&gt;
-&lt;li&gt;&amp;ldquo;azure_cli&amp;rdquo;入力にてAzure CLIコンテナを起動&lt;/li&gt;
-&lt;li&gt;コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;作業の中身&#34;&gt;作業の中身&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windowsを&lt;a href=&#34;https://docs.docker.com/docker-for-windows/&#34;&gt;インストール&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;64bit Windows 10 Pro/Enterprise/Education 1511以降に対応&lt;/li&gt;
-&lt;li&gt;Hyper-Vの有効化を忘れずに&lt;/li&gt;
-&lt;li&gt;Hyper-VとぶつかるVirtualBoxとはお別れです&lt;/li&gt;
-&lt;li&gt;Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。&lt;/li&gt;
-&lt;li&gt;共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;PowerShell functionを作成
-
-&lt;ul&gt;
-&lt;li&gt;のちほど詳しく&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershellのfunctionを作る&#34;&gt;PowerShellのfunctionを作る&lt;/h2&gt;
-
-&lt;p&gt;ここが作業のハイライト。&lt;/p&gt;
-
-&lt;p&gt;PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools&#34;&gt;Azure Resource Manager Template&lt;/a&gt;や&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker&#34;&gt;Docker&lt;/a&gt;むけextensionがあります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; code $profile
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;こんなfunctionを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;function azure_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data microsoft/azure-cli:latest
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので&lt;/li&gt;
-&lt;li&gt;コンテナが溜まるのがいやなので、&amp;ndash;rmで都度消します&lt;/li&gt;
-&lt;li&gt;毎度 azure login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します&lt;/li&gt;
-&lt;li&gt;ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します&lt;/li&gt;
-&lt;li&gt;コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ではテスト。まずはホスト側のファイルを確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; ls
-
-
-    ディレクトリ: C:\Workspace\dockereval\arm
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2016/06/22     11:21                subd
--a----       2016/06/22     10:26           8783 azuredeploy.json
--a----       2016/06/22     11:28            690 azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;いくつかのファイルとサブディレクトリがあります。&lt;/p&gt;
-
-&lt;p&gt;コンテナを起動してみましょう。azure_cli functionを呼びます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;PS C:\Workspace\dockereval\arm&amp;gt; azure_cli
-root@be41d3389a21:/data#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。公式Azure CLIコンテナは&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/~/dockerfile/&#34;&gt;debianベース&lt;/a&gt;です。&lt;/p&gt;
-
-&lt;p&gt;ファイル共有できているか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# ls
-azuredeploy.json  azuredeploy.parameters.json  subd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;できてますね。&lt;/p&gt;
-
-&lt;p&gt;azureコマンドが打てるか確認。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;root@be41d3389a21:/data# azure -v
-0.10.1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;しあわせ。&lt;/p&gt;
-</description>
+      <description>舌の根の乾かぬ内に 最近、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。
+動機  Docker for Windows(on Client Hyper-V)のベータが一般開放された Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい 月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る &amp;ldquo;azure_cli&amp;rdquo;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。 共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。  PowerShell functionを作成  のちほど詳しく   PowerShellのfunctionを作る ここが作業のハイライト。
+PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。Azure Resource Manager TemplateやDockerむけextensionがあります。</description>
     </item>
     
   </channel>

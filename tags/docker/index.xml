@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>re-imagine</title>
-    <link>http://torumakabe.github.io/tags/docker/index.xml</link>
-    <description>Recent content on re-imagine</description>
+    <title>Docker on re-imagine</title>
+    <link>http://torumakabe.github.io/tags/docker/</link>
+    <description>Recent content in Docker on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <atom:link href="http://torumakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="http://torumakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
@@ -14,36 +17,9 @@
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;小ネタです&#34;&gt;小ネタです&lt;/h2&gt;
-
-&lt;p&gt;Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。&lt;/p&gt;
-
-&lt;h2 id=&#34;条件&#34;&gt;条件&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Docker for Windows
-
-&lt;ul&gt;
-&lt;li&gt;Linuxモード&lt;/li&gt;
-&lt;li&gt;ドライブ共有&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;powershell窓で実行&#34;&gt;PowerShell窓で実行&lt;/h2&gt;
-
-&lt;p&gt;ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;golang:1.9.2-alpine DockerイメージはGOPATHに/goを&lt;a href=&#34;https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile&#34;&gt;設定して&lt;/a&gt;ビルドされていますが、念のため実行時にも設定&lt;/li&gt;
-&lt;li&gt;-v オプションでのマウントは&lt;a href=&#34;https://docs.docker.com/engine/admin/volumes/bind-mounts/&#34;&gt;非推奨&lt;/a&gt;になったので &amp;ndash;mount で&lt;/li&gt;
-&lt;li&gt;スタティックリンク&lt;/li&gt;
-&lt;/ul&gt;
-</description>
+      <description> 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
     </item>
     
     <item>
@@ -52,38 +28,13 @@
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
-      <description>
-
-&lt;h2 id=&#34;cliでコンテナを更新したい&#34;&gt;CLIでコンテナを更新したい&lt;/h2&gt;
-
-&lt;p&gt;Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が&lt;a href=&#34;https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/&#34;&gt;発表&lt;/a&gt;されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。&lt;/p&gt;
-
-&lt;p&gt;さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。&lt;/p&gt;
-
-&lt;p&gt;まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-cli-2-0&#34;&gt;Azure CLI 2.0&lt;/h2&gt;
-
-&lt;p&gt;Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。&lt;/p&gt;
-
-&lt;p&gt;すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az appservice web config container show -n yourcontainerapp -g YourRG
-{
-  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
-{
-  &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;これで更新されます。&lt;/p&gt;
-</description>
+      <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
+さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
+まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
+Azure CLI 2.0 Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。
+すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; }  これで更新されます。</description>
     </item>
     
     <item>
@@ -92,73 +43,12 @@
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
-      <description>
-
-&lt;h2 id=&#34;oms-container-solution-for-linux-プレビュー開始&#34;&gt;OMS Container Solution for Linux プレビュー開始&lt;/h2&gt;
-
-&lt;p&gt;OMS Container Solution for Linuxのプレビューが&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;はじまりました&lt;/a&gt;。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。&lt;/p&gt;
-
-&lt;p&gt;さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。&lt;/p&gt;
-
-&lt;h2 id=&#34;何ができるか-とその特徴&#34;&gt;何ができるか、とその特徴&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
-
-&lt;ul&gt;
-&lt;li&gt;収集データの詳細 - &lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details&#34;&gt;Containers data collection details&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;導入が楽ちん
-
-&lt;ol&gt;
-&lt;li&gt;OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる&lt;/li&gt;
-&lt;li&gt;コンテナホストに直接OMS Agentを導入することもできる&lt;/li&gt;
-&lt;/ol&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;1がコンテナ的でいいですよね。実現イメージはこんな感じです。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png&#34; alt=&#34;OMS Agent Installation Type&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。&lt;/p&gt;
-
-&lt;p&gt;では試しに、1のやり口でUbuntuへ導入してみましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;手順&#34;&gt;手順&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/&#34;&gt;参考&lt;/a&gt;)
-
-&lt;ul&gt;
-&lt;li&gt;Azureのサブスクリプションを持っている場合、&amp;rdquo;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure&#34;&gt;Microsoft Azure を使用した迅速なサインアップ&lt;/a&gt;&amp;ldquo;から読むと、話が早いです&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加&lt;/li&gt;
-&lt;li&gt;UbuntuにDockerを導入
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/installation/linux/ubuntulinux/&#34;&gt;参考&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;OMSエージェントコンテナを導入
-
-&lt;ul&gt;
-&lt;li&gt;先ほど入手したOMSのワークスペースIDとKeyを入れてください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&amp;quot;omsagent&amp;quot; --log-driver=none --restart=always microsoft/oms
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上。これでOMSポータルからログ分析ができます。こんな感じで。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png&#34; alt=&#34;Dashboard1&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png&#34; alt=&#34;Dashboard2&#34; title=&#34;from microsoft.com&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;なんと簡単じゃありませんか。詳細が気になるかたは、&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/&#34;&gt;こちら&lt;/a&gt;から。&lt;/p&gt;
-
-&lt;p&gt;なお、フィードバック&lt;a href=&#34;https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/&#34;&gt;熱烈歓迎&lt;/a&gt;だそうです。&lt;/p&gt;
-</description>
+      <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
+さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
+では試しに、1のやり口でUbuntuへ導入してみましょう。
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;rdquo;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください   sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.</description>
     </item>
     
     <item>
@@ -167,210 +57,13 @@
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
-      <description>
-
-&lt;h2 id=&#34;端末だってコード化されたい&#34;&gt;端末だってコード化されたい&lt;/h2&gt;
-
-&lt;p&gt;Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。&lt;/p&gt;
-
-&lt;h2 id=&#34;解決したい課題&#34;&gt;解決したい課題&lt;/h2&gt;
-
-&lt;p&gt;こんな悩みを解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい&lt;/li&gt;
-&lt;li&gt;WindowsもMacも使っているので、どちらでも同じ環境を作りたい&lt;/li&gt;
-&lt;li&gt;サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー&lt;/li&gt;
-&lt;li&gt;2016年にもなって長いコードをVimとかEmacsで書きたくない&lt;/li&gt;
-&lt;li&gt;Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい&lt;/li&gt;
-&lt;li&gt;仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい&lt;/li&gt;
-&lt;li&gt;Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか)&lt;/li&gt;
-&lt;li&gt;でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい&lt;/li&gt;
-&lt;li&gt;新メンバーがチームに入るたび、セットアップが大変&lt;/li&gt;
-&lt;li&gt;不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変&lt;/li&gt;
-&lt;li&gt;毎度作業のどこかが抜ける、漏れる、間違う 人間だもの&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;やり口&#34;&gt;やり口&lt;/h2&gt;
-
-&lt;p&gt;VagrantとDockerで解決します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る&lt;/li&gt;
-&lt;li&gt;Vagrantでセットアップを自動化する&lt;/li&gt;
-&lt;li&gt;Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する&lt;/li&gt;
-&lt;li&gt;Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する&lt;/li&gt;
-&lt;li&gt;公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る&lt;/li&gt;
-&lt;li&gt;Windows/MacのいまどきなIDEなりエディタを使えるようにする&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;セットアップ概要&#34;&gt;セットアップ概要&lt;/h2&gt;
-
-&lt;p&gt;簡単す。&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Virtualboxを&lt;a href=&#34;https://www.virtualbox.org/&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrantを&lt;a href=&#34;https://www.vagrantup.com/downloads.html&#34;&gt;インストール&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Vagrant Putty Plugin(vagrant-multi-putty)を&lt;a href=&#34;https://github.com/nickryand/vagrant-multi-putty&#34;&gt;インストール&lt;/a&gt; #Windowsのみ。Puttyは別途入れてください&lt;/li&gt;
-&lt;li&gt;作業フォルダを作り、Vagrant ファイルを書く&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。&lt;/p&gt;
-
-&lt;h2 id=&#34;サンプル解説&#34;&gt;サンプル解説&lt;/h2&gt;
-
-&lt;p&gt;OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
-VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot;
-
-$bootstrap=&amp;lt;&amp;lt;SCRIPT
-
-#Common tools
-sudo apt-get update
-sudo apt-get -y install wget unzip jq
-
-#Docker Engine
-sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install linux-image-extra-$(uname -r)
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-sudo sh -c &amp;quot;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &amp;gt; /etc/apt/sources.list.d/docker.list&amp;quot;
-sudo apt-get update
-sudo apt-get -y purge lxc-docker
-sudo apt-cache policy docker-engine
-sudo apt-get -y install docker-engine=1.11.1-0~trusty
-sudo gpasswd -a vagrant docker
-sudo service docker restart
-
-#Docker Machine
-sudo sh -c &amp;quot;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &amp;gt;/usr/local/bin/docker-machine &amp;amp;&amp;amp; chmod +x /usr/local/bin/docker-machine&amp;quot;
-
-#Azure CLI
-echo &amp;quot;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Terraform
-echo &amp;quot;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#Packer
-echo &amp;quot;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&amp;quot; &amp;gt;&amp;gt; $HOME/.bashrc
-
-#nodebrew
-curl -L git.io/nodebrew | perl - setup
-echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &amp;gt;&amp;gt; $HOME/.bashrc
-$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
-$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
-
-#Python3
-wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
-
-SCRIPT
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-
-  config.vm.box = &amp;quot;ubuntu/trusty64&amp;quot;
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-
-  config.vm.network &amp;quot;private_network&amp;quot;, ip: &amp;quot;192.168.33.10&amp;quot;
-
-  config.vm.provider &amp;quot;virtualbox&amp;quot; do |vb|
-     vb.customize [&amp;quot;modifyvm&amp;quot;, :id, &amp;quot;--memory&amp;quot;, &amp;quot;2048&amp;quot;]
-  end
-
-  config.vm.provision :shell, inline: $bootstrap, privileged: false
-
-end
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;$bootstrap=&amp;lt;&amp;lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。&lt;/p&gt;
-
-&lt;h3 id=&#34;common-tools&#34;&gt;Common tools&lt;/h3&gt;
-
-&lt;p&gt;一般的なツールをaptでインストールします。wgetとかjqとか。&lt;/p&gt;
-
-&lt;h3 id=&#34;docker-engine-machine&#34;&gt;Docker Engine &amp;amp; Machine&lt;/h3&gt;
-
-&lt;p&gt;この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。&lt;/p&gt;
-
-&lt;h3 id=&#34;azure-cli&#34;&gt;Azure CLI&lt;/h3&gt;
-
-&lt;p&gt;インストールせずに&lt;a href=&#34;https://hub.docker.com/r/microsoft/azure-cli/&#34;&gt;MS公式のDockerイメージ&lt;/a&gt;を引っ張ります。なのでalias設定だけ。
--v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
-また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&amp;ndash;rmで消します。&lt;/p&gt;
-
-&lt;h3 id=&#34;terraform-packer&#34;&gt;Terraform &amp;amp; Packer&lt;/h3&gt;
-
-&lt;p&gt;Azure CLIと同様です。Hashicorpが&lt;a href=&#34;https://hub.docker.com/u/hashicorp/&#34;&gt;公式イメージ&lt;/a&gt;を提供しているので、それを活用します。
-方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
--v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。&lt;/p&gt;
-
-&lt;p&gt;なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。&lt;/p&gt;
-
-&lt;h3 id=&#34;nodebrew&#34;&gt;nodebrew&lt;/h3&gt;
-
-&lt;p&gt;nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。&lt;/p&gt;
-
-&lt;h3 id=&#34;python3&#34;&gt;Python3&lt;/h3&gt;
-
-&lt;p&gt;Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。&lt;/p&gt;
-
-&lt;p&gt;みなさん他にもいろいろあるでしょう。シェルなのでお好みで。&lt;/p&gt;
-
-&lt;p&gt;さて、ここまでがプロビジョニング時の処理です。以降の&amp;rdquo;Vagrant.configure～&amp;rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。&lt;/p&gt;
-
-&lt;h2 id=&#34;どれだけ楽か&#34;&gt;どれだけ楽か&lt;/h2&gt;
-
-&lt;p&gt;では、環境を作ってみましょう。Vagrantfileがあるフォルダで&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant up
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;仮想マシンが作成されます。初回はプロビジョニング処理も走ります。&lt;/p&gt;
-
-&lt;p&gt;できましたか。できたら、&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant putty
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。&lt;/p&gt;
-
-&lt;p&gt;あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vagrant destroy
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。&lt;/p&gt;
-
-&lt;p&gt;なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。&lt;/p&gt;
-
-&lt;p&gt;わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。&lt;/p&gt;
-
-&lt;p&gt;ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。&lt;/p&gt;
-
-&lt;p&gt;また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう&lt;/li&gt;
-&lt;li&gt;サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
-
-&lt;ul&gt;
-&lt;li&gt;(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;bash-on-windowsまで待つとか言わない&#34;&gt;Bash on Windowsまで待つとか言わない&lt;/h2&gt;
-
-&lt;p&gt;「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。&lt;/p&gt;
-
-&lt;p&gt;インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。&lt;/p&gt;
-
-&lt;p&gt;夏近し、楽して早く帰ってビール呑みましょう。&lt;/p&gt;
-</description>
+      <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
+解決したい課題 こんな悩みを解決します。
+ WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
+ Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
+ Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
+サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing! VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot; $bootstrap=&amp;lt;&amp;lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.</description>
     </item>
     
     <item>
@@ -379,167 +72,18 @@ end
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
-      <description>
-
-&lt;h2 id=&#34;サーバレスって言いたいだけじゃないです&#34;&gt;サーバレスって言いたいだけじゃないです&lt;/h2&gt;
-
-&lt;p&gt;Linux向けAzure BatchのPreviewが&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;はじまり&lt;/a&gt;ました。地味ですが、なかなかのポテンシャルです。&lt;/p&gt;
-
-&lt;p&gt;クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
-節約」でしょう。&lt;/p&gt;
-
-&lt;p&gt;ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。&lt;/p&gt;
-
-&lt;p&gt;その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。&lt;/p&gt;
-
-&lt;h2 id=&#34;コンセプト&#34;&gt;コンセプト&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;管理サーバを作らない&lt;/li&gt;
-&lt;li&gt;Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される&lt;/li&gt;
-&lt;li&gt;ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される&lt;/li&gt;
-&lt;li&gt;サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う&lt;/li&gt;
-&lt;li&gt;セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;サンプル&#34;&gt;サンプル&lt;/h2&gt;
-
-&lt;p&gt;Githubにソースを&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample&#34;&gt;置いておきます&lt;/a&gt;。&lt;/p&gt;
-
-&lt;h3 id=&#34;バッチアカウントとストレージアカウント-コンテナの作成とアプリ-データの配置&#34;&gt;バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/&#34;&gt;公式ドキュメント&lt;/a&gt;で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。&lt;/p&gt;
-
-&lt;p&gt;ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.
-├── blob
-│   ├── application
-│   │   ├── starttask.sh
-│   │   └── task.sh
-│   ├── input
-│   │   └── the_star_spangled_banner.txt
-│   └── output
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/starttask.sh&#34;&gt;starttask.sh&lt;/a&gt; - docker engineをインストールします&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/blob/master/blob/application/task.sh&#34;&gt;task.sh&lt;/a&gt; - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。&lt;a href=&#34;https://github.com/ToruMakabe/Azure_Batch_Sample/tree/master/docker&#34;&gt;サンプル&lt;/a&gt;はPythonで書いたシンプルなWord Countアプリです&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。&lt;/p&gt;
-
-&lt;p&gt;コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。&lt;/p&gt;
-
-&lt;p&gt;さて、いよいよジョブをJSONで定義します。詳細は&lt;a href=&#34;https://msdn.microsoft.com/en-us/library/azure/dn820158.aspx?f=255&amp;amp;MSPPError=-2147217396&#34;&gt;公式ドキュメント&lt;/a&gt;を確認してください。ポイントだけまとめます。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil&lt;/li&gt;
-&lt;li&gt;4時間ごとに実行する - schedule/recurrenceInterval&lt;/li&gt;
-&lt;li&gt;ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption&lt;/li&gt;
-&lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
-&lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
-&lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;pre&gt;&lt;code&gt;  {
-  &amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
-  &amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
-  &amp;quot;schedule&amp;quot;: {
-    &amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
-    &amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
-  },
-  &amp;quot;jobSpecification&amp;quot;: {
-    &amp;quot;priority&amp;quot;:100,
-    &amp;quot;constraints&amp;quot;: {
-      &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-      &amp;quot;maxTaskRetryCount&amp;quot;:-1
-    },
-    &amp;quot;jobManagerTask&amp;quot;: {
-      &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
-      &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
-      &amp;quot;resourceFiles&amp;quot;: [ {
-        &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-        &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
-      }], 
-      &amp;quot;environmentSettings&amp;quot;: [ {
-        &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
-        &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
-      } ],
-      &amp;quot;constraints&amp;quot;: {
-        &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-        &amp;quot;maxTaskRetryCount&amp;quot;:0,
-        &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
-      },
-      &amp;quot;killJobOnCompletion&amp;quot;:false,
-      &amp;quot;runElevated&amp;quot;:true,
-      &amp;quot;runExclusive&amp;quot;:true
-      },
-      &amp;quot;poolInfo&amp;quot;: {
-        &amp;quot;autoPoolSpecification&amp;quot;: {
-          &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
-          &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
-          &amp;quot;pool&amp;quot;: {
-            &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
-            &amp;quot;virtualMachineConfiguration&amp;quot;: {
-              &amp;quot;imageReference&amp;quot;: {
-                &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
-                &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
-                &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
-                &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
-              },
-              &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
-            },
-            &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
-            &amp;quot;targetDedicated&amp;quot;:1,
-            &amp;quot;maxTasksPerNode&amp;quot;:1,
-            &amp;quot;taskSchedulingPolicy&amp;quot;: {
-              &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
-            },
-            &amp;quot;enableAutoScale&amp;quot;:false,
-            &amp;quot;enableInterNodeCommunication&amp;quot;:false,
-            &amp;quot;startTask&amp;quot;: {
-              &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
-              &amp;quot;resourceFiles&amp;quot;: [ {
-                &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-                &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
-              } ],
-              &amp;quot;environmentSettings&amp;quot;: [ {
-                &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
-                &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
-              } ],
-              &amp;quot;runElevated&amp;quot;:true,
-              &amp;quot;waitForSuccess&amp;quot;:true
-            },
-            &amp;quot;metadata&amp;quot;: [ {
-              &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
-              &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
-            } ]
-          }
-        }
-      }
-    }
-  }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。&lt;/p&gt;
-
-&lt;p&gt;それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。&lt;/p&gt;
-
-&lt;p&gt;ではスケジュールジョブをAzure BatchにCLIで送り込みます。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-automationとの使い分け&#34;&gt;Azure Automationとの使い分け&lt;/h2&gt;
-
-&lt;p&gt;Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。&lt;/p&gt;
-</description>
+      <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
+クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
+ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。
+その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。
+コンセプト  管理サーバを作らない Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納  サンプル Githubにソースを置いておきます。
+バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置 公式ドキュメントで概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。
+ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。
+. ├── blob │ ├── application │ │ ├── starttask.sh │ │ └── task.sh │ ├── input │ │ └── the_star_spangled_banner.txt │ └── output  applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。
+ starttask.sh - docker engineをインストールします task.sh - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。サンプルはPythonで書いたシンプルなWord Countアプリです  また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。
+コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。
+さて、いよいよジョブをJSONで定義します。詳細は公式ドキュメントを確認してください。ポイントだけまとめます。
+ 2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil 4時間ごとに実行する - schedule/recurrenceInterval ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption ジョブ実行時にtask.</description>
     </item>
     
     <item>
@@ -548,105 +92,12 @@ end
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
-      <description>
-
-&lt;h2 id=&#34;気軽に作って壊せる環境を作る&#34;&gt;気軽に作って壊せる環境を作る&lt;/h2&gt;
-
-&lt;p&gt;Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。&lt;/p&gt;
-
-&lt;p&gt;試行錯誤するでしょうから、萎えないようにデプロイは自動化します。&lt;/p&gt;
-
-&lt;h2 id=&#34;方針&#34;&gt;方針&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;インフラはAzure Resource Manager Templateでデプロイする
-
-&lt;ul&gt;
-&lt;li&gt;Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
-&lt;ul&gt;
-&lt;li&gt;Dockerfileの元ネタは&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Tools/docker&#34;&gt;ここ&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;GPUむけもあるけどグッと我慢、今回はCPUで&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Hub上のリポジトリは &lt;a href=&#34;https://hub.docker.com/r/torumakabe/cntk-cpu/&#34;&gt;torumakabe/cntk-cpu&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
-&lt;ul&gt;
-&lt;li&gt;docker extensionでdocker engineを導入&lt;/li&gt;
-&lt;li&gt;custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;VMにログインしたら即CNTKを使える、幸せ&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
-
-&lt;p&gt;Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。&lt;/p&gt;
-
-&lt;p&gt;リソースグループを作ります。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json&#34;&gt;azuredeploy.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;編集不要です&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json&#34;&gt;azuredeploy.parameters.json&lt;/a&gt;
-
-&lt;ul&gt;
-&lt;li&gt;テンプレートに直で書かきたくないパラメータです&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecute以外は、各々で&lt;/li&gt;
-&lt;li&gt;fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください&lt;/li&gt;
-&lt;li&gt;ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください
-&lt;br /&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;うし、デプロイ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;C:\Work&amp;gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。&lt;/p&gt;
-
-&lt;p&gt;docker engine入ってますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker -v
-Docker version 1.11.0, build 4dc5990
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKビルド済みのdockerイメージ、pullできてますかね。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker images
-REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
-yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;問題なし。ではエンジョイ Deep Learning。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
-root@a1234bc5d67d:/cntk#
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;CNTKの利用例は、&lt;a href=&#34;https://github.com/Microsoft/CNTK/tree/master/Examples&#34;&gt;Github&lt;/a&gt;にあります。&lt;/p&gt;
-
-&lt;h2 id=&#34;今後の展開&#34;&gt;今後の展開&lt;/h2&gt;
-
-&lt;p&gt;インフラおじさんは、最近Linuxむけに&lt;a href=&#34;https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/&#34;&gt;Previewがはじまった&lt;/a&gt;Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。&lt;/p&gt;
-
-&lt;p&gt;これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。&lt;/p&gt;
-
-&lt;p&gt;もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。&lt;/p&gt;
-</description>
+      <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
+試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+リソースグループを作ります。
+C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
+ azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください    うし、デプロイ。</description>
     </item>
     
     <item>
@@ -655,160 +106,23 @@ root@a1234bc5d67d:/cntk#
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
-      <description>
-
-&lt;h2 id=&#34;どこいってもいじられる&#34;&gt;どこいってもいじられる&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://www.adventar.org/calendars/968&#34;&gt;OpenStack Advent Calendar 2015&lt;/a&gt; 参加作品、19夜目のエントリです。&lt;/p&gt;
-
-&lt;p&gt;OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。&lt;/p&gt;
-
-&lt;p&gt;さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。&lt;/p&gt;
-
-&lt;h2 id=&#34;乗るしかないこのdockerウェーブに&#34;&gt;乗るしかないこのDockerウェーブに&lt;/h2&gt;
-
-&lt;p&gt;どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。&lt;/p&gt;
-
-&lt;p&gt;ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。&lt;/p&gt;
-
-&lt;p&gt;条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。&lt;/p&gt;
-
-&lt;p&gt;あと、当然ですが個人で気軽にオンラインで契約できることも条件です。&lt;/p&gt;
-
-&lt;p&gt;そうすると、ほぼ一択。&lt;a href=&#34;https://www.conoha.jp/&#34;&gt;Conoha&lt;/a&gt;です。かわいらしい座敷童の&lt;a href=&#34;https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu&#34;&gt;&amp;ldquo;このは&amp;rdquo;&lt;/a&gt;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。&lt;/p&gt;
-
-&lt;p&gt;では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。&lt;/p&gt;
-
-&lt;p&gt;今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は&lt;a href=&#34;http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration&#34;&gt;前佛さんの資料&lt;/a&gt;を参考にしてください。&lt;/p&gt;
-
-&lt;h2 id=&#34;ローカル環境&#34;&gt;ローカル環境&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Mac OS X (El Capitan)
-
-&lt;ul&gt;
-&lt;li&gt;Docker Toolbox 1.9.1&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
-また、Swarmのマスタはローカルに配置します。&lt;/p&gt;
-
-&lt;h2 id=&#34;いざ実行&#34;&gt;いざ実行&lt;/h2&gt;
-
-&lt;p&gt;まず、Docker Machineにクラウドの諸設定を食わせます。&lt;/p&gt;
-
-&lt;p&gt;Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は&lt;a href=&#34;https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/&#34;&gt;ここ&lt;/a&gt;を。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
-$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Conoha向けにOpenStack関連の環境変数をセットします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ export OS_USERNAME=yourname
-$ export OS_TENANT_NAME=yourtenantname
-$ export OS_PASSWORD=yourpass
-$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;次はローカルコンテナ環境を整えます。&lt;/p&gt;
-
-&lt;p&gt;Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker-machine create -d virtualbox local
-$ eval &amp;quot;$(docker-machine env local)&amp;quot;
-$ docker run swarm create    
-Status: Downloaded newer image for swarm:latest
-tokentokentokentoken
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;このトークンは控えておきましょう。&lt;/p&gt;
-
-&lt;p&gt;ではSwarmのマスタをローカルに作ります。先ほど生成したトークン指定を忘れずに。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://tokentokentokentoken head
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;SwarmのエージェントをAzureに作ります。VMを作って、OSとDockerをインストールして、なんて不要です。Docker Machineがやってくれます。ここでもトークン指定を忘れずに。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ eval &amp;quot;$(docker-machine env head)&amp;quot;
-$ docker-machine create -d azure --swarm --swarm-discovery token://tokentokentokentoken worker-azure01 --azure-location &amp;quot;East Asia&amp;quot; worker-azure00
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Conohaにも同様に。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker-machine create -d openstack --openstack-flavor-name g-1gb --openstack-image-name vmi-ubuntu-14.04-amd64 --openstack-sec-groups &amp;quot;default,gncs-ipv4-all&amp;quot; --swarm --swarm-discovery token://tokentokentokentoken worker-conoha00
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;さあ環境がサクッと出来上がりました。これ以降はSwarmクラスタ全体を操作対象にします。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ eval &amp;quot;$(docker-machine env --swarm head)&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;環境をチラ見してみましょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker info
-Containers: 4
-Images: 3
- Role: primary
- Strategy: spread
- Filters: health, port, dependency, affinity, constraint
- Nodes: 3
- head: 192.168.99.101:2376
-  └ Containers: 2
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.021 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=4.1.13-boot2docker, operatingsystem=Boot2Docker 1.9.1 (TCL 6.4.1); master : cef800b - Fri Dec 18 19:33:59 UTC 2015, provider=virtualbox, storagedriver=aufs
- worker-azure00: xxx.cloudapp.net:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.721 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.13.0-36-generic, operatingsystem=Ubuntu 14.04.1 LTS, provider=azure, storagedriver=aufs
- worker-conoha00: www.xxx.yyy.zzz:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 2
-  └ Reserved Memory: 0 B / 1.019 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.16.0-51-generic, operatingsystem=Ubuntu 14.04.3 LTS, provider=openstack, storagedriver=aufs
-CPUs: 4
-Total Memory: 3.761 GiB
-Name: 1234abcd
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;どこにどんな環境が作られたかが分かりますね。出力結果の4行目&amp;rdquo;Strategy: spread&amp;rdquo;を覚えておいてください。&lt;/p&gt;
-
-&lt;p&gt;ではコンテナを作ってみましょう。Nginxコンテナ三連星です。どの環境に作るか、という指定はしません。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ for i in `seq 1 3`; do docker run -d -p 80:80 nginx; done
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;どんな具合でしょう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                NAMES
-9cc2f5594fa5        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   5 seconds ago       Up 4 seconds        192.168.99.101:80-&amp;gt;80/tcp, 443/tcp   head/goofy_goldberg
-b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   32 seconds ago      Up 31 seconds       www.xxx.yyy.zzz:80-&amp;gt;80/tcp, 443/tcp   worker-conoha00/clever_chandrasekhar
-19e9d0e229a2        nginx               &amp;quot;nginx -g &#39;daemon off&amp;quot;   45 seconds ago      Up 42 seconds       zzz.yyy.xxx.www:80-&amp;gt;80/tcp, 443/tcp    worker-azure00/reverent_bhaskara
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&amp;rdquo;Strategy: spread&amp;rdquo;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。&lt;/p&gt;
-
-&lt;p&gt;まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した&lt;a href=&#34;https://www.tutum.co/&#34;&gt;Tutum&lt;/a&gt;との関係、今後どう進化していくのか、注目です。&lt;/p&gt;
-
-&lt;h2 id=&#34;ツールから入るハイブリッドクラウドも-またよし&#34;&gt;ツールから入るハイブリッドクラウドも、またよし&lt;/h2&gt;
-
-&lt;p&gt;ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。&lt;/p&gt;
-
-&lt;p&gt;でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。&lt;/p&gt;
-
-&lt;p&gt;もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。&lt;/p&gt;
-
-&lt;p&gt;簡単 = 正義です。簡単であれば使う人が増えて、要望が増えて、育ちます。かっちり感は後からついてくる。もしDockerで複数のクラウド環境を簡単に使いこなせるようになるのであれば、順番が逆ではありますが、お箸、Dockerというツールから入るのもいいかもしれません。&lt;/p&gt;
-
-&lt;p&gt;まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。&lt;/p&gt;
-
-&lt;p&gt;OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。&lt;/p&gt;
-</description>
+      <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
+OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
+さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
+乗るしかないこのDockerウェーブに どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。
+ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。
+条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。
+あと、当然ですが個人で気軽にオンラインで契約できることも条件です。
+そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&amp;ldquo;このは&amp;rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
+では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
+今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
+ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1   ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
+いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
+Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
+$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge $ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem  Conoha向けにOpenStack関連の環境変数をセットします。
+$ export OS_USERNAME=yourname $ export OS_TENANT_NAME=yourtenantname $ export OS_PASSWORD=yourpass $ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0  次はローカルコンテナ環境を整えます。
+Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
+$ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine env local)&amp;quot; $ docker run swarm create Status: Downloaded newer image for swarm:latest tokentokentokentoken  このトークンは控えておきましょう。</description>
     </item>
     
     <item>
@@ -817,46 +131,18 @@ b9d54d794a85        nginx               &amp;quot;nginx -g &#39;daemon off&amp;q
       <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
-      <description>
-
-&lt;h2 id=&#34;まずはじめに&#34;&gt;まずはじめに&lt;/h2&gt;
-
-&lt;p&gt;先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。&lt;/p&gt;
-
-&lt;p&gt;もちろん、技術者個人として、中立的に、公開できるネタを書きます。&lt;/p&gt;
-
-&lt;p&gt;AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。&lt;/p&gt;
-
-&lt;p&gt;なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。&lt;/p&gt;
-
-&lt;h2 id=&#34;azure-docker-vm-extension-を使う3つの理由&#34;&gt;Azure Docker VM Extension を使う3つの理由&lt;/h2&gt;
-
-&lt;p&gt;さて、今回は話題沸騰のDocker関連のネタ、&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;Azure Docker VM Extension&lt;/a&gt;について。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。&lt;/p&gt;
-
-&lt;p&gt;このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。&lt;/p&gt;
-
-&lt;p&gt;ずばり、答えはGithubの&lt;a href=&#34;https://github.com/Azure/azure-docker-extension&#34;&gt;README&lt;/a&gt;にまとまっています。この拡張機能のうれしさは、&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;Docker EngineのStable最新版をインストールしてくれる&lt;/li&gt;
-&lt;li&gt;Docker デーモンの起動オプションや認証まわりを設定できる (オプション)
-
-&lt;ul&gt;
-&lt;li&gt;ポートマッピング、認証まわり、Docker Registoryサーバの定義など&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;Docker Composeのパラメータを渡すことができる (オプション)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。&lt;/p&gt;
-
-&lt;p&gt;Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。&lt;/p&gt;
-
-&lt;p&gt;ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。&lt;/p&gt;
-
-&lt;p&gt;Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。&lt;/p&gt;
-
-&lt;p&gt;なお、このDocker拡張、ARM属性で言うpublisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。&lt;/p&gt;
-</description>
+      <description>まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
+もちろん、技術者個人として、中立的に、公開できるネタを書きます。
+AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。
+なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。
+Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
+このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
+ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
+ Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)  ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
+Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
+ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
+Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
+なお、このDocker拡張、ARM属性で言うpublisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</description>
     </item>
     
   </channel>

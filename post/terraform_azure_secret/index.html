@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraformでAzureのシークレットを受け渡す(ACI/AKS編) &middot; re-imagine</title>
+
+    <meta name="description" content="">
+
+    <meta name="generator" content="Hugo 0.39" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="tmak_tw" />
+    <meta name="twitter:title" content="TerraformでAzureのシークレットを受け渡す(ACI/AKS編) &middot; re-imagine">
+    <meta name="twitter:description" content="">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="TerraformでAzureのシークレットを受け渡す(ACI/AKS編) &middot; re-imagine">
+    <meta property="og:description" content="">
+
+    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="http://torumakabe.github.io//css/all.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="http://torumakabe.github.io//index.xml" />
+</head>
+<body>
+
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+    <div class="header">
+        <hgroup>
+            <h1 class="brand-title"><a href="http://torumakabe.github.io/">re-imagine</a></h1>
+            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
+        </hgroup>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
+                </li>
+                
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="pure-button" href="http://torumakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <div class="content pure-u-1 pure-u-md-3-4">
+        <div>
+            
+            <div class="posts">
+                <h1 class="content-subhead">27 Apr 2018, 17:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/terraform_azure_secret/" class="post-title">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-share">
+                        <div class="post-share-links">
+                            <h4 style="">Share</h4>
+                            <a href="#" data-type="facebook" data-url="http://torumakabe.github.io/post/terraform_azure_secret/" data-title="TerraformでAzureのシークレットを受け渡す(ACI/AKS編)" data-description="" data-media="" class="prettySocial fa fa-facebook"></a>
+                            <a href="#" data-type="googleplus" data-url="http://torumakabe.github.io/post/terraform_azure_secret/" data-description="" class="prettySocial fa fa-google-plus"></a>
+                            
+                            <a href="#" data-type="twitter" data-url="http://torumakabe.github.io/post/terraform_azure_secret/" data-description="" data-via="tmak_tw" class="prettySocial fa fa-twitter"></a>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="post-description">
+                        
+
+<h2 id="動機">動機</h2>
+
+<p>システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。</p>
+
+<ul>
+<li>いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない
+
+<ul>
+<li>めんどくさいし手が滑る</li>
+</ul></li>
+<li>データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない
+
+<ul>
+<li>メールとかチャットとかファイルサーバーとか勘弁</li>
+</ul></li>
+<li>もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない
+
+<ul>
+<li>本番でも、それやる？</li>
+</ul></li>
+<li>kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない
+
+<ul>
+<li>Base64符号化とか、うっかり忘れる</li>
+</ul></li>
+</ul>
+
+<p>つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。</p>
+
+<h2 id="シナリオ">シナリオ</h2>
+
+<p>Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。</p>
+
+<ul>
+<li>Nodeとデータストアを組み合わせた、<a href="https://github.com/ToruMakabe/ImpressAzureBookNode">Todoアプリケーション</a></li>
+<li>コンテナーイメージは<a href="https://hub.docker.com/r/torumakabe/nodetodo/">Docker Hub</a>にある</li>
+<li>コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う</li>
+<li>データストアはCosmos DB(MongoDB API)</li>
+<li>Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る
+
+<ul>
+<li>接続文字列の渡し方はACI/AKSで異なる</li>
+<li>ACI
+
+<ul>
+<li>コンテナー作成時に環境変数として接続文字列を渡す</li>
+</ul></li>
+<li>AKS
+
+<ul>
+<li>k8sのSecretとして接続文字列をストアする</li>
+<li>コンテナー作成時にSecretを参照し、環境変数として渡す</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="検証環境">検証環境</h2>
+
+<ul>
+<li>Azure Cloud Shell
+
+<ul>
+<li>Terraform v0.11.7</li>
+<li>Terraformの認証はCloud Shell組み込み</li>
+</ul></li>
+<li>Terraform Azure Provider v1.4</li>
+<li>Terraform kubernetes Provider v1.1</li>
+<li>AKS kubernetes 1.9.6</li>
+</ul>
+
+<h2 id="aciの場合">ACIの場合</h2>
+
+<p>ざっと以下の流れです。
+1. リソースグループ作成
+2. Cosmos DBアカウント作成
+3. ACIコンテナーグループ作成 (Cosmos DB属性から接続文字列を生成)</p>
+
+<p>var.で参照している変数は、別ファイルに書いています。</p>
+
+<p>[main.tf]</p>
+
+<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+  name     = &quot;${var.resource_group_name}&quot;
+  location = &quot;${var.resource_group_location}&quot;
+}
+
+resource &quot;random_integer&quot; &quot;ri&quot; {
+  min = 10000
+  max = 99999
+}
+
+resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
+  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  offer_type          = &quot;Standard&quot;
+  kind                = &quot;MongoDB&quot;
+
+  enable_automatic_failover = true
+
+  consistency_policy {
+    consistency_level       = &quot;BoundedStaleness&quot;
+    max_interval_in_seconds = 10
+    max_staleness_prefix    = 200
+  }
+
+  geo_location {
+    location          = &quot;${azurerm_resource_group.rg.location}&quot;
+    failover_priority = 0
+  }
+
+  geo_location {
+    location          = &quot;${var.failover_location}&quot;
+    failover_priority = 1
+  }
+}
+
+resource &quot;azurerm_container_group&quot; &quot;aci-todo&quot; {
+  name                = &quot;aci-todo&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  ip_address_type     = &quot;public&quot;
+  dns_name_label      = &quot;yourtodo&quot;
+  os_type             = &quot;linux&quot;
+
+  container {
+    name   = &quot;hw&quot;
+    image  = &quot;torumakabe/nodetodo&quot;
+    cpu    = &quot;1&quot;
+    memory = &quot;1.5&quot;
+    port   = &quot;8080&quot;
+
+    environment_variables {
+      &quot;MONGO_URL&quot; = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
+    }
+  }
+}
+</code></pre>
+
+<p>containerのenvironment_variablesブロックでCosmos DBの属性を参照し、接続文字列を生成しています。簡単ですね。これで接続文字列コピペ作業から解放されます。</p>
+
+<h2 id="aks">AKS</h2>
+
+<p>AKSの場合、流れは以下の通りです。
+1. リソースグループ作成
+2. Cosmos DBアカウント作成
+3. AKSクラスター作成
+4. k8s Secretを作成 (Cosmos DB属性から接続文字列生成)
+5. k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</p>
+
+<p>[main.tf]</p>
+
+<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+  name     = &quot;${var.resource_group_name}&quot;
+  location = &quot;${var.resource_group_location}&quot;
+}
+
+resource &quot;random_integer&quot; &quot;ri&quot; {
+  min = 10000
+  max = 99999
+}
+
+resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
+  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  offer_type          = &quot;Standard&quot;
+  kind                = &quot;MongoDB&quot;
+
+  enable_automatic_failover = true
+
+  consistency_policy {
+    consistency_level       = &quot;BoundedStaleness&quot;
+    max_interval_in_seconds = 10
+    max_staleness_prefix    = 200
+  }
+
+  geo_location {
+    location          = &quot;${azurerm_resource_group.rg.location}&quot;
+    failover_priority = 0
+  }
+
+  geo_location {
+    location          = &quot;${var.failover_location}&quot;
+    failover_priority = 1
+  }
+}
+
+resource &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
+  name                = &quot;yourakstf&quot;
+  location            = &quot;${azurerm_resource_group.rg.location}&quot;
+  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
+  dns_prefix          = &quot;yourakstf&quot;
+  kubernetes_version  = &quot;1.9.6&quot;
+
+  linux_profile {
+    admin_username = &quot;${var.admin_username}&quot;
+
+    ssh_key {
+      key_data = &quot;${var.key_data}&quot;
+    }
+  }
+
+  agent_pool_profile {
+    name            = &quot;default&quot;
+    count           = 3
+    vm_size         = &quot;Standard_B2ms&quot;
+    os_type         = &quot;Linux&quot;
+    os_disk_size_gb = 30
+  }
+
+  service_principal {
+    client_id     = &quot;${var.client_id}&quot;
+    client_secret = &quot;${var.client_secret}&quot;
+  }
+}
+
+provider &quot;kubernetes&quot; {
+  host = &quot;${azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
+
+  client_certificate     = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&quot;
+  client_key             = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&quot;
+  cluster_ca_certificate = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
+}
+
+resource &quot;kubernetes_secret&quot; &quot;cosmosdb_secret&quot; {
+  metadata {
+    name = &quot;cosmosdb-secret&quot;
+  }
+
+  data {
+    MONGO_URL = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
+  }
+}
+</code></pre>
+
+<p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
+
+<p>そしてアプリのデプロイ時に、登録したSecretを指定します。ここからはkubernetesワールドなので、kubectlなどを使います。マニフェストは以下のように。</p>
+
+<p>[todo.yaml]</p>
+
+<pre><code>apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: todoapp
+spec:
+  selector:
+    matchLabels:
+      app: todoapp
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: todoapp
+    spec:
+      containers:
+        - name: todoapp
+          image: torumakabe/nodetodo
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cosmosdb-secret
+                  key: MONGO_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapp
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: todoapp
+</code></pre>
+
+<p>シークレットの中身を見ることなく、コピペもせず、もちろんメールやチャットやファイルも使わず、アプリからCosmos DBへ接続できました。</p>
+
+<p>シークレットに限らず、Terraformの属性参照、変数表現は強力ですので、ぜひ活用してみてください。数多くの<a href="https://www.terraform.io/docs/providers/azurerm/">Azureリソース</a>が対応しています。</p>
+
+                    </div>
+                    
+                </section>
+            </div>
+            <div class="footer">
+    <div class="pure-menu pure-menu-horizontal pure-menu-open">
+        <ul>
+            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
+        </ul>
+    </div>
+</div>
+<script src="http://torumakabe.github.io//js/all.min.js"></script>
+        </div>
+    </div>
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', '', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
