@@ -68,6 +68,262 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">27 Mar 2018, 00:10</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_private_dns_preview/" class="post-title">Azure DNS Private Zonesの動きを確認する</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="プライベートゾーンのパブリックプレビュー開始">プライベートゾーンのパブリックプレビュー開始</h2>
+
+<p>Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。</p>
+
+<p>さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNet)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。</p>
+
+<ul>
+<li>Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。</li>
+<li>仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。</li>
+<li>プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。</li>
+<li>リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。</li>
+<li>プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。</li>
+</ul>
+
+<p>公式ドキュメントは<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview">こちら</a>。現時点の<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">制約もまとまっている</a>ので、目を通しておきましょう。</p>
+
+<h2 id="動きを見てみよう">動きを見てみよう</h2>
+
+<p>公式ドキュメントには<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-scenarios">想定シナリオ</a>があり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。</p>
+
+<h3 id="事前に準備する環境">事前に準備する環境</h3>
+
+<p>下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。</p>
+
+<ul>
+<li>VNet *2
+
+<ul>
+<li>vnet01</li>
+<li>subnet01
+
+<ul>
+<li>subnet01-nsg (allow ssh)</li>
+</ul></li>
+<li>vnet02</li>
+<li>subnet01
+
+<ul>
+<li>subnet01-nsg (allow ssh)</li>
+</ul></li>
+</ul></li>
+<li>Azure DNS Public Zone
+
+<ul>
+<li>example.com</li>
+</ul></li>
+</ul>
+
+<h3 id="azure-cliへdns拡張を導入">Azure CLIへDNS拡張を導入</h3>
+
+<p>プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-getstarted-cli#to-installuse-azure-dns-private-zones-feature-public-preview">公式ドキュメント</a>で確認してください。</p>
+
+<pre><code>$ az extension add --name dns
+</code></pre>
+
+<h3 id="プライベートゾーンの作成">プライベートゾーンの作成</h3>
+
+<p>既存のゾーンを確認します。パブリックゾーンがあります。</p>
+
+<pre><code>$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+</code></pre>
+
+<p>プライベートゾーンを作成します。Registration VNetとしてvnet01をリンクします。<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">現時点の制約</a>で、リンク時にはVNet上にVMが無い状態にする必要があります。</p>
+
+<pre><code>$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
+</code></pre>
+
+<p>同じ名前のゾーンが2つになりました。</p>
+
+<pre><code>$ az network dns zone list -o table
+ZoneName      ResourceGroup             RecordSets    MaxRecordSets
+------------  ----------------------  ------------  ---------------
+example.com   common-global-rg                   2             5000
+example.com   private-dns-poc-ejp-rg             1             5000
+</code></pre>
+
+<h3 id="registration-vnetへvmを作成">Registration VNetへVMを作成</h3>
+
+<p>VMを2つ作ります。1つにはインターネット経由でsshするので、パブリックIPを割り当てます。</p>
+
+<pre><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
+$ az network public-ip create -n vm01-pip -g ${BASE_NAME}-rg
+$ az network nic create -g ${BASE_NAME}-rg -n vm01-nic --public-ip-address vm01-pip --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm01 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm01-nic
+$ az network nic create -g ${BASE_NAME}-rg -n vm02-nic --vnet vnet01 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm02 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm02-nic
+</code></pre>
+
+<h3 id="パブリックipをパブリックゾーンへ登録">パブリックIPをパブリックゾーンへ登録</h3>
+
+<p>Split-Horizonの動きを確認したいので、パブリックIPをパブリックゾーンへ登録します。</p>
+
+<pre><code>$ az network public-ip show -g private-dns-poc-ejp-rg -n vm01-pip --query ipAddress
+&quot;13.78.84.84&quot;
+$ az network dns record-set a add-record -g common-global-rg -z example.com -n vm01 -a 13.78.84.84
+</code></pre>
+
+<p>パブリックゾーンで名前解決できることを確認します。</p>
+
+<pre><code>$ nslookup vm01.example.com
+Server:         103.5.140.1
+Address:        103.5.140.1#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 13.78.84.84
+</code></pre>
+
+<h3 id="registration-vnetの動きを確認">Registration VNetの動きを確認</h3>
+
+<p>vnet01のvm01へ、パブリックIP経由でsshします。</p>
+
+<pre><code>$ ssh vm01.example.com
+</code></pre>
+
+<p>同じRegistration VNet上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNetの内部ドメイン名がSuffixになります。</p>
+
+<pre><code>vm01:~$ nslookup vm02
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.aioh0amlfdze5drhlpb1ktqwxd.lx.internal.cloudapp.net
+Address: 10.0.0.5
+</code></pre>
+
+<p>ドメイン名をつけてみましょう。Nameはvnet01にリンクしたプライベートゾーンのドメイン名になりました。</p>
+
+<pre><code>vm01:~$ nslookup vm02.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm02.example.com
+Address: 10.0.0.5
+</code></pre>
+
+<p>逆引きもできます。</p>
+
+<pre><code>vm01:~$ nslookup 10.0.0.5
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+5.0.0.10.in-addr.arpa   name = vm02.example.com.
+
+Authoritative answers can be found from:
+</code></pre>
+
+<h3 id="split-horizonの動きを確認">Split-Horizonの動きを確認</h3>
+
+<p>さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNet内でnslookupするとどうなるでしょう。</p>
+
+<pre><code>vm01:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+</code></pre>
+
+<p>プライベートゾーンで解決されました。Split-Horizonが機能していることが分かります。</p>
+
+<p>あ、どうでもいいことですが、Split-Horizonって戦隊モノの必殺技みたいなネーミングですね。叫びながら地面に拳を叩きつけたい感じ。</p>
+
+<h3 id="resolution-vnetの動きを確認">Resolution VNetの動きを確認</h3>
+
+<p>vnet02を作成し、Resolution VNetとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。</p>
+
+<pre><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
+$ az network vnet create -g ${BASE_NAME}-rg -n vnet02 --address-prefix 10.1.0.0/16 --subnet-name subnet01
+$ az network vnet subnet update -g ${BASE_NAME}-rg -n subnet01 --vnet-name vnet02 --network-security-group subnet01-nsg
+$ az network public-ip create -n vm03-pip -g ${BASE_NAME}-rg
+$ az network dns zone update -g private-dns-poc-ejp-rg -n example.com --resolution-vnets vnet02
+$ az network nic create -g ${BASE_NAME}-rg -n vm03-nic --public-ip-address vm03-pip --vnet vnet02 --subnet subnet01
+$ az vm create -g ${BASE_NAME}-rg -n vm03 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm03-nic
+$ az network public-ip show -g private-dns-poc-ejp-rg -n vm03-pip --query ipAddress
+&quot;13.78.54.133&quot;
+$ ssh 13.78.54.133
+</code></pre>
+
+<p>名前解決の確認が目的なので、vnet01/02間はPeeringしません。</p>
+
+<p>では、vnet01上のvm01を正引きします。ドメイン名を指定しないと、解決できません。vnet02上にvm01がある、と指定されたと判断するからです。</p>
+
+<pre><code>vm03:~$ nslookup vm01
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can't find vm01: SERVFAIL
+</code></pre>
+
+<p>ではプライベートゾーンのドメイン名をつけてみます。解決できました。</p>
+
+<pre><code>vm03:~$ nslookup vm01.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+Non-authoritative answer:
+Name:   vm01.example.com
+Address: 10.0.0.4
+</code></pre>
+
+<p>Resolution VNetからは、逆引きできません。</p>
+
+<pre><code>vm03:~$ nslookup 10.0.0.4
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can't find 4.0.0.10.in-addr.arpa: NXDOMAIN
+</code></pre>
+
+<p>ところでRegistration VNetからResolution VNetのホスト名をnslookupするとどうなるでしょう。</p>
+
+<pre><code>$ ssh vm01.example.com
+vm01:~$ nslookup vm03
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can't find vm03: SERVFAIL
+
+vm01:~$ nslookup vm03.example.com
+Server:         168.63.129.16
+Address:        168.63.129.16#53
+
+** server can't find vm03.example.com: NXDOMAIN
+</code></pre>
+
+<p>ドメイン名あり、なしに関わらず、名前解決できません。VNetが別なのでVNetの内部DNSで解決できない、また、Resolution VNetのVMはレコードがプライベートゾーンに自動登録されないことが分かります。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">26 Mar 2018, 00:08</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1008,170 +1264,6 @@ spec:
 </code></pre>
 
 <p>簡単ですね。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">22 Jan 2018, 22:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_rg_contributor/" class="post-title">Azureのリソースグループ限定 共同作成者をいい感じに作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="共同作成者は-ちょっと強い">共同作成者は、ちょっと強い</h2>
-
-<p>Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。</p>
-
-<p>ユースケースのひとつに、&rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。</p>
-
-<p>なのですが、このようなケースで、権限付与の落とし穴があります。</p>
-
-<ul>
-<li>サブスクリプション所有者が開発用リソースグループを作る</li>
-<li>スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる</li>
-<li>開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ</li>
-<li>開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)</li>
-<li>開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない</li>
-<li>詰む</li>
-<li>サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し</li>
-</ul>
-
-<p>共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。</p>
-
-<h2 id="いい感じのカスタムロールを作る">いい感じのカスタムロールを作る</h2>
-
-<p>Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。</p>
-
-<p>シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。</p>
-
-<pre><code>{
-    &quot;Name&quot;: &quot;Resource Group Contributor&quot;,
-    &quot;IsCustom&quot;: true,
-    &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;,
-    &quot;Actions&quot;: [
-        &quot;*&quot;
-    ],
-    &quot;NotActions&quot;: [
-        &quot;Microsoft.Authorization/*/Delete&quot;,
-        &quot;Microsoft.Authorization/*/Write&quot;,
-        &quot;Microsoft.Authorization/elevateAccess/Action&quot;,
-        &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot;
-    ],
-    &quot;AssignableScopes&quot;: [
-        &quot;/subscriptions/your-subscriotion-id&quot;
-    ]
-}
-</code></pre>
-
-<p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
-
-<p>では、カスタムロールを作成します。</p>
-
-<pre><code>$ az role definition create --role-definition ./role.json
-</code></pre>
-
-<p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
-
-<pre><code>&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot;
-</code></pre>
-
-<h2 id="カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
-
-<p>次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。</p>
-
-<pre><code>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
-</code></pre>
-
-<p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
-
-<pre><code>$ az ad sp create-for-rbac -n &quot;rgcontributor&quot; -p &quot;your-password&quot; --role your-customrole-id --scopes &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
-</code></pre>
-
-<p>余談ですが、&rdquo;az ad sp create-for-rbac&rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
-
-<h2 id="試してみる">試してみる</h2>
-
-<p>ログインして試してみましょう。サービスプリンシパルの例です。</p>
-
-<pre><code>$ az login --service-principal -u &quot;http://rgcontributor&quot; -p &quot;your-password&quot; -t &quot;your-tenant-id&quot;
-</code></pre>
-
-<p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
-
-<pre><code>$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre>
-
-<p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
-
-<pre><code>$ az vm list -o table
-Name              ResourceGroup     Location
-----------------  ----------------  ----------
-sampledevvm01     sample-dev-rg  japaneast
-</code></pre>
-
-<p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
-
-<pre><code>$ az group create -n rgc-poc-rg -l japaneast
-The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/write' over scope '/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg'.
-</code></pre>
-
-<p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
-
-<pre><code>$ az group delete -n sample-dev-rg
-Are you sure you want to perform this operation? (y/n): y
-The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/delete' over scope '/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg'.
-</code></pre>
-
-<h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
-
-<p>でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。</p>
-
-<p>空テンプレートを、empty.jsonとしましょう。</p>
-
-<pre><code>{
-    &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
-    &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
-    &quot;parameters&quot;: {},
-    &quot;variables&quot;: {},
-    &quot;resources&quot;: [],
-    &quot;outputs&quot;: {}
-}
-</code></pre>
-
-<p>破壊的空砲を打ちます。</p>
-
-<pre><code>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
-</code></pre>
-
-<p>リソースグループは残ります。</p>
-
-<pre><code>$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre>
-
-<p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
-
-<pre><code>$ az vm list -o table
-
-</code></pre>
 
                     </div>
                 </section>

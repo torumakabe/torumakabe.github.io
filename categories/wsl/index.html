@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Golang &middot; re-imagine</title>
+    <title>Wsl &middot; re-imagine</title>
 
     <meta name="description" content="my life is the sum of my imagination">
 
     <meta name="generator" content="Hugo 0.39" />
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Golang &middot; re-imagine">
+    <meta name="twitter:title" content="Wsl &middot; re-imagine">
     <meta name="twitter:description" content="my life is the sum of my imagination">
 
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Golang &middot; re-imagine">
+    <meta property="og:title" content="Wsl &middot; re-imagine">
     <meta property="og:description" content="my life is the sum of my imagination">
 
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
@@ -298,177 +298,6 @@ Hello Go on the new WSL
 <h2 id="まとめ">まとめ</h2>
 
 <p>代表例としてGoの開発環境で説明しましたが、WSLENVは他の用途でも応用できるでしょう。スイッチの説明など、詳細は先ほど紹介した、<a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">こちら</a>を。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">04 Dec 2017, 22:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/" class="post-title">Windows上でLinux向けGoバイナリをDockerでビルドする</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Windows" href="http://torumakabe.github.io//categories/windows">Windows</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="小ネタです">小ネタです</h2>
-
-<p>Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。</p>
-
-<h2 id="条件">条件</h2>
-
-<ul>
-<li>Docker for Windows
-
-<ul>
-<li>Linuxモード</li>
-<li>ドライブ共有</li>
-</ul></li>
-</ul>
-
-<h2 id="powershell窓で実行">PowerShell窓で実行</h2>
-
-<p>ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。</p>
-
-<pre><code>docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux
-</code></pre>
-
-<ul>
-<li>golang:1.9.2-alpine DockerイメージはGOPATHに/goを<a href="https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile">設定して</a>ビルドされていますが、念のため実行時にも設定</li>
-<li>-v オプションでのマウントは<a href="https://docs.docker.com/engine/admin/volumes/bind-mounts/">非推奨</a>になったので &ndash;mount で</li>
-<li>スタティックリンク</li>
-</ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Nov 2017, 08:45</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azblob_golang/" class="post-title">Azure Blob アップローダーをGoで書いた、そしてその理由</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
-
-<p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
-
-<h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
-
-<p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
-
-<p>ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。</p>
-
-<pre><code>package main
-
-import (
-	&quot;context&quot;
-	&quot;flag&quot;
-	&quot;fmt&quot;
-	&quot;log&quot;
-	&quot;net/url&quot;
-	&quot;os&quot;
-
-	&quot;github.com/Azure/azure-storage-blob-go/2016-05-31/azblob&quot;
-)
-
-var (
-	accountName    string
-	accountKey     string
-	containerName  string
-	fileName       string
-	blockSize      int64
-	blockSizeBytes int64
-)
-
-func init() {
-	flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;)
-	flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;)
-	flag.StringVar(&amp;containerName, &quot;c&quot;, &quot;&quot;, &quot;(Required - short option) Blob Container Name&quot;)
-	flag.StringVar(&amp;containerName, &quot;container-name&quot;, &quot;&quot;, &quot;(Required) Blob Container Name&quot;)
-	flag.StringVar(&amp;fileName, &quot;f&quot;, &quot;&quot;, &quot;(Required - short option) Upload filename&quot;)
-	flag.StringVar(&amp;fileName, &quot;file&quot;, &quot;&quot;, &quot;(Required) Upload filename&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;b&quot;, 4, &quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;blocksize&quot;, 4, &quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Parse()
-
-	if (blockSize &lt; 1) || (blockSize) &gt; 100 {
-		fmt.Println(&quot;Blocksize must be from 1MB to 100MB&quot;)
-		os.Exit(1)
-	}
-	blockSizeBytes = blockSize * 1024 * 1024
-}
-
-func main() {
-	file, err := os.Open(fileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	fileSize, err := file.Stat()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	u, _ := url.Parse(fmt.Sprintf(&quot;https://%s.blob.core.windows.net/%s/%s&quot;, accountName, containerName, fileName))
-	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
-
-	ctx := context.Background()
-
-	fmt.Println(&quot;Uploading block blob...&quot;)
-	putBlockList, err := azblob.UploadStreamToBlockBlob(ctx, file, fileSize.Size(), blockBlobURL,
-		azblob.UploadStreamToBlockBlobOptions{
-			BlockSize: blockSizeBytes,
-			Progress: func(bytesTransferred int64) {
-				fmt.Printf(&quot;Uploaded %d of %d bytes.\n&quot;, bytesTransferred, fileSize.Size())
-			},
-		})
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = putBlockList // Avoid compiler's &quot;declared and not used&quot; error
-
-	fmt.Println(&quot;Done&quot;)
-}
-</code></pre>
-
-<p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
-
-<p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
-
-<h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
-
-<p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
-
-<p>たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。</p>
-
-<p>ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。</p>
-
-<p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
-
-<p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
 
                     </div>
                 </section>
