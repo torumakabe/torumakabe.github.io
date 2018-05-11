@@ -731,7 +731,7 @@ Succeeded
 <p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
 
 <pre><code>[get-vm-pip]
-command = vm list-ip-addresses --query [0].virtualMachine.network.publicIpAddresses[0].ipAddress
+command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddresses[].ipAddress
 </code></pre>
 
 <p>実行すると。</p>
