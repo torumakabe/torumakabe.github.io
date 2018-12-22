@@ -21,11 +21,11 @@
 GitHub Actions
 数時間、触った印象。
  GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
-Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
+Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
  KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい/証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
 コードは ここ に。
 ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .github/main.workflow を見てみましょう</description>
+. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .</description>
     </item>
     
   </channel>
