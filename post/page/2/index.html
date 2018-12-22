@@ -68,6 +68,329 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">30 Mar 2018, 16:30</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_msi_terraform/" class="post-title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
+
+<p>Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは<a href="https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code">この資料</a>も参考に。</p>
+
+<p>さて、先日Azure Marketplaceから<a href="https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform">Terraform入りの仮想マシン</a>をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。</p>
+
+<ul>
+<li>Terraform (latest)</li>
+<li>Azure CLI 2.0</li>
+<li>Managed Service Identity (MSI) VM Extension</li>
+<li>Unzip</li>
+<li>JQ</li>
+<li>apt-transport-https</li>
+</ul>
+
+<p>いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。</p>
+
+<h2 id="シークレットをコードにベタ書きする問題">シークレットをコードにベタ書きする問題</h2>
+
+<p>MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-service-identity/overview">Azure リソースの管理対象サービス ID (MSI)</a></p>
+
+<p>詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると</p>
+
+<p><strong>アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ</strong></p>
+
+<p>です。</p>
+
+<p>GitHub上に疑わしいシークレットがないかスキャンする<a href="https://azure.microsoft.com/ja-jp/blog/managing-azure-secrets-on-github-repositories/">取り組み</a>もはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。</p>
+
+<h2 id="terraformはmsiに対応している">TerraformはMSIに対応している</h2>
+
+<p>TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。</p>
+
+<p>ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。</p>
+
+<p><a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_msi.html">Authenticating to Azure Resource Manager using Managed Service Identity</a></p>
+
+<p>Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。</p>
+
+<h2 id="試してみよう">試してみよう</h2>
+
+<p>実は、すでに使い方を解説した公式ドキュメントがあります。</p>
+
+<p><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-vm-msi">Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する</a></p>
+
+<p>手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。</p>
+
+<h3 id="marketplaceからterraform入り仮想マシンを作る">MarketplaceからTerraform入り仮想マシンを作る</h3>
+
+<p>まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。</p>
+
+<ul>
+<li>MSI VM拡張の導入</li>
+<li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
+<li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
+</ul>
+
+<pre><code>[snip]
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
+                &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;port&quot;: 50342
+                },
+                &quot;protectedSettings&quot;: {}
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
+            &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
+            &quot;properties&quot;: {
+                &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
+                &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
+                &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
+                &quot;type&quot;: &quot;CustomScript&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;fileUris&quot;: [
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
+                    ]
+                },
+                &quot;protectedSettings&quot;: {
+                    &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
+                }
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
+            ]
+        }
+[snip]
+</code></pre>
+
+<h3 id="vmにログインし-環境を確認">VMにログインし、環境を確認</h3>
+
+<p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
+
+<pre><code>$ ssh your-vm-public-ip
+</code></pre>
+
+<p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
+
+<pre><code>$ terraform -v
+Terraform v0.11.5
+</code></pre>
+
+<p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
+
+<pre><code>$ echo $ARM_USE_MSI
+true
+</code></pre>
+
+<p>MSIも有効化されています(SystemAssigned)。</p>
+
+<pre><code>$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
+{
+  &quot;additionalProperties&quot;: {},
+  &quot;identityIds&quot;: null,
+  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
+  &quot;tenantId&quot;: &quot;tttt-tttt-tttt-tttt&quot;,
+  &quot;type&quot;: &quot;SystemAssigned&quot;
+}
+</code></pre>
+
+<p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
+
+<pre><code>$ ls
+tfEnv.sh  tfTemplate
+
+$ cat tfEnv.sh
+az login
+az role assignment create  --assignee &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot; --role 'b24988ac-6180-42a0-ab88-20f7382dd24c'  --scope /subscriptions/&quot;cccc-cccc-cccc-cccc&quot;
+
+$ . ~/tfEnv.sh
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
+[snip]
+{
+  &quot;additionalProperties&quot;: {},
+  &quot;canDelegate&quot;: null,
+  &quot;id&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&quot;,
+  &quot;name&quot;: &quot;ffff-ffff-ffff-ffff&quot;,
+  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
+  &quot;roleDefinitionId&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&quot;,
+  &quot;scope&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc&quot;,
+  &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;
+}
+</code></pre>
+
+<p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&rdquo;はContributorを指します。</p>
+
+<p>tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。</p>
+
+<pre><code>$ ls tfTemplate/
+azureProviderAndCreds.tf  remoteState.tf
+</code></pre>
+
+<p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
+
+<pre><code>$ cat tfTemplate/azureProviderAndCreds.tf
+#
+#
+# Provider and credential snippet to add to configurations
+# Assumes that there's a terraform.tfvars file with the var values
+#
+# Uncomment the creds variables if using service principal auth
+# Leave them commented to use MSI auth
+#
+#variable subscription_id {}
+#variable tenant_id {}
+#variable client_id {}
+#variable client_secret {}
+
+provider &quot;azurerm&quot; {
+#    subscription_id = &quot;${var.subscription_id}&quot;
+#    tenant_id = &quot;${var.tenant_id}&quot;
+#    client_id = &quot;${var.client_id}&quot;
+#    client_secret = &quot;${var.client_secret}&quot;
+}
+</code></pre>
+
+<p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
+
+<pre><code>$ cat tfTemplate/remoteState.tf
+terraform {
+ backend &quot;azurerm&quot; {
+  storage_account_name = &quot;storestaterandomid&quot;
+  container_name       = &quot;terraform-state&quot;
+  key                  = &quot;prod.terraform.tfstate&quot;
+  access_key           = &quot;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&quot;
+  }
+}
+</code></pre>
+
+<p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
+
+<h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
+
+<p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
+
+<pre><code>$ mkdir sample
+$ cd sample/
+</code></pre>
+
+<p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
+
+<pre><code>$ cp ../tfTemplate/remoteState.tf ./
+</code></pre>
+
+<p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
+
+<p>ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。</p>
+
+<pre><code>$ vim main.tf
+resource &quot;azurerm_resource_group&quot; &quot;tf-msi-poc&quot; {
+    name     = &quot;tf-msi-poc-aci-wus-rg&quot;
+    location = &quot;West US&quot;
+}
+
+resource &quot;random_integer&quot; &quot;random_int&quot; {
+    min = 100
+    max = 999
+}
+
+resource &quot;azurerm_container_group&quot; &quot;aci-example&quot; {
+    name                = &quot;aci-cg-${random_integer.random_int.result}&quot;
+    location            = &quot;${azurerm_resource_group.tf-msi-poc.location}&quot;
+    resource_group_name = &quot;${azurerm_resource_group.tf-msi-poc.name}&quot;
+    ip_address_type     = &quot;public&quot;
+    dns_name_label      = &quot;tomakabe-aci-cg-${random_integer.random_int.result}&quot;
+    os_type             = &quot;linux&quot;
+
+    container {
+        name    = &quot;nginx&quot;
+        image   = &quot;nginx&quot;
+        cpu     = &quot;0.5&quot;
+        memory  = &quot;1.0&quot;
+        port    = &quot;80&quot;
+    }
+}
+</code></pre>
+
+<p>init、plan、アプラーイ。アプライ王子。</p>
+
+<pre><code>$ terraform init
+$ terraform plan
+$ terraform apply -auto-approve
+[snip]
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+</code></pre>
+
+<p>できたか確認。</p>
+
+<pre><code>$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
+Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
+----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
+aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
+$ curl 13.91.90.117
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+[snip]
+</code></pre>
+
+<h2 id="おまけ">おまけ</h2>
+
+<p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
+
+<p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
+
+<pre><code>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
+Resource 'aaaa-aaaa-aaaa-aaaa-aaaa' does not exist or one of its queried reference-property objects are not present.
+</code></pre>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">27 Mar 2018, 00:10</h1>
                 <section class="post">
                     <header class="post-header">
@@ -1138,136 +1461,6 @@ spec:
                     </div>
                 </section>
                 
-                <h1 class="content-subhead">10 Feb 2018, 11:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
-
-<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。</p>
-
-<p>さて、そのNGINX Ingress Controllerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
-
-<p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
-</ul>
-
-<p>ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
-
-<pre><code>$ helm install stable/nginx-ingress --name my-nginx
-</code></pre>
-
-<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
-
-<pre><code>$ kubectl run nginx --image nginx --port 80
-$ kubectl run apache --image httpd --port 80
-</code></pre>
-
-<p>サービスとしてexposeします。</p>
-
-<pre><code>$ kubectl expose deployment nginx --type NodePort
-$ kubectl expose deployment apache --type NodePort
-</code></pre>
-
-<p>現時点のサービスたちを確認します。</p>
-
-<pre><code>$ kubectl get svc
-NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
-apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
-kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
-my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
-my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
-nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
-</code></pre>
-
-<p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
-
-<p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
-
-<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
-</code></pre>
-
-<p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
-
-<pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
-</code></pre>
-
-<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  name: ingress-nginx-sample
-spec:
-  rules:
-    - host: dev.example.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: nginx
-              servicePort: 80
-          - path: /apache
-            backend:
-              serviceName: apache
-              servicePort: 80
-  tls:
-    - hosts:
-      - dev.example.com
-      secretName: example-tls
-</code></pre>
-
-<p>あとは反映するだけ。</p>
-
-<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre>
-
-<p>curlで確認します。</p>
-
-<pre><code>$ curl https://dev.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>/apacheへのパスも確認します。</p>
-
-<pre><code>$ curl https://dev.example.com/apache
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-
-<p>簡単ですね。</p>
-
-                    </div>
-                </section>
-                
             </div>
             
 <div class="pagination">
@@ -1277,7 +1470,7 @@ spec:
         <i class="fa fa-angle-double-left"></i>&nbsp;Newer
       </a>
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 13</span>
+    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 14</span>
     
       <a href="/post/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
         Older&nbsp;<i class="fa fa-angle-double-right"></i>

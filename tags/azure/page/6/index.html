@@ -68,6 +68,258 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">08 May 2016, 14:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/azure_functions_fbmsgapi/" class="post-title">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="まだ好みなんて聞いてないぜ">まだ好みなんて聞いてないぜ</h2>
+
+<p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
+
+<p>Azure Functionsは、</p>
+
+<ol>
+<li>アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう</li>
+<li>利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表</li>
+<li>Azure内外機能との、容易なイベント連動。</li>
+</ol>
+
+<p>が特徴です。AWSのLambdaと似てるっちゃ似ています。</p>
+
+<p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
+
+<h3 id="基本方針">基本方針</h3>
+
+<ul>
+<li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
+<li>Facebook Messenger APIを使って、webhook連動する</li>
+<li>Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す</li>
+<li>ビールは<a href="http://beertaster.org/beerstyle/web/beerstyle_main_j.html">Craft Beer Association</a>の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す</li>
+<li>Botらしく、それらしい文末表現をランダムで返す</li>
+<li>好みとか文脈は全く聞かないぜSorry</li>
+<li>アプリはNodeで書く。C#のサンプルは増えてきたので</li>
+<li>静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う</li>
+<li>DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #<a href="https://gist.github.com/murdockcrc/12266f9d844be416a6a0">サンプル</a></li>
+<li>FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る</li>
+<li>拡張性はひとまず目をつぶる  #<a href="http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f">この辺の話</a></li>
+</ul>
+
+<p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
+
+<h2 id="必要な作業">必要な作業</h2>
+
+<p>以下が必要な作業の流れです。</p>
+
+<ul>
+<li>Azureで
+
+<ul>
+<li>Function Appの作成  #1</li>
+<li>Bot用Functionの作成 #2</li>
+<li>Facebook Messenger APIとの接続検証  #6</li>
+<li>Facebook Messenger API接続用Tokenの設定  #8</li>
+<li>DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9</li>
+<li>DocumentDBのストアドプロシージャ作成  #10</li>
+<li>Function Appを書く  #11</li>
+<li>FunctionsのサイトにDocumentDB Node SDKを導入 #12</li>
+<li>Function AppのGithub連携設定  #13</li>
+<li>Function Appのデプロイ (GithubへのPush)  #14</li>
+</ul></li>
+<li>Facebookで
+
+<ul>
+<li>Facebook for Developersへの登録  #3</li>
+<li>Botをひも付けるFacebook Pageの作成  #4</li>
+<li>Bot用マイアプリの作成  #5</li>
+<li>Azure Functionsからのcallback URLを登録、接続検証  #6</li>
+<li>Azure Functions向けTokenを生成 #7</li>
+</ul></li>
+</ul>
+
+<p>アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</p>
+
+<ul>
+<li>Function Appを書くまで、#1〜2、#5〜8は、<a href="http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/">こちらのブログエントリ</a>がとても参考になります。</li>
+<li>Facebook for Developersへの登録、#3は、<a href="https://developers.facebook.com/">https://developers.facebook.com/</a> から。いきなり迷子の人は、<a href="http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8">こちら</a>も参考に。</li>
+<li>Facebook Pageの作成は、<a href="http://allabout.co.jp/gm/gc/387840/">ここ</a>を。Botで楽しむだけなら細かい設定は後回しでいいです。</li>
+<li>DocumentDBについては、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/">公式</a>を。
+
+<ul>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/">DBアカウント〜コレクション作成</a></li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/">ドキュメントインポート</a></li>
+<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/">ストアドプロシージャ</a></li>
+</ul></li>
+<li>FunctionsのサイトにDocumentDB Node SDKを導入する#12は、<a href="http://tech.guitarrapc.com/entry/2016/04/05/043723">こちら</a>を。コンソールからnpm installできます。<br /></li>
+<li>Github連携設定、#13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
+</ul>
+
+<h2 id="function-appのサンプル">Function Appのサンプル</h2>
+
+<p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
+
+<p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
+
+<pre><code>D:\home\site\wwwroot
+├── fb-message-callback
+│   ├── TestOutput.json
+│   ├── function.json
+│   └── index.js  #これが今回のアプリ
+├── node_modules  #DocumentDB Node SDKが入っている
+├── host.json
+├── README.md
+</code></pre>
+
+<p>なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。</p>
+
+<p>ではFunction Appの実体、index.jsを見てみましょう。</p>
+
+<pre><code>var https = require('https');
+var documentClient = require(&quot;documentdb&quot;).DocumentClient;
+const databaseUrl = &quot;dbs/&quot; + process.env.APPSETTING_DOCDB_DB_ID;
+
+var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &quot;masterKey&quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
+
+function sendTextMessage(sender, text, context) {
+  getDataFromDocDB().then(function (value) {
+    var msgAll = value[0].randomDocument.beer + &quot; &quot; + value[1].randomDocument.msg;
+    var postData = JSON.stringify({
+      recipient: sender,
+      message: {
+        &quot;attachment&quot;:{
+          &quot;type&quot;:&quot;template&quot;,
+          &quot;payload&quot;:{
+            &quot;template_type&quot;:&quot;button&quot;,
+            &quot;text&quot;:msgAll,
+            &quot;buttons&quot;:[
+              {
+                &quot;type&quot;:&quot;web_url&quot;,
+                &quot;url&quot;:value[0].randomDocument.url,
+                &quot;title&quot;:&quot;詳しく&quot;
+              }
+            ]
+          }
+        }
+      }
+    });
+    var req = https.request({
+      hostname: 'graph.facebook.com',
+      port: 443,
+      path: '/v2.6/me/messages',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.APPSETTING_FB_PAGE_TOKEN
+      }
+    });
+    req.write(postData);
+    req.end();
+  }).catch(function(err){
+    context.log(err);
+  });  
+}
+
+function getRandomDoc(sprocUrl){
+  return new Promise(function (resolve, reject) {
+    const sprocParams = {};
+    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
+      if (err) {
+        reject(err);
+      }
+      if (result) {
+        resolve(result);
+      }
+    });
+  });
+}
+
+var results = {
+  beer: function getBeer() {
+    var collectionUrl = databaseUrl + &quot;/colls/beer&quot;;
+    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  },
+  eom: function getEom() {
+    var collectionUrl = databaseUrl + &quot;/colls/eom&quot;;
+    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
+    return getRandomDoc(sprocUrl).then(function (result) {
+      return result;
+    });
+  }
+}
+
+function getDataFromDocDB() {
+  return Promise.all([results.beer(), results.eom()]);
+}
+
+module.exports = function (context, req) {
+  messaging_evts = req.body.entry[0].messaging;
+  for (i = 0; i &lt; messaging_evts.length; i++) {
+    evt = req.body.entry[0].messaging[i];
+    sender = evt.sender;
+    if (evt.message &amp;&amp; evt.message.text, context) {
+      sendTextMessage(sender, evt.message.text, context);
+    }
+  }
+  context.done();
+};
+</code></pre>
+
+<ul>
+<li>最下部のmodule.export以降のブロックで、webhookイベントを受け取ります</li>
+<li>それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
+
+<ul>
+<li>好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが</li>
+</ul></li>
+<li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
+
+<ul>
+<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ
+<br /></li>
+</ul></li>
+</ul>
+
+<pre><code>{
+  &quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
+  &quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
+  &quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
+}
+</code></pre>
+
+<pre><code>{
+  &quot;msg&quot;: &quot;はウマい&quot;,
+  &quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
+}
+</code></pre>
+
+<ul>
+<li>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</li>
+</ul>
+
+<p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。</p>
+
+<p><em>&ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&rdquo;</em></p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">29 Apr 2016, 17:00</h1>
                 <section class="post">
                     <header class="post-header">
@@ -682,138 +934,6 @@ PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan Wes
 <p>以上。これで&rdquo;dev&rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。</p>
 
 <p>なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="http://torumakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
-
-<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
-
-<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
-
-<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
-
-<ol>
-<li>ARMテンプレートリソースは分離して使う</li>
-<li>リソース競合したら依存関係を定義する</li>
-<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
-</ol>
-
-<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
-
-<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
-
-<p>でも、現時点の実装では、おすすめしません。</p>
-
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
-
-<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
-
-<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
-
-<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
-
-<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
-
-<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
-
-<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
-
-<h3 id="読みづらい">読みづらい</h3>
-
-<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
-
-<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
-
-<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
-
-<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
-
-<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
-
-<ul>
-<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
-<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
-</ul>
-
-<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフでうまく表現できないようです。</p>
-
-<p>そのような場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
-
-<pre><code># Create a frontend subnet
-# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
-    name = &quot;frontend&quot;
-    resource_group_name = &quot;${var.resource_group_name}&quot;
-    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
-    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
-    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
-    depends_on = [
-        &quot;azurerm_network_security_rule.fe_web80&quot;,
-        &quot;azurerm_network_security_rule.fe_web443&quot;,
-        &quot;azurerm_network_security_rule.fe_ssh&quot;
-    ]
-}
-</code></pre>
-
-<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
-
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
-
-<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
-
-<pre><code>os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
-        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
-    }
-}
-</code></pre>
-
-<p>が、エラーが返ってきます。</p>
-
-<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
-</code></pre>
-
-<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
-
-<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
-
-<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
 
                     </div>
                 </section>

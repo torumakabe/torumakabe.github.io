@@ -68,7 +68,7 @@
     <item>
       <title>Azure</title>
       <link>http://torumakabe.github.io/tags/azure/</link>
-      <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
+      <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/tags/azure/</guid>
       <description></description>
@@ -273,6 +273,15 @@
     </item>
     
     <item>
+      <title>Github</title>
+      <link>http://torumakabe.github.io/tags/github/</link>
+      <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
+      
+      <guid>http://torumakabe.github.io/tags/github/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Golang</title>
       <link>http://torumakabe.github.io/tags/golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
@@ -320,7 +329,7 @@
     <item>
       <title>Kubernetes</title>
       <link>http://torumakabe.github.io/tags/kubernetes/</link>
-      <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
+      <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
       <guid>http://torumakabe.github.io/tags/kubernetes/</guid>
       <description></description>

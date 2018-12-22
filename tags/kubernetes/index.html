@@ -68,6 +68,161 @@
             
             <div class="posts">
                 
+                <h1 class="content-subhead">22 Dec 2018, 20:00</h1>
+                <section class="post">
+                    <header class="post-header">
+
+                        <a href="http://torumakabe.github.io/post/github_actions_aks/" class="post-title">GitHub ActionsでAzure CLIとkubectlを動かす</a>
+
+                        <p class="post-meta">
+                            
+                            
+                                under 
+                                
+                                <a class="post-category post-category-GitHub" href="http://torumakabe.github.io//categories/github">GitHub</a>
+                            
+                        </p>
+                    </header>
+
+                    <div class="post-description">
+                        
+
+<h2 id="github-actionsのプレビュー招待がきた">GitHub Actionsのプレビュー招待がきた</h2>
+
+<p>ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。</p>
+
+<p><a href="https://developer.github.com/actions/">GitHub Actions</a></p>
+
+<p>数時間、触った印象。</p>
+
+<ul>
+<li>GitHubへのPushなどイベントをトリガーにWorkflowを流せる</li>
+<li>シンプルなWorkflow記法 (TerraformのHCLに似ている)</li>
+<li>Workflowから呼び出すActionはDockerコンテナー</li>
+<li>Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)</li>
+</ul>
+
+<p>Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。</p>
+
+<h2 id="kubernetes-aks-kubectlサンプル">Kubernetes(AKS) kubectlサンプル</h2>
+
+<p>こんなことを試してみました。</p>
+
+<ul>
+<li>KubernetesのマニフェストをGitHubリポジトリへPush</li>
+<li>PushイベントをトリガーにWorkflowを起動</li>
+<li>Azure CLIを使ってAKSクラスターのCredentialを取得</li>
+<li>イベント発生元がmasterブランチであれば継続</li>
+<li>kubectl applyでマニフェストを適用</li>
+</ul>
+
+<p>kubectlを制限したい/証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
+
+<p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
+
+<p>ディレクトリ構造は、こうです。</p>
+
+<pre><code>.
+├── .git
+│   └── (省略)
+├── .github
+│   └── main.workflow
+├── LICENSE
+├── README.md
+├── azure-cli
+│   ├── Dockerfile
+│   └── entrypoint.sh
+└── sampleapp.yaml
+</code></pre>
+
+<ul>
+<li>.github の下にWorkflowを書きます</li>
+<li>azure-cli の下に自作Actionを置きました</li>
+<li>sampleapp.yaml がkubernetesのマニフェストです</li>
+</ul>
+
+<h3 id="workflow">Workflow</h3>
+
+<p>まず、 .github/main.workflow を見てみましょう</p>
+
+<pre><code>workflow &quot;Deploy app to AKS&quot; {
+  on = &quot;push&quot;
+  resolves = [&quot;Deploy to AKS&quot;]
+}
+
+action &quot;Load AKS credential&quot; {
+  uses = &quot;./azure-cli/&quot;
+  secrets = [&quot;AZURE_SERVICE_APP_ID&quot;, &quot;AZURE_SERVICE_PASSWORD&quot;, &quot;AZURE_SERVICE_TENANT&quot;]
+  args = &quot;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&quot;
+  env = {
+    AZ_OUTPUT_FORMAT = &quot;table&quot;
+    AKS_RG_NAME = &quot;your-aks-rg&quot;
+    AKS_CLUSTER_NAME = &quot;youraks&quot;
+  }
+}
+
+action &quot;Deploy branch filter&quot; {
+  uses = &quot;actions/bin/filter@master&quot;
+  args = &quot;branch master&quot;
+}
+
+action &quot;Deploy to AKS&quot; {
+  needs = [&quot;Load AKS credential&quot;, &quot;Deploy branch filter&quot;]
+  uses = &quot;docker://gcr.io/cloud-builders/kubectl&quot;
+  runs = &quot;sh -l -c&quot;
+  args = [&quot;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e 's/YOUR_VALUE/'\&quot;$YOUR_VALUE\&quot;'/' -e 's/YOUR_DNS_LABEL_NAME/'$YOUR_DNS_LABEL_NAME'/' | kubectl apply -f - &quot;]
+  env = {
+    YOUR_VALUE = &quot;Ale&quot;
+    YOUR_DNS_LABEL_NAME = &quot;yournamedispvar&quot;
+  }
+}
+</code></pre>
+
+<p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
+
+<p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&rdquo;Load AKS credential&rdquo;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
+
+<p>&ldquo;Deploy branch filter&rdquo;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&rdquo;Deploy to AKS&rdquo;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
+
+<p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&rdquo;Actions&rdquo;タブで実行結果を確認できます。</p>
+
+<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/ghaction_sc.png" alt="Workflow" /></p>
+
+<p>できた。Azure CLIとkubectlが使えるなら、他にも応用できそう。</p>
+
+<p>以下、actionブロックを補足します。</p>
+
+<h3 id="load-aks-credential">Load AKS credential</h3>
+
+<p>Azure CLIを使ってAKSクラスターのCredentialを取得し、kubectlのコンテキスト設定します。envでクラスターのリソースグループ名とクラスター名を渡しています。</p>
+
+<p>GitHub ActionsがAzure CLI Actionを<a href="https://github.com/actions/azure">提供している</a>のですが、Azure CLIのバージョンを最新にしたかったのと、動的にコンテナーを作ってみたかったので ./azure-cli にDockerfileを<a href="https://github.com/ToruMakabe/actions-playground/tree/master/azure-cli">書きました</a>。</p>
+
+<p>試す時は、みなさんの環境向けにenvを書き換えてください。なお、AKSクラスターからCredentialを取得する権限が必要です。権限を持ったサービスプリンシパルのアプリケーションID/パスワード、テナントIDをGitHubリポジトリのSecretに設定してください。actionブロックのsecretsで指定している通りです。</p>
+
+<h3 id="deploy-branch-filter">Deploy branch filter</h3>
+
+<p>bin/filterはGitHub Actionsが<a href="https://github.com/actions/bin">提供している</a>ユーティリティです。この例では、イベントがmasterブランチで発生した場合のみWorkflowを継続します。</p>
+
+<h3 id="deploy-to-aks">Deploy to AKS</h3>
+
+<p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
+
+<p>このactionが実行されると、envの&rdquo;YOUR_VALUE&rdquo;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&rdquo;YOUR_DNS_LABEL_NAME&rdquo;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
+
+<p>アプリのパスは /dispvar です。curlしてみると。</p>
+
+<pre><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
+Hello. You set &quot;Ale&quot;
+</code></pre>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
+
+                    </div>
+                </section>
+                
                 <h1 class="content-subhead">12 Mar 2018, 00:21</h1>
                 <section class="post">
                     <header class="post-header">

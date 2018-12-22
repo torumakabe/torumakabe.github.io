@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://torumakabe.github.io/post/github_actions_aks/</loc>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://torumakabe.github.io/post/wslenv_golang/</loc>
     <lastmod>2018-05-02T17:00:00+09:00</lastmod>
   </url>
@@ -365,7 +370,7 @@
   
   <url>
     <loc>http://torumakabe.github.io/tags/azure/</loc>
-    <lastmod>2018-04-27T17:00:00+09:00</lastmod>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -526,6 +531,18 @@
   </url>
   
   <url>
+    <loc>http://torumakabe.github.io/tags/github/</loc>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://torumakabe.github.io/categories/github/</loc>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://torumakabe.github.io/tags/golang/</loc>
     <lastmod>2018-05-02T17:00:00+09:00</lastmod>
     <priority>0</priority>
@@ -557,7 +574,7 @@
   
   <url>
     <loc>http://torumakabe.github.io/tags/kubernetes/</loc>
-    <lastmod>2018-03-12T00:21:00+09:00</lastmod>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -653,7 +670,7 @@
   
   <url>
     <loc>http://torumakabe.github.io/post/</loc>
-    <lastmod>2018-05-02T17:00:00+09:00</lastmod>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -761,7 +778,7 @@
   
   <url>
     <loc>http://torumakabe.github.io/</loc>
-    <lastmod>2018-05-02T17:00:00+09:00</lastmod>
+    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
