@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Securty on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/securty/</link>
+    <link>https://ToruMakabe.github.io/tags/securty/</link>
     <description>Recent content in Securty on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 15 Feb 2016 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/securty/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/securty/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure DDoS対策ことはじめ</title>
-      <link>http://torumakabe.github.io/post/azure_ddosprotection/</link>
+      <link>https://ToruMakabe.github.io/post/azure_ddosprotection/</link>
       <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_ddosprotection/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_ddosprotection/</guid>
       <description>すこぶるFAQ 攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。
 公式ホワイトペーパー Microsoft Azure Network Security Whitepaper V3が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。
 今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。

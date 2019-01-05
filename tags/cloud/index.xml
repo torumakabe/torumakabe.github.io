@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Cloud on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/cloud/</link>
+    <link>https://ToruMakabe.github.io/tags/cloud/</link>
     <description>Recent content in Cloud on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
-      <link>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <link>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <guid>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
       <description>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。
 具体的な数値で、正しい理解を &amp;ldquo;クラウドは性能不足、企業システムが重すぎる&amp;rdquo;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。
 記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。
@@ -46,10 +46,10 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
     
     <item>
       <title>うちのクラウド、空いてます</title>
-      <link>http://torumakabe.github.io/post/cloud-vacancy/</link>
+      <link>https://ToruMakabe.github.io/post/cloud-vacancy/</link>
       <pubDate>Sun, 13 Apr 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/cloud-vacancy/</guid>
+      <guid>https://ToruMakabe.github.io/post/cloud-vacancy/</guid>
       <description>無限なんてあり得ない 「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウドサービスのうたい文句、けっこう目にします。
 そのいっぽうで、「1000台のサーバーを1時間だけ使って、料金は数万円で済みました」という事例をアピールしているサービスの、別ユーザーが「この前、数10台のサーバー追加を依頼したら、在庫切れって言われてねぇ」と言っていたり。
 クラウドコンピューティングの概念は雲かもしれませんが、その向こうには物理リソースがあるわけで、無限というのは、残念ながら無理があります。
@@ -64,10 +64,10 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
     
     <item>
       <title>クラウド = 発電所?</title>
-      <link>http://torumakabe.github.io/post/cloud-and-power/</link>
+      <link>https://ToruMakabe.github.io/post/cloud-and-power/</link>
       <pubDate>Sun, 16 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/cloud-and-power/</guid>
+      <guid>https://ToruMakabe.github.io/post/cloud-and-power/</guid>
       <description>思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。
 でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。
 本当に発電は大規模発電所任せ? 最近CMでよく見ますが、エネファームってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Upload on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/upload/</link>
+    <link>https://ToruMakabe.github.io/tags/upload/</link>
     <description>Recent content in Upload on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Thu, 11 Feb 2016 12:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/upload/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/upload/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>http://torumakabe.github.io/post/azureblobupload_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobupload_perf/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobupload_perf/</guid>
       <description>同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。
 端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。
 そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。

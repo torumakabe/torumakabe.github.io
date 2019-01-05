@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Vpn Gateway on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/vpn-gateway/</link>
+    <link>https://ToruMakabe.github.io/tags/vpn-gateway/</link>
     <description>Recent content in Vpn Gateway on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 08 Oct 2017 10:30:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/vpn-gateway/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/vpn-gateway/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
-      <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
       <description>動機 焦げlogさんで、とても興味深いエントリを拝見しました。
  Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました  確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは
  ※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…

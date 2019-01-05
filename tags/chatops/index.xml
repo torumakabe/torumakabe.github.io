@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Chatops on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/chatops/</link>
+    <link>https://ToruMakabe.github.io/tags/chatops/</link>
     <description>Recent content in Chatops on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/chatops/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/chatops/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>http://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
 AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
 素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。

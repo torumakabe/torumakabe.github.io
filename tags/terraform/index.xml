@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Terraform on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/terraform/</link>
+    <link>https://ToruMakabe.github.io/tags/terraform/</link>
     <description>Recent content in Terraform on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Fri, 27 Apr 2018 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</title>
-      <link>http://torumakabe.github.io/post/terraform_azure_secret/</link>
+      <link>https://ToruMakabe.github.io/post/terraform_azure_secret/</link>
       <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform_azure_secret/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform_azure_secret/</guid>
       <description>動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。
  いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る  データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁  もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？  kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる   つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
 シナリオ Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。
@@ -25,10 +25,10 @@
     
     <item>
       <title>俺のAzure CLI 2018春版</title>
-      <link>http://torumakabe.github.io/post/myazurecli201804/</link>
+      <link>https://ToruMakabe.github.io/post/myazurecli201804/</link>
       <pubDate>Mon, 09 Apr 2018 15:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/myazurecli201804/</guid>
+      <guid>https://ToruMakabe.github.io/post/myazurecli201804/</guid>
       <description>春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
 俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
 Azure CLI 2.0 の構成
@@ -44,10 +44,10 @@ Azure CLI 2.0 のエイリアス拡張機能
     
     <item>
       <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</link>
       <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</guid>
       <description>カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。
 ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。
  最新のイメージ名を確認のうえ、手で指定する 自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する  2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。
@@ -60,10 +60,10 @@ data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; { name_regex = &a
     
     <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
-      <link>http://torumakabe.github.io/post/azure_msi_terraform/</link>
+      <link>https://ToruMakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_msi_terraform/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_msi_terraform/</guid>
       <description>TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けはこの資料も参考に。
 さて、先日Azure MarketplaceからTerraform入りの仮想マシンをプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。
  Terraform (latest) Azure CLI 2.0 Managed Service Identity (MSI) VM Extension Unzip JQ apt-transport-https  いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。
@@ -86,10 +86,10 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
     
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
-      <link>http://torumakabe.github.io/post/az_vmss_terraform/</link>
+      <link>https://ToruMakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/az_vmss_terraform/</guid>
+      <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
       <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018&amp;frasl;3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
 前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)   コード 以下のファイルを同じディレクトリに作成します。
 Terraform メインコード VMSSと周辺リソースを作ります。
@@ -99,10 +99,10 @@ resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;poc&amp;quot; { na
     
     <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
-      <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <link>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</guid>
       <description>サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
 インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
  BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
@@ -122,10 +122,10 @@ terraform workspace select prod  みなまで言わなくても分かります�
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&amp;ldquo;azurerm_template_deployment&amp;rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
@@ -144,10 +144,10 @@ Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autores
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
 追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
 エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
@@ -167,10 +167,10 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
 情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
 今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
@@ -184,10 +184,10 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>http://torumakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
 Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
 そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
@@ -202,10 +202,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
-      <link>http://torumakabe.github.io/post/terraform-openstack-minimum/</link>
+      <link>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</link>
       <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
 小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
 テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。

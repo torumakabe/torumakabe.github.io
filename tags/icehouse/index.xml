@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Icehouse on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/icehouse/</link>
+    <link>https://ToruMakabe.github.io/tags/icehouse/</link>
     <description>Recent content in Icehouse on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 06 May 2014 00:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/icehouse/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/icehouse/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
-      <link>http://torumakabe.github.io/post/vagrant-icehouse/</link>
+      <link>https://ToruMakabe.github.io/post/vagrant-icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
+      <guid>https://ToruMakabe.github.io/post/vagrant-icehouse/</guid>
       <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
 では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
 ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。

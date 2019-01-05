@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Batch on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/batch/</link>
+    <link>https://ToruMakabe.github.io/tags/batch/</link>
     <description>Recent content in Batch on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Fri, 29 Apr 2016 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/batch/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/batch/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
+      <link>https://ToruMakabe.github.io/post/azure_batch_docker/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
       <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
 クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
 ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blob on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/blob/</link>
+    <link>https://ToruMakabe.github.io/tags/blob/</link>
     <description>Recent content in Blob on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/blob/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/blob/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>http://torumakabe.github.io/post/azure_blobevent/</link>
+      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
 プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
@@ -29,10 +29,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
-      <link>http://torumakabe.github.io/post/azureblobcopy_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobcopy_perf/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobcopy_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobcopy_perf/</guid>
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
 でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
 調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
@@ -43,10 +43,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <link>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</link>
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。
 なお、Premium Storageは例外です。FAQを確認してみましょう。
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
@@ -58,10 +58,10 @@ $Blob = Get-AzureStorageBlob yourDataDisk.</description>
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>http://torumakabe.github.io/post/azureblobupload_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobupload_perf/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobupload_perf/</guid>
       <description>同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。
 端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。
 そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。

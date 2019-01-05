@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Openstack on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/openstack/</link>
+    <link>https://ToruMakabe.github.io/tags/openstack/</link>
     <description>Recent content in Openstack on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sat, 19 Dec 2015 00:01:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/openstack/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/openstack/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>http://torumakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
 OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
 さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
@@ -38,10 +38,10 @@ $ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine en
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
-      <link>http://torumakabe.github.io/post/terraform-openstack-minimum/</link>
+      <link>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</link>
       <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
 小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
 テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
@@ -57,10 +57,10 @@ $ terraform plan Refreshing Terraform state prior to plan... The Terraform execu
     
     <item>
       <title>君はOpenStack Monascaを知っているか</title>
-      <link>http://torumakabe.github.io/post/monasca/</link>
+      <link>https://ToruMakabe.github.io/post/monasca/</link>
       <pubDate>Fri, 12 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/monasca/</guid>
+      <guid>https://ToruMakabe.github.io/post/monasca/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の12夜目担当作品です。
 Monitoring as a Service 監視をサービスとして提供するって、どういうことでしょうか。
 [Monitoring]
@@ -81,10 +81,10 @@ Monitoring as a Service 監視をサービスとして提供するって、ど�
     
     <item>
       <title>OpenStackと長期バージョン固定</title>
-      <link>http://torumakabe.github.io/post/longtermsupport/</link>
+      <link>https://ToruMakabe.github.io/post/longtermsupport/</link>
       <pubDate>Tue, 09 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/longtermsupport/</guid>
+      <guid>https://ToruMakabe.github.io/post/longtermsupport/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。
 ソフトウェア、バージョン、サポート たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。
 進化著しいソフト、OpenStackでは OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして公式サイトを見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。
@@ -110,10 +110,10 @@ OpenStackのBusiness Driverとして、最もユーザーが重視している�
     
     <item>
       <title>ハンサムOpenStack</title>
-      <link>http://torumakabe.github.io/post/handsome-openstack/</link>
+      <link>https://ToruMakabe.github.io/post/handsome-openstack/</link>
       <pubDate>Sat, 06 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/handsome-openstack/</guid>
+      <guid>https://ToruMakabe.github.io/post/handsome-openstack/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の6夜目担当作品です。
 出オチ OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。
 こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。
@@ -140,10 +140,10 @@ Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3�
     
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>
-      <link>http://torumakabe.github.io/post/openstack-tools/</link>
+      <link>https://ToruMakabe.github.io/post/openstack-tools/</link>
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/openstack-tools/</guid>
+      <guid>https://ToruMakabe.github.io/post/openstack-tools/</guid>
       <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
 なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
 やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp;amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp;amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
@@ -160,10 +160,10 @@ OS_USERNAME: your_username
     
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>http://torumakabe.github.io/post/vagrant-openstack/</link>
+      <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/vagrant-openstack/</guid>
+      <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
       <description> ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
 多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
 さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
@@ -176,10 +176,10 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
-      <link>http://torumakabe.github.io/post/vagrant-icehouse/</link>
+      <link>https://ToruMakabe.github.io/post/vagrant-icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/vagrant-icehouse/</guid>
+      <guid>https://ToruMakabe.github.io/post/vagrant-icehouse/</guid>
       <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
 では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
 ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
@@ -189,20 +189,20 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
     
     <item>
       <title>OpenStack超入門シリーズ 初期3部作完結</title>
-      <link>http://torumakabe.github.io/post/openstack-3primer/</link>
+      <link>https://ToruMakabe.github.io/post/openstack-3primer/</link>
       <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/openstack-3primer/</guid>
+      <guid>https://ToruMakabe.github.io/post/openstack-3primer/</guid>
       <description> よく聞かれることをまとめました ひとまず、初期3部作完結。また書くかもしれません。
  OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り OpenStack超入門シリーズ いまさら聞けない Swiftの使い方 OpenStack超入門シリーズ いまさら聞けない Neutronの使い方  </description>
     </item>
     
     <item>
       <title>OpenStack超入門シリーズ</title>
-      <link>http://torumakabe.github.io/post/openstack-primer/</link>
+      <link>https://ToruMakabe.github.io/post/openstack-primer/</link>
       <pubDate>Thu, 27 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/openstack-primer/</guid>
+      <guid>https://ToruMakabe.github.io/post/openstack-primer/</guid>
       <description>基本的な質問が増えてきた OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。
 よく聞かれることはまとめておこう もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。
 第一弾 OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り</description>
@@ -210,10 +210,10 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
     
     <item>
       <title>OpenStack Swiftへのファイル分割アップロード</title>
-      <link>http://torumakabe.github.io/post/swift-upload/</link>
+      <link>https://ToruMakabe.github.io/post/swift-upload/</link>
       <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/swift-upload/</guid>
+      <guid>https://ToruMakabe.github.io/post/swift-upload/</guid>
       <description>Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。
 アップロード形式は大きく3つ &amp;ndash; そのまま、DLO、SLO  そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。 DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。 SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。  動きを見てみよう 環境は以下の通り。
  HP Public Cloud US-West Region Swift Clientを動かすCompute Node &amp;ndash; standard.large / ubuntu 12.04 Swift CLI &amp;ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot; non-seg.iso real 0m24.557s user 0m12.617s sys 0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
@@ -222,10 +222,10 @@ $curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.object
     
     <item>
       <title>Transparency is Noisy</title>
-      <link>http://torumakabe.github.io/post/transparency-is-noisy/</link>
+      <link>https://ToruMakabe.github.io/post/transparency-is-noisy/</link>
       <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/transparency-is-noisy/</guid>
+      <guid>https://ToruMakabe.github.io/post/transparency-is-noisy/</guid>
       <description>雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。
 いっぽうで、みなで仕様を議論し、期限を定めて開発する。その過程を公開。こっちは有言実行。
 有言実行は、叩かれやすいんです。雑音も多く生まれます。でもそれは、オープンである裏返し。

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Paintschainer on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/paintschainer/</link>
+    <link>https://ToruMakabe.github.io/tags/paintschainer/</link>
     <description>Recent content in Paintschainer on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Fri, 03 Feb 2017 18:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/paintschainer/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/paintschainer/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure N-SeriesでPaintsChainerを動かす</title>
-      <link>http://torumakabe.github.io/post/paintschainer_on_azure/</link>
+      <link>https://ToruMakabe.github.io/post/paintschainer_on_azure/</link>
       <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/paintschainer_on_azure/</guid>
+      <guid>https://ToruMakabe.github.io/post/paintschainer_on_azure/</guid>
       <description>PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;が、とても面白いです。
 畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。
 せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp;amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。

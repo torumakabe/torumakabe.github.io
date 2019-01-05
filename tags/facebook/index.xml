@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Facebook on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/facebook/</link>
+    <link>https://ToruMakabe.github.io/tags/facebook/</link>
     <description>Recent content in Facebook on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 08 May 2016 14:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/facebook/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/facebook/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
 Azure Functionsは、
  アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。

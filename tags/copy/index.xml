@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Copy on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/copy/</link>
+    <link>https://ToruMakabe.github.io/tags/copy/</link>
     <description>Recent content in Copy on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 13 Jun 2017 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/copy/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/copy/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
-      <link>http://torumakabe.github.io/post/azureblobcopy_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobcopy_perf/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobcopy_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobcopy_perf/</guid>
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
 でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
 調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。

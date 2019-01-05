@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Aks on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/aks/</link>
+    <link>https://ToruMakabe.github.io/tags/aks/</link>
     <description>Recent content in Aks on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 12 Mar 2018 00:21:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/aks/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/aks/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>http://torumakabe.github.io/post/aks_dns/</link>
+      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_dns/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
 わたしの知る限り、2つの方法があります。
  AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
@@ -28,10 +28,10 @@ $ kubectl create -f nginx-label.</description>
     
     <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
-      <link>http://torumakabe.github.io/post/aks_tls_autorenewal/</link>
+      <link>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</guid>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
 さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
 そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
@@ -44,10 +44,10 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
     
     <item>
       <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
-      <link>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <link>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</guid>
       <description>楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
 さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
 せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。

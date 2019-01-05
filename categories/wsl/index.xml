@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Wsl on re-imagine</title>
-    <link>http://torumakabe.github.io/categories/wsl/</link>
+    <link>https://ToruMakabe.github.io/categories/wsl/</link>
     <description>Recent content in Wsl on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/categories/wsl/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/categories/wsl/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</title>
-      <link>http://torumakabe.github.io/post/wslenv_golang/</link>
+      <link>https://ToruMakabe.github.io/post/wslenv_golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/wslenv_golang/</guid>
+      <guid>https://ToruMakabe.github.io/post/wslenv_golang/</guid>
       <description>見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支援系の機能、ツールも拡充されています。特に、WSL/Windowsの連携、相互運用まわりは着実に進化しています。そのうちのひとつが、このエントリーで紹介するWSLENVです。
 WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ単純に共有するだけでなく、ルールに従って変換も行います。これが地味に便利。でも地味だから、あまり話題になっていない。なので具体例で紹介しよう、というのがこのエントリーの目的です。
 TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。

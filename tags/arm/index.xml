@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Arm on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/arm/</link>
+    <link>https://ToruMakabe.github.io/tags/arm/</link>
     <description>Recent content in Arm on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Fri, 25 Mar 2016 22:50:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&amp;ldquo;azurerm_template_deployment&amp;rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
@@ -35,10 +35,10 @@ Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autores
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
 追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
 エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
@@ -58,10 +58,10 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
 ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
 手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
@@ -71,10 +71,10 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
 情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
 今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
@@ -88,10 +88,10 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>http://torumakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
 Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
 そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
@@ -106,10 +106,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>http://torumakabe.github.io/post/azure_infradeployment_selection/</link>
+      <link>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</link>
       <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</guid>
       <description>ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。
 特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。
 なので「ケースバイケース。以上」とは、言いにくい。
@@ -136,10 +136,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>Azure ARM Templateによるデプロイと冪等性</title>
-      <link>http://torumakabe.github.io/post/arm_idempotent/</link>
+      <link>https://ToruMakabe.github.io/post/arm_idempotent/</link>
       <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/arm_idempotent/</guid>
+      <guid>https://ToruMakabe.github.io/post/arm_idempotent/</guid>
       <description>宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
 さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
 Azure リソース マネージャーの概要  &amp;ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&amp;rdquo;

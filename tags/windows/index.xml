@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Windows on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/windows/</link>
+    <link>https://ToruMakabe.github.io/tags/windows/</link>
     <description>Recent content in Windows on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
-      <link>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <link>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
       <description> 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
 条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
 docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
@@ -24,10 +24,10 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
     
     <item>
       <title>自動化を愛するWindows使いへ Boxstarterのすすめ</title>
-      <link>http://torumakabe.github.io/post/intro_boxstarter/</link>
+      <link>https://ToruMakabe.github.io/post/intro_boxstarter/</link>
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/intro_boxstarter/</guid>
+      <guid>https://ToruMakabe.github.io/post/intro_boxstarter/</guid>
       <description>Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
 でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
 Boxstarter
@@ -43,10 +43,10 @@ Install-BoxstarterPackage -PackageName &amp;quot;https://gist.githubusercontent.
     
     <item>
       <title>Bash on WindowsでNode開発環境を作る</title>
-      <link>http://torumakabe.github.io/post/bashonwindows_nvm/</link>
+      <link>https://ToruMakabe.github.io/post/bashonwindows_nvm/</link>
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/bashonwindows_nvm/</guid>
+      <guid>https://ToruMakabe.github.io/post/bashonwindows_nvm/</guid>
       <description>Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。
 たとえばNodeのバージョン管理。Windowsにはnodistがありますが、Linux/Macでは動きません。Linux/Macで使ってるNVMがWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。
 最近、Azure FunctionsでNode v6.4.0が使えるようになったので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。

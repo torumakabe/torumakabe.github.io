@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Functions on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/functions/</link>
+    <link>https://ToruMakabe.github.io/tags/functions/</link>
     <description>Recent content in Functions on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/functions/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/functions/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>http://torumakabe.github.io/post/azure_blobevent/</link>
+      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
 プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
@@ -29,10 +29,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>http://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
 AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
 素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
@@ -55,10 +55,10 @@ AZChatOpsSample
     
     <item>
       <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <link>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</link>
       <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
 さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
  運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう  Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください   デプロイ  Function Appを作成  ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.azurewebsites.net空間でユニークになるように App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行したぶん課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう メモリは128MBあれば十分です 他のパラメータはお好みで  環境変数の設定  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定 先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)  サンプルコードを取得  githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; AZFuncTimerTriggerSample  準備済みのGithubリポジトリにpush リポジトリとFunction Appを同期  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ Githubリポジトリとブランチを設定し、同期を待ちます  Nodeのモジュールをインストール  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動 このディレクトリが、実行する関数、functionの単位です &amp;ldquo;npm install&amp;rdquo; を実行 (package.</description>
@@ -66,10 +66,10 @@ AZChatOpsSample
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
 Azure Functionsは、
  アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。

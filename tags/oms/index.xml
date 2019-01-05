@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Oms on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/oms/</link>
+    <link>https://ToruMakabe.github.io/tags/oms/</link>
     <description>Recent content in Oms on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>http://torumakabe.github.io/post/oms_container_linux/</link>
+      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
 何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。

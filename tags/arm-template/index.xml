@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Arm Template on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/arm-template/</link>
+    <link>https://ToruMakabe.github.io/tags/arm-template/</link>
     <description>Recent content in Arm Template on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Thu, 23 Mar 2017 15:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/arm-template/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/arm-template/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
-      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
+      <link>https://ToruMakabe.github.io/post/arm_template_managed_disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
+      <guid>https://ToruMakabe.github.io/post/arm_template_managed_disk/</guid>
       <description>お伝えしたいこと  ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでManaged Diskを作る時のコツ 可用性セットを意識しよう  ARMテンプレートのドキュメントが使いやすくなった docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも使いやすくなりました。ARMテンプレート使いのみなさまは https://docs.microsoft.com/ja-jp/azure/templates/ をブックマークして、サクサク調べちゃってください。
 Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり知られてないようなのでアピールしておきます。
 コードアシストしてくれます。

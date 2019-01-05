@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Packer on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/packer/</link>
+    <link>https://ToruMakabe.github.io/tags/packer/</link>
     <description>Recent content in Packer on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
 ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
 手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。

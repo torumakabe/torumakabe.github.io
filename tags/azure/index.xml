@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Azure on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/azure/</link>
+    <link>https://ToruMakabe.github.io/tags/azure/</link>
     <description>Recent content in Azure on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sat, 22 Dec 2018 20:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
-      <link>http://torumakabe.github.io/post/github_actions_aks/</link>
+      <link>https://ToruMakabe.github.io/post/github_actions_aks/</link>
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/github_actions_aks/</guid>
+      <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
       <description>GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
 GitHub Actions
 数時間、触った印象。
@@ -30,10 +30,10 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
     
     <item>
       <title>TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</title>
-      <link>http://torumakabe.github.io/post/terraform_azure_secret/</link>
+      <link>https://ToruMakabe.github.io/post/terraform_azure_secret/</link>
       <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform_azure_secret/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform_azure_secret/</guid>
       <description>動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。
  いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る  データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁  もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？  kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる   つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
 シナリオ Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。
@@ -42,10 +42,10 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
     
     <item>
       <title>俺のAzure CLI 2018春版</title>
-      <link>http://torumakabe.github.io/post/myazurecli201804/</link>
+      <link>https://ToruMakabe.github.io/post/myazurecli201804/</link>
       <pubDate>Mon, 09 Apr 2018 15:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/myazurecli201804/</guid>
+      <guid>https://ToruMakabe.github.io/post/myazurecli201804/</guid>
       <description>春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
 俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
 Azure CLI 2.0 の構成
@@ -61,10 +61,10 @@ Azure CLI 2.0 のエイリアス拡張機能
     
     <item>
       <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</link>
       <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</guid>
       <description>カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。
 ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。
  最新のイメージ名を確認のうえ、手で指定する 自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する  2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。
@@ -77,10 +77,10 @@ data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; { name_regex = &a
     
     <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
-      <link>http://torumakabe.github.io/post/azure_msi_terraform/</link>
+      <link>https://ToruMakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_msi_terraform/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_msi_terraform/</guid>
       <description>TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けはこの資料も参考に。
 さて、先日Azure MarketplaceからTerraform入りの仮想マシンをプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。
  Terraform (latest) Azure CLI 2.0 Managed Service Identity (MSI) VM Extension Unzip JQ apt-transport-https  いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。
@@ -103,10 +103,10 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
     
     <item>
       <title>Azure DNS Private Zonesの動きを確認する</title>
-      <link>http://torumakabe.github.io/post/azure_private_dns_preview/</link>
+      <link>https://ToruMakabe.github.io/post/azure_private_dns_preview/</link>
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_private_dns_preview/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_private_dns_preview/</guid>
       <description>プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。
 さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNet)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。
  Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。 仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。 プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。 リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。 プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。  公式ドキュメントはこちら。現時点の制約もまとまっているので、目を通しておきましょう。
@@ -119,10 +119,10 @@ $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordS
     
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
-      <link>http://torumakabe.github.io/post/az_vmss_terraform/</link>
+      <link>https://ToruMakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/az_vmss_terraform/</guid>
+      <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
       <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018&amp;frasl;3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
 前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)   コード 以下のファイルを同じディレクトリに作成します。
 Terraform メインコード VMSSと周辺リソースを作ります。
@@ -132,10 +132,10 @@ resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;poc&amp;quot; { na
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>http://torumakabe.github.io/post/aks_dns/</link>
+      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_dns/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
 わたしの知る限り、2つの方法があります。
  AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
@@ -147,10 +147,10 @@ $ kubectl create -f nginx-label.</description>
     
     <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
-      <link>http://torumakabe.github.io/post/aks_tls_autorenewal/</link>
+      <link>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</guid>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
 さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
 そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
@@ -163,10 +163,10 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
     
     <item>
       <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
-      <link>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <link>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</guid>
       <description>楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
 さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
 せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
@@ -179,10 +179,10 @@ $ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment ap
     
     <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
-      <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
+      <link>https://ToruMakabe.github.io/post/azure_rg_contributor/</link>
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_rg_contributor/</guid>
       <description>共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
 ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
 なのですが、このようなケースで、権限付与の落とし穴があります。
@@ -197,10 +197,10 @@ $ az role definition create --role-definition ./role.json  出力にカスタム
     
     <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
-      <link>http://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <link>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <guid>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</guid>
       <description>サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
 インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
  BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
@@ -220,10 +220,10 @@ terraform workspace select prod  みなまで言わなくても分かります�
     
     <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
-      <link>http://torumakabe.github.io/post/azblob_golang/</link>
+      <link>https://ToruMakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azblob_golang/</guid>
+      <guid>https://ToruMakabe.github.io/post/azblob_golang/</guid>
       <description>Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
 ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
 ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
@@ -232,10 +232,10 @@ terraform workspace select prod  みなまで言わなくても分かります�
     
     <item>
       <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
-      <link>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
       <description>動機 焦げlogさんで、とても興味深いエントリを拝見しました。
  Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました  確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは
  ※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…
@@ -247,10 +247,10 @@ terraform workspace select prod  みなまで言わなくても分かります�
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>http://torumakabe.github.io/post/azure_blobevent/</link>
+      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
 プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
@@ -263,10 +263,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
-      <link>http://torumakabe.github.io/post/azureblobcopy_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobcopy_perf/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobcopy_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobcopy_perf/</guid>
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
 でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
 調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
@@ -277,10 +277,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>Azureユーザー視点のLatency測定 2017/4版</title>
-      <link>http://torumakabe.github.io/post/azure_latency/</link>
+      <link>https://ToruMakabe.github.io/post/azure_latency/</link>
       <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_latency/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_latency/</guid>
       <description>関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。
 せっかくなので、
  太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure東日本リージョン 自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure西日本リージョン 自宅(神奈川) -&amp;gt; OCN光 -&amp;gt; インターネット -&amp;gt; Azure米国西海岸リージョン Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure西日本リージョン Azure東日本リージョン -&amp;gt; Azureバックボーン -&amp;gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ  自宅Wi-Fi環境  802.11ac(5GHz)  自宅加入インターネット接続サービス  OCN 光 マンション 100M  OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです  米国リージョン  US WEST (カリフォルニア)   測定結果 1.</description>
@@ -288,10 +288,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     
     <item>
       <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
-      <link>http://torumakabe.github.io/post/arm_template_managed_disk/</link>
+      <link>https://ToruMakabe.github.io/post/arm_template_managed_disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/arm_template_managed_disk/</guid>
+      <guid>https://ToruMakabe.github.io/post/arm_template_managed_disk/</guid>
       <description>お伝えしたいこと  ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでManaged Diskを作る時のコツ 可用性セットを意識しよう  ARMテンプレートのドキュメントが使いやすくなった docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも使いやすくなりました。ARMテンプレート使いのみなさまは https://docs.microsoft.com/ja-jp/azure/templates/ をブックマークして、サクサク調べちゃってください。
 Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり知られてないようなのでアピールしておきます。
 コードアシストしてくれます。
@@ -307,10 +307,10 @@ Azureのストレージサービスは、多数のサーバーで構成された
     
     <item>
       <title>Azure N-SeriesでPaintsChainerを動かす</title>
-      <link>http://torumakabe.github.io/post/paintschainer_on_azure/</link>
+      <link>https://ToruMakabe.github.io/post/paintschainer_on_azure/</link>
       <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/paintschainer_on_azure/</guid>
+      <guid>https://ToruMakabe.github.io/post/paintschainer_on_azure/</guid>
       <description>PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&amp;ldquo;PaintsChainerをAmazon EC2で動かしてみた&amp;rdquo;が、とても面白いです。
 畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。
 せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp;amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。
@@ -326,10 +326,10 @@ $ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest l
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
@@ -341,10 +341,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>http://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
 AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
 素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
@@ -367,10 +367,10 @@ AZChatOpsSample
     
     <item>
       <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>http://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <link>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</link>
       <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
 さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
  運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう  Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください   デプロイ  Function Appを作成  ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.azurewebsites.net空間でユニークになるように App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行したぶん課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう メモリは128MBあれば十分です 他のパラメータはお好みで  環境変数の設定  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定 先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)  サンプルコードを取得  githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; AZFuncTimerTriggerSample  準備済みのGithubリポジトリにpush リポジトリとFunction Appを同期  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ Githubリポジトリとブランチを設定し、同期を待ちます  Nodeのモジュールをインストール  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動 このディレクトリが、実行する関数、functionの単位です &amp;ldquo;npm install&amp;rdquo; を実行 (package.</description>
@@ -378,10 +378,10 @@ AZChatOpsSample
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>http://torumakabe.github.io/post/oms_container_linux/</link>
+      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
 何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
@@ -392,10 +392,10 @@ AZChatOpsSample
     
     <item>
       <title>Azure X-Plat CLIでResource Policyを設定する</title>
-      <link>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</link>
+      <link>https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/</link>
       <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/</guid>
       <description>Azure X-Plat CLIのリリースサイクル OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ月次です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。
 たとえば、今回のテーマであるResource Policy。GA直後に公開されたドキュメントに、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。
 機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。
@@ -415,10 +415,10 @@ X-Plat CLI固有部分に絞って紹介します。
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>http://torumakabe.github.io/post/azure_osstools_iac/</link>
+      <link>https://ToruMakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_osstools_iac/</guid>
       <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
 解決したい課題 こんな悩みを解決します。
  WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
@@ -430,10 +430,10 @@ X-Plat CLI固有部分に絞って紹介します。
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
 Azure Functionsは、
  アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。
@@ -445,10 +445,10 @@ Azure Functionsは、
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
+      <link>https://ToruMakabe.github.io/post/azure_batch_docker/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
       <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
 クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
 ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。
@@ -465,10 +465,10 @@ Azure Functionsは、
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <link>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</link>
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。
 なお、Premium Storageは例外です。FAQを確認してみましょう。
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
@@ -480,10 +480,10 @@ $Blob = Get-AzureStorageBlob yourDataDisk.</description>
     
     <item>
       <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>http://torumakabe.github.io/post/azure_docker_cntk/</link>
+      <link>https://ToruMakabe.github.io/post/azure_docker_cntk/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_docker_cntk/</guid>
       <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
 方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
@@ -494,10 +494,10 @@ C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;  ARM�
     
     <item>
       <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
-      <link>http://torumakabe.github.io/post/azure_auditlog_alert/</link>
+      <link>https://ToruMakabe.github.io/post/azure_auditlog_alert/</link>
       <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_auditlog_alert/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_auditlog_alert/</guid>
       <description>監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利な機能です。日々の運用に効きます。
 どんな風に使えるか ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。
 たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。
@@ -514,10 +514,10 @@ param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $Web
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&amp;ldquo;azurerm_template_deployment&amp;rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
@@ -536,10 +536,10 @@ Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autores
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>http://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
 追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
 エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
@@ -559,10 +559,10 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
 ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
 手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
@@ -572,10 +572,10 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
 情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
 今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
@@ -589,10 +589,10 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>http://torumakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
 Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
 そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
@@ -607,10 +607,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>Azure DDoS対策ことはじめ</title>
-      <link>http://torumakabe.github.io/post/azure_ddosprotection/</link>
+      <link>https://ToruMakabe.github.io/post/azure_ddosprotection/</link>
       <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_ddosprotection/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_ddosprotection/</guid>
       <description>すこぶるFAQ 攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。
 公式ホワイトペーパー Microsoft Azure Network Security Whitepaper V3が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。
 今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。
@@ -620,10 +620,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>http://torumakabe.github.io/post/azureblobupload_perf/</link>
+      <link>https://ToruMakabe.github.io/post/azureblobupload_perf/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azureblobupload_perf/</guid>
+      <guid>https://ToruMakabe.github.io/post/azureblobupload_perf/</guid>
       <description>同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。
 端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。
 そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。
@@ -636,10 +636,10 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     
     <item>
       <title>Linux on Azureでファイル共有する方法</title>
-      <link>http://torumakabe.github.io/post/fileshare_linuxonazure/</link>
+      <link>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</link>
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <guid>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</guid>
       <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。
 さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。
 ですが個人的にはあまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。
@@ -657,10 +657,10 @@ local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: 
     
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>http://torumakabe.github.io/post/striping_linuxonazure/</link>
+      <link>https://ToruMakabe.github.io/post/striping_linuxonazure/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/striping_linuxonazure/</guid>
+      <guid>https://ToruMakabe.github.io/post/striping_linuxonazure/</guid>
       <description>&amp;ldquo;俺の鉄板&amp;rdquo;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
 クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
 ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
@@ -677,10 +677,10 @@ Linuxで使える代表的なストライプ実装は、LVMとMD。
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
-      <link>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <link>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <guid>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
       <description>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。
 具体的な数値で、正しい理解を &amp;ldquo;クラウドは性能不足、企業システムが重すぎる&amp;rdquo;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。
 記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。
@@ -710,10 +710,10 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
     
     <item>
       <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>http://torumakabe.github.io/post/azure_infradeployment_selection/</link>
+      <link>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</link>
       <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</guid>
       <description>ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。
 特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。
 なので「ケースバイケース。以上」とは、言いにくい。
@@ -740,10 +740,10 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
     
     <item>
       <title>Azure ARM Templateによるデプロイと冪等性</title>
-      <link>http://torumakabe.github.io/post/arm_idempotent/</link>
+      <link>https://ToruMakabe.github.io/post/arm_idempotent/</link>
       <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/arm_idempotent/</guid>
+      <guid>https://ToruMakabe.github.io/post/arm_idempotent/</guid>
       <description>宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
 さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
 Azure リソース マネージャーの概要  &amp;ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&amp;rdquo;
@@ -772,10 +772,10 @@ PS C:\&amp;gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName 
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>http://torumakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
 OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
 さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
@@ -797,10 +797,10 @@ $ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine en
     
     <item>
       <title>Azure Docker VM Extensionを使う3つの理由</title>
-      <link>http://torumakabe.github.io/post/azure_docker_extension/</link>
+      <link>https://ToruMakabe.github.io/post/azure_docker_extension/</link>
       <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_docker_extension/</guid>
       <description>まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
 もちろん、技術者個人として、中立的に、公開できるネタを書きます。
 AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。

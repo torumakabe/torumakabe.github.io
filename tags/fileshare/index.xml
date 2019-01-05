@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Fileshare on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/fileshare/</link>
+    <link>https://ToruMakabe.github.io/tags/fileshare/</link>
     <description>Recent content in Fileshare on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 07 Feb 2016 17:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/fileshare/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/fileshare/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Linux on Azureでファイル共有する方法</title>
-      <link>http://torumakabe.github.io/post/fileshare_linuxonazure/</link>
+      <link>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</link>
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <guid>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</guid>
       <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。
 さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。
 ですが個人的にはあまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Eventgrid on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/eventgrid/</link>
+    <link>https://ToruMakabe.github.io/tags/eventgrid/</link>
     <description>Recent content in Eventgrid on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>http://torumakabe.github.io/post/azure_blobevent/</link>
+      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
 プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。

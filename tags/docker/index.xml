@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/docker/</link>
+    <link>https://ToruMakabe.github.io/tags/docker/</link>
     <description>Recent content in Docker on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
-      <link>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <link>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
       <description> 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
 条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
 docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
@@ -24,10 +24,10 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
@@ -39,10 +39,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>http://torumakabe.github.io/post/oms_container_linux/</link>
+      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
 何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
@@ -53,10 +53,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>http://torumakabe.github.io/post/azure_osstools_iac/</link>
+      <link>https://ToruMakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_osstools_iac/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_osstools_iac/</guid>
       <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
 解決したい課題 こんな悩みを解決します。
  WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&amp;gt;IP指定-&amp;gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
@@ -68,10 +68,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>http://torumakabe.github.io/post/azure_batch_docker/</link>
+      <link>https://ToruMakabe.github.io/post/azure_batch_docker/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_batch_docker/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
       <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
 クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
 ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。
@@ -88,10 +88,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
     
     <item>
       <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>http://torumakabe.github.io/post/azure_docker_cntk/</link>
+      <link>https://ToruMakabe.github.io/post/azure_docker_cntk/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_docker_cntk/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_docker_cntk/</guid>
       <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
 方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
@@ -102,10 +102,10 @@ C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;  ARM�
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>http://torumakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
 OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
 さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
@@ -127,10 +127,10 @@ $ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine en
     
     <item>
       <title>Azure Docker VM Extensionを使う3つの理由</title>
-      <link>http://torumakabe.github.io/post/azure_docker_extension/</link>
+      <link>https://ToruMakabe.github.io/post/azure_docker_extension/</link>
       <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_docker_extension/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_docker_extension/</guid>
       <description>まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
 もちろん、技術者個人として、中立的に、公開できるネタを書きます。
 AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。

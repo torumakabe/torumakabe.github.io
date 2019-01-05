@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dns on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/dns/</link>
+    <link>https://ToruMakabe.github.io/tags/dns/</link>
     <description>Recent content in Dns on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Tue, 27 Mar 2018 00:10:30 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/dns/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/dns/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azure DNS Private Zonesの動きを確認する</title>
-      <link>http://torumakabe.github.io/post/azure_private_dns_preview/</link>
+      <link>https://ToruMakabe.github.io/post/azure_private_dns_preview/</link>
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_private_dns_preview/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_private_dns_preview/</guid>
       <description>プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。
 さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNet)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。
  Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。 仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。 プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。 リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。 プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。  公式ドキュメントはこちら。現時点の制約もまとまっているので、目を通しておきましょう。
@@ -29,10 +29,10 @@ $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordS
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>http://torumakabe.github.io/post/aks_dns/</link>
+      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/aks_dns/</guid>
+      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
 わたしの知る限り、2つの方法があります。
  AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。

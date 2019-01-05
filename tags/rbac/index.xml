@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rbac on re-imagine</title>
-    <link>http://torumakabe.github.io/tags/rbac/</link>
+    <link>https://ToruMakabe.github.io/tags/rbac/</link>
     <description>Recent content in Rbac on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Mon, 22 Jan 2018 22:00:00 +0900</lastBuildDate>
     
-	<atom:link href="http://torumakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://ToruMakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
-      <link>http://torumakabe.github.io/post/azure_rg_contributor/</link>
+      <link>https://ToruMakabe.github.io/post/azure_rg_contributor/</link>
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
       
-      <guid>http://torumakabe.github.io/post/azure_rg_contributor/</guid>
+      <guid>https://ToruMakabe.github.io/post/azure_rg_contributor/</guid>
       <description>共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
 ユースケースのひとつに、&amp;rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&amp;rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
 なのですが、このようなケースで、権限付与の落とし穴があります。
