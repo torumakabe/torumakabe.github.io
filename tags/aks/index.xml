@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Aks on re-imagine</title>
+    <title>AKS on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/aks/</link>
-    <description>Recent content in Aks on re-imagine</description>
+    <description>Recent content in AKS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Mon, 12 Mar 2018 00:21:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/aks/index.xml" rel="self" type="application/rss+xml" />

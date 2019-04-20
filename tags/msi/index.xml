@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Msi on re-imagine</title>
+    <title>MSI on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/msi/</link>
-    <description>Recent content in Msi on re-imagine</description>
+    <description>Recent content in MSI on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Fri, 30 Mar 2018 16:30:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/msi/index.xml" rel="self" type="application/rss+xml" />

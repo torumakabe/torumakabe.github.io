@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hp Public Cloud on re-imagine</title>
+    <title>HP Public Cloud on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/hp-public-cloud/</link>
-    <description>Recent content in Hp Public Cloud on re-imagine</description>
+    <description>Recent content in HP Public Cloud on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />

@@ -1,262 +1,167 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rbac &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>RBAC | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Rbac &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: RBAC - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/rbac/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Rbac &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
 
 
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
 
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
+  
+  | <a class="subtitle is-6" href="/tags/rbac">#RBAC</a>
+  
 
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">22 Jan 2018, 22:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_rg_contributor/" class="post-title">Azureのリソースグループ限定 共同作成者をいい感じに作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="共同作成者は-ちょっと強い">共同作成者は、ちょっと強い</h2>
-
-<p>Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。</p>
-
-<p>ユースケースのひとつに、&rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。</p>
-
-<p>なのですが、このようなケースで、権限付与の落とし穴があります。</p>
-
-<ul>
-<li>サブスクリプション所有者が開発用リソースグループを作る</li>
-<li>スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる</li>
-<li>開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ</li>
-<li>開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能)</li>
-<li>開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない</li>
-<li>詰む</li>
-<li>サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し</li>
-</ul>
-
-<p>共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。</p>
-
-<h2 id="いい感じのカスタムロールを作る">いい感じのカスタムロールを作る</h2>
-
-<p>Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。</p>
-
-<p>シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。</p>
-
-<pre><code>{
-    &quot;Name&quot;: &quot;Resource Group Contributor&quot;,
-    &quot;IsCustom&quot;: true,
-    &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;,
-    &quot;Actions&quot;: [
-        &quot;*&quot;
-    ],
-    &quot;NotActions&quot;: [
-        &quot;Microsoft.Authorization/*/Delete&quot;,
-        &quot;Microsoft.Authorization/*/Write&quot;,
-        &quot;Microsoft.Authorization/elevateAccess/Action&quot;,
-        &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot;
-    ],
-    &quot;AssignableScopes&quot;: [
-        &quot;/subscriptions/your-subscriotion-id&quot;
-    ]
-}
-</code></pre>
-
-<p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
-
-<p>では、カスタムロールを作成します。</p>
-
-<pre><code>$ az role definition create --role-definition ./role.json
-</code></pre>
-
-<p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
-
-<pre><code>&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot;
-</code></pre>
-
-<h2 id="カスタムロールをユーザー-グループ-サービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
-
-<p>次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。</p>
-
-<pre><code>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
-</code></pre>
-
-<p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
-
-<pre><code>$ az ad sp create-for-rbac -n &quot;rgcontributor&quot; -p &quot;your-password&quot; --role your-customrole-id --scopes &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
-</code></pre>
-
-<p>余談ですが、&rdquo;az ad sp create-for-rbac&rdquo;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
-
-<h2 id="試してみる">試してみる</h2>
-
-<p>ログインして試してみましょう。サービスプリンシパルの例です。</p>
-
-<pre><code>$ az login --service-principal -u &quot;http://rgcontributor&quot; -p &quot;your-password&quot; -t &quot;your-tenant-id&quot;
-</code></pre>
-
-<p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
-
-<pre><code>$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre>
-
-<p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
-
-<pre><code>$ az vm list -o table
-Name              ResourceGroup     Location
-----------------  ----------------  ----------
-sampledevvm01     sample-dev-rg  japaneast
-</code></pre>
-
-<p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
-
-<pre><code>$ az group create -n rgc-poc-rg -l japaneast
-The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/write' over scope '/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg'.
-</code></pre>
-
-<p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
-
-<pre><code>$ az group delete -n sample-dev-rg
-Are you sure you want to perform this operation? (y/n): y
-The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/delete' over scope '/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg'.
-</code></pre>
-
-<h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
-
-<p>でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。</p>
-
-<p>空テンプレートを、empty.jsonとしましょう。</p>
-
-<pre><code>{
-    &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
-    &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
-    &quot;parameters&quot;: {},
-    &quot;variables&quot;: {},
-    &quot;resources&quot;: [],
-    &quot;outputs&quot;: {}
-}
-</code></pre>
-
-<p>破壊的空砲を打ちます。</p>
-
-<pre><code>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
-</code></pre>
-
-<p>リソースグループは残ります。</p>
-
-<pre><code>$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre>
-
-<p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
-
-<pre><code>$ az vm list -o table
-
-</code></pre>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 22, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_rg_contributor/">Azureのリソースグループ限定 共同作成者をいい感じに作る</a></h1>
+      <div class="content">
+        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
+ユースケースのひとつに、&rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
+なのですが、このようなケースで、権限付与の落とし穴があります。
+ サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
+いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
+シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
+{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] }  組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
+では、カスタムロールを作成します。
+$ az role definition create --role-definition ./role.json  出力にカスタムロールのIDが入っていますので、控えておきます。
+&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_rg_contributor/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

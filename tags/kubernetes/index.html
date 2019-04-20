@@ -1,881 +1,274 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kubernetes &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Kubernetes | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Kubernetes &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: Kubernetes - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/kubernetes/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Kubernetes &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">22 Dec 2018, 20:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/github_actions_aks/" class="post-title">GitHub ActionsでAzure CLIとkubectlを動かす</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-GitHub" href="https://ToruMakabe.github.io//categories/github">GitHub</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="github-actionsのプレビュー招待がきた">GitHub Actionsのプレビュー招待がきた</h2>
-
-<p>ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。</p>
-
-<p><a href="https://developer.github.com/actions/">GitHub Actions</a></p>
-
-<p>数時間、触った印象。</p>
-
-<ul>
-<li>GitHubへのPushなどイベントをトリガーにWorkflowを流せる</li>
-<li>シンプルなWorkflow記法 (TerraformのHCLに似ている)</li>
-<li>Workflowから呼び出すActionはDockerコンテナー</li>
-<li>Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)</li>
-</ul>
-
-<p>Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。</p>
-
-<h2 id="azure-cli-kubernetes-aks-kubectlサンプル">Azure CLI/Kubernetes(AKS) kubectlサンプル</h2>
-
-<p>こんなことを試してみました。</p>
-
-<ul>
-<li>KubernetesのマニフェストをGitHubリポジトリへPush</li>
-<li>PushイベントをトリガーにWorkflowを起動</li>
-<li>Azure CLIを使ってAKSクラスターのCredentialを取得</li>
-<li>イベント発生元がmasterブランチであれば継続</li>
-<li>kubectl applyでマニフェストを適用</li>
-</ul>
-
-<p>kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
-
-<p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
-
-<p>ディレクトリ構造は、こうです。</p>
-
-<pre><code>.
-├── .git
-│   └── (省略)
-├── .github
-│   └── main.workflow
-├── LICENSE
-├── README.md
-├── azure-cli
-│   ├── Dockerfile
-│   └── entrypoint.sh
-└── sampleapp.yaml
-</code></pre>
-
-<ul>
-<li>.github の下にWorkflowを書きます</li>
-<li>azure-cli の下に自作Actionを置きました</li>
-<li>sampleapp.yaml がkubernetesのマニフェストです</li>
-</ul>
-
-<h3 id="workflow">Workflow</h3>
-
-<p>まず、 .github/main.workflow を見てみましょう</p>
-
-<pre><code>workflow &quot;Deploy app to AKS&quot; {
-  on = &quot;push&quot;
-  resolves = [&quot;Deploy to AKS&quot;]
-}
-
-action &quot;Load AKS credential&quot; {
-  uses = &quot;./azure-cli/&quot;
-  secrets = [&quot;AZURE_SERVICE_APP_ID&quot;, &quot;AZURE_SERVICE_PASSWORD&quot;, &quot;AZURE_SERVICE_TENANT&quot;]
-  args = &quot;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&quot;
-  env = {
-    AZ_OUTPUT_FORMAT = &quot;table&quot;
-    AKS_RG_NAME = &quot;your-aks-rg&quot;
-    AKS_CLUSTER_NAME = &quot;youraks&quot;
-  }
-}
-
-action &quot;Deploy branch filter&quot; {
-  uses = &quot;actions/bin/filter@master&quot;
-  args = &quot;branch master&quot;
-}
-
-action &quot;Deploy to AKS&quot; {
-  needs = [&quot;Load AKS credential&quot;, &quot;Deploy branch filter&quot;]
-  uses = &quot;docker://gcr.io/cloud-builders/kubectl&quot;
-  runs = &quot;sh -l -c&quot;
-  args = [&quot;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e 's/YOUR_VALUE/'\&quot;$YOUR_VALUE\&quot;'/' -e 's/YOUR_DNS_LABEL_NAME/'$YOUR_DNS_LABEL_NAME'/' | kubectl apply -f - &quot;]
-  env = {
-    YOUR_VALUE = &quot;Ale&quot;
-    YOUR_DNS_LABEL_NAME = &quot;yournamedispvar&quot;
-  }
-}
-</code></pre>
-
-<p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
-
-<p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&rdquo;Load AKS credential&rdquo;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
-
-<p>&ldquo;Deploy branch filter&rdquo;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&rdquo;Deploy to AKS&rdquo;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
-
-<p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&rdquo;Actions&rdquo;タブで実行結果を確認できます。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/ghaction_sc.png" alt="Workflow" /></p>
-
-<p>できた。Azure CLIとkubectlが使えるなら、他にも応用できそう。</p>
-
-<p>以下、actionブロックを補足します。</p>
-
-<h3 id="load-aks-credential">Load AKS credential</h3>
-
-<p>Azure CLIを使ってAKSクラスターのCredentialを取得し、kubectlのコンテキスト設定します。envでクラスターのリソースグループ名とクラスター名を渡しています。</p>
-
-<p>GitHub ActionsがAzure CLI Actionを<a href="https://github.com/actions/azure">提供している</a>のですが、Azure CLIのバージョンを最新にしたかったのと、動的にコンテナーを作ってみたかったので ./azure-cli にDockerfileを<a href="https://github.com/ToruMakabe/actions-playground/tree/master/azure-cli">書きました</a>。</p>
-
-<p>試す時は、みなさんの環境向けにenvを書き換えてください。なお、AKSクラスターからCredentialを取得する権限が必要です。権限を持ったサービスプリンシパルのアプリケーションID/パスワード、テナントIDをGitHubリポジトリのSecretに設定してください。actionブロックのsecretsで指定している通りです。</p>
-
-<h3 id="deploy-branch-filter">Deploy branch filter</h3>
-
-<p>bin/filterはGitHub Actionsが<a href="https://github.com/actions/bin">提供している</a>ユーティリティです。この例では、イベントがmasterブランチで発生した場合のみWorkflowを継続します。</p>
-
-<h3 id="deploy-to-aks">Deploy to AKS</h3>
-
-<p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
-
-<p>このactionが実行されると、envの&rdquo;YOUR_VALUE&rdquo;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&rdquo;YOUR_DNS_LABEL_NAME&rdquo;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
-
-<p>アプリのパスは /dispvar です。curlしてみると。</p>
-
-<pre><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
-Hello. You set &quot;Ale&quot;
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
-<p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">12 Mar 2018, 00:21</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/aks_dns/" class="post-title">AKSのService作成時にホスト名を付ける</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="2つのやり口">2つのやり口</h2>
-
-<p>Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。</p>
-
-<p>わたしの知る限り、2つの方法があります。</p>
-
-<ul>
-<li>AKS(k8s) 1.9で対応した<a href="https://github.com/kubernetes/kubernetes/pull/47849">DNSラベル名付与機能</a>を使う</li>
-<li><a href="https://github.com/kubernetes-incubator/external-dns">Kubenetes ExternalDNS</a>を使ってAzure DNSへAレコードを追加する</li>
-</ul>
-
-<p>以下、AKS 1.9.2での実現手順です。</p>
-
-<h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
-
-<p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
-
-<p>[nginx-label.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx
-  annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
-spec:
-  selector:
-    app: nginx
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプロイ。</p>
-
-<pre><code>$ kubectl create -f nginx-label.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
-
-<pre><code>$ curl hogeginx.eastus.cloudapp.azure.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
-
-<h2 id="kubenetes-externaldns">Kubenetes ExternalDNS</h2>
-
-<p>任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は<a href="https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md">こちら</a>。</p>
-
-<p>Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。</p>
-
-<p>さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。</p>
-
-<p>ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。</p>
-
-<pre><code>$ az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&quot; -n hogeExtDnsSp
-</code></pre>
-
-<p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
-
-<p>ではExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。</p>
-
-<p>[azure.json]</p>
-
-<pre><code>{
-    &quot;tenantId&quot;: &quot;your-tenant&quot;,
-    &quot;subscriptionId&quot;: &quot;your-subscription-id&quot;,
-    &quot;aadClientId&quot;: &quot;your-appId&quot;,
-    &quot;aadClientSecret&quot;: &quot;your-password&quot;,
-    &quot;resourceGroup&quot;: &quot;hoge-dns-rg&quot;
-}
-</code></pre>
-
-<p>JSONファイルを元に、secretを作ります。</p>
-
-<pre><code>$ kubectl create secret generic azure-config-file --from-file=azure.json
-</code></pre>
-
-<p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
-
-<p>[extdns.yaml]</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: external-dns
-spec:
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: external-dns
-    spec:
-      containers:
-      - name: external-dns
-        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
-        args:
-        - --source=service
-        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
-        - --provider=azure
-        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial's resource group
-        volumeMounts:
-        - name: azure-config-file
-          mountPath: /etc/kubernetes
-          readOnly: true
-      volumes:
-      - name: azure-config-file
-        secret:
-          secretName: azure-config-file
-</code></pre>
-
-<p>ExternalDNSをデプロイします。</p>
-
-<pre><code>$ kubectl create -f extdns.yaml
-</code></pre>
-
-<p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
-
-<p>[nginx-extdns.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx-extdns
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx-extdns
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx-extdns
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
-spec:
-  selector:
-    app: nginx-extdns
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre>
-
-<p>デプローイ。</p>
-
-<pre><code>$ kubectl create -f nginx-extdns.yaml
-</code></pre>
-
-<p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
-
-<pre><code>$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
-Name      ResourceGroup       Ttl  Type    Metadata
---------  ----------------  -----  ------  ----------
-hogeginx  hoge-dns-rg         300  A
-</code></pre>
-
-<p>ゲッツ。</p>
-
-<pre><code>$ curl hogeginx.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Feb 2018, 00:20</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" class="post-title">AKSのIngress TLS証明書を自動更新する</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="カジュアルな証明書管理方式が欲しい">カジュアルな証明書管理方式が欲しい</h2>
-
-<p>ChromeがHTTPサイトに対する警告を<a href="https://japan.cnet.com/article/35100589/">強化するそうです</a>。非HTTPSサイトには、生きづらい世の中になりました。</p>
-
-<p>さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。</p>
-
-<p>そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。</p>
-
-<ul>
-<li>TLSはIngress(NGINX Ingress Controller)でまとめて終端</li>
-<li><a href="https://letsencrypt.org/">Let&rsquo;s Encypt</a>から証明書を入手</li>
-<li>Kubenetesのアドオンである<a href="https://github.com/jetstack/cert-manager/">cert-manager</a>で証明書の入手、更新とIngressへの適用を自動化
-
-<ul>
-<li>ACME(Automatic Certificate Management Environment)対応</li>
-<li>cert-managerはまだ歴史の浅いプロジェクトだが、<a href="https://github.com/jetstack/cert-manager/">kube-lego</a>の後継として期待</li>
-</ul></li>
-</ul>
-
-<p>なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
-</ul>
-
-<p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
-
-<pre><code>$ helm install stable/nginx-ingress --name my-nginx
-</code></pre>
-
-<p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
-
-<pre><code>$ kubectl get svc
-NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
-kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
-my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
-my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
-</code></pre>
-
-<p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
-
-<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
-</code></pre>
-
-<p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&rdquo;&ndash;set rbac.create=false&rdquo;オプションを指定しています。</p>
-
-<pre><code>$ git clone https://github.com/jetstack/cert-manager
-$ cd cert-manager/
-$ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
-</code></pre>
-
-<p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
-
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
-kind: Issuer
-metadata:
-  name: letsencrypt-staging
-  namespace: default
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-staging.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: hoge@example.com
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
-    http01: {}
-</code></pre>
-
-<p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
-
-<p>なお、Let&rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも<a href="https://github.com/jetstack/cert-manager/pull/246">いずれ対応する見込み</a>です。</p>
-
-<p>では、Issuerを登録します。</p>
-
-<pre><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
-</code></pre>
-
-<p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
-
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: example-com
-  namespace: default
-spec:
-  secretName: example-com-tls
-  issuerRef:
-    name: letsencrypt-staging
-  commonName: www.example.com
-  dnsNames:
-  - www.example.com
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - www.example.com
-</code></pre>
-
-<p>証明書設定をデプロイします。</p>
-
-<pre><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
-</code></pre>
-
-<p>証明書の発行状況を確認します。</p>
-
-<pre><code>$ kubectl describe certificate example-com
-Name:         example-com
-Namespace:    default
-[snip]
-Events:
-  Type     Reason                 Age              From                     Message
-  ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &quot;example-com-tls&quot; not found
-  Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
-  Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
-  Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
-  Normal   ObtainAuthorization    7m               cert-manager-controller  Obtained authorization for domain www.example.com
-  Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
-  Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
-  Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
-</code></pre>
-
-<p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
-
-<p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
-
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
-kind: Issuer
-metadata:
-  name: letsencrypt-prod
-  namespace: default
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-v01.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: hoge@example.com
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    # Enable the HTTP-01 challenge provider
-    http01: {}
-</code></pre>
-
-<p>デプロイします。</p>
-
-<pre><code>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
-</code></pre>
-
-<p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
-
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: prod-example-com
-  namespace: default
-spec:
-  secretName: prod-example-com-tls
-  issuerRef:
-    name: letsencrypt-prod
-  commonName: www.example.com
-  dnsNames:
-  - www.example.com
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - www.example.com
-</code></pre>
-
-<p>デプロイします。</p>
-
-<pre><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
-</code></pre>
-
-<p>発行状況を確認します。</p>
-
-<pre><code>$ kubectl describe certificate prod-example-com
-Name:         prod-example-com
-Namespace:    default
-[snip]
-Events:
-  Type     Reason                 Age              From                     Message
-  ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &quot;prod-example-com-tls&quot; not found
-  Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
-  Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
-  Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
-  Normal   IssueCertificate       7s               cert-manager-controller  Issuing certificate...
-  Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
-  Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
-  Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
-</code></pre>
-
-<p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
-
-<p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
-
-<pre><code>$ kubectl run nginx --image nginx --port 80
-$ kubectl expose deployment nginx --type NodePort
-</code></pre>
-
-<p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  name: ingress-nginx-sample
-spec:
-  rules:
-    - host: www.example.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: nginx
-              servicePort: 80
-  tls:
-    - hosts:
-      - www.example.com
-      secretName: prod-example-com-tls
-</code></pre>
-
-<p>デプロイします。</p>
-
-<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre>
-
-<p>いざ確認。</p>
-
-<pre><code>$ curl https://www.example.com/
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">10 Feb 2018, 11:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" class="post-title">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
-
-<p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。</p>
-
-<p>さて、そのNGINX Ingress Controllerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
-
-<p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
-</ul>
-
-<p>ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
-
-<pre><code>$ helm install stable/nginx-ingress --name my-nginx
-</code></pre>
-
-<p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
-
-<pre><code>$ kubectl run nginx --image nginx --port 80
-$ kubectl run apache --image httpd --port 80
-</code></pre>
-
-<p>サービスとしてexposeします。</p>
-
-<pre><code>$ kubectl expose deployment nginx --type NodePort
-$ kubectl expose deployment apache --type NodePort
-</code></pre>
-
-<p>現時点のサービスたちを確認します。</p>
-
-<pre><code>$ kubectl get svc
-NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
-apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
-kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
-my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
-my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
-nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
-</code></pre>
-
-<p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
-
-<p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
-
-<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
-</code></pre>
-
-<p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
-
-<pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
-</code></pre>
-
-<p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
-
-<pre><code>apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  name: ingress-nginx-sample
-spec:
-  rules:
-    - host: dev.example.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: nginx
-              servicePort: 80
-          - path: /apache
-            backend:
-              serviceName: apache
-              servicePort: 80
-  tls:
-    - hosts:
-      - dev.example.com
-      secretName: example-tls
-</code></pre>
-
-<p>あとは反映するだけ。</p>
-
-<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre>
-
-<p>curlで確認します。</p>
-
-<pre><code>$ curl https://dev.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre>
-
-<p>/apacheへのパスも確認します。</p>
-
-<pre><code>$ curl https://dev.example.com/apache
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
-</code></pre>
-
-<p>簡単ですね。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/github">#GitHub</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 22, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></h1>
+      <div class="content">
+        GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
+GitHub Actions
+数時間、触った印象。
+ GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
+Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
+ KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
+コードは ここ に。
+ディレクトリ構造は、こうです。
+. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+  | <a class="subtitle is-6" href="/tags/dns">#DNS</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 12, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_dns/">AKSのService作成時にホスト名を付ける</a></h1>
+      <div class="content">
+        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
+わたしの知る限り、2つの方法があります。
+ AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
+DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
+[nginx-label.yaml]
+apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80  デプロイ。
+$ kubectl create -f nginx-label.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 11, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/">AKSのIngress TLS証明書を自動更新する</a></h1>
+      <div class="content">
+        カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
+さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
+そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
+ TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&rsquo;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待   なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
+使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
+ Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。この記事も参考に。
+$ helm install stable/nginx-ingress --name my-nginx  サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。
+$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.0.0.1 &lt;none&gt; 443/TCP 79d my-nginx-nginx-ingress-controller LoadBalancer 10.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 10, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></h1>
+      <div class="content">
+        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
+さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
+せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
+使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
+ Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
+$ helm install stable/nginx-ingress --name my-nginx  バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
+$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80  サービスとしてexposeします。
+$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort  現時点のサービスたちを確認します。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

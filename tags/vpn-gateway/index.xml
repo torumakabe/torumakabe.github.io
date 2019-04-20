@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Vpn Gateway on re-imagine</title>
+    <title>VPN Gateway on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/vpn-gateway/</link>
-    <description>Recent content in Vpn Gateway on re-imagine</description>
+    <description>Recent content in VPN Gateway on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Sun, 08 Oct 2017 10:30:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/vpn-gateway/index.xml" rel="self" type="application/rss+xml" />

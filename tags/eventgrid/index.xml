@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Eventgrid on re-imagine</title>
+    <title>EventGrid on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/eventgrid/</link>
-    <description>Recent content in Eventgrid on re-imagine</description>
+    <description>Recent content in EventGrid on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />

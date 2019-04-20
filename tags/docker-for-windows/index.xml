@@ -6,6 +6,7 @@
     <description>Recent content in Docker for Windows on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Tue, 28 Feb 2017 08:00:30 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/docker-for-windows/index.xml" rel="self" type="application/rss+xml" />

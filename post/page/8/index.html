@@ -1,632 +1,347 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Posts | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Posts &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Posts - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Posts &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">06 Apr 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" class="post-title">Azureの監査ログアラートからWebhookの流れで楽をする</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="監査ログからアラートを上げられるようになります">監査ログからアラートを上げられるようになります</h2>
-
-<p>Azureの監査ログからアラートを上げる機能のプレビューが<a href="https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/">はじまりました</a>。これ、地味ですが便利な機能です。日々の運用に効きます。</p>
-
-<h2 id="どんな風に使えるか">どんな風に使えるか</h2>
-
-<p>ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。</p>
-
-<p>たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。</p>
-
-<p>これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。</p>
-
-<p>これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。</p>
-
-<h2 id="実装例">実装例</h2>
-
-<p>例としてこんな仕組みを作ってみましょう。</p>
-
-<ul>
-<li>西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行</li>
-<li>WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する</li>
-<li>OMSでログ分析</li>
-</ul>
-
-<h2 id="準備">準備</h2>
-
-<p>以下の準備ができているか確認します。</p>
-
-<ul>
-<li>Azure Automation向けADアプリ、サービスプリンシパル作成</li>
-<li>サービスプリンシパルへのロール割り当て</li>
-<li>Azure Automationのアカウント作成</li>
-<li>Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録</li>
-<li>Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています)</li>
-<li>OMSワークスペースの作成</li>
-</ul>
-
-<p>もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。</p>
-
-<p><strong><a href="http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5">勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）</a></strong></p>
-
-<h2 id="azure-automation側の仕掛け">Azure Automation側の仕掛け</h2>
-
-<p>先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。</p>
-
-<p>ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。</p>
-
-<pre><code>param ( 
-    [object]$WebhookData          
-)
-
-if ($WebhookData -ne $null) {  
-    $WebhookName    =   $WebhookData.WebhookName
-    $WebhookBody    =   $WebhookData.RequestBody  
-    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody)
-
-    $AlertContext = [object]$WebhookBody.context
-
-    $SPAppID = Get-AutomationVariable -Name 'SPAppID'
-    $Tenant = Get-AutomationVariable -Name 'TenantID'
-    $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId'
-    $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey'
-    $CertificationName = Get-AutomationVariable -Name 'CertificationName'
-    $Certificate = Get-AutomationCertificate -Name $CertificationName
-    $CertThumbprint = ($Certificate.Thumbprint).ToString()    
-
-    $null = Login-AzureRmAccount -ServicePrincipal -TenantId $Tenant -CertificateThumbprint $CertThumbprint -ApplicationId $SPAppID   
-
-    $resourceObj = Get-AzureRmResource -ResourceId $AlertContext.resourceId
-    $VM = Get-AzureRmVM -Name $resourceObj.Name -ResourceGroupName $resourceObj.ResourceGroupName
-
-    $Settings = @{&quot;workspaceId&quot; = &quot;$OMSWorkspaceId&quot;}
-    $ProtectedSettings = @{&quot;workspaceKey&quot; = &quot;$OMSWorkspaceKey&quot;}
-
-    if ($VM.StorageProfile.OsDisk.OsType -eq &quot;Linux&quot;) {  
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &quot;OmsAgentForLinux&quot; -Publisher &quot;Microsoft.EnterpriseCloud.Monitoring&quot; -ExtensionType &quot;OmsAgentForLinux&quot; -TypeHandlerVersion &quot;1.0&quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    elseif ($VM.StorageProfile.OsDisk.OsType -eq &quot;Windows&quot;)
-    {
-        Set-AzureRmVMExtension -ResourceGroupName $AlertContext.resourceGroupName -Location $VM.Location -VMName $VM.Name -Name &quot;MicrosoftMonitoringAgent&quot; -Publisher &quot;Microsoft.EnterpriseCloud.Monitoring&quot; -ExtensionType &quot;MicrosoftMonitoringAgent&quot; -TypeHandlerVersion &quot;1.0&quot; -Settings $Settings -ProtectedSettings $ProtectedSettings;
-    }
-    else
-    {
-        Write-Error &quot;Unknown OS Type.&quot;
-    }
-}
-else 
-{
-    Write-Error &quot;This runbook is meant to only be started from a webhook.&quot; 
-}
-</code></pre>
-
-<p>Runbookができたら、Webhookを作ります。詳しくは<a href="https://azure.microsoft.com/ja-jp/documentation/articles/automation-webhooks/">こちら</a>。</p>
-
-<p>WebhookのURLを控えておいてください。</p>
-
-<h2 id="azure-監査ログアラート側の仕掛け">Azure 監査ログアラート側の仕掛け</h2>
-
-<p>Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。</p>
-
-<pre><code>PS C:\work&gt; $actionEmail = New-AzureRmAlertRuleEmail -CustomEmail yourname@example.com
-
-PS C:\work&gt; $actionWebhook = New-AzureRmAlertRuleWebhook -ServiceUri https://abcdefgh.azure-automation.net/webhooks?token=your_token
-
-PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan West&quot; -ResourceGroup dev -OperationName Microsoft.Compute/virtualMachines/write -Status Succeeded  -SubStatus Created -TargetResourceGroup dev -Actions $actionEmail,$actionWebhook
-</code></pre>
-
-<p>以上。これで&rdquo;dev&rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。</p>
-
-<p>なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">27 Mar 2016, 20:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/" class="post-title">書評: Site Reliability Engineering</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Book" href="https://ToruMakabe.github.io//categories/book">Book</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="英語だけどぜひ読んでほしい">英語だけどぜひ読んでほしい</h2>
-
-<p><strong><a href="http://www.amazon.co.jp/Site-Reliability-Engineering-Production-Systems-ebook/dp/B01DCPXKZ6/ref=tmm_kin_swatch_0?_encoding=UTF8&amp;qid=1459069692&amp;sr=8-1">Site Reliability Engineering: How Google Runs Production Systems</a></strong></p>
-
-<p>参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。GoogleのSREについては断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。</p>
-
-<p>共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。</p>
-
-<p>以下、印象に残ったこと。</p>
-
-<ul>
-<li><p>Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。</p></li>
-
-<li><p>インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするために、コードを書く。</p></li>
-
-<li><p>日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。</p></li>
-
-<li><p>アプリ/製品チームとSREチームは&rdquo;Error Budget&rdquo;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。</p></li>
-
-<li><p>インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。</p></li>
-
-<li><p>Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。</p></li>
-
-<li><p>SLA違反など、重大な障害では&rdquo;Postmortem(過激だが死体解剖の意)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。</p></li>
-
-<li><p>他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミュレーションや演習、通信業の輻輳対策など。</p></li>
-</ul>
-
-<p>もう一回読んだら、また違う発見があるんじゃないかと。</p>
-
-<h2 id="自分ごととして読みたい">自分ごととして読みたい</h2>
-
-<p>今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。</p>
-
-<p>DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。</p>
-
-<p>もちろん、Googleの圧倒的物量、成長スピードゆえのミッションと働き方である事は否定しません。でも、自分とは無関係、と無視するにはもったいないです。</p>
-
-<p>なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるということは、そこに何か本質的な価値があるのではないでしょうか。</p>
-
-<p>オススメです。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
-
-<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
-
-<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
-
-<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
-
-<ol>
-<li>ARMテンプレートリソースは分離して使う</li>
-<li>リソース競合したら依存関係を定義する</li>
-<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
-</ol>
-
-<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
-
-<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
-
-<p>でも、現時点の実装では、おすすめしません。</p>
-
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
-
-<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
-
-<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
-
-<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
-
-<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
-
-<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
-
-<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
-
-<h3 id="読みづらい">読みづらい</h3>
-
-<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
-
-<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
-
-<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
-
-<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
-
-<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
-
-<ul>
-<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
-<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
-</ul>
-
-<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフでうまく表現できないようです。</p>
-
-<p>そのような場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
-
-<pre><code># Create a frontend subnet
-# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
-    name = &quot;frontend&quot;
-    resource_group_name = &quot;${var.resource_group_name}&quot;
-    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
-    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
-    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
-    depends_on = [
-        &quot;azurerm_network_security_rule.fe_web80&quot;,
-        &quot;azurerm_network_security_rule.fe_web443&quot;,
-        &quot;azurerm_network_security_rule.fe_ssh&quot;
-    ]
-}
-</code></pre>
-
-<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
-
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
-
-<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
-
-<pre><code>os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
-        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
-    }
-}
-</code></pre>
-
-<p>が、エラーが返ってきます。</p>
-
-<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
-</code></pre>
-
-<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
-
-<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
-
-<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">23 Mar 2016, 13:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/" class="post-title">Azure &amp; Terraform エラーコード429の対処法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="terraformer増加に備えて">Terraformer増加に備えて</h2>
-
-<p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
-
-<p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
-
-<h2 id="エラーコード429">エラーコード429</h2>
-
-<p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-</code></pre>
-
-<p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
-
-<h2 id="対処法">対処法</h2>
-
-<p><strong>もう一度applyしてください</strong></p>
-
-<p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
-
-<h2 id="背景">背景</h2>
-
-<p>エラーになった背景ですが、2つの可能性があります。</p>
-
-<ol>
-<li>APIリクエスト数上限に達した</li>
-<li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
-</ol>
-
-<h3 id="1-apiリクエスト数上限に達した">1. APIリクエスト数上限に達した</h3>
-
-<p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">Azure サブスクリプションとサービスの制限、クォータ、制約</a></strong></p>
-
-<p>Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。</p>
-
-<p>長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。</p>
-
-<p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
-
-<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
-
-<p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
-
-<p>わたしが経験したエラーの中に、こんなものがありました。</p>
-
-<pre><code>Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。</p>
-
-<p>Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして<a href="https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429">あがっています</a>。</p>
-
-<p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
-
-<p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">17 Mar 2016, 23:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" class="post-title">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="いつの間に">いつの間に</h2>
-
-<p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
-
-<h2 id="ansible-localと組み合わせたサンプル">ansible_localと組み合わせたサンプル</h2>
-
-<p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
-
-<p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
-
-<h3 id="前準備">前準備</h3>
-
-<ul>
-<li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
-<li>認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。</li>
-<li>Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。
-
-<ul>
-<li>Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。</li>
-</ul></li>
-<li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
-</ul>
-
-<h3 id="サンプル">サンプル</h3>
-
-<p>ubuntu.jsonはこんな感じです。</p>
-
-<pre><code>{
-  &quot;variables&quot;: {
-    &quot;client_id&quot;: &quot;&quot;,
-    &quot;client_secret&quot;: &quot;&quot;,
-    &quot;resource_group&quot;: &quot;&quot;,
-    &quot;storage_account&quot;: &quot;&quot;,
-    &quot;subscription_id&quot;: &quot;&quot;,
-    &quot;tenant_id&quot;: &quot;&quot;
-  },
-  &quot;builders&quot;: [{
-    &quot;type&quot;: &quot;azure-arm&quot;,
-
-    &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;,
-    &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;,
-    &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;,
-    &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;,
-    &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;,
-    &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;,
-
-    &quot;capture_container_name&quot;: &quot;images&quot;,
-    &quot;capture_name_prefix&quot;: &quot;packer&quot;,
-
-    &quot;image_publisher&quot;: &quot;Canonical&quot;,
-    &quot;image_offer&quot;: &quot;UbuntuServer&quot;,
-    &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;,
-
-    &quot;location&quot;: &quot;Japan West&quot;,
-    &quot;vm_size&quot;: &quot;Standard_D1&quot;
-  }],
-  &quot;provisioners&quot;: [{
-    &quot;type&quot;: &quot;shell&quot;,
-      &quot;scripts&quot;: [
-        &quot;../script/ubuntu/provision.sh&quot;
-    ]
-  },
-  {
-    &quot;type&quot;: &quot;ansible-local&quot;,
-    &quot;playbook_file&quot;: &quot;../ansible/baseimage.yml&quot;,
-    &quot;inventory_file&quot;: &quot;../ansible/hosts&quot;,
-    &quot;role_paths&quot;: [
-      &quot;../ansible/roles/baseimage&quot;
-    ]
-  },
-  {
-    &quot;type&quot;: &quot;shell&quot;,
-      &quot;scripts&quot;: [
-        &quot;../script/ubuntu/deprovision.sh&quot;
-    ]
-  }]
-}
-</code></pre>
-
-<p>waagentによるde-provisionはansibleでもできるのですが、他OS対応も考えて、最後に追いshellしてます。他ファイルは<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Github</a>でご確認を。</p>
-
-<p>これで手順書&amp;目視&amp;指差し確認でイメージ作るのを、やめられそうですね。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/post/page/7/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 8 of 14</span>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     
-      <a href="/post/page/9/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
     
-  </nav>
-</div>
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/automation">#Automation</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 6, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_auditlog_alert/">Azureの監査ログアラートからWebhookの流れで楽をする</a></h1>
+      <div class="content">
+        監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利な機能です。日々の運用に効きます。
+どんな風に使えるか ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。
+たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。
+これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
+これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
+実装例 例としてこんな仕組みを作ってみましょう。
+ 西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
+ Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
+勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
+Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
+ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
+param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/book">#Book</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/ops">#Ops</a>
+  
+  | <a class="subtitle is-6" href="/tags/google">#Google</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/">書評: Site Reliability Engineering</a></h1>
+      <div class="content">
+        英語だけどぜひ読んでほしい Site Reliability Engineering: How Google Runs Production Systems
+参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。GoogleのSREについては断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。
+共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。
+以下、印象に残ったこと。
+ Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。
+ インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするために、コードを書く。
+ 日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。
+ アプリ/製品チームとSREチームは&rdquo;Error Budget&rdquo;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。
+ インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。
+ Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。
+ SLA違反など、重大な障害では&rdquo;Postmortem(過激だが死体解剖の意)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。
+ 他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミュレーションや演習、通信業の輻輳対策など。
+  もう一回読んだら、また違う発見があるんじゃないかと。
+自分ごととして読みたい 今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。
+DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。
+もちろん、Googleの圧倒的物量、成長スピードゆえのミッションと働き方である事は否定しません。でも、自分とは無関係、と無視するにはもったいないです。
+なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるということは、そこに何か本質的な価値があるのではないでしょうか。
+オススメです。
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 25, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/">Azure &amp; Terraform Tips (ARM対応 2016春版)</a></h1>
+      <div class="content">
+        俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
+小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
+この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&ldquo;azurerm_template_deployment&rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
+でも、現時点の実装では、おすすめしません。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
+タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
+せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
+読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
+それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&ldquo;depends_on&rdquo;で明示してあげましょう。
+例えば、以前のエントリで紹介した下記の問題。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 23, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/">Azure &amp; Terraform エラーコード429の対処法</a></h1>
+      <div class="content">
+        Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
+追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
+エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。
+対処法 もう一度applyしてください
+冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
+背景 エラーになった背景ですが、2つの可能性があります。
+ APIリクエスト数上限に達した リソースの作成や更新に時間がかかっており、Azure側で処理を中断した  1. APIリクエスト数上限に達した Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。
+Azure サブスクリプションとサービスの制限、クォータ、制約
+Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。
+長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。
+ひとまずプロダクトの方針は確認したいので、Issueに質問をあげておきました。
+2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。
+わたしが経験したエラーの中に、こんなものがありました。
+Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/packer">#Packer</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 17, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a></h1>
+      <div class="content">
+        いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
+ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
+手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
+前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。  ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
+{ &quot;variables&quot;: { &quot;client_id&quot;: &quot;&quot;, &quot;client_secret&quot;: &quot;&quot;, &quot;resource_group&quot;: &quot;&quot;, &quot;storage_account&quot;: &quot;&quot;, &quot;subscription_id&quot;: &quot;&quot;, &quot;tenant_id&quot;: &quot;&quot; }, &quot;builders&quot;: [{ &quot;type&quot;: &quot;azure-arm&quot;, &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;, &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;, &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;, &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;, &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;, &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;, &quot;capture_container_name&quot;: &quot;images&quot;, &quot;capture_name_prefix&quot;: &quot;packer&quot;, &quot;image_publisher&quot;: &quot;Canonical&quot;, &quot;image_offer&quot;: &quot;UbuntuServer&quot;, &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;, &quot;location&quot;: &quot;Japan West&quot;, &quot;vm_size&quot;: &quot;Standard_D1&quot; }], &quot;provisioners&quot;: [{ &quot;type&quot;: &quot;shell&quot;, &quot;scripts&quot;: [ &quot;.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
+          <a class="button" href="/post/page/7/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+          <a class="button" href="/post/page/9/">
+            Older
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="14 6 20 12 14 18"/>
+    
+  </svg>
+            </span>
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

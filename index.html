@@ -1,1041 +1,306 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>re-imagine &middot; re-imagine</title>
+	<meta name="generator" content="Hugo 0.55.2" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title></title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="re-imagine &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="re-imagine &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">22 Dec 2018, 20:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/github_actions_aks/" class="post-title">GitHub ActionsでAzure CLIとkubectlを動かす</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-GitHub" href="https://ToruMakabe.github.io//categories/github">GitHub</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="github-actionsのプレビュー招待がきた">GitHub Actionsのプレビュー招待がきた</h2>
-
-<p>ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。</p>
-
-<p><a href="https://developer.github.com/actions/">GitHub Actions</a></p>
-
-<p>数時間、触った印象。</p>
-
-<ul>
-<li>GitHubへのPushなどイベントをトリガーにWorkflowを流せる</li>
-<li>シンプルなWorkflow記法 (TerraformのHCLに似ている)</li>
-<li>Workflowから呼び出すActionはDockerコンテナー</li>
-<li>Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)</li>
-</ul>
-
-<p>Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。</p>
-
-<h2 id="azure-cli-kubernetes-aks-kubectlサンプル">Azure CLI/Kubernetes(AKS) kubectlサンプル</h2>
-
-<p>こんなことを試してみました。</p>
-
-<ul>
-<li>KubernetesのマニフェストをGitHubリポジトリへPush</li>
-<li>PushイベントをトリガーにWorkflowを起動</li>
-<li>Azure CLIを使ってAKSクラスターのCredentialを取得</li>
-<li>イベント発生元がmasterブランチであれば継続</li>
-<li>kubectl applyでマニフェストを適用</li>
-</ul>
-
-<p>kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
-
-<p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
-
-<p>ディレクトリ構造は、こうです。</p>
-
-<pre><code>.
-├── .git
-│   └── (省略)
-├── .github
-│   └── main.workflow
-├── LICENSE
-├── README.md
-├── azure-cli
-│   ├── Dockerfile
-│   └── entrypoint.sh
-└── sampleapp.yaml
-</code></pre>
-
-<ul>
-<li>.github の下にWorkflowを書きます</li>
-<li>azure-cli の下に自作Actionを置きました</li>
-<li>sampleapp.yaml がkubernetesのマニフェストです</li>
-</ul>
-
-<h3 id="workflow">Workflow</h3>
-
-<p>まず、 .github/main.workflow を見てみましょう</p>
-
-<pre><code>workflow &quot;Deploy app to AKS&quot; {
-  on = &quot;push&quot;
-  resolves = [&quot;Deploy to AKS&quot;]
-}
-
-action &quot;Load AKS credential&quot; {
-  uses = &quot;./azure-cli/&quot;
-  secrets = [&quot;AZURE_SERVICE_APP_ID&quot;, &quot;AZURE_SERVICE_PASSWORD&quot;, &quot;AZURE_SERVICE_TENANT&quot;]
-  args = &quot;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&quot;
-  env = {
-    AZ_OUTPUT_FORMAT = &quot;table&quot;
-    AKS_RG_NAME = &quot;your-aks-rg&quot;
-    AKS_CLUSTER_NAME = &quot;youraks&quot;
-  }
-}
-
-action &quot;Deploy branch filter&quot; {
-  uses = &quot;actions/bin/filter@master&quot;
-  args = &quot;branch master&quot;
-}
-
-action &quot;Deploy to AKS&quot; {
-  needs = [&quot;Load AKS credential&quot;, &quot;Deploy branch filter&quot;]
-  uses = &quot;docker://gcr.io/cloud-builders/kubectl&quot;
-  runs = &quot;sh -l -c&quot;
-  args = [&quot;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e 's/YOUR_VALUE/'\&quot;$YOUR_VALUE\&quot;'/' -e 's/YOUR_DNS_LABEL_NAME/'$YOUR_DNS_LABEL_NAME'/' | kubectl apply -f - &quot;]
-  env = {
-    YOUR_VALUE = &quot;Ale&quot;
-    YOUR_DNS_LABEL_NAME = &quot;yournamedispvar&quot;
-  }
-}
-</code></pre>
-
-<p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
-
-<p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&rdquo;Load AKS credential&rdquo;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
-
-<p>&ldquo;Deploy branch filter&rdquo;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&rdquo;Deploy to AKS&rdquo;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
-
-<p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&rdquo;Actions&rdquo;タブで実行結果を確認できます。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/ghaction_sc.png" alt="Workflow" /></p>
-
-<p>できた。Azure CLIとkubectlが使えるなら、他にも応用できそう。</p>
-
-<p>以下、actionブロックを補足します。</p>
-
-<h3 id="load-aks-credential">Load AKS credential</h3>
-
-<p>Azure CLIを使ってAKSクラスターのCredentialを取得し、kubectlのコンテキスト設定します。envでクラスターのリソースグループ名とクラスター名を渡しています。</p>
-
-<p>GitHub ActionsがAzure CLI Actionを<a href="https://github.com/actions/azure">提供している</a>のですが、Azure CLIのバージョンを最新にしたかったのと、動的にコンテナーを作ってみたかったので ./azure-cli にDockerfileを<a href="https://github.com/ToruMakabe/actions-playground/tree/master/azure-cli">書きました</a>。</p>
-
-<p>試す時は、みなさんの環境向けにenvを書き換えてください。なお、AKSクラスターからCredentialを取得する権限が必要です。権限を持ったサービスプリンシパルのアプリケーションID/パスワード、テナントIDをGitHubリポジトリのSecretに設定してください。actionブロックのsecretsで指定している通りです。</p>
-
-<h3 id="deploy-branch-filter">Deploy branch filter</h3>
-
-<p>bin/filterはGitHub Actionsが<a href="https://github.com/actions/bin">提供している</a>ユーティリティです。この例では、イベントがmasterブランチで発生した場合のみWorkflowを継続します。</p>
-
-<h3 id="deploy-to-aks">Deploy to AKS</h3>
-
-<p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
-
-<p>このactionが実行されると、envの&rdquo;YOUR_VALUE&rdquo;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&rdquo;YOUR_DNS_LABEL_NAME&rdquo;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
-
-<p>アプリのパスは /dispvar です。curlしてみると。</p>
-
-<pre><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
-Hello. You set &quot;Ale&quot;
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
-<p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">02 May 2018, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/wslenv_golang/" class="post-title">WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-WSL" href="https://ToruMakabe.github.io//categories/wsl">WSL</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="見た目は地味だが役に立つ">見た目は地味だが役に立つ</h2>
-
-<p>Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支援系の機能、ツールも<a href="https://blogs.msdn.microsoft.com/commandline/2018/03/07/windows10v1803/">拡充</a>されています。特に、WSL/Windowsの連携、相互運用まわりは着実に進化しています。そのうちのひとつが、このエントリーで紹介するWSLENVです。</p>
-
-<p>WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ単純に共有するだけでなく、ルールに従って変換も行います。これが地味に便利。でも地味だから、あまり話題になっていない。なので具体例で紹介しよう、というのがこのエントリーの目的です。</p>
-
-<h2 id="tl-dr">TL;DR</h2>
-
-<p>英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。</p>
-
-<p><a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">Share Environment Vars between WSL and Windows</a></p>
-
-<h2 id="go開発環境を例に">Go開発環境を例に</h2>
-
-<p>前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。</p>
-
-<h3 id="想定開発者像-ペルソナ">想定開発者像、ペルソナ</h3>
-
-<ul>
-<li>Windows端末を使っている</li>
-<li>Go言語を使っている</li>
-<li>CLIはbash/WSL中心
-
-<ul>
-<li>スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽</li>
-<li>アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮</li>
-</ul></li>
-<li>とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心</li>
-</ul>
-
-<h3 id="前提条件">前提条件</h3>
-
-<ul>
-<li>WSL、WindowsそれぞれにGoを導入
-
-<ul>
-<li>バージョン管理のためにも、パッケージマネージャーがおすすめ</li>
-<li>わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています</li>
-</ul></li>
-<li>GOPATHは %USERPROFILE%go とする
-
-<ul>
-<li>ユーザー名を tomakabeとすると C:\Users\tomakabe\go</li>
-<li>setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定</li>
-<li>WSLでもこのディレクトリをGOPATHとする</li>
-</ul></li>
-<li>VS Code + <a href="https://github.com/Microsoft/vscode-go">Go拡張</a>をWindowsに導入</li>
-<li>WindowsのCLIはPowerShellを利用</li>
-</ul>
-
-<h3 id="そぞろ歩き-その1-windowsでのgo開発">そぞろ歩き その1(WindowsでのGo開発)</h3>
-
-<p>では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。</p>
-
-<p>まず、Windowsで環境変数GOPATHを確認します。</p>
-
-<pre><code>PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
-
-Name                           Value
-----                           -----
-GOPATH                         C:\Users\tomakabe\go
-</code></pre>
-
-<p>GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</p>
-
-<pre><code>PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
-PS C:\Users\tomakabe\go&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2018/05/02     11:10                bin
-d-----       2018/05/02     11:06                src
-
-PS C:\Users\tomakabe\go&gt; ls .\bin\
-
-
-    ディレクトリ: C:\Users\tomakabe\go\bin
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:10       14835200 dlv.exe
--a----       2018/05/02     11:09        4239360 go-outline.exe
--a----       2018/05/02     11:09        4045824 go-symbols.exe
--a----       2018/05/02     11:08       11094528 gocode.exe
--a----       2018/05/02     11:09        5708288 godef.exe
-[snip]
-</code></pre>
-
-<p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
-
-<pre><code>PS C:\Users\tomakabe\go&gt; cd .\src\github.com\ToruMakabe\work\
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; cat .\hello.go
-package main
-
-import &quot;fmt&quot;
-
-func main() {
-        fmt.Println(&quot;Hello Go on the new WSL&quot;)
-}
-</code></pre>
-
-<p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
-
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go\src\github.com\ToruMakabe\work
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:54        2049536 hello.exe
--a----       2018/05/02     11:10             91 hello.go
-
-
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; .\hello.exe
-Hello Go on the new WSL
-</code></pre>
-
-<p>ここまでは従来のWindowsにおけるGo開発環境です。ではWSLに話を移しましょう。</p>
-
-<h3 id="そぞろ歩き-その2-wslでのgo開発">そぞろ歩き その2(WSLでのGo開発)</h3>
-
-<p>WSLにつなぎます。ターミナルは任意ですが、わたしはVS Codeの統合ターミナルが好きです。コードを書きながら操作できるので。</p>
-
-<p>GOPATHを確認します。空っぽです。WSLは既定でWindowsから環境変数PATHを受け取ります。PATHは特別扱いです。ですが、他の環境変数は、指定しないと渡されません。よってWindowsで設定していても、WSLから見るとGOPATHは空っぽです。</p>
-
-<pre><code>~ $ echo $GOPATH
-
-</code></pre>
-
-<p>$HOMEもきれいな状態です。</p>
-
-<pre><code>~ $ ls
-~ $
-</code></pre>
-
-<p>ではGOPATHに指定したい、先ほどWindowsで確認したディレクトリへ移動します。ちなみにWindowsのCドライブはWSLで/mnt/c/に変換されます。先ほど確認したbin、srcが見えています。</p>
-
-<pre><code>~ $ cd /mnt/c/Users/tomakabe/go/
-/mnt/c/Users/tomakabe/go $ ls
-bin  src
-</code></pre>
-
-<p>ではここで実験。試しにパッケージをインポートしてみましょう。定番の<a href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>をインポートしてみます。わざとらしいですが、なんだか嫌な予感がします。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
-Fetching https://golang.org/x/tools/cmd/goimports?go-get=1
-Parsing meta tags from https://golang.org/x/tools/cmd/goimports?go-get=1 (status code 200)
-get &quot;golang.org/x/tools/cmd/goimports&quot;: found meta tag get.metaImport{Prefix:&quot;golang.org/x/tools&quot;, VCS:&quot;git&quot;, RepoRoot:&quot;https://go.googlesource.com/tools&quot;} at https://golang.org/x/tools/cmd/goimports?go-get=1
-get &quot;golang.org/x/tools/cmd/goimports&quot;: verifying non-authoritative meta tag
-Fetching https://golang.org/x/tools?go-get=1
-Parsing meta tags from https://golang.org/x/tools?go-get=1 (status code 200)
-golang.org/x/tools (download)
-created GOPATH=/home/tomakabe/go; see 'go help gopath'
-</code></pre>
-
-<p>嫌な予感は予定調和で的中します。GOPATHがいらっしゃらないので、/home/tomakabe/go とみなしてしまいました。先ほど確認した際、$HOMEはきれいな状態でした、が。新たにお作りになられたようです。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ ls ~/
-go
-/mnt/c/Users/tomakabe/go $ ls ~/go
-bin  src
-</code></pre>
-
-<p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
-
-<h3 id="そぞろ歩き-その3-解決編">そぞろ歩き その3(解決編)</h3>
-
-<p>そこで登場するのが、WSLENVです。Windowsで作業します。Windowsの環境変数GOPATHを、環境変数WSLENVへスイッチとともに設定します。/pスイッチは、「この環境変数はパスを格納しているから、いい感じにして」という指定です。</p>
-
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &quot;$env:WSLENV`:GOPATH/p&quot;
-
-成功: 指定した値は保存されました。
-</code></pre>
-
-<p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ echo $GOPATH
-/mnt/c/Users/tomakabe/go
-</code></pre>
-
-<p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
-
-<p>ではWSLでサンプルコードを触ってみましょう。ソースのあるディレクトリへ移動します。ソースと先ほどビルドしたexeがあります。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello.exe  hello.go
-</code></pre>
-
-<p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello  hello.exe  hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello
-./hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, not stripped
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ./hello
-Hello Go on the new WSL
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
-<p>代表例としてGoの開発環境で説明しましたが、WSLENVは他の用途でも応用できるでしょう。スイッチの説明など、詳細は先ほど紹介した、<a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">こちら</a>を。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">27 Apr 2018, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/terraform_azure_secret/" class="post-title">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="動機">動機</h2>
-
-<p>システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。</p>
-
-<ul>
-<li>いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない
-
-<ul>
-<li>めんどくさいし手が滑る</li>
-</ul></li>
-<li>データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない
-
-<ul>
-<li>メールとかチャットとかファイルサーバーとか勘弁</li>
-</ul></li>
-<li>もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない
-
-<ul>
-<li>本番でも、それやる？</li>
-</ul></li>
-<li>kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない
-
-<ul>
-<li>Base64符号化とか、うっかり忘れる</li>
-</ul></li>
-</ul>
-
-<p>つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。</p>
-
-<h2 id="シナリオ">シナリオ</h2>
-
-<p>Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。</p>
-
-<ul>
-<li>Nodeとデータストアを組み合わせた、<a href="https://github.com/ToruMakabe/ImpressAzureBookNode">Todoアプリケーション</a></li>
-<li>コンテナーイメージは<a href="https://hub.docker.com/r/torumakabe/nodetodo/">Docker Hub</a>にある</li>
-<li>コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う</li>
-<li>データストアはCosmos DB(MongoDB API)</li>
-<li>Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る
-
-<ul>
-<li>接続文字列の渡し方はACI/AKSで異なる</li>
-<li>ACI
-
-<ul>
-<li>コンテナー作成時に環境変数として接続文字列を渡す</li>
-</ul></li>
-<li>AKS
-
-<ul>
-<li>k8sのSecretとして接続文字列をストアする</li>
-<li>コンテナー作成時にSecretを参照し、環境変数として渡す</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2 id="検証環境">検証環境</h2>
-
-<ul>
-<li>Azure Cloud Shell
-
-<ul>
-<li>Terraform v0.11.7</li>
-<li>Terraformの認証はCloud Shell組み込み</li>
-</ul></li>
-<li>Terraform Azure Provider v1.4</li>
-<li>Terraform kubernetes Provider v1.1</li>
-<li>AKS kubernetes 1.9.6</li>
-</ul>
-
-<h2 id="aciの場合">ACIの場合</h2>
-
-<p>ざっと以下の流れです。</p>
-
-<ol>
-<li>リソースグループ作成</li>
-<li>Cosmos DBアカウント作成</li>
-<li>ACIコンテナーグループ作成 (Cosmos DB属性から接続文字列を生成)</li>
-</ol>
-
-<p>var.で参照している変数は、別ファイルに書いています。</p>
-
-<p>[main.tf]</p>
-
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
-  name     = &quot;${var.resource_group_name}&quot;
-  location = &quot;${var.resource_group_location}&quot;
-}
-
-resource &quot;random_integer&quot; &quot;ri&quot; {
-  min = 10000
-  max = 99999
-}
-
-resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
-  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
-  location            = &quot;${azurerm_resource_group.rg.location}&quot;
-  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
-  offer_type          = &quot;Standard&quot;
-  kind                = &quot;MongoDB&quot;
-
-  enable_automatic_failover = true
-
-  consistency_policy {
-    consistency_level       = &quot;BoundedStaleness&quot;
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
-  }
-
-  geo_location {
-    location          = &quot;${azurerm_resource_group.rg.location}&quot;
-    failover_priority = 0
-  }
-
-  geo_location {
-    location          = &quot;${var.failover_location}&quot;
-    failover_priority = 1
-  }
-}
-
-resource &quot;azurerm_container_group&quot; &quot;aci-todo&quot; {
-  name                = &quot;aci-todo&quot;
-  location            = &quot;${azurerm_resource_group.rg.location}&quot;
-  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
-  ip_address_type     = &quot;public&quot;
-  dns_name_label      = &quot;yourtodo&quot;
-  os_type             = &quot;linux&quot;
-
-  container {
-    name   = &quot;todo&quot;
-    image  = &quot;torumakabe/nodetodo&quot;
-    cpu    = &quot;1&quot;
-    memory = &quot;1.5&quot;
-    port   = &quot;8080&quot;
-
-    environment_variables {
-      &quot;MONGO_URL&quot; = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
-    }
-  }
-}
-</code></pre>
-
-<p>containerのenvironment_variablesブロックでCosmos DBの属性を参照し、接続文字列を生成しています。簡単ですね。これで接続文字列コピペ作業から解放されます。</p>
-
-<h2 id="aks">AKS</h2>
-
-<p>AKSの場合、流れは以下の通りです。</p>
-
-<ol>
-<li>リソースグループ作成</li>
-<li>Cosmos DBアカウント作成</li>
-<li>AKSクラスター作成</li>
-<li>k8s Secretを作成 (Cosmos DB属性から接続文字列生成)</li>
-<li>k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</li>
-</ol>
-
-<p>[main.tf]</p>
-
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
-  name     = &quot;${var.resource_group_name}&quot;
-  location = &quot;${var.resource_group_location}&quot;
-}
-
-resource &quot;random_integer&quot; &quot;ri&quot; {
-  min = 10000
-  max = 99999
-}
-
-resource &quot;azurerm_cosmosdb_account&quot; &quot;db&quot; {
-  name                = &quot;your-cosmos-db-${random_integer.ri.result}&quot;
-  location            = &quot;${azurerm_resource_group.rg.location}&quot;
-  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
-  offer_type          = &quot;Standard&quot;
-  kind                = &quot;MongoDB&quot;
-
-  enable_automatic_failover = true
-
-  consistency_policy {
-    consistency_level       = &quot;BoundedStaleness&quot;
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
-  }
-
-  geo_location {
-    location          = &quot;${azurerm_resource_group.rg.location}&quot;
-    failover_priority = 0
-  }
-
-  geo_location {
-    location          = &quot;${var.failover_location}&quot;
-    failover_priority = 1
-  }
-}
-
-resource &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
-  name                = &quot;yourakstf&quot;
-  location            = &quot;${azurerm_resource_group.rg.location}&quot;
-  resource_group_name = &quot;${azurerm_resource_group.rg.name}&quot;
-  dns_prefix          = &quot;yourakstf&quot;
-  kubernetes_version  = &quot;1.9.6&quot;
-
-  linux_profile {
-    admin_username = &quot;${var.admin_username}&quot;
-
-    ssh_key {
-      key_data = &quot;${var.key_data}&quot;
-    }
-  }
-
-  agent_pool_profile {
-    name            = &quot;default&quot;
-    count           = 3
-    vm_size         = &quot;Standard_B2ms&quot;
-    os_type         = &quot;Linux&quot;
-    os_disk_size_gb = 30
-  }
-
-  service_principal {
-    client_id     = &quot;${var.client_id}&quot;
-    client_secret = &quot;${var.client_secret}&quot;
-  }
-}
-
-provider &quot;kubernetes&quot; {
-  host = &quot;${azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
-
-  client_certificate     = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&quot;
-  client_key             = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&quot;
-  cluster_ca_certificate = &quot;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
-}
-
-resource &quot;kubernetes_secret&quot; &quot;cosmosdb_secret&quot; {
-  metadata {
-    name = &quot;cosmosdb-secret&quot;
-  }
-
-  data {
-    MONGO_URL = &quot;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&quot;
-  }
-}
-</code></pre>
-
-<p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
-
-<p>そしてアプリのデプロイ時に、登録したSecretを指定します。ここからはkubernetesワールドなので、kubectlなどを使います。マニフェストは以下のように。</p>
-
-<p>[todo.yaml]</p>
-
-<pre><code>apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: todoapp
-spec:
-  selector:
-    matchLabels:
-      app: todoapp
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: todoapp
-    spec:
-      containers:
-        - name: todoapp
-          image: torumakabe/nodetodo
-          ports:
-            - containerPort: 8080
-          env:
-            - name: MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  name: cosmosdb-secret
-                  key: MONGO_URL
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: todoapp
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    app: todoapp
-</code></pre>
-
-<p>シークレットの中身を見ることなく、コピペもせず、もちろんメールやチャットやファイルも使わず、アプリからCosmos DBへ接続できました。</p>
-
-<p>シークレットに限らず、Terraformの属性参照、変数表現は強力ですので、ぜひ活用してみてください。数多くの<a href="https://www.terraform.io/docs/providers/azurerm/">Azureリソース</a>が対応しています。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">09 Apr 2018, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/myazurecli201804/" class="post-title">俺のAzure CLI 2018春版</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="春の環境リフレッシュ祭り">春の環境リフレッシュ祭り</h2>
-
-<p>最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。</p>
-
-<h2 id="俺のおすすめ-3選">俺のおすすめ 3選</h2>
-
-<ul>
-<li>デフォルト設定
-
-<ul>
-<li>リソースグループやロケーション、出力形式などのデフォルト設定ができる</li>
-</ul></li>
-<li>エイリアス
-
-<ul>
-<li>サブコマンドにエイリアスを付けられる</li>
-<li>引数付きの込み入った表現もできる</li>
-</ul></li>
-<li>VS Code プラグイン
-
-<ul>
-<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Toolsプラグイン</a> でazコマンドの編集をコードアシストしてくれる</li>
-<li>編集画面上でコマンド選択して実行できる</li>
-</ul></li>
-</ul>
-
-<h2 id="デフォルト設定">デフォルト設定</h2>
-
-<p>$AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-configuration?view=azure-cli-latest">Azure CLI 2.0 の構成</a></p>
-
-<p>まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。</p>
-
-<pre><code>[core]
-output = table
-</code></pre>
-
-<p><del>そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。</del>
-軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。</p>
-
-<pre><code>[defaults]
-group = default-ejp-rg
-</code></pre>
-
-<p>他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。</p>
-
-<p>ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。</p>
-
-<p>デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。</p>
-
-<pre><code>az vm create -n yoursmplvm01 --image UbuntuLTS
-</code></pre>
-
-<h2 id="エイリアス">エイリアス</h2>
-
-<p>$AZURE_CONFIG_DIR/aliasにエイリアスを書けます。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest">Azure CLI 2.0 のエイリアス拡張機能</a></p>
-
-<p>前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</p>
-
-<pre><code>az extension add --name alias
-</code></pre>
-
-<p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
-
-<h3 id="頻繁に打つからできる限り短くしたい系">頻繁に打つからできる限り短くしたい系</h3>
-
-<pre><code>[ls]
-command = list
-
-[nw]
-command = network
-
-[pip]
-command = public-ip
-
-[fa]
-command = functionapp
-</code></pre>
-
-<p>例えばデフォルトリソースグループでパブリックIP公開してるか確認したいな、と思った時は、az network public-ip listじゃなくて、こう打てます。</p>
-
-<pre><code>$ az nw pip ls
-Name                  ResourceGroup    Location    Zones    AddressVersion    AllocationMethod      IdleTimeoutInMinutes
-ProvisioningState
---------------------  ---------------  ----------  -------  ----------------  ------------------  ----------------------
--------------------
-yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
-Succeeded
-</code></pre>
-
-<h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
-
-<p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
-
-<pre><code>[get-vm-pip]
-command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddresses[].ipAddress
-</code></pre>
-
-<p>実行すると。</p>
-
-<pre><code>$ az get-vm-pip -n yoursmplvm01
-Result
--------------
-52.185.133.68
-</code></pre>
-
-<h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
-
-<p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
-
-<pre><code>[empty-rg]
-command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
-</code></pre>
-
-<p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
-
-<pre><code>$ az empty-rg
-</code></pre>
-
-<p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
-
-<h2 id="vs-code-プラグイン-azure-cli-tools">VS Code プラグイン (Azure CLI Tools )</h2>
-
-<p>Azure CLIのVS Code向けプラグインがあります。コードアシストと編集画面からの実行が2大機能。紹介ページのGifアニメを見るのが分かりやすいです。</p>
-
-<p><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Tools</a></p>
-
-<p>プラグインを入れて、拡張子.azcliでファイルを作ればプラグインが効きます。長いコマンドを補完支援付きでコーディングしたい、スクリプトを各行実行して確認しながら作りたい、なんて場合におすすめです。</p>
-
-<h2 id="注意点">注意点</h2>
-
-<ul>
-<li>エイリアスには補完が効かない
-
-<ul>
-<li>bashでのCLI実行、VS Code Azure CLI Toolsともに、現時点(<sup>2018</sup>&frasl;<sub>4</sub>)でエイリアスには補完が効きません</li>
-</ul></li>
-<li>ソースコード管理に不要なファイルを含めない
-
-<ul>
-<li>$AZURE_CONFIG_DIR/ 下には、aliasやconfigの他に、認証トークンやプロファイルといったシークレット情報が置かれます。なのでGitなどでソースコード管理する場合は、aliasとconfig以外は除外したほうがいいでしょう</li>
-</ul></li>
-</ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">06 Apr 2018, 18:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/" class="post-title">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="カスタムイメージではlatest指定できない">カスタムイメージではlatest指定できない</h2>
-
-<p>Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。</p>
-
-<p>ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。</p>
-
-<ol>
-<li>最新のイメージ名を確認のうえ、手で指定する</li>
-<li>自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する</li>
-</ol>
-
-<p>2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。</p>
-
-<h2 id="terraformではイメージ名取得に正規表現とソートが可能">Terraformではイメージ名取得に正規表現とソートが可能</h2>
-
-<p>Terraformでは見出しの通り、捗る表現ができます。</p>
-
-<p>イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/data_source_image.go#L164">文字列比較</a>なので、末尾の番号の決めた桁は埋めること。</p>
-
-<p>ということで降順で最上位、つまり最新のイメージ名を取得できます。</p>
-
-<pre><code>data &quot;azurerm_image&quot; &quot;poc&quot; {
-  name_regex          = &quot;ubuntu1604-[0-9]*&quot;
-  sort_descending     = true
-  resource_group_name = &quot;${var.managed_image_resource_group_name}&quot;
-}
-</code></pre>
-
-<p>あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。</p>
-
-<pre><code>  storage_profile_image_reference {
-    id = &quot;${data.azurerm_image.poc.id}&quot;
-  }
-</code></pre>
-
-<p>便利である。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
       
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 1 of 14</span>
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
     
-      <a href="/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
     
-  </nav>
-</div>
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/github">#GitHub</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 22, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></h1>
+      <div class="content">
+        GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
+GitHub Actions
+数時間、触った印象。
+ GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
+Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
+ KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
+コードは ここ に。
+ディレクトリ構造は、こうです。
+. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/wsl">#WSL</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/golang">#Golang</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 2, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/wslenv_golang/">WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</a></h1>
+      <div class="content">
+        見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支援系の機能、ツールも拡充されています。特に、WSL/Windowsの連携、相互運用まわりは着実に進化しています。そのうちのひとつが、このエントリーで紹介するWSLENVです。
+WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ単純に共有するだけでなく、ルールに従って変換も行います。これが地味に便利。でも地味だから、あまり話題になっていない。なので具体例で紹介しよう、というのがこのエントリーの目的です。
+TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。
+Share Environment Vars between WSL and Windows
+Go開発環境を例に 前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。
+想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮  とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています  GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする  VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
+まず、Windowsで環境変数GOPATHを確認します。
+PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go  GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/wslenv_golang/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 27, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform_azure_secret/">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a></h1>
+      <div class="content">
+        動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。
+ いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る  データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁  もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？  kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる   つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
+シナリオ Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。
+ Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる ACI  コンテナー作成時に環境変数として接続文字列を渡す  AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す    検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み  Terraform Azure Provider v1.4 Terraform kubernetes Provider v1.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_secret/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 9, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/myazurecli201804/">俺のAzure CLI 2018春版</a></h1>
+      <div class="content">
+        春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
+俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
+Azure CLI 2.0 の構成
+まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。
+[core] output = table  そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
+[defaults] group = default-ejp-rg  他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
+ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。
+デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。
+az vm create -n yoursmplvm01 --image UbuntuLTS  エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
+Azure CLI 2.0 のエイリアス拡張機能
+前提はAzure CLI v2.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/myazurecli201804/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 6, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</a></h1>
+      <div class="content">
+        カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。
+ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。
+ 最新のイメージ名を確認のうえ、手で指定する 自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する  2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。
+Terraformではイメージ名取得に正規表現とソートが可能 Terraformでは見出しの通り、捗る表現ができます。
+イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の文字列比較なので、末尾の番号の決めた桁は埋めること。
+ということで降順で最上位、つまり最新のイメージ名を取得できます。
+data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; }  あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
+ storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; }  便利である。
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+          <a class="button" href="/page/2/">
+            Older
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="14 6 20 12 14 18"/>
+    
+  </svg>
+            </span>
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', '', 'auto');
-ga('send', 'pageview');
-
-</script>
 
 </body>
 </html>
+

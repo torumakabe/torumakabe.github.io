@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Oms on re-imagine</title>
+    <title>OMS on re-imagine</title>
     <link>https://ToruMakabe.github.io/tags/oms/</link>
-    <description>Recent content in Oms on re-imagine</description>
+    <description>Recent content in OMS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />

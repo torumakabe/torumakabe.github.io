@@ -1,982 +1,280 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Functions &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Functions | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Functions &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: Functions - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/functions/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Functions &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_blobevent/" class="post-title">Azure Event GridでBlobイベントを拾う</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
-
-<p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
-
-<p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-
-<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
-
-<p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
-
-<p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
-
-<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept" /></p>
-
-<p>Event Gridに期待する理由はいくつかあります。</p>
-
-<ul>
-<li>フィルタ
-
-<ul>
-<li>特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます</li>
-</ul></li>
-<li>信頼性
-
-<ul>
-<li>リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます</li>
-</ul></li>
-<li>スケールと高スループット
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings">Azure Functions Blobトリガー</a>のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった</li>
-<li>具体的な数値はプレビュー後に期待しましょう</li>
-</ul></li>
-<li>ファンアウト
-
-<ul>
-<li>ひとつのイベントを複数のHandlerに紐づけられます</li>
-</ul></li>
-<li>Azureの外やサードパーティーとの連携
-
-<ul>
-<li>Webhookでシンプルにできます</li>
-</ul></li>
-</ul>
-
-<h2 id="前提条件">前提条件</h2>
-
-<ul>
-<li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
-<li>現時点ではWest Central USリージョンのみで提供しています</li>
-<li>プライベートプレビューは申請が必要です</li>
-</ul>
-
-<p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-
-<pre><code>az provider register --namespace  Microsoft.EventGrid
-az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<p>以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。</p>
-
-<pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<h2 id="使い方">使い方</h2>
-
-<p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre>
-
-<p>Blobストレージアカウントを作ります。</p>
-
-<pre><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre>
-
-<p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
-ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
--g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre>
-
-<p>以下はパラメーターの補足です。</p>
-
-<ul>
-<li>&ndash;endpoint
-
-<ul>
-<li>Handlerのエンドポイントを指定します。ここではテストのために<a href="https://requestb.in/">RequestBin</a>に作ったエンドポイントを指定します</li>
-</ul></li>
-<li>&ndash;included-event-types
-
-<ul>
-<li>イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します</li>
-</ul></li>
-<li>&ndash;subject-ends-with
-
-<ul>
-<li>対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました</li>
-</ul></li>
-</ul>
-
-<p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
-
-<p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:25:15.2635962Z&quot;,
-  &quot;id&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1A9D8A6703A&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060986&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&quot;
-    }
-  }
-}]
-</code></pre>
-
-<p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
-vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
-g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre>
-
-<p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:36:33.827967Z&quot;,
-  &quot;id&quot;: &quot;e8b036ee-001e-00e7-4994-23740d06225b&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;e8b036ee-001e-00e7-4994-23740d000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1AB6D1B24F6&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060D42&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;9ec5c091-061d-4111-ad82-52d9803ce373&quot;
-    }
-  }
-}]
-</code></pre>
-
-<h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
-
-<p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-
-<h3 id="概要">概要</h3>
-
-<p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings" /></p>
-
-<p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>
-
-<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&rdquo;path&rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
-
-<p>入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。</p>
-
-<p>そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。</p>
-
-<p>なお、この悩みはAzureの開発チームも認識しており、Functions側で対応する方針とのことです。</p>
-
-<h3 id="handler">Handler</h3>
-
-<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>#r &quot;Newtonsoft.json&quot;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-
-public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
-{
-    string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
-    outputQueueItem = System.IO.Path.GetFileName(imageUrl);
-}
-</code></pre>
-
-<p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&quot;: &quot;1.0.0-beta1-10006&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;eventGridTrigger&quot;,
-      &quot;name&quot;: &quot;eventGridEvent&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;type&quot;: &quot;queue&quot;,
-      &quot;name&quot;: &quot;outputQueueItem&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<h3 id="resizer">Resizer</h3>
-
-<p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>using ImageResizer;
-
-public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
-{
-  var imageBuilder = ImageResizer.ImageBuilder.Current;
-  var size = imageDimensionsTable[ImageSize.Small];
-
-  imageBuilder.Build(inputBlob, outputBlob,
-    new ResizeSettings(size.Item1, size.Item2, FitMode.Max, null), false);
-
-}
-
-public enum ImageSize
-{
-  Small
-}
-
-private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimensionsTable = new Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt;()
-{
-  { ImageSize.Small, Tuple.Create(100, 100) }
-};
-</code></pre>
-
-<p>ImageResizerのパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;ImageResizer&quot;: &quot;4.1.9&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
-
-<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&rdquo;images-s&rdquo;として別途作成しました。コンテナー&rdquo;images&rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;name&quot;: &quot;myQueueItem&quot;,
-      &quot;type&quot;: &quot;queueTrigger&quot;,
-      &quot;direction&quot;: &quot;in&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;
-    },
-    {
-      &quot;name&quot;: &quot;inputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;name&quot;: &quot;outputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images-s/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
-nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre>
-
-<p>これで、コンテナー&rdquo;images&rdquo;にjpgファイルがアップロードされると、コンテナー&rdquo;images-s&rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">07 Oct 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" class="post-title">SlackとAzure FunctionsでChatOpsする</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
-
-<p>Azure上でChatOpsしたい、と相談をいただきました。</p>
-
-<p>AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">サンプル</a>があります。</p>
-
-<p><img src="http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png" alt="Azure Runスラッシュ" title="from fabriccontroller.net" /></p>
-
-<p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
-
-<h2 id="slackからrunbookを実行できて-何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
-
-<ul>
-<li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
-<li>CLIやAPIをRunbookで隠蔽し、おぼえることを減らす</li>
-<li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
-</ul>
-
-<h2 id="ブツ">ブツ</h2>
-
-<p>Githubに上げておきました。</p>
-
-<p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
-
-<h2 id="おおまかな流れ">おおまかな流れ</h2>
-
-<p>手順書つらいのでポイントだけ。</p>
-
-<ul>
-<li><p>SlackのSlash CommandとIncoming Webhookを作る</p>
-
-<ul>
-<li>流れは氏の<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">元ネタ</a>と同じ</li>
-</ul></li>
-
-<li><p>ARM TemplateでFunction Appをデプロイ</p>
-
-<ul>
-<li><p>Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます</p></li>
-
-<li><p>パラメータファイルのサンプルは<a href="https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json">sample.azuredeploy.parameters.json</a>です。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います</p></li>
-
-<li><p>Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください</p></li>
-
-<li><p>GithubからのCIは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/app-service-deploy-complex-application-predictably/">はじめてのケースを考慮し</a>ARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています</p></li>
-
-<li><p>Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)</p></li>
-
-<li><p>Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します</p></li>
-
-<li><p>作成済みのSlack関連パラメータを指定します</p></li>
-</ul></li>
-
-<li><p>ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)</p></li>
-
-<li><p>デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更</p>
-
-<ul>
-<li>kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え</li>
-</ul></li>
-
-<li><p>Slack上で、Slash Commandのリクエスト先URLを変更 (例: <a href="https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken">https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken</a>)</p></li>
-
-<li><p>ファンクションが動いたら、Slackの指定チャンネルでSlash Commandが打てるようになる</p>
-
-<ul>
-<li><p>/runbook [runbook名] [parm1] [parm2] [parm&hellip;]</p></li>
-
-<li><p>パラメータはrunbook次第</p></li>
-</ul></li>
-
-<li><p>Runbookの進捗はIncoming Webhookでslackに通知される</p>
-
-<ul>
-<li>Runbookのステータスが変わったときに通知</li>
-</ul></li>
-</ul>
-
-<h2 id="よもやま話">よもやま話</h2>
-
-<ul>
-<li><p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>
-
-<ul>
-<li><p>ファンクションはトリガーされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。</p></li>
-
-<li><p>Azure FunctionsのWebコンソールログが無活動だと30分で停止するので、coldに入る条件も30分と誤解していたのですが、正しくは5分。ソースは<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">ここ</a>。</p></li>
-
-<li><p>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</p></li>
-
-<li><p>ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。</p></li>
-
-<li><p>でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。</p></li>
-
-<li><p>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</p></li>
-</ul></li>
-</ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">13 Sep 2016, 17:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/" class="post-title">Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="背景と動機">背景と動機</h2>
-
-<p>Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。</p>
-
-<p>さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。</p>
-
-<ul>
-<li>運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。</li>
-<li>Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(<a href="https://www.microsoft.com/ja-jp/server-cloud/products-operations-management-suite.aspx">MS OMS</a>、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。</li>
-<li>でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。</li>
-<li>Azureリソースの使用量データ取得が一例。Azureでは使用量データを<a href="https://azure.microsoft.com/ja-jp/documentation/articles/billing-understand-your-bill/">ポータルからダウンロード</a>したり、<a href="https://powerbi.microsoft.com/ja-jp/documentation/powerbi-content-pack-azure-enterprise/">Power BIで分析</a>できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。</li>
-<li>ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。</li>
-<li>それAzure Functionsで出来るよ。</li>
-</ul>
-
-<h2 id="方針">方針</h2>
-
-<ul>
-<li>Azure FunctionsのTimer Triggerを使って、日次で実行</li>
-<li>Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み</li>
-<li>Nodeで書く (C#のサンプルはたくさんあるので)</li>
-<li>業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)</li>
-</ul>
-
-<h2 id="quick-start">Quick Start</h2>
-
-<h3 id="準備">準備</h3>
-
-<ul>
-<li>ところでAzure Funtionsって何よ、って人はまず<a href="https://blogs.technet.microsoft.com/azure-sa-members/azurefunctions/">いい資料1</a>と<a href="https://buchizo.wordpress.com/2016/06/04/azure-functions-overview-and-under-the-hood/">いい資料2</a>でざっと把握を</li>
-<li>AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (<a href="https://doc.co/66mYfB">ここ</a>とか<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">ここ</a>を参考に)
-
-<ul>
-<li>後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください</li>
-<li>権限はsubscriptionに対するreaderが妥当でしょう</li>
-</ul></li>
-<li>Githubのリポジトリを作成 (VSTSやBitbucketも使えます)</li>
-<li>使用量データを貯めるストレージアカウントを作成
-
-<ul>
-<li>後ほど環境変数に設定するので、接続文字列を控えておいてください</li>
-</ul></li>
-</ul>
-
-<h3 id="デプロイ">デプロイ</h3>
-
-<ul>
-<li>Function Appを作成
-
-<ul>
-<li>ポータル左上&rdquo;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App</li>
-<li>アプリ名は.azurewebsites.net空間でユニークになるように</li>
-<li>App Seriviceプランは、占有型の&rdquo;クラシック&rdquo;か、共有で実行したぶん課金の&rdquo;動的&rdquo;かを選べます。今回の使い方だと動的がお得でしょう</li>
-<li>メモリは128MBあれば十分です</li>
-<li>他のパラメータはお好みで</li>
-</ul></li>
-<li>環境変数の設定
-
-<ul>
-<li>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; アプリケーション設定の構成 -&gt; アプリ設定</li>
-<li>先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)</li>
-</ul></li>
-<li>サンプルコードを取得
-
-<ul>
-<li>githubに置いてますので、作業するマシンにcloneしてください -&gt; <a href="https://github.com/ToruMakabe/AZFuncTimerTriggerSample">AZFuncTimerTriggerSample</a></li>
-</ul></li>
-<li>準備済みのGithubリポジトリにpush</li>
-<li>リポジトリとFunction Appを同期
-
-<ul>
-<li>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; 継続的インテグレーションの構成 -&gt; セットアップ</li>
-<li>Githubリポジトリとブランチを設定し、同期を待ちます</li>
-</ul></li>
-<li>Nodeのモジュールをインストール
-
-<ul>
-<li><del>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; kuduに移動 -&gt; site/wwwroot/getUsageData へ移動</del></li>
-<li><del>このディレクトリが、実行する関数、functionの単位です</del></li>
-<li><del>&ldquo;npm install&rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&rdquo;へインストールされます)</del></li>
-<li>deploy.cmd で自動的にインストールするよう変えました</li>
-</ul></li>
-</ul>
-
-<p>これで、指定ストレージアカウントの&rdquo;usagedata&rdquo;コンテナに日次で使用量データファイルができます。</p>
-
-<h2 id="コード解説">コード解説</h2>
-
-<p>3つのファイルをデプロイしました。簡単な順に、ざっと解説します。<a href="https://github.com/ToruMakabe/AZFuncTimerTriggerSample">コード</a>を眺めながら読み進めてください。</p>
-
-<h3 id="package-json">package.json</h3>
-
-<p>主となるコードファイルは後述の&rdquo;index.js&rdquo;ですが、その動作に必要な環境を定義します。依存モジュールのバージョンの違いでトラブらないよう、dependenciesで指定するところがクライマックスです。</p>
-
-<h3 id="function-json">function.json</h3>
-
-<p>Azure Functionsの特徴である、TriggerとBindingsを定義します。サンプルはTimer Triggerなので、実行タイミングをここに書きます。&rdquo;schedule&rdquo;属性に、cron形式({秒}{分}{時}{日}{月}{曜日})で。</p>
-
-<p>&ldquo;0 0 0 * * *&rdquo; と指定しているので、毎日0時0分0秒に起動します。UTCです。</p>
-
-<h3 id="index-js">index.js</h3>
-
-<p>メインロジックです。</p>
-
-<ul>
-<li>先ほど設定した環境変数は、&rdquo;process.env.HOGE&rdquo;を通じ実行時に読み込まれます。認証関連情報はハードコードせず、このやり口で。</li>
-<li>日付関連処理はUTCの明示を徹底しています。Azure Functions実行環境はUTCですが、ローカルでのテストなど他環境を考えると、指定できるところはしておくのがおすすめです。これはクラウドでグローバル展開する可能性があるコードすべてに言えます。</li>
-<li>0時に起動しますが、使用量データ作成遅延の可能性があるので、処理対象は2日前です。お好みで調整してください。詳細仕様は<a href="https://msdn.microsoft.com/en-us/library/azure/mt219001.aspx">こちら</a>。</li>
-<li>module.export からが主フローです。asyncを使って、Blobコンテナの作成、使用量データ取得&amp;ファイル書き込みを、順次処理しています。後ほど豆知識で補足します。</li>
-<li>最後にcontext.done()でFunctionsに対してアプリの終了を伝えます。黙って終わるような行儀の悪い子は嫌いです。</li>
-<li>ヘルパー関数たちは最後にまとめてあります。ポイントはcontinuationTokenを使ったループ処理です。
-
-<ul>
-<li>Resource Usage API は、レスポンスで返すデータが多い場合に、途中で切って「次はこのトークンで続きからアクセスしてちょ」という動きをします。</li>
-<li>ループが2周目に入った場合は、データを書きだすファイルが分かれます。フォーマットは&rdquo;YYYY-MM-DD_n.json&rdquo;です。</li>
-</ul></li>
-</ul>
-
-<h2 id="豆知識-node-on-azure-functions">豆知識 (Node on Azure Functions)</h2>
-
-<ul>
-<li>通信やI/Oの関数など、非同期処理の拾い忘れ、突き抜けに注意してください
-
-<ul>
-<li>NodeはJavascript、シングルスレッドなので時間のかかる処理でブロックしないのが基本です</li>
-<li>Azure FunctionsはNode v6.4.0が使えるのでES6のpromiseが書けるのですが、SDKがまだpromiseを<a href="https://github.com/Azure/azure-sdk-for-node/issues/1450">サポートしていない</a>ので、サポートされるまではcallbackで堅く書きましょう</li>
-</ul></li>
-<li>Nodeに限った話ではないですが、Azure Functions Timer TriggerはInput/Output Bindingと組み合わせられません
-
-<ul>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#-7">サポートマトリックス</a>を確認しましょう</li>
-<li>なのでサンプルではOutput Binding使わずに書きました</li>
-<li>Input/Outputを使える他のTriggerでは、楽なのでぜひ活用してください</li>
-</ul></li>
-</ul>
-
-<h2 id="豆知識-azure-usage-api">豆知識 (Azure Usage API)</h2>
-
-<ul>
-<li>Resource Usage APIは使用量のためのAPIなので、料金に紐づけたい場合は、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/billing-usage-rate-card-overview/">Ratecard API</a>を組み合わせてください</li>
-</ul>
-
-<p><strong>それでは、幸せな運用管理サーバレス生活を。</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">08 May 2016, 14:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/" class="post-title">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="まだ好みなんて聞いてないぜ">まだ好みなんて聞いてないぜ</h2>
-
-<p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
-
-<p>Azure Functionsは、</p>
-
-<ol>
-<li>アプリを放り込めば動く。サーバの管理が要らない。サーバレス。  #でもこれは従来のPaaSもそう</li>
-<li>利用メモリ単位での、粒度の細かい課金。  #現在プレビュー中にて、詳細は今後発表</li>
-<li>Azure内外機能との、容易なイベント連動。</li>
-</ol>
-
-<p>が特徴です。AWSのLambdaと似てるっちゃ似ています。</p>
-
-<p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
-
-<h3 id="基本方針">基本方針</h3>
-
-<ul>
-<li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
-<li>Facebook Messenger APIを使って、webhook連動する</li>
-<li>Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す</li>
-<li>ビールは<a href="http://beertaster.org/beerstyle/web/beerstyle_main_j.html">Craft Beer Association</a>の分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す</li>
-<li>Botらしく、それらしい文末表現をランダムで返す</li>
-<li>好みとか文脈は全く聞かないぜSorry</li>
-<li>アプリはNodeで書く。C#のサンプルは増えてきたので</li>
-<li>静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う</li>
-<li>DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する  #<a href="https://gist.github.com/murdockcrc/12266f9d844be416a6a0">サンプル</a></li>
-<li>FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る</li>
-<li>拡張性はひとまず目をつぶる  #<a href="http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f">この辺の話</a></li>
-</ul>
-
-<p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
-
-<h2 id="必要な作業">必要な作業</h2>
-
-<p>以下が必要な作業の流れです。</p>
-
-<ul>
-<li>Azureで
-
-<ul>
-<li>Function Appの作成  #1</li>
-<li>Bot用Functionの作成 #2</li>
-<li>Facebook Messenger APIとの接続検証  #6</li>
-<li>Facebook Messenger API接続用Tokenの設定  #8</li>
-<li>DocumentDBのデータベース、コレクション作成、ドキュメント投入  #9</li>
-<li>DocumentDBのストアドプロシージャ作成  #10</li>
-<li>Function Appを書く  #11</li>
-<li>FunctionsのサイトにDocumentDB Node SDKを導入 #12</li>
-<li>Function AppのGithub連携設定  #13</li>
-<li>Function Appのデプロイ (GithubへのPush)  #14</li>
-</ul></li>
-<li>Facebookで
-
-<ul>
-<li>Facebook for Developersへの登録  #3</li>
-<li>Botをひも付けるFacebook Pageの作成  #4</li>
-<li>Bot用マイアプリの作成  #5</li>
-<li>Azure Functionsからのcallback URLを登録、接続検証  #6</li>
-<li>Azure Functions向けTokenを生成 #7</li>
-</ul></li>
-</ul>
-
-<p>アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</p>
-
-<ul>
-<li>Function Appを書くまで、#1〜2、#5〜8は、<a href="http://oauth.jp/blog/2016/04/19/fb-message-callback-with-azure-function/">こちらのブログエントリ</a>がとても参考になります。</li>
-<li>Facebook for Developersへの登録、#3は、<a href="https://developers.facebook.com/">https://developers.facebook.com/</a> から。いきなり迷子の人は、<a href="http://qiita.com/k_kuni/items/3d7176ee4e3009b45dd8">こちら</a>も参考に。</li>
-<li>Facebook Pageの作成は、<a href="http://allabout.co.jp/gm/gc/387840/">ここ</a>を。Botで楽しむだけなら細かい設定は後回しでいいです。</li>
-<li>DocumentDBについては、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-introduction/">公式</a>を。
-
-<ul>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-create-account/">DBアカウント〜コレクション作成</a></li>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-import-data/">ドキュメントインポート</a></li>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/documentdb-programming/">ストアドプロシージャ</a></li>
-</ul></li>
-<li>FunctionsのサイトにDocumentDB Node SDKを導入する#12は、<a href="http://tech.guitarrapc.com/entry/2016/04/05/043723">こちら</a>を。コンソールからnpm installできます。<br /></li>
-<li>Github連携設定、#13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
-</ul>
-
-<h2 id="function-appのサンプル">Function Appのサンプル</h2>
-
-<p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
-
-<p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
-
-<pre><code>D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-</code></pre>
-
-<p>なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。</p>
-
-<p>ではFunction Appの実体、index.jsを見てみましょう。</p>
-
-<pre><code>var https = require('https');
-var documentClient = require(&quot;documentdb&quot;).DocumentClient;
-const databaseUrl = &quot;dbs/&quot; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &quot;masterKey&quot;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &quot; &quot; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &quot;attachment&quot;:{
-          &quot;type&quot;:&quot;template&quot;,
-          &quot;payload&quot;:{
-            &quot;template_type&quot;:&quot;button&quot;,
-            &quot;text&quot;:msgAll,
-            &quot;buttons&quot;:[
-              {
-                &quot;type&quot;:&quot;web_url&quot;,
-                &quot;url&quot;:value[0].randomDocument.url,
-                &quot;title&quot;:&quot;詳しく&quot;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: 'graph.facebook.com',
-      port: 443,
-      path: '/v2.6/me/messages',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &quot;/colls/beer&quot;;
-    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &quot;/colls/eom&quot;;
-    var sprocUrl = collectionUrl + &quot;/sprocs/GetRandomDoc&quot;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;&amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-</code></pre>
-
-<ul>
-<li>最下部のmodule.export以降のブロックで、webhookイベントを受け取ります</li>
-<li>それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
-
-<ul>
-<li>好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが</li>
-</ul></li>
-<li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
-
-<ul>
-<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ
-<br /></li>
-</ul></li>
-</ul>
-
-<pre><code>{
-  &quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
-  &quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
-  &quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
-}
-</code></pre>
-
-<pre><code>{
-  &quot;msg&quot;: &quot;はウマい&quot;,
-  &quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
-}
-</code></pre>
-
-<ul>
-<li>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</li>
-</ul>
-
-<p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。</p>
-
-<p><em>&ldquo;なお、Facebook Messenger API連動アプリの外部公開には、審査が必要とのことです&rdquo;</em></p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
+  
+  | <a class="subtitle is-6" href="/tags/eventgrid">#EventGrid</a>
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 5, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_blobevent/">Azure Event GridでBlobイベントを拾う</a></h1>
+      <div class="content">
+        Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
+プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
+Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
+イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
+Event Gridに期待する理由はいくつかあります。
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_blobevent/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/chatops">#ChatOps</a>
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+  | <a class="subtitle is-6" href="/tags/slack">#Slack</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">October 7, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/">SlackとAzure FunctionsでChatOpsする</a></h1>
+      <div class="content">
+        Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
+AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
+素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
+SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
+AZChatOpsSample
+おおまかな流れ 手順書つらいのでポイントだけ。
+ SlackのSlash CommandとIncoming Webhookを作る
+ 流れは氏の元ネタと同じ  ARM TemplateでFunction Appをデプロイ
+ Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
+ パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
+ Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
+ GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています
+ Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
+ Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
+ 作成済みのSlack関連パラメータを指定します
+  ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)
+ デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
+ kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 13, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/">Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</a></h1>
+      <div class="content">
+        背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
+さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
+ 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう  Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください   デプロイ  Function Appを作成  ポータル左上&rdquo;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App アプリ名は.azurewebsites.net空間でユニークになるように App Seriviceプランは、占有型の&rdquo;クラシック&rdquo;か、共有で実行したぶん課金の&rdquo;動的&rdquo;かを選べます。今回の使い方だと動的がお得でしょう メモリは128MBあれば十分です 他のパラメータはお好みで  環境変数の設定  Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; アプリケーション設定の構成 -&gt; アプリ設定 先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)  サンプルコードを取得  githubに置いてますので、作業するマシンにcloneしてください -&gt; AZFuncTimerTriggerSample  準備済みのGithubリポジトリにpush リポジトリとFunction Appを同期  Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; 継続的インテグレーションの構成 -&gt; セットアップ Githubリポジトリとブランチを設定し、同期を待ちます  Nodeのモジュールをインストール  Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; kuduに移動 -&gt; site/wwwroot/getUsageData へ移動 このディレクトリが、実行する関数、functionの単位です &ldquo;npm install&rdquo; を実行 (package.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+  | <a class="subtitle is-6" href="/tags/facebook">#Facebook</a>
+  
+  | <a class="subtitle is-6" href="/tags/bot">#Bot</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 8, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</a></h1>
+      <div class="content">
+        まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
+Azure Functionsは、
+ アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。
+何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。
+基本方針  FunctionsはAzure内の様々な機能とイベント連動できるが、あえてサンプルの少ないAzure外とつないでみる Facebook Messenger APIを使って、webhook連動する Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す ビールはCraft Beer Associationの分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す Botらしく、それらしい文末表現をランダムで返す 好みとか文脈は全く聞かないぜSorry アプリはNodeで書く。C#のサンプルは増えてきたので 静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する #サンプル FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る 拡張性はひとまず目をつぶる #この辺の話  ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。
+必要な作業 以下が必要な作業の流れです。
+ Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14  Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7   アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

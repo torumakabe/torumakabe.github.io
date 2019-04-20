@@ -6,6 +6,7 @@
     <description>Recent content in Golang on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
     <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />

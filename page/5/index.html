@@ -1,663 +1,336 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>re-imagine &middot; re-imagine</title>
+	<meta name="generator" content="Hugo 0.55.2" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title></title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="re-imagine &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="re-imagine &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">23 Mar 2017, 15:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/arm_template_managed_disk/" class="post-title">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="お伝えしたいこと">お伝えしたいこと</h2>
-
-<ul>
-<li>ARMテンプレートのドキュメントが使いやすくなった</li>
-<li>Visual Studio CodeとAzure Resource Manager Toolsを使おう</li>
-<li>ARMテンプレートでManaged Diskを作る時のコツ</li>
-<li>可用性セットを意識しよう</li>
-</ul>
-
-<h2 id="armテンプレートのドキュメントが使いやすくなった">ARMテンプレートのドキュメントが使いやすくなった</h2>
-
-<p>docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも<a href="https://azure.microsoft.com/ja-jp/blog/azure-resource-manager-template-reference-now-available/">使いやすくなりました</a>。ARMテンプレート使いのみなさまは <a href="https://docs.microsoft.com/ja-jp/azure/templates/">https://docs.microsoft.com/ja-jp/azure/templates/</a> をブックマークして、サクサク調べちゃってください。</p>
-
-<h2 id="visual-studio-codeとazure-resource-manager-toolsを使おう">Visual Studio CodeとAzure Resource Manager Toolsを使おう</h2>
-
-<p>これがあまり知られてないようなのでアピールしておきます。</p>
-
-<p><img src="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/media/resource-manager-create-first-template/vs-code-show-values.png" alt="コードアシスト" title="コードアシスト" /></p>
-
-<p>コードアシストしてくれます。</p>
-
-<p>画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/resource-manager-create-first-template?toc=%2fazure%2ftemplates%2ftoc.json&amp;bc=%2Fazure%2Ftemplates%2Fbreadcrumb%2Ftoc.json#get-vs-code-and-extension">Get VS Code and extension</a></p>
-
-<h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
-
-<p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
-
-<p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
-
-<pre><code>&quot;osDisk&quot;: {
-  &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
-  &quot;createOption&quot;: &quot;FromImage&quot;,
-  &quot;managedDisk&quot;: {
-    &quot;storageAccountType&quot;: &quot;Standard_LRS&quot;
-  },
-  &quot;diskSizeGB&quot;: 128
-}
-</code></pre>
-
-<p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。</p>
-
-<h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
-
-<p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
-
-<p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
-
-<p><a href="http://download.microsoft.com/download/C/0/2/C02C4D26-0472-4688-AC13-199EA321135E/23rdACM_SOSP_WindowsAzureStorage_201110_jpn.pdf">参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)</a></p>
-
-<p>可用性セットは、電源とネットワークを共有するグループである&rdquo;障害ドメイン(FD: Fault Domain)&ldquo;を意識して仮想マシンを分散配置する設定です。そして、可用性セットに配置した仮想マシンに割り当てたManaged Diskは、Storage Unitを分散するように配置されます。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed" /></p>
-
-<p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
-
-<p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
-
-<pre><code>{
-  &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
-  &quot;name&quot;: &quot;AvSet01&quot;,
-  &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
-  &quot;location&quot;: &quot;[resourceGroup().location]&quot;,
-  &quot;properties&quot;: {
-    &quot;managed&quot;: true,
-    &quot;platformFaultDomainCount&quot;: 2,
-    &quot;platformUpdateDomainCount&quot;: 5
-  }
-},
-</code></pre>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&rdquo;propaties&rdquo;の&rdquo;managed&rdquo;をtrueにすべし、とあります。なるほど。</p>
-
-<p>そしてポイントです。合わせて&rdquo;platformFaultDomainCount&rdquo;を指定してください。managedにする場合は必須パラメータです。</p>
-
-<p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
-
-<p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
-
-<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
-
-Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
-</code></pre>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">28 Feb 2017, 08:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/" class="post-title">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-cli-2-0版です">Azure CLI 2.0版です</h2>
-
-<p><a href="http://torumakabe.github.io/post/dockerforwin_azurecli/">Docker for WindowsでインストールレスAzure CLI環境を作る</a>、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。</p>
-
-<h2 id="動機">動機</h2>
-
-<ul>
-<li>Docker for Windows、もっと活用しようぜ</li>
-<li>がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい</li>
-<li>開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい</li>
-<li>WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう</li>
-<li>○○レスって言ってみたかった</li>
-</ul>
-
-<h2 id="やり口">やり口</h2>
-
-<ul>
-<li>もちろんDocker for Windows (on Client Hyper-V) を使う</li>
-<li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る</li>
-<li>&ldquo;az_cli&rdquo;入力にてAzure CLIコンテナを起動</li>
-<li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
-</ul>
-
-<h2 id="作業の中身">作業の中身</h2>
-
-<ul>
-<li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/install/">インストール</a>
-
-<ul>
-<li>64bit Windows 10 Pro/Enterprise/Education 1511以降に対応</li>
-<li>Hyper-Vの有効化を忘れずに</li>
-<li>Hyper-VとぶつかるVirtualBoxとはお別れです</li>
-<li>モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers]</li>
-<li>ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]</li>
-</ul></li>
-<li>PowerShell functionを作成
-
-<ul>
-<li>のちほど詳しく</li>
-</ul></li>
-</ul>
-
-<h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
-
-<p>ここが作業のハイライト。</p>
-
-<p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; code $profile
-</code></pre>
-
-<p>こんなfunctionを作ります。</p>
-
-<pre><code>function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-</code></pre>
-
-<ul>
-<li>エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので</li>
-<li>コンテナが溜まるのがいやなので、&ndash;rmで都度消します</li>
-<li>毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します</li>
-<li>ARM TemplateのJSONファイルなど、ホストからファイルを渡したいため、カレントディレクトリ ${PWD} をコンテナと -v オプションで共有します</li>
-<li>コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
-</ul>
-
-<p>ではテスト。まずはホスト側のファイルを確認。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-</code></pre>
-
-<p>いくつかのファイルがあります。</p>
-
-<p>コンテナを起動してみましょう。az_cli functionを呼びます。</p>
-
-<pre><code>PS C:\Workspace\ARM&gt; az_cli
-bash-4.3#
-</code></pre>
-
-<p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
-
-<p>カレントディレクトリを確認。</p>
-
-<pre><code>bash-4.3# pwd
-/data
-</code></pre>
-
-<p>ファイル共有できているか確認。</p>
-
-<pre><code>bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-</code></pre>
-
-<p>できてますね。</p>
-
-<p>azコマンドが打てるか確認。</p>
-
-<pre><code>bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-</code></pre>
-
-<p>タブで補完も効きます。</p>
-
-<pre><code>bash-4.3# az a
-account     acr         acs         ad          appservice
-</code></pre>
-
-<p>しあわせ。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">03 Feb 2017, 18:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/paintschainer_on_azure/" class="post-title">Azure N-SeriesでPaintsChainerを動かす</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="paintschainer面白い">PaintsChainer面白い</h2>
-
-<p>クラスメソッドさんのDevelopers.IOでのエントリ<a href="http://dev.classmethod.jp/cloud/paintschainer-on-ec2/">&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;</a>が、とても面白いです。</p>
-
-<p>畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。</p>
-
-<p>せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。</p>
-
-<h2 id="試した環境">試した環境</h2>
-
-<ul>
-<li>米国中南部リージョン</li>
-<li>Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)</li>
-<li>Ubuntu 16.04</li>
-<li>NSGはSSH(22)の他にHTTP(80)を受信許可</li>
-</ul>
-
-<h2 id="導入手順">導入手順</h2>
-
-<h3 id="nvidia-tesla-driversのインストール">NVIDIA Tesla driversのインストール</h3>
-
-<p>マイクロソフト公式ドキュメントの通りに導入します。</p>
-
-<p><a href="https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-n-series-driver-setup">Set up GPU drivers for N-series VMs</a></p>
-
-<h3 id="dockerのインストール">Dockerのインストール</h3>
-
-<p>Docker公式ドキュメントの通りに導入します。</p>
-
-<p><a href="https://docs.docker.com/engine/installation/linux/ubuntu/">Get Docker for Ubuntu</a></p>
-
-<h3 id="nvidia-dockerのインストール">NVIDIA Dockerのインストール</h3>
-
-<p>GitHub上のNVIDIAのドキュメント通りに導入します。</p>
-
-<p><a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Docker</a></p>
-
-<p>ここまでの作業に問題がないか、確認します。</p>
-
-<pre><code>$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
-Using default tag: latest
-latest: Pulling from nvidia/cuda
-8aec416115fd: Pull complete
-[...]
-Status: Downloaded newer image for nvidia/cuda:latest
-Fri Feb  3 06:43:18 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
-| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-</code></pre>
-
-<h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
-
-<p>Liam Jones氏が公開している<a href="https://github.com/liamjones/PaintsChainer-Docker">PaintsChainer-Docker</a>を使って、PaintsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。</p>
-
-<pre><code>$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
-</code></pre>
-
-<h2 id="paintschainerを使ってみる">PaintsChainerを使ってみる</h2>
-
-<p>VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintsChainerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia" /></p>
-
-<p>PaintsChainer、すごいなぁ。
-クラウディアさん、おなか寒そうだけど。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">20 Nov 2016, 13:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/" class="post-title">Azure App Service on LinuxのコンテナをCLIで更新する方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="cliでコンテナを更新したい">CLIでコンテナを更新したい</h2>
-
-<p>Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が<a href="https://azure.microsoft.com/en-us/blog/app-service-on-linux-now-supports-containers-and-asp-net-core/">発表</a>されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。</p>
-
-<p>さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。</p>
-
-<p>まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。</p>
-
-<h2 id="azure-cli-2-0">Azure CLI 2.0</h2>
-
-<p>Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。</p>
-
-<p>すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。</p>
-
-<pre><code>$ az appservice web config container show -n yourcontainerapp -g YourRG
-{
-  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot;
-}
-</code></pre>
-
-<p>新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。</p>
-
-<pre><code>$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot;
-{
-  &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot;
-}
-</code></pre>
-
-<p>これで更新されます。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">07 Oct 2016, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" class="post-title">SlackとAzure FunctionsでChatOpsする</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
-
-<p>Azure上でChatOpsしたい、と相談をいただきました。</p>
-
-<p>AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">サンプル</a>があります。</p>
-
-<p><img src="http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png" alt="Azure Runスラッシュ" title="from fabriccontroller.net" /></p>
-
-<p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
-
-<h2 id="slackからrunbookを実行できて-何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
-
-<ul>
-<li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
-<li>CLIやAPIをRunbookで隠蔽し、おぼえることを減らす</li>
-<li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
-</ul>
-
-<h2 id="ブツ">ブツ</h2>
-
-<p>Githubに上げておきました。</p>
-
-<p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
-
-<h2 id="おおまかな流れ">おおまかな流れ</h2>
-
-<p>手順書つらいのでポイントだけ。</p>
-
-<ul>
-<li><p>SlackのSlash CommandとIncoming Webhookを作る</p>
-
-<ul>
-<li>流れは氏の<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">元ネタ</a>と同じ</li>
-</ul></li>
-
-<li><p>ARM TemplateでFunction Appをデプロイ</p>
-
-<ul>
-<li><p>Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます</p></li>
-
-<li><p>パラメータファイルのサンプルは<a href="https://github.com/ToruMakabe/AZChatOpsSample/blob/master/sample.azuredeploy.parameters.json">sample.azuredeploy.parameters.json</a>です。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います</p></li>
-
-<li><p>Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください</p></li>
-
-<li><p>GithubからのCIは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/app-service-deploy-complex-application-predictably/">はじめてのケースを考慮し</a>ARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています</p></li>
-
-<li><p>Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)</p></li>
-
-<li><p>Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します</p></li>
-
-<li><p>作成済みのSlack関連パラメータを指定します</p></li>
-</ul></li>
-
-<li><p>ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)</p></li>
-
-<li><p>デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更</p>
-
-<ul>
-<li>kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え</li>
-</ul></li>
-
-<li><p>Slack上で、Slash Commandのリクエスト先URLを変更 (例: <a href="https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken">https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken</a>)</p></li>
-
-<li><p>ファンクションが動いたら、Slackの指定チャンネルでSlash Commandが打てるようになる</p>
-
-<ul>
-<li><p>/runbook [runbook名] [parm1] [parm2] [parm&hellip;]</p></li>
-
-<li><p>パラメータはrunbook次第</p></li>
-</ul></li>
-
-<li><p>Runbookの進捗はIncoming Webhookでslackに通知される</p>
-
-<ul>
-<li>Runbookのステータスが変わったときに通知</li>
-</ul></li>
-</ul>
-
-<h2 id="よもやま話">よもやま話</h2>
-
-<ul>
-<li><p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>
-
-<ul>
-<li><p>ファンクションはトリガーされるまで寝ています。また、5分間動きがないとこれまた寝ます(cold状態になる)。寝た子を起こすのには時間がかかるので、Slackの3秒ルールに間に合わない可能性があります。</p></li>
-
-<li><p>Azure FunctionsのWebコンソールログが無活動だと30分で停止するので、coldに入る条件も30分と誤解していたのですが、正しくは5分。ソースは<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">ここ</a>。</p></li>
-
-<li><p>そこで、4分周期でTimer Triggerし、postJobにダミーPOSTするpingFuncを作りました。</p></li>
-
-<li><p>ファンクションのコードに更新があった場合、リロード処理が走ります。リロード後、またしてもトリガーを待って寝てしまうので、コード変更直後にSlash Commandを打つとタイムアウトする可能性大です。あせらずpingまで待ちましょう。</p></li>
-
-<li><p>でもAzure AutomationのAPI応答待ちなど、外部要因で3秒超えちゃう可能性はあります。非同期にしてひとまずSlackに応答返す作りに変えたほうがいいですね。これはSlackのSlash Commandに限らず、呼び出し元に待ってもらえないケース全てに言える考慮点です。</p></li>
-
-<li><p>Azure Functionsはまだプレビューなので、<a href="https://github.com/Azure/azure-webjobs-sdk-script/issues/529">議論されているとおり</a>改善の余地が多くあります。期待しましょう。</p></li>
-</ul></li>
-</ul>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/page/4/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 5 of 14</span>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     
-      <a href="/page/6/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
     
-  </nav>
-</div>
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/arm-template">#ARM Template</a>
+  
+  | <a class="subtitle is-6" href="/tags/managed-disk">#Managed Disk</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 23, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_template_managed_disk/">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a></h1>
+      <div class="content">
+        お伝えしたいこと  ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでManaged Diskを作る時のコツ 可用性セットを意識しよう  ARMテンプレートのドキュメントが使いやすくなった docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも使いやすくなりました。ARMテンプレート使いのみなさまは https://docs.microsoft.com/ja-jp/azure/templates/ をブックマークして、サクサク調べちゃってください。
+Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり知られてないようなのでアピールしておきます。
+コードアシストしてくれます。
+画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。
+Get VS Code and extension
+ARMテンプレートでManaged Diskを作る時のコツ Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。
+Managed Diskは Microsoft.Compute/disks で個別に定義できますが、省略もできます。Microsoft.Compute/virtualMachines の中に書いてしまうやり口です。
+&quot;osDisk&quot;: { &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;, &quot;createOption&quot;: &quot;FromImage&quot;, &quot;managedDisk&quot;: { &quot;storageAccountType&quot;: &quot;Standard_LRS&quot; }, &quot;diskSizeGB&quot;: 128 }  こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。
+可用性セットを意識しよう Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。
+Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。
+参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_template_managed_disk/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/docker-for-windows">#Docker for Windows</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure-cli">#Azure CLI</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 28, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a></h1>
+      <div class="content">
+        Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。
+動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る &ldquo;az_cli&rdquo;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]  PowerShell functionを作成  のちほど詳しく   PowerShellのfunctionを作る ここが作業のハイライト。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/paintschainer">#PaintsChainer</a>
+  
+  | <a class="subtitle is-6" href="/tags/nvidia">#NVIDIA</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 3, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/paintschainer_on_azure/">Azure N-SeriesでPaintsChainerを動かす</a></h1>
+      <div class="content">
+        PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;が、とても面白いです。
+畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。
+せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。
+試した環境  米国中南部リージョン Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80) Ubuntu 16.04 NSGはSSH(22)の他にHTTP(80)を受信許可  導入手順 NVIDIA Tesla driversのインストール マイクロソフト公式ドキュメントの通りに導入します。
+Set up GPU drivers for N-series VMs
+Dockerのインストール Docker公式ドキュメントの通りに導入します。
+Get Docker for Ubuntu
+NVIDIA Dockerのインストール GitHub上のNVIDIAのドキュメント通りに導入します。
+NVIDIA Docker
+ここまでの作業に問題がないか、確認します。
+$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest latest: Pulling from nvidia/cuda 8aec416115fd: Pull complete [...] Status: Downloaded newer image for nvidia/cuda:latest Fri Feb 3 06:43:18 2017 +-----------------------------------------------------------------------------+ | NVIDIA-SMI 367.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/paintschainer_on_azure/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/webapp">#WebApp</a>
+  
+  | <a class="subtitle is-6" href="/tags/linux">#Linux</a>
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">November 20, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/">Azure App Service on LinuxのコンテナをCLIで更新する方法</a></h1>
+      <div class="content">
+        CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
+さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
+まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
+Azure CLI 2.0 Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。
+すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; }  これで更新されます。
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/chatops">#ChatOps</a>
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+  | <a class="subtitle is-6" href="/tags/slack">#Slack</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">October 7, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/">SlackとAzure FunctionsでChatOpsする</a></h1>
+      <div class="content">
+        Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
+AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
+素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
+SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
+AZChatOpsSample
+おおまかな流れ 手順書つらいのでポイントだけ。
+ SlackのSlash CommandとIncoming Webhookを作る
+ 流れは氏の元ネタと同じ  ARM TemplateでFunction Appをデプロイ
+ Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
+ パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
+ Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
+ GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています
+ Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
+ Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
+ 作成済みのSlack関連パラメータを指定します
+  ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)
+ デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
+ kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
+          <a class="button" href="/page/4/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+          <a class="button" href="/page/6/">
+            Older
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="14 6 20 12 14 18"/>
+    
+  </svg>
+            </span>
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', '', 'auto');
-ga('send', 'pageview');
-
-</script>
 
 </body>
 </html>
+

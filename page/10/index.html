@@ -1,1049 +1,387 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>re-imagine &middot; re-imagine</title>
+	<meta name="generator" content="Hugo 0.55.2" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title></title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="re-imagine &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="re-imagine &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">27 Jan 2016, 00:19</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/striping_linuxonazure/" class="post-title">Linux on AzureでDisk IO性能を確保する方法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の鉄板-ができるまで">&ldquo;俺の鉄板&rdquo;ができるまで</h2>
-
-<p>前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。</p>
-
-<p>クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。</p>
-
-<p>ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。</p>
-
-<ol>
-<li>構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する
-
-<ul>
-<li>やみくもに調べものしないように</li>
-<li>経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い</li>
-</ul></li>
-<li>ベンダの公式資料を確認する
-
-<ul>
-<li>「この使い方を推奨/サポートしています」と明記されていれば安心</li>
-<li>でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない</li>
-<li>不明確なら早めに問い合わせる</li>
-</ul></li>
-<li>ベンダが運営しているコミュニティ上の情報を確認する
-
-<ul>
-<li>ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある</li>
-</ul></li>
-<li>コミュニティや有識者の情報を確認する
-
-<ul>
-<li>OSSでは特に</li>
-<li>専門性を感じるサイト、人はリストしておく</li>
-</ul></li>
-<li>動かす
-
-<ul>
-<li>やっぱり動かしてみないと</li>
-</ul></li>
-<li>提案する
-
-<ul>
-<li>リスクがあれば明示します</li>
-</ul></li>
-<li>問題なければ実績になる、問題があればリカバリする
-
-<ul>
-<li>提案しっぱなしにせずフォローすることで、自信とパターンが増える</li>
-<li>次の案件で活きる
-<br /></li>
-</ul></li>
-</ol>
-
-<p>いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。</p>
-
-<h2 id="linux-on-azureでdisk-io性能を確保する方法">Linux on AzureでDisk IO性能を確保する方法</h2>
-
-<p>さて今回の主題です。</p>
-
-<p>結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。</p>
-
-<p>Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。</p>
-
-<p>サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。</p>
-
-<p>Linuxで使える代表的なストライプ実装は、LVMとMD。</p>
-
-<p>ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。</p>
-
-<p>前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。</p>
-
-<p><a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-linux-configure-raid/">&ldquo;Configure Software RAID on Linux&rdquo;</a></p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">&ldquo;Premium Storage: Azure 仮想マシン ワークロード向けの高パフォーマンス ストレージ&rdquo;</a></p>
-
-<p><a href="http://blogs.msdn.com/b/igorpag/archive/2014/10/23/azure-storage-secrets-and-linux-i-o-optimizations.aspx">&ldquo;Azure Storage secrets and Linux I/O optimizations&rdquo;</a></p>
-
-<p>得られた情報の中で大事なのは、</p>
-
-<ul>
-<li>公式ドキュメントで
-
-<ul>
-<li>LVMではなくMDを使った構成例が紹介されている</li>
-</ul></li>
-<li>マイクロソフトがホストするブログ(MSDN)で、エキスパートが
-
-<ul>
-<li>LVMと比較したうえで、MDをすすめている</li>
-<li>MDのChunkサイズについて推奨値を紹介している</li>
-<li>そのほか、ファイルシステムやスケジューラに関する有益な情報あり</li>
-</ul></li>
-</ul>
-
-<p>なるほど。わたしのこの時点での方針はこうです。</p>
-
-<ul>
-<li>LVMを使う必然性はないため、MDに絞る
-
-<ul>
-<li>LVMのほうが機能豊富だが、目的はストライピングだけであるため、シンプルなほうを</li>
-<li>物理障害対策はAzureに任せる (3コピー)</li>
-</ul></li>
-<li>MDのChunkをデフォルトの512KBから64KBに変更する (ここは結果によって調整)</li>
-<li>Premium StorageのキャッシュはReadOnly or Noneにする予定であるため、ファイルシステムのバリアを無効にする</li>
-</ul>
-
-<p>上記シナリオで、ディスク当たり5,000IOPS、ストライプ数に比例した性能が実際出れば提案価値あり、ということになります。
-ですが、ズバリな実績値が見つからない。ダラダラ探すのは時間の無駄。これは自分でやるしかない。</p>
-
-<p>構成手順は前述のリンク先にありますが、ポイントを抜き出します。OS=Ubuntu、ファイルシステム=ext4の場合です。</p>
-
-<p>MDでストライプを作る際、チャンクを64KBに変更します。</p>
-
-<pre><code>sudo mdadm --create /dev/md127 --level 0 --raid-devices 2  /dev/sdc1 /dev/sdd1 -c 64k
-</code></pre>
-
-<p>マウント時にバリアを無効にします。</p>
-
-<pre><code>sudo mount /dev/md127 /mnt -o barrier=0
-</code></pre>
-
-<p>では、Premium Storage(P30)をMDで2つ束ねたストライプにfioを実行してみましょう。</p>
-
-<ul>
-<li>100% Random Read</li>
-<li>キャッシュ効果のないデータをとるため、Premium StorageのキャッシュはNone、fio側もdirect=1</li>
-<li>ブロックサイズは小さめの値が欲しかったので、1K</li>
-</ul>
-
-<p>結果。</p>
-
-<pre><code>randread: (g=0): rw=randread, bs=1K-1K/1K-1K/1K-1K, ioengine=libaio, iodepth=32
-fio-2.1.3
-Starting 1 process
-
-randread: (groupid=0, jobs=1): err= 0: pid=9193: Tue Jan 26 05:48:09 2016
-  read : io=102400KB, bw=9912.9KB/s, iops=9912, runt= 10330msec
-[snip]
-</code></pre>
-
-<p>2本束ねて9,912IOPS。1本あたりほぼ5,000IOPS。ほぼ期待値。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">24 Jan 2016, 00:19</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" class="post-title">クラウドは本当に性能不足なのか</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p><strong>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。</strong></p>
-
-<h2 id="具体的な数値で-正しい理解を">具体的な数値で、正しい理解を</h2>
-
-<p><a href="http://itpro.nikkeibp.co.jp/atcl/watcher/14/334361/011800463/">&ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;</a>という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。</p>
-
-<p>記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。</p>
-
-<p>どんな技術、製品、サービスにも限界や制約はあります。具体的な数値や仕様で語らないと、そこから都市伝説が生まれます。</p>
-
-<p>いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。</p>
-
-<h2 id="シングルvmでどれだけ">シングルVMでどれだけ</h2>
-
-<p>話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。</p>
-
-<p>わたしは原理主義者ではないので「クラウドに載せたかったら、そのシステムを作り直せ」とは思いません。作りを大きく変えなくても載せられる、それでクラウドの特徴を活かして幸せになれるのであれば、それでいいです。もちろん最適化するにこしたことはありませんが。</p>
-
-<p>となると、クラウド活用の検討を進めるか、あきらめるか、判断材料のひとつは「スケールアウトできなくても、性能足りるか?」です。</p>
-
-<p>この場合、1サーバ、VMあたりの性能上限が制約です。なので、AzureのシングルVM性能が鍵になります。</p>
-
-<p>では、Azureの仮想マシンの提供リソースを確認しましょう。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/">&ldquo;仮想マシンのサイズ&rdquo;</a></p>
-
-<p>ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。</p>
-
-<p>企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。</p>
-
-<ul>
-<li>Standard_GS5の主な仕様
-
-<ul>
-<li>32仮想CPUコア</li>
-<li>448GBメモリ</li>
-<li>80,000IOPS</li>
-</ul></li>
-</ul>
-
-<p>メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。</p>
-
-<p>なお、<strong>現時点で</strong>まだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。</p>
-
-<h2 id="32仮想cpuコアの規模感">32仮想CPUコアの規模感</h2>
-
-<p>クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/virtual-machines-size-specs/#-3">&ldquo;パフォーマンスに関する考慮事項&rdquo;</a></p>
-
-<p>ACUはAzure内で相対評価をする場合にはいいのですが、「じゃあAzureの外からシステムもってきたとき、実際どのくらいさばけるのよ。いま持ってる/買えるサーバ製品でいうと、どのくらいよ」という問いには向きません。</p>
-
-<p>クラウドや仮想化に関わらず、アプリの作りと処理するデータ、ハードの組み合わせで性能は変わります。動かしてみるのが一番です。せっかくイニシャルコストのかからないクラウドです。試しましょう。でもその前に、試す価値があるか判断しなければいけない。なにかしらの参考値が欲しい。予算と組織で動いてますから。わかります。</p>
-
-<p>では例をあげましょう。<strong>俺のベンチマーク</strong>を出したいところですが、「それじゃない」と突っ込まれそうです。ここはぐっと我慢して、企業でよく使われているERP、SAPのSAP SDベンチマークにしましょう。</p>
-
-<p><a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">&ldquo;SAP Standard Application Benchmarks in Cloud Environments&rdquo;</a></p>
-
-<p><a href="http://global.sap.com/campaigns/benchmark/index.epx">&ldquo;SAP Standard Application Benchmarks&rdquo;</a></p>
-
-<p>SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。</p>
-
-<p>比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。</p>
-
-<table>
-<thead>
-<tr>
-<th align="left"></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C91D3C5AFFF9A4689C82EA97027CDF4A42858AD1610A3F732">DELL R720</a></th>
-<th align="left"><a href="http://global.sap.com/campaigns/benchmark/assets/Cert15038.pdf">Azure VM GS5</a></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7CFDB9CAEA540B6F601993E4359AB45BEF7ED0949D1BFF155D">NEC R120f-2M</a></th>
-<th align="left"><a href="http://download.sap.com/download.epd?context=40E2D9D5E00EEF7C14B03FD143D20C6C90E8F6DEAA4E15F8090BA77A6249E1D0">FUJITSU RX4770 M2</a></th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Date</td>
-<td align="left"><sup>2012</sup>&frasl;<sub>4</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>9</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>7</sub></td>
-<td align="left"><sup>2015</sup>&frasl;<sub>7</sub></td>
-</tr>
-
-<tr>
-<td align="left">CPU Type</td>
-<td align="left">Intel Xeon Processor E5-2690</td>
-<td align="left">Intel Xeon Processor E5-2698B v3</td>
-<td align="left">Intel Xeon Processor E5-2699 v3</td>
-<td align="left">Intel Xeon Processor E7-8890 v3</td>
-</tr>
-
-<tr>
-<td align="left">CPU Sockets</td>
-<td align="left">2</td>
-<td align="left">2</td>
-<td align="left">2</td>
-<td align="left">4</td>
-</tr>
-
-<tr>
-<td align="left">CPU Cores</td>
-<td align="left">16</td>
-<td align="left">32 (Virtual)</td>
-<td align="left">36</td>
-<td align="left">72</td>
-</tr>
-
-<tr>
-<td align="left">SD Benchmark Users</td>
-<td align="left">6,500</td>
-<td align="left">7,600</td>
-<td align="left">14,440</td>
-<td align="left">29,750</td>
-</tr>
-
-<tr>
-<td align="left">SAPS</td>
-<td align="left">35,970</td>
-<td align="left">41,670</td>
-<td align="left">79,880</td>
-<td align="left">162,500</td>
-</tr>
-</tbody>
-</table>
-
-<p>3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。</p>
-
-<p>なお補足ですが、もちろんSAPはAPサーバをスケールアウトする構成もとれます。その性能は<a href="http://global.sap.com/campaigns/benchmark/appbm_cloud.epx">3-Tierベンチマーク</a>で確認できます。<a href="http://blogs.msdn.com/b/saponsqlserver/archive/2015/10/05/world-record-sap-sales-and-distribution-standard-application-benchmark-for-sap-cloud-deployments-released-using-azure-iaas-vms.aspx">Azure上で247,880SAPS</a>出たそうです。</p>
-
-<h2 id="80-000iopsの規模感">80,000IOPSの規模感</h2>
-
-<p>IOPS = IO Per Second、秒あたりどれだけIOできるかという指標です。Azure VM GS5では<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-premium-storage-preview-portal/">Premium Storage</a>を接続し、VMあたり最大80,000IOPSを提供します。</p>
-
-<p>一般的に企業で使われているディスクアレイに載っているHDDのIOPSは、1本あたりおおよそ200です。IOPSに影響する要素は回転数で、よく回る15,000rpm FC/SAS HDDでだいたいこのくらい。</p>
-
-<p>なので80,000 / 200 = 400。よって80,000IOPSを達成しようとすると、HDDを400本並べないといけません。小さくないです。</p>
-
-<p>もちろんディスクアレイにはキャッシュがあるので、キャッシュヒット次第でIOPSは変わります。ベンダが胸を張って公開している値も、キャッシュに当てまくった数字であることが多いです。ですが誠実な技術者は「水物」なキャッシュヒットを前提にサイジングしません。アプリがアレイを占有できて、扱うデータの量や中身に変化がない場合は別ですが、それはまれでしょう。ヒットしない最悪の場合を考慮するはずです。</p>
-
-<p>なお、数十万IOPSをこえるディスクアレイがあるのは事実です。でも「桁が違う。クラウドしょぼい」と思わないでください。ディスクアレイ全体の性能と、VMあたりどのくらい提供するかは、別の問題です。ひとつのVMがディスクアレイを占有するのでない限り、VMあたりのIOコントロールは必要です。そうでないと、暴れん坊VMの割を食うVMがでてきます。見えていないだけで、クラウドのバックエンドにはスケーラブルなストレージが鎮座しています。</p>
-
-<h2 id="結論">結論</h2>
-
-<ul>
-<li>Intel x86 2ソケットモデルサーバで動いているようなシステムの移行であれば検討価値あり</li>
-<li>メモリが448GB以上必要であれば難しい</li>
-<li>サーバあたり80,000IOPS以上必要であれば難しい、でも本当にサーバあたりそれだけ必要か精査すべき</li>
-</ul>
-
-<p>ちょっと前までオンプレ案件も担当していましたが、ここ数年は2ソケットサーバ案件中心、ときどき、4ソケット以上で興奮。という感覚です。みなさんはいかがでしょう。データはないのでご参考まで。</p>
-
-<p>なにはともあれ、プロのみなさんは噂に流されず、制約を数値で把握して判断、設計しましょう。Azureではそのほかの制約条件も公開されていますので、ぜひご一読を。上限を緩和できるパラメータも、あります。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">&ldquo;Azure サブスクリプションとサービスの制限、クォータ、制約&rdquo;</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Jan 2016, 00:20</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" class="post-title">Azureでインフラデプロイツールを選ぶ時に考えていること</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="ケースバイケースだけど">ケースバイケースだけど</h2>
-
-<p>Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。</p>
-
-<p>特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。</p>
-
-<p>なので「ケースバイケース。以上」とは、言いにくい。</p>
-
-<p>私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。</p>
-
-<h2 id="書く前に前提など">書く前に前提など</h2>
-
-<p>対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。</p>
-
-<p>レイヤリングや用語は、 @gosukenator さんの<a href="http://mizzy.org/blog/2013/10/29/1/">&ldquo;インフラ系技術の流れ&rdquo;</a>が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。</p>
-
-<p>では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。</p>
-
-<h2 id="そもそもツールで自動化すべきかを考える">そもそもツールで自動化すべきかを考える</h2>
-
-<p>いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。</p>
-
-<p>なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。</p>
-
-<h2 id="使い捨てられないかを考える">使い捨てられないかを考える</h2>
-
-<p>次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。</p>
-
-<p>ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。</p>
-
-<p>変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。</p>
-
-<p>変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。</p>
-
-<h2 id="優先事項や制約条件を洗い出す">優先事項や制約条件を洗い出す</h2>
-
-<p>アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。</p>
-
-<ul>
-<li><em>社内/プロジェクト標準</em></li>
-</ul>
-
-<p>　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。</p>
-
-<ul>
-<li><em>他レイヤでの優先ツール</em></li>
-</ul>
-
-<p>　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。</p>
-
-<ul>
-<li><em>規模</em></li>
-</ul>
-
-<p>　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。</p>
-
-<ul>
-<li><em>チーム or ひとり</em></li>
-</ul>
-
-<p>　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。</p>
-
-<ul>
-<li><em>Windows or Linux</em></li>
-</ul>
-
-<p>　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。</p>
-
-<h2 id="マネージドサービス-機能を活用する">マネージドサービス、機能を活用する</h2>
-
-<p>マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。</p>
-
-<p>また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。</p>
-
-<p>ですが、<a href="http://torumakabe.github.io/post/arm_idempotent/">以前のエントリ</a>で触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。</p>
-
-<p>よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。</p>
-
-<p>ARM Templateでは、ハード(VM、ストレージ、ネットワーク)の割り当て、OSの導入と設定、各種エージェントの導入が基本。それに加え、Immutableな環境ではプラットフォームソフトを導入してしまっていいでしょう。ARM TemplateにはDSCやシェルを実行するエクステンションが使えるので、活用します。</p>
-
-<p>また、Bootstrapping時点で、Configurationツールを導入できてしまうのであれば、せっかくなので入れてしまいましょう。たとえばChefサーバのインストールは、ここで。</p>
-
-<p>以上、ちょっとまとまりに欠けますが、ざっとわたしが意識していることを、挙げてみました。</p>
-
-<h2 id="汎用的-リファレンスアーキテクチャ">汎用的 リファレンスアーキテクチャ</h2>
-
-<p>具体例があったほうが分かりやすいので、最後に汎用的な組み合わせを紹介します。</p>
-
-<p><a href="https://gallery.technet.microsoft.com/Automating-Deployment-with-84c1549f">&ldquo;Automating Deployment with Azure &amp; Chef&rdquo;</a></p>
-
-<ul>
-<li><p>ARM TemplateでBootstrapping</p>
-
-<ul>
-<li>VMを4つ作成、1つはLinux、他はWindows</li>
-<li>ストレージ、ネットワークの作成</li>
-<li>VMのストレージ、ネットワーク設定</li>
-<li>OSの導入</li>
-<li>ドメインコントローラサーバへのソフト導入、各種設定 (DSC/PowerShell Extension)</li>
-<li>他Windowsサーバへのソフト導入、各種設定、ドメイン参加 (PowerShell Extension)</li>
-<li>LinuxへChefサーバを導入、各種設定 (Shell Extension)
-<br /></li>
-</ul></li>
-
-<li><p>ChefでConfiguration</p>
-
-<ul>
-<li>各ノードのChef bootstrap(言葉が混同しやすいので注意)</li>
-<li>Chef Clientサービスの起動設定</li>
-<li>DBサーバのDB領域ディスク作成、フォーマット</li>
-<li>DBサーバへSQL Server 2014のインストール</li>
-<li>ChefがDBサーバが設定通りになるよう維持し続ける
-<br /></li>
-</ul></li>
-</ul>
-
-<p>どうでしょう、役割分担がイメージできたでしょうか。いいドキュメントがあったので、ChefのLinux/Windows混在例を紹介しましたが、Windowsとの親和性や情報量を重視するなら、ChefをAzure Automation DSCに置き換えて挑戦してもいいでしょう。そのまた逆もありで、ChefならLinux染めな環境で、とこだわってもいいと思います。</p>
-
-<p>書くことが意外に多かったので、また機会があれば、参考例を交えて紹介します。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">06 Jan 2016, 00:16</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/arm_idempotent/" class="post-title">Azure ARM Templateによるデプロイと冪等性</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="宣言的に-冪等に">宣言的に、冪等に</h2>
-
-<p>ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。</p>
-
-<p>さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。</p>
-
-<h3 id="azure-リソース-マネージャーの概要-https-azure-microsoft-com-ja-jp-documentation-articles-resource-group-overview"><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-overview/">Azure リソース マネージャーの概要</a></h3>
-
-<blockquote>
-<p>&ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;</p>
-
-<p>&ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;</p>
-</blockquote>
-
-<p>冪等と言い切ってはいませんが、目的は似ています。</p>
-
-<p>なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。</p>
-
-<p>残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。</p>
-
-<h2 id="増分デプロイと完全デプロイ">増分デプロイと完全デプロイ</h2>
-
-<p>まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使える<a href="https://github.com/Azure/azure-xplat-cli">クロスプラットフォームCLI</a>もあります。</p>
-
-<pre><code>PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json
-</code></pre>
-
-<p>ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。</p>
-
-<p>今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途<a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">ドキュメント</a>で確認してください。</p>
-
-<p>さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。</p>
-
-<p>コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。</p>
-
-<blockquote>
-<p>・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します</p>
-
-<p>・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します</p>
-
-<p>・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません</p>
-</blockquote>
-
-<p>すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。</p>
-
-<p>いっぽうで、完全モードです。</p>
-
-<blockquote>
-<p>・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</p>
-
-<p>・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します</p>
-
-<p>・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません</p>
-</blockquote>
-
-<p>2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。</p>
-
-<h2 id="動きをつかむ">動きをつかむ</h2>
-
-<p>では動きを見ていきましょう。テンプレートはGithubに公開されている<a href="https://github.com/Azure/azure-quickstart-templates/tree/master/101-vm-simple-linux">Very simple deployment of an Linux VM</a>を使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)を<a href="https://github.com/Azure/azure-quickstart-templates/blob/master/101-vm-simple-linux/azuredeploy.json">リンク先</a>でざっと確認してください。</p>
-
-<p>パラメータファイル(azuredeploy.parameters.json)は以下とします。</p>
-
-<pre><code>{
-  &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&quot;,
-  &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
-  &quot;parameters&quot;: {
-    &quot;adminUsername&quot;: {
-      &quot;value&quot;: &quot;azureUser&quot;
-    },
-    &quot;adminPassword&quot;: {
-      &quot;value&quot;: &quot;password1234!&quot;
-    },
-    &quot;dnsLabelPrefix&quot;: {
-      &quot;value&quot;: &quot;armpocps&quot;
-    },
-    &quot;ubuntuOSVersion&quot;: {
-      &quot;value&quot;: &quot;14.04.2-LTS&quot;
-    }    
-  }
-}
-</code></pre>
-
-<p>まず、1回目の実行です。リソースグループ &ldquo;ARMEval&rdquo;に対しデプロイします。このリソースグループは前もって作っておいた空の箱です。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 11:46:41
-Mode              : Incremental
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-</code></pre>
-
-<p>できあがりです。空のリソースグループ にLinux VM、ストレージ、仮想ネットワーク、パブリックIPなどがデプロイされました。Modeを指定しない場合は増分(Incremental)となります。</p>
-
-<p>この環境にじわじわと変更を入れていきましょう。まずはazuredeploy.parameter.json上のパラメータ、DNS名のPrefix(dnsLabelPrefix)をarmpocps -&gt; armpocps2と変えます。</p>
-
-<pre><code>&quot;dnsLabelPrefix&quot;: {
-  &quot;value&quot;: &quot;armpocps2&quot;
-},
-</code></pre>
-
-<p>では再投入です。パラメータファイルの内容は変えましたが、コマンドは同じです。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json 
-[snip]
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-</code></pre>
-
-<p>変更内容の確認です。</p>
-
-<pre><code>PS C:\Workspace&gt; Get-AzureRmPublicIpAddress
-[snip]
-DnsSettings              : {
-                             &quot;DomainNameLabel&quot;: &quot;armpocps2&quot;,
-                             &quot;Fqdn&quot;: &quot;armpocps2.japanwest.cloudapp.azure.com&quot;
-                           }
-</code></pre>
-
-<p>問題なく変わっていますね。冪等チックです。この例ではシンプルにDNS名のPrefixを変えましたが、VMインスタンス数やsubnet名を変えたりもできます。関心のある方は<a href="https://gallery.technet.microsoft.com/Cloud-Consistency-with-0b79b775">ドキュメント</a>を。</p>
-
-<p>増分モードによる変更は期待できそうです。が、さて、ここからが探検です。リソース削除が可能な完全モードを試してみましょう。
-リソース定義ファイル(azuredeploy.json)から、大胆にVMの定義を削ってみます。下記リソースをファイルからごっそり消します。</p>
-
-<pre><code>{
-  &quot;apiVersion&quot;: &quot;[variables('apiVersion')]&quot;,
-  &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines&quot;,
-  &quot;name&quot;: &quot;[variables('vmName')]&quot;,
-[snip]
-</code></pre>
-
-<p>では、完全モード &ldquo;-Mode complete&rdquo;付きでコマンドを再投入します。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group 'ARMEval' which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &quot;Y&quot;): Y
-
-DeploymentName    : azuredeploy
-ResourceGroupName : ARMEval
-ProvisioningState : Succeeded
-Timestamp         : 2016/01/04 12:01:00
-Mode              : Complete
-TemplateLink      :
-Parameters        :
-                Name             Type                       Value
-                ===============  =========================  ==========
-                adminUsername    String                     azureUser
-                adminPassword    SecureString
-                dnsLabelPrefix   String                     armpocps2
-                ubuntuOSVersion  String                     14.04.2-LTS
-
-Outputs           :
-</code></pre>
-
-<p>あっさり完了しました。本当にVMが消えているが確認します。出力が冗長ですがご容赦ください。</p>
-
-<pre><code>PS C:\Workspace&gt; Find-AzureRmResource -ResourceGroupNameContains ARMEval
-
-Name              : myPublicIP
-ResourceId        :     /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/publicIPAddresses/myPublicIP
-ResourceName      : myPublicIP
-ResourceType      : Microsoft.Network/publicIPAddresses
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : myVMNic
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/networkInterfaces/myVMNic
-ResourceName      : myVMNic
-ResourceType      : Microsoft.Network/networkInterfaces
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : MyVNET
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Network/virtualNetworks/MyVNET
-ResourceName      : MyVNET
-ResourceType      : Microsoft.Network/virtualNetworks
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-
-Name              : yourstorageaccount
-ResourceId        : /subscriptions/your-subscription-id/resourceGroups/ARMEval/providers/Microsoft.Storage/storageAccounts/yourstorageaccount
-ResourceName      : yourstorageaccount
-ResourceType      : Microsoft.Storage/storageAccounts
-ResourceGroupName : ARMEval
-Location          : japanwest
-SubscriptionId    : your-subscription-id
-Tags              : {}
-</code></pre>
-
-<p>VMだけが消えています。定義からリソースがなくなれば、存在するリソースも消す、これが完全モードです。</p>
-
-<p>さらに検証。冪等さを求めるのであれば、またリソース定義にVMを加えて再投入したら、涼しい顔で復活してほしい。先ほどazuredeploy.jsonから消したVMリソース定義を、そのまま書き戻して再投入してみます。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-確認
-Are you sure you want to use the complete deployment mode? Resources in the resource group 'ARMEval' which are not included in the template will be deleted.
-[Y] はい(Y)  [N] いいえ(N)  [S] 中断(S)  [?] ヘルプ (既定値は &quot;Y&quot;): Y
-
-New-AzureRmResourceGroupDeployment : 21:05:52 - Resource Microsoft.Compute/virtualMachines 'MyUbuntuVM' failed with message 'The resource operation completed with terminal provisioning state 'Failed'.'
-[snip]
-New-AzureRmResourceGroupDeployment : 21:05:52 - One or more errors occurred while preparing VM disks. See disk instance view for details.
-</code></pre>
-
-<p>残念ながら失敗しました。どうやらdiskまわりのエラーが発生したようです。</p>
-
-<p>これは、完全モードでのリソース削除の仕様が原因です。ARMは該当のVMリソースは消すのですが、VMが格納されているストレージを削除しません。リソース作成時は依存関係が考慮されますが、削除時は異なります。</p>
-
-<p>試しにストレージを消して再実行してみましょう。</p>
-
-<pre><code>PS C:\Workspace&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName ARMEval -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  -Mode complete
-
-[snip]
-ProvisioningState : Succeeded
-</code></pre>
-
-<p>定義通りの環境になりました。依存関係をたどって消してほしいのが人情ですが、残したほうがいいケースもあるので、今後の改善を期待しましょう。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<p>冪等であると言い切れないものの、リソース定義と実行モードを理解したうえで使えば有用。ただ、完全モードによる削除は使い方が難しい。現状ではそんな印象です。</p>
-
-<p>そこで、ARM Templateをデプロイに組み込む際、ARMによるデプロイはBootstrap用途に限定し、より構成頻度が高いConfiguration用途には、冪等性を持った別のツールを組み合わせるのが現実解と考えます。</p>
-
-<p>Bootstrap用途では、プラットフォームの提供機能を使ったほうが、機能も多いし最適化されています。Azureで今後この層を担当していくのはARMです。そして、この用途ではChefやAnsibleなど汎用ツールに物足りなさがあります。</p>
-
-<p>また、Bootstrapは1回切りであるケースが多いので、失敗したらリソースグループをばっさり消して再作成する、と割り切りやすいです。それならば冪等でなくともいいでしょう。</p>
-
-<p>長くなったので、デプロイツールの組み合わせについては、あたらめて書きたいと思います。</p>
-
-<p>参考: <a href="http://mizzy.org/blog/2013/10/29/1/">インフラ系技術の流れ Bootstrapping/Configuration/Orchestration</a></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">19 Dec 2015, 00:01</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_openstack_swarm/" class="post-title">OpenStackとAzureにDocker Swarmをかぶせてみた</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="どこいってもいじられる">どこいってもいじられる</h2>
-
-<p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
-
-<p>OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。</p>
-
-<p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
-
-<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
-
-<p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
-
-<p>ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。</p>
-
-<p>条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。</p>
-
-<p>あと、当然ですが個人で気軽にオンラインで契約できることも条件です。</p>
-
-<p>そうすると、ほぼ一択。<a href="https://www.conoha.jp/">Conoha</a>です。かわいらしい座敷童の<a href="https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu">&ldquo;このは&rdquo;</a>がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。</p>
-
-<p>では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。</p>
-
-<p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
-
-<h2 id="ローカル環境">ローカル環境</h2>
-
-<ul>
-<li>Mac OS X (El Capitan)
-
-<ul>
-<li>Docker Toolbox 1.9.1</li>
-</ul></li>
-</ul>
-
-<p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
-また、Swarmのマスタはローカルに配置します。</p>
-
-<h2 id="いざ実行">いざ実行</h2>
-
-<p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
-
-<p>Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は<a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/">ここ</a>を。</p>
-
-<pre><code>$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
-$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem
-</code></pre>
-
-<p>Conoha向けにOpenStack関連の環境変数をセットします。</p>
-
-<pre><code>$ export OS_USERNAME=yourname
-$ export OS_TENANT_NAME=yourtenantname
-$ export OS_PASSWORD=yourpass
-$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0
-</code></pre>
-
-<p>次はローカルコンテナ環境を整えます。</p>
-
-<p>Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。</p>
-
-<pre><code>$ docker-machine create -d virtualbox local
-$ eval &quot;$(docker-machine env local)&quot;
-$ docker run swarm create    
-Status: Downloaded newer image for swarm:latest
-tokentokentokentoken
-</code></pre>
-
-<p>このトークンは控えておきましょう。</p>
-
-<p>ではSwarmのマスタをローカルに作ります。先ほど生成したトークン指定を忘れずに。</p>
-
-<pre><code>$ docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://tokentokentokentoken head
-</code></pre>
-
-<p>SwarmのエージェントをAzureに作ります。VMを作って、OSとDockerをインストールして、なんて不要です。Docker Machineがやってくれます。ここでもトークン指定を忘れずに。</p>
-
-<pre><code>$ eval &quot;$(docker-machine env head)&quot;
-$ docker-machine create -d azure --swarm --swarm-discovery token://tokentokentokentoken worker-azure01 --azure-location &quot;East Asia&quot; worker-azure00
-</code></pre>
-
-<p>Conohaにも同様に。</p>
-
-<pre><code>$ docker-machine create -d openstack --openstack-flavor-name g-1gb --openstack-image-name vmi-ubuntu-14.04-amd64 --openstack-sec-groups &quot;default,gncs-ipv4-all&quot; --swarm --swarm-discovery token://tokentokentokentoken worker-conoha00
-</code></pre>
-
-<p>さあ環境がサクッと出来上がりました。これ以降はSwarmクラスタ全体を操作対象にします。</p>
-
-<pre><code>$ eval &quot;$(docker-machine env --swarm head)&quot;
-</code></pre>
-
-<p>環境をチラ見してみましょう。</p>
-
-<pre><code>$ docker info
-Containers: 4
-Images: 3
- Role: primary
- Strategy: spread
- Filters: health, port, dependency, affinity, constraint
- Nodes: 3
- head: 192.168.99.101:2376
-  └ Containers: 2
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.021 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=4.1.13-boot2docker, operatingsystem=Boot2Docker 1.9.1 (TCL 6.4.1); master : cef800b - Fri Dec 18 19:33:59 UTC 2015, provider=virtualbox, storagedriver=aufs
- worker-azure00: xxx.cloudapp.net:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 1
-  └ Reserved Memory: 0 B / 1.721 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.13.0-36-generic, operatingsystem=Ubuntu 14.04.1 LTS, provider=azure, storagedriver=aufs
- worker-conoha00: www.xxx.yyy.zzz:2376
-  └ Containers: 1
-  └ Reserved CPUs: 0 / 2
-  └ Reserved Memory: 0 B / 1.019 GiB
-  └ Labels: executiondriver=native-0.2, kernelversion=3.16.0-51-generic, operatingsystem=Ubuntu 14.04.3 LTS, provider=openstack, storagedriver=aufs
-CPUs: 4
-Total Memory: 3.761 GiB
-Name: 1234abcd
-</code></pre>
-
-<p>どこにどんな環境が作られたかが分かりますね。出力結果の4行目&rdquo;Strategy: spread&rdquo;を覚えておいてください。</p>
-
-<p>ではコンテナを作ってみましょう。Nginxコンテナ三連星です。どの環境に作るか、という指定はしません。</p>
-
-<pre><code>$ for i in `seq 1 3`; do docker run -d -p 80:80 nginx; done
-</code></pre>
-
-<p>どんな具合でしょう。</p>
-
-<pre><code>$ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                NAMES
-9cc2f5594fa5        nginx               &quot;nginx -g 'daemon off&quot;   5 seconds ago       Up 4 seconds        192.168.99.101:80-&gt;80/tcp, 443/tcp   head/goofy_goldberg
-b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 seconds ago      Up 31 seconds       www.xxx.yyy.zzz:80-&gt;80/tcp, 443/tcp   worker-conoha00/clever_chandrasekhar
-19e9d0e229a2        nginx               &quot;nginx -g 'daemon off&quot;   45 seconds ago      Up 42 seconds       zzz.yyy.xxx.www:80-&gt;80/tcp, 443/tcp    worker-azure00/reverent_bhaskara
-</code></pre>
-
-<p>Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&rdquo;Strategy: spread&rdquo;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。</p>
-
-<p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
-
-<h2 id="ツールから入るハイブリッドクラウドも-またよし">ツールから入るハイブリッドクラウドも、またよし</h2>
-
-<p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
-
-<p>でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。</p>
-
-<p>もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。</p>
-
-<p>簡単 = 正義です。簡単であれば使う人が増えて、要望が増えて、育ちます。かっちり感は後からついてくる。もしDockerで複数のクラウド環境を簡単に使いこなせるようになるのであれば、順番が逆ではありますが、お箸、Dockerというツールから入るのもいいかもしれません。</p>
-
-<p>まずは開発、検証環境など、リスク低いところから試して慣れていくのがおすすめです。触っていくうちに、いろいろ見えてくるでしょう。Dockerはもちろんですが、それぞれのクラウドの特徴も。</p>
-
-<p>OpenStackもAzureも、特徴を活かし、うまく使いこなしてほしいと思っております。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/page/9/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 10 of 14</span>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     
-      <a href="/page/11/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
     
-  </nav>
-</div>
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/linux">#Linux</a>
+  
+  | <a class="subtitle is-6" href="/tags/disk">#Disk</a>
+  
+  | <a class="subtitle is-6" href="/tags/performance">#Performance</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/striping_linuxonazure/">Linux on AzureでDisk IO性能を確保する方法</a></h1>
+      <div class="content">
+        &ldquo;俺の鉄板&rdquo;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
+クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
+ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
+ 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い  ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる  ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある  コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく  動かす  やっぱり動かしてみないと  提案する  リスクがあれば明示します  問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
+Linux on AzureでDisk IO性能を確保する方法 さて今回の主題です。
+結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。
+Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。
+サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。
+Linuxで使える代表的なストライプ実装は、LVMとMD。
+ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。
+前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。
+&ldquo;Configure Software RAID on Linux&rdquo;
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/striping_linuxonazure/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/cloud">#Cloud</a>
+  
+  | <a class="subtitle is-6" href="/tags/performance">#Performance</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 24, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/">クラウドは本当に性能不足なのか</a></h1>
+      <div class="content">
+        このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。
+具体的な数値で、正しい理解を &ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。
+記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。
+どんな技術、製品、サービスにも限界や制約はあります。具体的な数値や仕様で語らないと、そこから都市伝説が生まれます。
+いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。
+シングルVMでどれだけ 話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。
+わたしは原理主義者ではないので「クラウドに載せたかったら、そのシステムを作り直せ」とは思いません。作りを大きく変えなくても載せられる、それでクラウドの特徴を活かして幸せになれるのであれば、それでいいです。もちろん最適化するにこしたことはありませんが。
+となると、クラウド活用の検討を進めるか、あきらめるか、判断材料のひとつは「スケールアウトできなくても、性能足りるか?」です。
+この場合、1サーバ、VMあたりの性能上限が制約です。なので、AzureのシングルVM性能が鍵になります。
+では、Azureの仮想マシンの提供リソースを確認しましょう。
+&ldquo;仮想マシンのサイズ&rdquo;
+ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。
+企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。
+ Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS   メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
+なお、現時点でまだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。
+32仮想CPUコアの規模感 クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。
+&ldquo;パフォーマンスに関する考慮事項&rdquo;
+ACUはAzure内で相対評価をする場合にはいいのですが、「じゃあAzureの外からシステムもってきたとき、実際どのくらいさばけるのよ。いま持ってる/買えるサーバ製品でいうと、どのくらいよ」という問いには向きません。
+クラウドや仮想化に関わらず、アプリの作りと処理するデータ、ハードの組み合わせで性能は変わります。動かしてみるのが一番です。せっかくイニシャルコストのかからないクラウドです。試しましょう。でもその前に、試す価値があるか判断しなければいけない。なにかしらの参考値が欲しい。予算と組織で動いてますから。わかります。
+では例をあげましょう。俺のベンチマークを出したいところですが、「それじゃない」と突っ込まれそうです。ここはぐっと我慢して、企業でよく使われているERP、SAPのSAP SDベンチマークにしましょう。
+&ldquo;SAP Standard Application Benchmarks in Cloud Environments&rdquo;
+&ldquo;SAP Standard Application Benchmarks&rdquo;
+SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。
+比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。
+    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012&frasl;4 2015&frasl;9 2015&frasl;7 2015&frasl;7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 11, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/">Azureでインフラデプロイツールを選ぶ時に考えていること</a></h1>
+      <div class="content">
+        ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。
+特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。
+なので「ケースバイケース。以上」とは、言いにくい。
+私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。
+書く前に前提など 対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。
+レイヤリングや用語は、 @gosukenator さんの&ldquo;インフラ系技術の流れ&rdquo;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。
+では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。
+そもそもツールで自動化すべきかを考える いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。
+なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。
+使い捨てられないかを考える 次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。
+ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。
+変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。
+変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。
+優先事項や制約条件を洗い出す アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。
+ 社内/プロジェクト標準  　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。
+ 他レイヤでの優先ツール  　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。
+ 規模  　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。
+ チーム or ひとり  　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。
+ Windows or Linux  　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。
+マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
+また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
+ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 6, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_idempotent/">Azure ARM Templateによるデプロイと冪等性</a></h1>
+      <div class="content">
+        宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
+さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
+Azure リソース マネージャーの概要  &ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;
+&ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
+ 冪等と言い切ってはいませんが、目的は似ています。
+なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
+残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
+増分デプロイと完全デプロイ まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使えるクロスプラットフォームCLIもあります。
+PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。
+今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途ドキュメントで確認してください。
+さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
+コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
+・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
+いっぽうで、完全モードです。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ 2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
+動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
+パラメータファイル(azuredeploy.parameters.json)は以下とします。
+{ &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&quot;, &quot;contentVersion&quot;: &quot;1.0.0.0&quot;, &quot;parameters&quot;: { &quot;adminUsername&quot;: { &quot;value&quot;: &quot;azureUser&quot; }, &quot;adminPassword&quot;: { &quot;value&quot;: &quot;password1234!
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_idempotent/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 19, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_openstack_swarm/">OpenStackとAzureにDocker Swarmをかぶせてみた</a></h1>
+      <div class="content">
+        どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
+OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
+さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
+乗るしかないこのDockerウェーブに どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。
+ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。
+条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。
+あと、当然ですが個人で気軽にオンラインで契約できることも条件です。
+そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&ldquo;このは&rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
+では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
+今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
+ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1   ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
+いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
+Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
+$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge $ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem  Conoha向けにOpenStack関連の環境変数をセットします。
+$ export OS_USERNAME=yourname $ export OS_TENANT_NAME=yourtenantname $ export OS_PASSWORD=yourpass $ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0  次はローカルコンテナ環境を整えます。
+Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
+$ docker-machine create -d virtualbox local $ eval &quot;$(docker-machine env local)&quot; $ docker run swarm create Status: Downloaded newer image for swarm:latest tokentokentokentoken  このトークンは控えておきましょう。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_openstack_swarm/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
+          <a class="button" href="/page/9/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+          <a class="button" href="/page/11/">
+            Older
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="14 6 20 12 14 18"/>
+    
+  </svg>
+            </span>
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', '', 'auto');
-ga('send', 'pageview');
-
-</script>
 
 </body>
 </html>
+

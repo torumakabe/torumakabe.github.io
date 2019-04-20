@@ -1,1003 +1,350 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terraform &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Terraform | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Terraform &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: Terraform - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/terraform/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Terraform &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">08 Jan 2018, 16:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/" class="post-title">TerraformでAzure サンプル 2018/1版</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="サンプルのアップデート">サンプルのアップデート</h2>
-
-<p>年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの<a href="http://torumakabe.github.io/post/azure_tf_fundamental_rules/">記事</a>に目が止まりました。原則はいいとして、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">サンプル</a>は2年物で腐りかけです。ということでアップデートします。</p>
-
-<h2 id="インパクトの大きな変更点">インパクトの大きな変更点</h2>
-
-<p>Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。</p>
-
-<ol>
-<li>BackendにAzure Blobを使えるようになった</li>
-<li>Workspaceで同一コード・複数環境管理ができるようになった</li>
-<li>対応リソースが増えた</li>
-<li><a href="https://registry.terraform.io/">Terraform Module Registry</a>が公開された</li>
-</ol>
-
-<h2 id="更新版サンプルの方針">更新版サンプルの方針</h2>
-
-<p>重要アップデートをふまえ、以下の方針で新サンプルを作りました。</p>
-
-<h3 id="チーム-複数端末での運用">チーム、複数端末での運用</h3>
-
-<p>BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。</p>
-
-<h3 id="workspaceの導入">Workspaceの導入</h3>
-
-<p>従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。</p>
-
-<p>要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。</p>
-
-<h3 id="module-terraform-module-registryの活用">Module、Terraform Module Registryの活用</h3>
-
-<p>TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。</p>
-
-<h3 id="リソースグループは環境ごとに準備し-管理をterraformから分離">リソースグループは環境ごとに準備し、管理をTerraformから分離</h3>
-
-<p>AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。</p>
-
-<p>TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。</p>
-
-<p>ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。</p>
-
-<pre><code>terraform workspace select prod
-</code></pre>
-
-<p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
-
-<h2 id="サンプル解説">サンプル解説</h2>
-
-<p>サンプルは<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801">GitHub</a>に置きました。合わせてご確認ください。</p>
-
-<p>このコードをapplyすると、以下のリソースが出来上がります。</p>
-
-<ul>
-<li>NGINX on Ubuntu Webサーバー VMスケールセット</li>
-<li>VMスケールセット向けロードバランサー</li>
-<li>踏み台サーバー</li>
-<li>上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)</li>
-</ul>
-
-<h3 id="リポジトリ構造">リポジトリ構造</h3>
-
-<p>サンプルのリポジトリ構造です。</p>
-
-<pre><code>├── modules
-│   ├── computegroup
-│   │   ├── main.tf
-│   │   ├── os
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
-│   │   ├── outputs.tf
-│   │   └── variables.tf
-│   ├── loadbalancer
-│   │   ├── main.tf
-│   │   ├── outputs.tf
-│   │   └── variables.tf
-│   └── network
-│       ├── main.tf
-│       ├── outputs.tf
-│       └── variables.tf
-└── projects
-    ├── project_a
-    │   ├── backend.tf
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    └── shared
-        ├── backend.tf
-        ├── main.tf
-        ├── outputs.tf
-        └── variables.tf
-</code></pre>
-
-<p>/modulesには<a href="https://registry.terraform.io/browse?provider=azurerm">Terraform Module Registry</a>でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。</p>
-
-<p>そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。</p>
-
-<p>このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。</p>
-
-<ul>
-<li>アプリ開発者がproject_a下でアプリ関連リソースに集中したい</li>
-<li>性能観点で分割したい (Terraformはリソース量につれて重くなりがち)</li>
-<li>有事を考慮し影響範囲を分割したい</li>
-</ul>
-
-<p>プロジェクト間では、stateをremote_stateを使って共有します。サンプルではsharedで作成した仮想ネットワークのサブネットIDを<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/shared/outputs.tf#L1">output</a>し、project_aで参照できるよう<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801/blob/master/projects/project_a/backend.tf.sample#L10">定義</a>しています。</p>
-
-<h2 id="使い方">使い方</h2>
-
-<h3 id="前提">前提</h3>
-
-<ul>
-<li>Linux、WSL、macOSなどbash環境の実行例です</li>
-<li>SSHの公開鍵をTerraform実行環境の ~/.ssh/id_rsa.pub として準備してください</li>
-</ul>
-
-<h3 id="管理者向けのサービスプリンシパルを用意する">管理者向けのサービスプリンシパルを用意する</h3>
-
-<p>インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。</p>
-
-<p>もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。<a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html">Terraformのドキュメント</a>も参考に。</p>
-
-<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/SUBSCRIPTION_ID&quot;
-</code></pre>
-
-<p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
-
-<p>なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go">使う</a>からです。</p>
-
-<p>そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが<a href="https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go">使われません</a>。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。</p>
-
-<p>サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも<a href="https://www.terraform.io/docs/backends/types/azurerm.html">対応できます</a>。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。</p>
-
-<h3 id="管理者の環境変数を設定する">管理者の環境変数を設定する</h3>
-
-<p>Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。</p>
-
-<pre><code>export ARM_SUBSCRIPTION_ID=&quot;&lt;your subscription id&gt;&quot;
-export ARM_CLIENT_ID=&quot;&lt;your servicce principal appid&gt;&quot;
-export ARM_CLIENT_SECRET=&quot;&lt;your service principal password&gt;&quot;
-export ARM_TENANT_ID=&quot;&lt;your service principal tenant&gt;&quot;
-</code></pre>
-
-<h3 id="workspaceを作る">Workspaceを作る</h3>
-
-<p>開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。</p>
-
-<pre><code>terraform workspace new dev
-terraform workspace new stage
-terraform workspace new prod
-</code></pre>
-
-<h3 id="リソースグループを作る">リソースグループを作る</h3>
-
-<p>まずWorkspace別にリソースグループを作ります。</p>
-
-<pre><code>az group create -n tf-sample-dev-rg -l japaneast
-az group create -n tf-sample-stage-rg -l japaneast
-az group create -n tf-sample-prod-rg -l japaneast
-</code></pre>
-
-<p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
-
-<pre><code>data &quot;azurerm_resource_group&quot; &quot;resource_group&quot; {
-  name = &quot;${var.resource_group_name}-${terraform.workspace}-rg&quot;
-}
-</code></pre>
-
-<p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&rdquo;tf-sample&rdquo;と指定しています。</p>
-
-<p>次にBackend、state共有向けリソースグループを作ります。</p>
-
-<pre><code>az group create -n tf-sample-state-rg -l japaneast
-</code></pre>
-
-<p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
-
-<pre><code>terraform {
-  backend &quot;azurerm&quot; {
-    resource_group_name  = &quot;tf-sample-state-rg&quot;
-    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
-    container_name       = &quot;tfstate-project-a&quot;
-    key                  = &quot;terraform.tfstate&quot;
-  }
-}
-</code></pre>
-
-<p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
-
-<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&quot; &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&quot;
-</code></pre>
-
-<p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
-
-<h3 id="backendを準備する">Backendを準備する</h3>
-
-<p>project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに</p>
-
-<ul>
-<li>ストレージアカウント (名前は任意)</li>
-<li>コンテナー *2 (tfstate-project-a, tfstate-shared)</li>
-</ul>
-
-<p>を作ってください。GUIでもCLIでも、お好きなやり方で。</p>
-
-<p>その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。</p>
-
-<pre><code>terraform {
-  backend &quot;azurerm&quot; {
-    resource_group_name  = &quot;tf-sample-state-rg&quot;
-    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
-    container_name       = &quot;tfstate-project-a&quot;
-    key                  = &quot;terraform.tfstate&quot;
-  }
-}
-
-data &quot;terraform_remote_state&quot; &quot;shared&quot; {
-  backend = &quot;azurerm&quot;
-
-  config {
-    resource_group_name  = &quot;tf-sample-state-rg&quot;
-    storage_account_name = &quot;&lt;your storage account name&gt;&quot;
-    container_name       = &quot;tfstate-shared&quot;
-    key                  = &quot;terraform.tfstateenv:${terraform.workspace}&quot;
-  }
-}
-</code></pre>
-
-<p>これで準備完了です。</p>
-
-<h3 id="実行">実行</h3>
-
-<p>Workspaceをdevに切り替えます。</p>
-
-<pre><code>terraform workspace select dev
-</code></pre>
-
-<p>まずは土台となるリソースを作成するsharedから。</p>
-
-<pre><code>cd shared
-terraform init
-terraform plan
-terraform apply
-</code></pre>
-
-<p>土台となるリソースが作成されたら、次はproject_aを。</p>
-
-<pre><code>cd ../project_a
-terraform init
-terraform plan
-terraform apply
-</code></pre>
-
-<p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
-
-<p>dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。</p>
-
-<pre><code>terraform workspace select stage
-[以下devと同様の操作]
-</code></pre>
-
-<p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
-
-<h2 id="参考情報">参考情報</h2>
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>
-<li><a href="https://github.com/terraform-providers/terraform-provider-azurerm/tree/master/examples">サンプル集 on GitHub</a></li>
-</ul>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">25 Mar 2016, 22:50</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/" class="post-title">Azure &amp; Terraform Tips (ARM対応 2016春版)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="俺の屍を越えていけ">俺の屍を越えていけ</h2>
-
-<p>今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。この週末お楽しみ、という人も多いかもしれません。</p>
-
-<p>小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。</p>
-
-<h2 id="この3つは触る前から意識しよう">この3つは触る前から意識しよう</h2>
-
-<ol>
-<li>ARMテンプレートリソースは分離して使う</li>
-<li>リソース競合したら依存関係を定義する</li>
-<li>公開鍵認証SSH指定でエラーが出ても驚かない</li>
-</ol>
-
-<h2 id="1-armテンプレートリソースは分離して使う">1. ARMテンプレートリソースは分離して使う</h2>
-
-<p>v0.6.14で、リソース<a href="https://www.terraform.io/docs/providers/azurerm/r/template_deployment.html">&ldquo;azurerm_template_deployment&rdquo;</a>が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。</p>
-
-<p>でも、現時点の実装では、おすすめしません。</p>
-
-<h3 id="armテンプレートのデプロイ機能とterraformで作ったリソースが不整合を起こす">ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす</h3>
-
-<p>避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-template-deploy/">リソース グループに存在するが、テンプレートに指定されていないリソースを削除します</a></strong></p>
-
-<p>つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。</p>
-
-<h3 id="タイムアウトしがち">タイムアウトしがち</h3>
-
-<p>それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、<a href="https://ja.wikipedia.org/wiki/%E5%89%B2%E3%82%8C%E7%AA%93%E7%90%86%E8%AB%96">割れ窓理論</a>的によろしくないです。</p>
-
-<h3 id="せっかくのリソースグラフを活用できない">せっかくのリソースグラフを活用できない</h3>
-
-<p>Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。</p>
-
-<h3 id="読みづらい">読みづらい</h3>
-
-<p>Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。</p>
-
-<p>それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。</p>
-
-<h2 id="2-リソース競合したら依存関係を定義する">2. リソース競合したら依存関係を定義する</h2>
-
-<p>Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は<a href="https://www.terraform.io/intro/getting-started/dependencies.html">&ldquo;depends_on&rdquo;</a>で明示してあげましょう。</p>
-
-<p>例えば、<a href="http://torumakabe.github.io/post/azure_terraform_429_workaround/">以前のエントリ</a>で紹介した下記の問題。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-
-
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>HTTPステータスコード429(Too many requests)が返ってきているのでわかりにくいですが、実態はセキュリティーグループリソースの取り合いです。</p>
-
-<ul>
-<li>サブネットリソース作成側: サブネットを新規作成し、セキュリティーグループを紐付けたい</li>
-<li>セキュリティーグループルール作成側: ルールをセキュリティーグループに登録したい(更新処理)</li>
-</ul>
-
-<p>この2つが並行してセキュリティーグループを取り合うので、高確率でエラーになります。セキュリティーグループルールはリソースの新規作成でなく、セキュリティーグループの更新処理であるため「リソースを<strong>作成したら/存在したら</strong>次にすすむ」というTerraformのグラフでうまく表現できないようです。</p>
-
-<p>そのような場合、明示的に依存関係を&rdquo;depends_on&rdquo;で定義します。</p>
-
-<pre><code># Create a frontend subnet
-# &quot;depends_on&quot; arg is a workaround to avoid conflict with updating NSG rules 
-resource &quot;azurerm_subnet&quot; &quot;frontend&quot; {
-    name = &quot;frontend&quot;
-    resource_group_name = &quot;${var.resource_group_name}&quot;
-    virtual_network_name = &quot;${azurerm_virtual_network.vnet1.name}&quot;
-    address_prefix = &quot;${var.vnet1_frontend_address_prefix}&quot;
-    network_security_group_id = &quot;${azurerm_network_security_group.frontend.id}&quot;
-    depends_on = [
-        &quot;azurerm_network_security_rule.fe_web80&quot;,
-        &quot;azurerm_network_security_rule.fe_web443&quot;,
-        &quot;azurerm_network_security_rule.fe_ssh&quot;
-    ]
-}
-</code></pre>
-
-<p>これでサブネット作成処理は、セキュリティーグループルール登録完了まで、作成処理開始を待ちます。美しくないですが、当面の回避策です。</p>
-
-<h2 id="3-公開鍵認証ssh指定でエラーが出ても驚かない">3. 公開鍵認証SSH指定でエラーが出ても驚かない</h2>
-
-<p>TerraformはLinux VMの定義で、公開鍵認証SSHを指定できます。こんな感じで。</p>
-
-<pre><code>os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-        path = &quot;/home/${var.adminuser}/.ssh/authorized_keys&quot;
-        key_data = &quot;${file(&quot;/Users/you/.ssh/yourkey.pem&quot;)}&quot;
-    }
-}
-</code></pre>
-
-<p>が、エラーが返ってきます。</p>
-
-<pre><code>[DEBUG] Error setting Virtual Machine Storage OS Profile Linux Configuration: &amp;errors.errorString{s:&quot;Invalid address to set: []string{\&quot;os_profile_linux_config\&quot;, \&quot;12345678\&quot;, \&quot;ssh_keys\&quot;}&quot;}
-</code></pre>
-
-<p>残念ながら、Terraformが使っているAzure SDK(Golang)のバグです。</p>
-
-<p>妥当性チェックのエラーで、実際にはキーの登録はできているようです。私は何度か試行してすべて公開鍵SSHログインに成功しています。</p>
-
-<p><a href="https://github.com/hashicorp/terraform/issues/5793">Issueとして認識</a>されていますので、修正を待ちましょう。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">23 Mar 2016, 13:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/" class="post-title">Azure &amp; Terraform エラーコード429の対処法</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="terraformer増加に備えて">Terraformer増加に備えて</h2>
-
-<p>2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが<a href="https://github.com/hashicorp/terraform/blob/v0.6.14/CHANGELOG.md">追加</a>されました。待っていた人も多いのではないでしょうか。</p>
-
-<p>追って<a href="https://www.hashicorp.com/partners.html#sipart">Hashicorp認定パートナー</a>のクリエーションラインさんから導入・サポートサービスが<a href="http://www.creationline.com/lab/13268">アナウンス</a>されましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。</p>
-
-<h2 id="エラーコード429">エラーコード429</h2>
-
-<p>さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。</p>
-
-<pre><code>Error applying plan:
-
-1 error(s) occurred:
-azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429
-</code></pre>
-
-<p>autorestがステータスコード429をキャッチしました。<a href="https://tools.ietf.org/html/rfc6585#section-4">RFC上で429は</a>&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。</p>
-
-<h2 id="対処法">対処法</h2>
-
-<p><strong>もう一度applyしてください</strong></p>
-
-<p>冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。</p>
-
-<h2 id="背景">背景</h2>
-
-<p>エラーになった背景ですが、2つの可能性があります。</p>
-
-<ol>
-<li>APIリクエスト数上限に達した</li>
-<li>リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</li>
-</ol>
-
-<h3 id="1-apiリクエスト数上限に達した">1. APIリクエスト数上限に達した</h3>
-
-<p>Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。</p>
-
-<p><strong><a href="https://azure.microsoft.com/ja-jp/documentation/articles/azure-subscription-service-limits/">Azure サブスクリプションとサービスの制限、クォータ、制約</a></strong></p>
-
-<p>Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。</p>
-
-<p>長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。</p>
-
-<p>ひとまずプロダクトの方針は確認したいので、Issueに質問を<a href="https://github.com/hashicorp/terraform/issues/5704">あげておきました</a>。</p>
-
-<h3 id="2-リソースの作成や更新に時間がかかっており-azure側で処理を中断した">2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した</h3>
-
-<p>Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。</p>
-
-<p>わたしが経験したエラーの中に、こんなものがありました。</p>
-
-<pre><code>Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation. 
-</code></pre>
-
-<p>Too many requestsというよりは、リソースのアップデートが終わってないので先に進めない、という内容です。</p>
-
-<p>Too many requestsをどう解釈するかにもよりますが、ちょっと混乱しますね。この問題はFeedbackとして<a href="https://feedback.azure.com/forums/34192--general-feedback/suggestions/13069563-better-http-status-code-instead-of-429">あがっています</a>。</p>
-
-<p>でも安心してください。<strong>もう一度applyしてください</strong>。</p>
-
-<p><strong>(2016/3/25 追記) 回避策を<a href="http://torumakabe.github.io/post/azure_terraform_earlyphase_tips/">別エントリ</a>に書きました</strong></p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">09 Mar 2016, 16:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" class="post-title">Terraform &amp; Azure デプロイ設計4原則</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<p>注: 2018/1/8にサンプルを更新しました。更新エントリは<a href="http://torumakabe.github.io/post/terraform_azure_sample_201801/">こちら</a>。</p>
-
-<h2 id="情報がありそうでない">情報がありそうでない</h2>
-
-<p><a href="http://torumakabe.github.io/post/azure_tf_arm_sp/">以前のエントリ</a>で書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。</p>
-
-<p>今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。</p>
-
-<p>なお、考え方は他のクラウドやデプロイツールでも応用できるかと。</p>
-
-<h2 id="4原則">4原則</h2>
-
-<ol>
-<li>セキュリティファースト</li>
-<li>手順書をなくそう</li>
-<li>分割境界にこだわりすぎない</li>
-<li>早すぎる最適化は悪</li>
-</ol>
-
-<p>なお、サンプルのTerraformファイル群を、<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample">Githubに置いて</a>おきました。</p>
-
-<p>今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。</p>
-
-<pre><code>.
-├── .gitignore
-├── main.tf
-├── availability_set
-│   ├── avset_web.tf
-│   ├── avset_db.tf
-│   └── variables.tf
-├── network
-│   ├── sg_backend.tf
-│   ├── sg_frontend.tf
-│   ├── variables.tf
-│   └── vnets.tf
-├── storage
-│   ├── storage_backend.tf
-│   ├── storage_frontend.tf
-│   └── variables.tf
-└── terraform.tfvars
-</code></pre>
-
-<p>Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。</p>
-
-<h2 id="1-セキュリティファースト">1. セキュリティファースト</h2>
-
-<p>セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。</p>
-
-<ul>
-<li><p>認証情報は変数指定し、設定ファイルから読み込む</p>
-
-<ul>
-<li>サブスクリプションIDやOAuth Client ID/Secretなどを、リソースを作るtfファイルに書かない</li>
-<li>terraform.tfvarsなどにまとめて書く</li>
-</ul></li>
-
-<li><p>認証情報や現物情報が入ったファイルはバージョン管理ツールから除外する</p>
-
-<ul>
-<li>Gitなら.gitignoreに指定する</li>
-<li>.tfstateなど現物情報(Azure上のIDなど)が入る結果ファイルも除外
-
-<ul>
-<li>チームで使う場合はファイルではなく、Consulなどのリモートバックエンドを使うと思いますが、念のため</li>
-</ul></li>
-</ul></li>
-
-<li><p>RBACで必要最小限の権限を付与する</p>
-
-<ul>
-<li>Terraformの外の話ですが、サービスプリンシパルを作る時には意識しましょう</li>
-<li>身内がリソースをうっかり壊したら、それは管理者の責任です
-<br /></li>
-</ul></li>
-
-<li><p>ネットワークセキュリティグループはサブネットに指定しておく</p>
-
-<ul>
-<li>個々のVMの管理者に任せず、サブネットで絞っておきましょう
-
-<ul>
-<li>VMはアドホックに作られるケースが多く、ルーズになりがちです</li>
-</ul></li>
-<li>サンプルではフロントエンドとバックエンドサブネットそれぞれにセキュリティグループを指定しています
-
-<ul>
-<li>フロントの受信はPort 80、443、22を許可 (できれば22はソースIP指定)</li>
-<li>バックの受信はフロントサブネットからのみ許可 (Internetからの通信を deny all)</li>
-</ul></li>
-</ul></li>
-</ul>
-
-<h2 id="2-手順書をなくそう">2. 手順書をなくそう</h2>
-
-<p>どうせなら手順書を無くす心意気でやりましょう。Infrastructure as Codeのメリットのひとつです。コードで手順を語りましょう。わかりやすさ重視です。</p>
-
-<p>ドキュメントを否定する訳ではなく、コード化に至った背景、ポリシーや使い方、前提条件はドキュメント化し、あとはコードで語る。という世界観です。</p>
-
-<h2 id="3-分割境界にこだわりすぎない">3. 分割境界にこだわりすぎない</h2>
-
-<p>TerraformのModuleをはじめ、最近のデプロイツールはリソースや処理単位をグルーピングできます。ここがアーキテクトの腕の見せ所です。安易に「ベストプラクティス教えろや」という人は残念ながら残念です。大事なことなので2回言いました。</p>
-
-<p>グルーピング、分割する目的は、</p>
-
-<ul>
-<li>main.tfの肥大化を防止し、コードの見通しを良くする</li>
-<li>再利用しやすくする</li>
-<li>責任範囲を明確化し、オーナー意識を醸成する</li>
-<li>権限とコードを一致させる</li>
-</ul>
-
-<p>などが挙げられます。規模が小さく関わる人が少ないうちは無理して分割する必要はないですが、大きくなってくるとメリットがあります。</p>
-
-<p>以下が分割単位、境界ポリシーの例です。</p>
-
-<ul>
-<li><p>リソースタイプで分割する</p>
-
-<ul>
-<li>サンプルはその例
-
-<ul>
-<li>ネットワーク、ストレージ、VM Availability Setで分割</li>
-</ul></li>
-<li>直観的</li>
-<li>デプロイに関わる人数が少ない間はこれがおすすめ
-<br /></li>
-</ul></li>
-
-<li><p>組織単位で分割する</p>
-
-<ul>
-<li><a href="https://ja.wikipedia.org/wiki/%E3%83%A1%E3%83%AB%E3%83%B4%E3%82%A3%E3%83%B3%E3%83%BB%E3%82%B3%E3%83%B3%E3%82%A6%E3%82%A7%E3%82%A4">コンウェイの法則</a></li>
-<li>リソースタイプ = 組織 という場合もある
-
-<ul>
-<li>ネットワーク管理者が別グループ、など</li>
-</ul></li>
-</ul></li>
-
-<li><p>地理的に分割する</p>
-
-<ul>
-<li>リージョンやロケーションで分割</li>
-<li>リソースタイプと組み合わせる手もある
-
-<ul>
-<li>&ldquo;Network_JapanEast&rdquo;など
-<br /></li>
-</ul></li>
-</ul></li>
-
-<li><p>静的なリソースと動的なリソースを分ける</p>
-
-<ul>
-<li>変化の頻度で分ける
-
-<ul>
-<li>ネットワークが頻繁に変わることはまれ</li>
-<li>VMは増減が激しい</li>
-</ul></li>
-<li>動的なリソースは対象から外す、別手段とする手も
-<br /></li>
-</ul></li>
-</ul>
-
-<p>スカッとしませんが、ひとつのポリシーにこだわらず、複数組み合わせてもいいと思います。そんな世界に僕らは生きています。</p>
-
-<h2 id="4-早すぎる最適化は悪">4. 早すぎる最適化は悪</h2>
-
-<p>最適化できる人 = その道のエキスパート です。使いはじめたばかりの段階では、最適化とか無理。また、システムの外部環境や制約がはじめから決まっていることは、まれです。</p>
-
-<p>なので、はじめから「最強の構成」を目指さないほうがいいでしょう。特に分割方針。きっとすぐに変えたくなります。</p>
-
-<p>ひとつのmain.tfで動かしながら、まずTerraformやAzureの仕様や挙動を理解しましょう。そして、慣れてきて、システムの外部環境や制約が見えてきた時点で分割方針を決めてもいいのではないか、と思います。</p>
-
-<p>そして、</p>
-
-<ul>
-<li>リファクタリングできるなら、する</li>
-<li>リファクタリングできなくても、理解の上で維持し機会を待つ、または、次の機会に活かす</li>
-<li>はじめに作った人へマサカリを投げない</li>
-</ul>
-
-<p>完璧を求めずにいきましょう。</p>
-
-<p>でも、しつこいですが、セキュリティだけは、はじめから意識してくださいね。Security by design。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">27 Feb 2016, 12:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" class="post-title">TerraformをAzure ARMで使う時の認証</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="高まってまいりました">高まってまいりました</h2>
-
-<p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
-
-<p>Terraformのマイナーバージョンアップのたびに、<a href="https://www.terraform.io/docs/providers/azurerm/index.html">Azure Resource Manager Providerのリソース</a>が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。</p>
-
-<p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
-
-<h2 id="client-id-client-secret-って何よ">client_id/client_secret って何よ</h2>
-
-<p>以下がARM向けのProvider設定です。</p>
-
-<pre><code># Configure the Azure Resource Manager Provider
-provider &quot;azurerm&quot; {
-  subscription_id = &quot;...&quot;
-  client_id       = &quot;...&quot;
-  client_secret   = &quot;...&quot;
-  tenant_id       = &quot;...&quot;
-}
-</code></pre>
-
-<p>subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、<strong>client_id/client_secret って何よ</strong>。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。</p>
-
-<pre><code>&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;
-</code></pre>
-
-<p>おっとそういうことか。OAuth。</p>
-
-<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
-
-<p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/">&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;</a></p>
-
-<p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;</a></p>
-
-<p>以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</p>
-
-<p>まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。</p>
-
-<pre><code>$ azure ad app create --name &quot;My Terraform&quot; --home-page &quot;http://tftest.makabe.info&quot; --identifier-uris &quot;http://tftest.makabe.info&quot; --password pAssw0rd%
-info:    Executing command ad app create
-+ Creating application My Terraform
-data:    AppId:                   AppId-AppId-AppId-AppId-AppId
-data:    ObjectId:                AppObjId-AppObjId-AppObjId-AppObjId
-data:    DisplayName:             My Terraform
-data:    IdentifierUris:          0=http://tftest.makabe.info
-data:    ReplyUrls:
-data:    AvailableToOtherTenants:  False
-data:    AppPermissions:
-data:                             claimValue:  user_impersonation
-data:                             description:  Allow the application to access My Terraform on behalf of the signed-in user.
-data:                             directAccessGrantTypes:
-data:                             displayName:  Access My Terraform
-data:                             impersonationAccessGrantTypes:  impersonated=User, impersonator=Application
-data:                             isDisabled:
-data:                             origin:  Application
-data:                             permissionId:  AppPermID-AppPermID-AppPermID-AppPermID
-data:                             resourceScopeType:  Personal
-data:                             userConsentDescription:  Allow the application to access My Terraform on your behalf.
-data:                             userConsentDisplayName:  Access My Terraform
-data:                             lang:
-info:    ad app create command OK
-</code></pre>
-
-<p>次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。</p>
-
-<pre><code>$ azure ad sp create AppId-AppId-AppId-AppId-AppId
-info:    Executing command ad sp create
-+ Creating service principal for application AppId-AppId-AppId-AppId-AppId
-data:    Object Id:               SpObjId-SpObjId-SpObjId-SpObjId
-data:    Display Name:            My Terraform
-data:    Service Principal Names:
-data:                             AppId-AppId-AppId-AppId-AppId
-data:                             http://tftest.makabe.info
-info:    ad sp create command OK
-</code></pre>
-
-<p>サービスプリンシパルの役割を設定します。&ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。</p>
-
-<p>この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。</p>
-
-<pre><code>$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
-info:    Executing command role assignment create
-+ Finding role with specified name
-/data:    RoleAssignmentId     : /subscriptions/SubId-SubId-SubId-SubId-SubId/providers/Microsoft.Authorization/roleAssignments/RoleAsId-RoleAsId-RoleAsId-RoleAsId
-data:    RoleDefinitionName   : Contributor
-data:    RoleDefinitionId     : RoleDefId-RoleDefId-RoleDefId-RoleDefId-RoleDefId
-data:    Scope                : /subscriptions/SubId-SubId-SubId-SubId-SubId
-data:    Display Name         : My Terraform
-data:    SignInName           :
-data:    ObjectId             : SpObjId-SpObjId-SpObjId-SpObjId-SpObjId
-data:    ObjectType           : ServicePrincipal
-data:
-+
-info:    role assignment create command OK
-</code></pre>
-
-<p>サービスプリンシパルまわりの設定は以上です。</p>
-
-<p>テナントIDを確認しておきましょう。</p>
-
-<pre><code>$ azure account list --json
-[
-  {
-    &quot;id&quot;: &quot;SubId-SubId-SubId-SubId-SubId&quot;,
-    &quot;name&quot;: &quot;Your Subscription Name&quot;,
-    &quot;user&quot;: {
-      &quot;name&quot;: &quot;abc@microsoft.com&quot;,
-      &quot;type&quot;: &quot;user&quot;
-    },
-    &quot;tenantId&quot;: &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;,
-    &quot;state&quot;: &quot;Enabled&quot;,
-    &quot;isDefault&quot;: true,
-    &quot;registeredProviders&quot;: [],
-    &quot;environmentName&quot;: &quot;AzureCloud&quot;
-  }
-]
-</code></pre>
-
-<p>これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。</p>
-
-<pre><code># Configure the Azure Resource Manager Provider
-provider &quot;azurerm&quot; {
-  subscription_id = &quot;SubId-SubId-SubId-SubId-SubId&quot;
-  client_id       = &quot;AppId-AppId-AppId-AppId-AppId&quot;
-  client_secret   = &quot;pAssw0rd%&quot;
-  tenant_id       = &quot;TenantId-TenantId-TenantId-TenantId-TenantId&quot;
-}
-
-# Create a resource group
-resource &quot;azurerm_resource_group&quot; &quot;test&quot; {
-    name     = &quot;test&quot;
-    location = &quot;Japan West&quot;
-}
-</code></pre>
-
-<p>apply。もちろんplanしましたよ。</p>
-
-<pre><code>$ terraform apply
-azurerm_resource_group.test: Creating...
-  location: &quot;&quot; =&gt; &quot;japanwest&quot;
-  name:     &quot;&quot; =&gt; &quot;test&quot;
-azurerm_resource_group.test: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
-</code></pre>
-
-<p>これで、ARM認証難民がうまれなくなりますように。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/tags/terraform/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 2 of 3</span>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     
-      <a href="/tags/terraform/page/3/" class="post-list-pagination-item pure-button post-list-pagination-item-next">
-        Older&nbsp;<i class="fa fa-angle-double-right"></i>
-      </a>
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
     
-  </nav>
-</div>
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 8, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/">TerraformでAzure サンプル 2018/1版</a></h1>
+      <div class="content">
+        サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
+インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
+ BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
+チーム、複数端末での運用 BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。
+Workspaceの導入 従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。
+要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。
+Module、Terraform Module Registryの活用 TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。
+リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
+TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
+ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
+terraform workspace select prod  みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
+サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
+このコードをapplyすると、以下のリソースが出来上がります。
+ NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
+├── modules │ ├── computegroup │ │ ├── main.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 25, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/">Azure &amp; Terraform Tips (ARM対応 2016春版)</a></h1>
+      <div class="content">
+        俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。この週末お楽しみ、という人も多いかもしれません。
+小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
+この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&ldquo;azurerm_template_deployment&rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
+でも、現時点の実装では、おすすめしません。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
+タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
+せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
+読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
+それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&ldquo;depends_on&rdquo;で明示してあげましょう。
+例えば、以前のエントリで紹介した下記の問題。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 23, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/">Azure &amp; Terraform エラーコード429の対処法</a></h1>
+      <div class="content">
+        Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
+追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
+エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。
+対処法 もう一度applyしてください
+冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
+背景 エラーになった背景ですが、2つの可能性があります。
+ APIリクエスト数上限に達した リソースの作成や更新に時間がかかっており、Azure側で処理を中断した  1. APIリクエスト数上限に達した Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。
+Azure サブスクリプションとサービスの制限、クォータ、制約
+Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。
+長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。
+ひとまずプロダクトの方針は確認したいので、Issueに質問をあげておきました。
+2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。
+わたしが経験したエラーの中に、こんなものがありました。
+Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 9, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/">Terraform &amp; Azure デプロイ設計4原則</a></h1>
+      <div class="content">
+        注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
+情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
+今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
+なお、考え方は他のクラウドやデプロイツールでも応用できるかと。
+4原則  セキュリティファースト 手順書をなくそう 分割境界にこだわりすぎない 早すぎる最適化は悪  なお、サンプルのTerraformファイル群を、Githubに置いておきました。
+今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
+. ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
+1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
+ 認証情報は変数指定し、設定ファイルから読み込む
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/">TerraformをAzure ARMで使う時の認証</a></h1>
+      <div class="content">
+        高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
+Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
+そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
+client_id/client_secret って何よ 以下がARM向けのProvider設定です。
+# Configure the Azure Resource Manager Provider provider &quot;azurerm&quot; { subscription_id = &quot;...&quot; client_id = &quot;...&quot; client_secret = &quot;...&quot; tenant_id = &quot;...&quot; }  subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、client_id/client_secret って何よ。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。
+&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;  おっとそういうことか。OAuth。
+サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
+&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
+&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
+以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
+          <a class="button" href="/tags/terraform/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+          <a class="button" href="/tags/terraform/page/3/">
+            Older
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="14 6 20 12 14 18"/>
+    
+  </svg>
+            </span>
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

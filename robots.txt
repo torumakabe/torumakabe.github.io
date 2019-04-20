@@ -1,1 +1,3 @@
-User-agent: *\nDisallow:
+User-agent: *
+
+Sitemap: https://ToruMakabe.github.io//sitemap.xml

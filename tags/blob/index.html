@@ -1,1231 +1,271 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blob &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Blob | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Blob &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: Blob - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/blob/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Blob &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">05 Sep 2017, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_blobevent/" class="post-title">Azure Event GridでBlobイベントを拾う</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
-
-<p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
-
-<p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-
-<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
-
-<p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
-
-<p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
-
-<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept" /></p>
-
-<p>Event Gridに期待する理由はいくつかあります。</p>
-
-<ul>
-<li>フィルタ
-
-<ul>
-<li>特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます</li>
-</ul></li>
-<li>信頼性
-
-<ul>
-<li>リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます</li>
-</ul></li>
-<li>スケールと高スループット
-
-<ul>
-<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings">Azure Functions Blobトリガー</a>のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった</li>
-<li>具体的な数値はプレビュー後に期待しましょう</li>
-</ul></li>
-<li>ファンアウト
-
-<ul>
-<li>ひとつのイベントを複数のHandlerに紐づけられます</li>
-</ul></li>
-<li>Azureの外やサードパーティーとの連携
-
-<ul>
-<li>Webhookでシンプルにできます</li>
-</ul></li>
-</ul>
-
-<h2 id="前提条件">前提条件</h2>
-
-<ul>
-<li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
-<li>現時点ではWest Central USリージョンのみで提供しています</li>
-<li>プライベートプレビューは申請が必要です</li>
-</ul>
-
-<p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-
-<pre><code>az provider register --namespace  Microsoft.EventGrid
-az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<p>以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。</p>
-
-<pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<h2 id="使い方">使い方</h2>
-
-<p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
-
-<p>リソースグループを作ります。</p>
-
-<pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre>
-
-<p>Blobストレージアカウントを作ります。</p>
-
-<pre><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre>
-
-<p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
-ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
--g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre>
-
-<p>以下はパラメーターの補足です。</p>
-
-<ul>
-<li>&ndash;endpoint
-
-<ul>
-<li>Handlerのエンドポイントを指定します。ここではテストのために<a href="https://requestb.in/">RequestBin</a>に作ったエンドポイントを指定します</li>
-</ul></li>
-<li>&ndash;included-event-types
-
-<ul>
-<li>イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します</li>
-</ul></li>
-<li>&ndash;subject-ends-with
-
-<ul>
-<li>対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました</li>
-</ul></li>
-</ul>
-
-<p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
-
-<p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:25:15.2635962Z&quot;,
-  &quot;id&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1A9D8A6703A&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060986&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&quot;
-    }
-  }
-}]
-</code></pre>
-
-<p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
-vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
-g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre>
-
-<p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-
-<pre><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:36:33.827967Z&quot;,
-  &quot;id&quot;: &quot;e8b036ee-001e-00e7-4994-23740d06225b&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;e8b036ee-001e-00e7-4994-23740d000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1AB6D1B24F6&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060D42&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;9ec5c091-061d-4111-ad82-52d9803ce373&quot;
-    }
-  }
-}]
-</code></pre>
-
-<h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
-
-<p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-
-<h3 id="概要">概要</h3>
-
-<p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings" /></p>
-
-<p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>
-
-<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&rdquo;path&rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
-
-<p>入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。</p>
-
-<p>そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。</p>
-
-<p>なお、この悩みはAzureの開発チームも認識しており、Functions側で対応する方針とのことです。</p>
-
-<h3 id="handler">Handler</h3>
-
-<p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>#r &quot;Newtonsoft.json&quot;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-
-public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
-{
-    string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
-    outputQueueItem = System.IO.Path.GetFileName(imageUrl);
-}
-</code></pre>
-
-<p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&quot;: &quot;1.0.0-beta1-10006&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;eventGridTrigger&quot;,
-      &quot;name&quot;: &quot;eventGridEvent&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;type&quot;: &quot;queue&quot;,
-      &quot;name&quot;: &quot;outputQueueItem&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<h3 id="resizer">Resizer</h3>
-
-<p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
-
-<p>[run.csx]</p>
-
-<pre><code>using ImageResizer;
-
-public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
-{
-  var imageBuilder = ImageResizer.ImageBuilder.Current;
-  var size = imageDimensionsTable[ImageSize.Small];
-
-  imageBuilder.Build(inputBlob, outputBlob,
-    new ResizeSettings(size.Item1, size.Item2, FitMode.Max, null), false);
-
-}
-
-public enum ImageSize
-{
-  Small
-}
-
-private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimensionsTable = new Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt;()
-{
-  { ImageSize.Small, Tuple.Create(100, 100) }
-};
-</code></pre>
-
-<p>ImageResizerのパッケージを指定します。</p>
-
-<p>[project.json]</p>
-
-<pre><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;ImageResizer&quot;: &quot;4.1.9&quot;
-    }
-  }
- }
-}
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
-
-<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&rdquo;images-s&rdquo;として別途作成しました。コンテナー&rdquo;images&rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
-
-<p>[function.json]</p>
-
-<pre><code>{
-  &quot;bindings&quot;: [
-    {
-      &quot;name&quot;: &quot;myQueueItem&quot;,
-      &quot;type&quot;: &quot;queueTrigger&quot;,
-      &quot;direction&quot;: &quot;in&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;
-    },
-    {
-      &quot;name&quot;: &quot;inputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;in&quot;
-    },
-    {
-      &quot;name&quot;: &quot;outputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images-s/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;out&quot;
-    }
-  ],
-  &quot;disabled&quot;: false
-}
-</code></pre>
-
-<p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-
-<pre><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
-nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre>
-
-<p>これで、コンテナー&rdquo;images&rdquo;にjpgファイルがアップロードされると、コンテナー&rdquo;images-s&rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">13 Jun 2017, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azureblobcopy_perf/" class="post-title">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="ファイルコピーの需要は根強い">ファイルコピーの需要は根強い</h2>
-
-<p>グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。</p>
-
-<p>でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。</p>
-
-<h2 id="調べてみた">調べてみた</h2>
-
-<p>ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。</p>
-
-<h3 id="ツールと実行環境">ツールと実行環境</h3>
-
-<ul>
-<li>AzCopy 6.1.0</li>
-<li>Azure PowerShell 4.1.0</li>
-<li>Windows 10 1703</li>
-<li>ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory</li>
-</ul>
-
-<h3 id="アクセス回線パターン">アクセス回線パターン</h3>
-
-<ol>
-<li><p>一般的な回線</p>
-
-<ul>
-<li>自宅(川崎)</li>
-<li>OCN光 100M マンションタイプ</li>
-<li>宅内は802.11ac(5GHz)</li>
-<li>川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ</li>
-<li>ゲートウェイ名から推測</li>
-</ul></li>
-
-<li><p>いい感じの回線</p>
-
-<ul>
-<li>日本マイクロソフト 品川オフィス</li>
-<li>1Gbps 有線</li>
-<li>Azureデータセンターへ「ネットワーク的に近くて広帯域」</li>
-</ul></li>
-</ol>
-
-<h3 id="コピーするファイル">コピーするファイル</h3>
-
-<ul>
-<li>総容量: 約60GB
-
-<ul>
-<li>6160ファイル</li>
-<li>1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10</li>
-</ul></li>
-<li>Linux fallocateコマンドで作成</li>
-</ul>
-
-<h3 id="ファイル形式パターン">ファイル形式パターン</h3>
-
-<ol>
-<li>ファイル、Blobそのまま送る (6160ファイル)</li>
-<li>ディスクイメージで送る (1ファイル)
-
-<ul>
-<li>Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置</li>
-<li>転送前にデタッチ、エクスポート(Blob SAS形式)</li>
-<li>AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)</li>
-</ul></li>
-</ol>
-
-<h3 id="対象のazureリージョン">対象のAzureリージョン</h3>
-
-<ul>
-<li>東日本 (マスター、複製元と位置づける)</li>
-<li>米国中南部 (太平洋越え + 米国内を見たい)</li>
-<li>ブラジル南部</li>
-</ul>
-
-<h3 id="転送パターン">転送パターン</h3>
-
-<ul>
-<li>ユーザー拠点の端末からAzureリージョン: AzCopy Upload</li>
-<li>Azureリージョン間 (Storage to Storage)
-
-<ul>
-<li>ファイル: AzCopy Copy</li>
-<li>イメージ: PowerShell Start-AzureStorageBlobCopy</li>
-</ul></li>
-</ul>
-
-<h2 id="結果">結果</h2>
-
-<table>
-<thead>
-<tr>
-<th align="left">形式　</th>
-<th align="left">コピー元　　　　　</th>
-<th align="left">コピー先　　　　　　　　</th>
-<th align="left">コマンド　</th>
-<th align="right">　並列数</th>
-<th align="right">　実行時間(時:分:秒)</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure 東日本</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">07:55:22</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">10:22:30</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">自宅</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">2</td>
-<td align="right">12:46:37</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure 東日本</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">16</td>
-<td align="right">00:20:47</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">16</td>
-<td align="right">00:45.11</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">オフィス</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Upload</td>
-<td align="right">8</td>
-<td align="right">02:07.58</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">AzCopy Copy</td>
-<td align="right">N/A</td>
-<td align="right">00:28:55</td>
-</tr>
-
-<tr>
-<td align="left">イメージ　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure 米国中南部</td>
-<td align="left">PowerShell</td>
-<td align="right">N/A</td>
-<td align="right">00:11:11</td>
-</tr>
-
-<tr>
-<td align="left">ファイル　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">AzCopy Copy</td>
-<td align="right">N/A</td>
-<td align="right">00.25:33</td>
-</tr>
-
-<tr>
-<td align="left">イメージ　</td>
-<td align="left">Azure 東日本</td>
-<td align="left">Azure ブラジル南部</td>
-<td align="left">PowerShell</td>
-<td align="right">N/A</td>
-<td align="right">00.09:20</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="考察">考察</h2>
-
-<ul>
-<li><p>アクセス回線の差が大きく影響</p>
-
-<ul>
-<li>自宅パターンでプロバイダから帯域制限されていたかは不明 (自宅からAzure東日本まで16Mbpsくらいは出た)</li>
-<li>アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい</li>
-<li>こまめに送る</li>
-<li>Azure内でデータを生成する</li>
-<li>もしくはExpressRouteを引く (自宅で、とは言っていない)</li>
-</ul></li>
-
-<li><p>アクセス回線が細い場合、AzCopy Uploadの並列数を下げる</p>
-
-<ul>
-<li>AzCopyのデフォルト並列数は実行環境のCPUコア数 *8だが、今回実施した端末での並列数(4コア * 8 = 32)ではかえって性能が劣化した</li>
-<li>アクセス回線に合わせて並列数は調整する</li>
-</ul></li>
-
-<li><p>Azureのリージョン間コピーは早い</p>
-
-<ul>
-<li>Azureバックボーンを通るから</li>
-<li>端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから</li>
-</ul></li>
-
-<li><p>地理的な距離感覚だけで考えてはダメ</p>
-
-<ul>
-<li>地理的な近さではなく、ネットワーク的な近さと太さ</li>
-<li>Azureバックボーンを使うと日本とブラジルの間でもそれなりのスループット</li>
-</ul></li>
-
-<li><p>ファイル数が多いときはイメージで送るのも手</p>
-
-<ul>
-<li>ファイル数がコピー時間に影響する (1 vs 6160)</li>
-<li>そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&hellip;</li>
-<li>もしファイルシステムとして、であれば有効な手段</li>
-<li>エクスポートのひと手間は考慮</li>
-</ul></li>
-
-<li><p>Azureバックボーンを使うと、意外にブラジル近い</p>
-
-<ul>
-<li>土管か(ない</li>
-</ul></li>
-</ul>
-
-<p>Azureバックボーンの帯域にはSLAがありませんが、意識して仕組みを作ると得をします。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">21 Apr 2016, 21:30</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" class="post-title">Azure Linux VMのディスク利用料節約Tips</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
-
-<p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
-
-<p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
-
-<pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
-
-空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
-</code></pre>
-
-<p>詳細な定義は、以下で。</p>
-
-<p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
-
-<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
-
-<p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
-
-<ul>
-<li>RHEL 7.2 on Azure</li>
-<li>XFS &amp; Ext4</li>
-<li>10GBytesのPage Blobの上にファイルシステムを作成</li>
-<li>mkfsはデフォルト</li>
-<li>mountはデフォルトとdiscardオプションありの2パターン</li>
-<li>MD、LVM構成にしない</li>
-<li>以下のタイミングで課金対象容量を確認
-
-<ul>
-<li>Page BlobのVMアタッチ時</li>
-<li>ファイルシステム作成時</li>
-<li>マウント時</li>
-<li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
-<li>5GBytesのファイル削除時</li>
-</ul></li>
-</ul>
-
-<p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
-
-<pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
-
-$blobSizeInBytes = 124 + $Blob.Name.Length * 2
-
-$metadataEnumerator = $Blob.ICloudBlob.Metadata.GetEnumerator()
-while ($metadataEnumerator.MoveNext())
-{
-    $blobSizeInBytes += 3 + $metadataEnumerator.Current.Key.Length + $metadataEnumerator.Current.Value.Length
-}
-
-$Blob.ICloudBlob.GetPageRanges() | 
-    ForEach-Object { $blobSizeInBytes += 12 + $_.EndOffset - $_.StartOffset }
-
-return $blobSizeInBytes
-</code></pre>
-
-<p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
-
-<h2 id="結果">結果</h2>
-
-<h3 id="xfs">XFS</h3>
-
-<table>
-<thead>
-<tr>
-<th align="left">　確認タイミング　</th>
-<th align="right">　課金対象容量(Bytes)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Page BlobのVMアタッチ時</td>
-<td align="right">960</td>
-</tr>
-
-<tr>
-<td align="left">ファイルシステム作成時</td>
-<td align="right">10,791,949</td>
-</tr>
-
-<tr>
-<td align="left">マウント時</td>
-<td align="right">10,791,949</td>
-</tr>
-
-<tr>
-<td align="left">5GBytesのデータ書き込み時</td>
-<td align="right">5,253,590,051</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時</td>
-<td align="right">5,253,590,051</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時 (discard)</td>
-<td align="right">10,710,029</td>
-</tr>
-</tbody>
-</table>
-
-<h3 id="ext4">Ext4</h3>
-
-<table>
-<thead>
-<tr>
-<th align="left">　確認タイミング　</th>
-<th align="right">　課金対象容量(Bytes)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">Page BlobのVMアタッチ時</td>
-<td align="right">960</td>
-</tr>
-
-<tr>
-<td align="left">ファイルシステム作成時</td>
-<td align="right">138,683,592</td>
-</tr>
-
-<tr>
-<td align="left">マウント時</td>
-<td align="right">306,451,689</td>
-</tr>
-
-<tr>
-<td align="left">5GBytesのデータ書き込み時</td>
-<td align="right">5,549,470,887</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時</td>
-<td align="right">5,549,470,887</td>
-</tr>
-
-<tr>
-<td align="left">5Gbytesのファイル削除時 (discard)</td>
-<td align="right">306,586,780</td>
-</tr>
-</tbody>
-</table>
-
-<p>この結果から、以下のことがわかります。</p>
-
-<ul>
-<li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
-<li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
-<li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
-
-<ul>
-<li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
-<li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
-<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a>
-
-<br /></li>
-</ul></li>
-</ul>
-
-<p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
-
-                    </div>
-                </section>
-                
-                <h1 class="content-subhead">11 Feb 2016, 12:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/azureblobupload_perf/" class="post-title">Azure Blob Upload ツール別ベンチマーク</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-Azure" href="https://ToruMakabe.github.io//categories/azure">Azure</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="同じ目的を達成できるツールがたくさん">同じ目的を達成できるツールがたくさん</h2>
-
-<p>やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。</p>
-
-<p>端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。</p>
-
-<p>そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。</p>
-
-<p>で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。</p>
-
-<p>なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。</p>
-
-<h2 id="環境と測定方式">環境と測定方式</h2>
-
-<p>おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。</p>
-
-<p>環境は以下の通り。</p>
-
-<ul>
-<li>Windows端末
-
-<ul>
-<li>Surface Pro 4 Core i7/16GB Memory/802.11ac</li>
-<li>1Gbps Ethernet (USB経由)</li>
-<li>Windows 10 (1511)</li>
-</ul></li>
-<li>Mac端末
-
-<ul>
-<li>Macbook 12inch Core M/8GB Memory/802.11ac</li>
-<li>USB-C&hellip; 有線テストは省きます</li>
-<li>El Capitan</li>
-</ul></li>
-<li>Wi-Fiアクセスポイント/端末間帯域
-
-<ul>
-<li>100~200Mbpsでつながっています</li>
-</ul></li>
-<li>Azureデータセンタまでの接続
-
-<ul>
-<li>日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続</li>
-<li>よってWAN側の遅延、帯域ともに条件がいい</li>
-</ul></li>
-<li>対象ツール
-
-<ul>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-use-azcopy/">AzCopy v5.0.0.27</a> (Windowsのみ)</li>
-<li><a href="https://azure.microsoft.com/ja-jp/documentation/articles/xplat-cli-install/">Azure CLI v0.9.15</a></li>
-<li><a href="http://storageexplorer.com/">Azure Storage Explorer - Cross Platform GUI v0.7</a></li>
-</ul></li>
-<li>転送ファイル
-
-<ul>
-<li>Ubuntu 15.10 ISOイメージ (647MBytes)</li>
-</ul></li>
-</ul>
-
-<p>そして測定方式。</p>
-
-<p>AzCopyはPowerShellのMeasure-Commandにて実行時間をとります。NCが平行度指定です。デフォルトの平行度はCPUコア数の8倍です。わしのSurface、OSから4コア見えていますので、32。</p>
-
-<pre><code>Measure-Command {AzCopy /Source:C:\Users\myaccount\work /Dest:https://myaccount.blob.core.windows.net/mycontainer /DestKey:mykey /Pattern:ubuntu-15.10-server-amd64.iso /Y /NC:count}
-</code></pre>
-
-<p>Azure CLIも同様にMeasure-Commandで。&ndash;concurrenttaskcountで平行度を指定できますが、<a href="https://github.com/Azure/azure-xplat-cli/blob/dev/lib/util/storage.util._js">ソース</a>を確認したところ、平行度のデフォルトは5です。&rdquo;StorageUtil.threadsInOperation = 5;&ldquo;ですね。</p>
-
-<pre><code>Measure-Command {azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count}
-</code></pre>
-
-<p>残念ながらMacむけAzCopyはありませんので、Azure CLIのみ実行します。timeコマンドで時間をとります。</p>
-
-<pre><code>time azure storage blob upload ./ubuntu-15.10-server-amd64.iso -a myaccount -k mykey mycontainer ubuntu1510 --concurrenttaskcount count
-</code></pre>
-
-<p>Azure Storage Explorer Cross Platform GUIは、目視+iPhoneのストップウォッチで。</p>
-
-<h2 id="結果">結果</h2>
-
-<p>平行度上げても伸びないな、というタイミングまで上げます。</p>
-
-<table>
-<thead>
-<tr>
-<th align="right">　実行No　</th>
-<th align="center">　クライアントOS　</th>
-<th align="center">　ネットワーク接続　</th>
-<th align="center">　クライアント　</th>
-<th align="right">　並行数　</th>
-<th align="right">　転送時間(秒)　</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="right">1</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">(default:32)</td>
-<td align="right">9.62</td>
-</tr>
-
-<tr>
-<td align="right">2</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">5</td>
-<td align="right">12.28</td>
-</tr>
-
-<tr>
-<td align="right">3</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">10</td>
-<td align="right">10.83</td>
-</tr>
-
-<tr>
-<td align="right">4</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">AzCopy</td>
-<td align="right">20</td>
-<td align="right">10.43</td>
-</tr>
-
-<tr>
-<td align="right">5</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">49.92</td>
-</tr>
-
-<tr>
-<td align="right">6</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">29.47</td>
-</tr>
-
-<tr>
-<td align="right">7</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">21.05</td>
-</tr>
-
-<tr>
-<td align="right">8</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Azure CLI</td>
-<td align="right">40</td>
-<td align="right">20.12</td>
-</tr>
-
-<tr>
-<td align="right">9</td>
-<td align="center">Windows 10</td>
-<td align="center">1Gbps Ethernet</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">50.10</td>
-</tr>
-
-<tr>
-<td align="right">10</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">(default:32)</td>
-<td align="right">74.87</td>
-</tr>
-
-<tr>
-<td align="right">11</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">5</td>
-<td align="right">53.32</td>
-</tr>
-
-<tr>
-<td align="right">12</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">AzCopy</td>
-<td align="right">10</td>
-<td align="right">58.85</td>
-</tr>
-
-<tr>
-<td align="right">13</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">57.23</td>
-</tr>
-
-<tr>
-<td align="right">14</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">50.71</td>
-</tr>
-
-<tr>
-<td align="right">15</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">54.37</td>
-</tr>
-
-<tr>
-<td align="right">16</td>
-<td align="center">Windows 10</td>
-<td align="center">802.11ac</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">54.63</td>
-</tr>
-
-<tr>
-<td align="right">17</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">(default:5)</td>
-<td align="right">40.86</td>
-</tr>
-
-<tr>
-<td align="right">18</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">10</td>
-<td align="right">33.97</td>
-</tr>
-
-<tr>
-<td align="right">19</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Azure CLI</td>
-<td align="right">20</td>
-<td align="right">58.57</td>
-</tr>
-
-<tr>
-<td align="right">20</td>
-<td align="center">Mac OS X</td>
-<td align="center">802.11ac</td>
-<td align="center">Storage Explorer</td>
-<td align="right">N/A</td>
-<td align="right">58.20</td>
-</tr>
-</tbody>
-</table>
-
-<h2 id="考察">考察</h2>
-
-<ul>
-<li>有線AzCopy早い。単純計算で67MByte/s出ています。それぞれの計測点の解釈の違いでBlobサービス制限の60MBytes/sを超えてしまっていますがw。データセンタまでのボトルネックがなければ、ポテンシャルを引き出せることがわかります。</li>
-<li>平行度は大きく性能に影響します。
-
-<ul>
-<li>平行度が高すぎてもだめ
-
-<ul>
-<li>無線AzCopyのデフォルト(平行度32)が平行度10、20より時間がかかっていることからわかる</li>
-</ul></li>
-<li>デフォルトで遅いからといってあきらめず、平行度変えて試してみましょう</li>
-<li>SDK使って自分で作る時も同じ。平行度パラメータを意識してください
-
-<ul>
-<li>.NET: BlobRequestOptions</li>
-<li>Java/Android: BlobRequestOptions.setConcurrentRequestCount()</li>
-<li>Node.js: parallelOperationThreadCount</li>
-<li>C++: blob_request_options::set_parallelism_factor</li>
-</ul></li>
-</ul></li>
-<li>Azure CLIよりAzCopyが早い。
-
-<ul>
-<li>.NETで最適化できているから合点</li>
-<li>Node.jsベースでマルチOS対応のAzure CLIは比べられると分が悪い</li>
-<li>でも、802.11acでも無線がボトルネックになっているので、いまどきのWi-Fi環境では似たような性能になる</li>
-<li>No.18の結果は無線状態がよかったと想定</li>
-</ul></li>
-<li>Azure Storage Explorer Cross Platform GUIは、現時点で平行度変えられないので性能面では不利。でも直観的なので、使い分け。</li>
-</ul>
-
-<p>WAN条件がいいベンチマークでなので、ぜひみなさんの条件でも試してみてください。遅延の大きなリージョンや途中に帯域ボトルネックがある条件でやると、最適な平行度が変わってくるはずです。</p>
-
-<p>でも一番言いたかったのは、Macbookの有線アダプタ欲しいということです。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
+  
+  | <a class="subtitle is-6" href="/tags/eventgrid">#EventGrid</a>
+  
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 5, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_blobevent/">Azure Event GridでBlobイベントを拾う</a></h1>
+      <div class="content">
+        Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
+プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
+Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
+イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
+Event Gridに期待する理由はいくつかあります。
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_blobevent/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
+  
+  | <a class="subtitle is-6" href="/tags/copy">#Copy</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">June 13, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azureblobcopy_perf/">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</a></h1>
+      <div class="content">
+        ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
+でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
+調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
+ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線
+ 自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ ゲートウェイ名から推測  いい感じの回線
+ 日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」   コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10  Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)  Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)   対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え + 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy   結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobcopy_perf/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/linux">#Linux</a>
+  
+  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 21, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/">Azure Linux VMのディスク利用料節約Tips</a></h1>
+      <div class="content">
+        定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。
+なお、Premium Storageは例外です。FAQを確認してみましょう。
+仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
+Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
+書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
+ RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+$Blob = Get-AzureStorageBlob yourDataDisk.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
+  
+  | <a class="subtitle is-6" href="/tags/upload">#Upload</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 11, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azureblobupload_perf/">Azure Blob Upload ツール別ベンチマーク</a></h1>
+      <div class="content">
+        同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。
+端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。
+そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。
+で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。
+なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
+環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
+環境は以下の通り。
+ Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)  Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan  Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています  Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい  対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7  転送ファイル  Ubuntu 15.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobupload_perf/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+

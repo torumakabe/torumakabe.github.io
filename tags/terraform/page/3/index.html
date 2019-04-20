@@ -1,218 +1,179 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terraform &middot; re-imagine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="my life is the sum of my imagination">
+<title>Terraform | re-imagine</title>
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Terraform &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
+<meta property='og:title' content='Tag: Terraform - re-imagine'>
+<meta property='og:description' content=''>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/terraform/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Terraform &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
 
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
 
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
 </head>
 <body>
-
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">04 Apr 2015, 00:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/" class="post-title">いきなり Terraform OpenStack Provider</a>
-
-                        <p class="post-meta">
-                            
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h3 id="terraform-0-4でopenstack-providerリリース">Terraform 0.4でOpenStack Providerリリース</h3>
-
-<p>以前からOpenStack対応は表明されていたのですが、いよいよ<a href="https://hashicorp.com/blog/terraform-0-4.html">v0.4</a>でリリースされました。</p>
-
-<h3 id="小さくはじめましょう">小さくはじめましょう</h3>
-
-<p>この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。</p>
-
-<h3 id="テストした環境">テストした環境</h3>
-
-<ul>
-<li>Terraform 0.4</li>
-<li>Mac OS 10.10.2</li>
-<li>HP Helion Public Cloud</li>
-</ul>
-
-<h3 id="openstackerのみだしなみ-環境変数">OpenStackerのみだしなみ、環境変数</h3>
-
-<p>下記、環境変数はセットされてますよね。要確認。</p>
-
-<ul>
-<li>OS_AUTH_URL<br /></li>
-<li>OS_USERNAME<br /></li>
-<li>OS_PASSWORD<br /></li>
-<li>OS_REGION_NAME<br /></li>
-<li>OS_TENANT_NAME<br /></li>
-</ul>
-
-<h3 id="最小限の構成ファイル">最小限の構成ファイル</h3>
-
-<script type="text/javascript" src="http://gist.github.com/977209064bcfda66d085.js"></script>
-
-<p>これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。</p>
-
-<h3 id="さあ実行">さあ実行</h3>
-
-<p>まずはterraform planコマンドで、実行計画を確認します。</p>
-
-<pre><code>$ terraform plan
-Refreshing Terraform state prior to plan...
-
-
-The Terraform execution plan has been generated and is shown below.
-Resources are shown in alphabetical order for quick scanning. Green resources
-will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
-
-Note: You didn't specify an &quot;-out&quot; parameter to save this plan, so when &quot;apply&quot; is called, Terraform can't guarantee this is what will execute.
-
-+ openstack_compute_instance_v2.sample-server
-    access_ip_v4:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    access_ip_v6:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    flavor_id:         &quot;&quot; =&gt; &quot;my_flavor_id&quot;
-    flavor_name:       &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    floating_ip:       &quot;&quot; =&gt; &quot;aaa.bbb.ccc.ddd&quot;
-    image_id:          &quot;&quot; =&gt; &quot;my_image_id&quot;
-    image_name:        &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    key_pair:          &quot;&quot; =&gt; &quot;my_keypair&quot;
-    name:              &quot;&quot; =&gt; &quot;tf-sample&quot;
-    network.#:         &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;
-    region:            &quot;&quot; =&gt; &quot;my_region&quot;
-    security_groups.#: &quot;&quot; =&gt; &quot;1&quot;
-    security_groups.0: &quot;&quot; =&gt; &quot;my_sg&quot;
-</code></pre>
-
-<p>定義通りに動きそうですね。では実行。applyです。</p>
-
-<pre><code>$ terraform apply  
-openstack_compute_instance_v2.sample-server: Creating...  
-    access_ip_v4:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    access_ip_v6:      &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    flavor_id:         &quot;&quot; =&gt; &quot;my_flavor&quot;  
-    flavor_name:       &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    floating_ip:       &quot;&quot; =&gt; &quot;aaa.bbb.ccc.ddd&quot;  
-    image_id:          &quot;&quot; =&gt; &quot;my_image_id&quot;  
-    image_name:        &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    key_pair:          &quot;&quot; =&gt; &quot;my_keypair&quot;  
-    name:              &quot;&quot; =&gt; &quot;tf-sample&quot;  
-    network.#:         &quot;&quot; =&gt; &quot;&lt;computed&gt;&quot;  
-    region:            &quot;&quot; =&gt; &quot;my_region&quot;
-    security_groups.#: &quot;&quot; =&gt; &quot;1&quot;
-    security_groups.0: &quot;&quot; =&gt; &quot;my_sg&quot;
-openstack_compute_instance_v2.test-server: Creation complete
-
-Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
-
-The state of your infrastructure has been saved to the path below. This state is required to modify and destroy your infrastructure, so keep it safe. To inspect the complete state use the `terraform show` command.
-</code></pre>
-
-<p>とても楽ちんですね。あとはオプションを追加して込み入った構成に挑戦してみてください。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-<div class="pagination">
-  <nav role="pagination" class="post-list-pagination">
-      
-      <a href="/tags/terraform/page/2/" class="post-list-pagination-item pure-button post-list-pagination-item-prev">
-        <i class="fa fa-angle-double-left"></i>&nbsp;Newer
-      </a>
-      
-    <span class="post-list-pagination-item post-list-pagination-item-current">Page 3 of 3</span>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     
-  </nav>
-</div>
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="rss" href='/index.xml'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
 
 
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
+
+  
+  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 4, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/">いきなり Terraform OpenStack Provider</a></h1>
+      <div class="content">
+        Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
+小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
+テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
+ OS_AUTH_URL
+ OS_USERNAME
+ OS_PASSWORD
+ OS_REGION_NAME
+ OS_TENANT_NAME
+  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
+さあ実行 まずはterraform planコマンドで、実行計画を確認します。
+$ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          
+          <a class="button" href="/tags/terraform/page/2/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
+          
         </div>
-    </div>
-</div>
+      </div>
+      <div class="level-right is-marginless">
+        <div class="level-item">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>
 
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
 
-ga('create', '', 'auto');
-ga('send', 'pageview');
 
-</script>
 
 </body>
 </html>
+
+
