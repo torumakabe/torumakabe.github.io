@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする | re-imagine</title>
+
+<meta property='og:title' content='作りかけのAKSクラスターにTerraformで追いプロビジョニングする - re-imagine'>
+<meta property='og:description' content='何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、触れません。
+動機 Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。
+ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に後追いでこんなものを入れています。
+ Istio Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる) HelmのTiller (helm initで作ると守りが緩いので、localhostに限定したdeploymentで入れたい) AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics) リアルタイムコンテナーログ表示設定  kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。
+とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。今年のはじめに書いた本でも、Terraformの活用例を紹介しています。サンプルコードはこちら。
+で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。ここからがこのエントリーの本題です。
+AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。
+ Virtual Node Cluster Autoscaler (on Virtual Machine Scale Sets) Network Policy (with Calico) Pod Security Policy Multi Nodepool リアルタイムコンテナーログ表示  これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。
+ Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
+ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
+意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
+Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは /subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Terraform'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2019-04-26T18:00:00&#43;09:00'/><meta property='article:modified_time' content='2019-04-26T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+      
+    </div>
+    <h2 class="subtitle is-6">April 26, 2019</h2>
+    <h1 class="title">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</h1>
+    
+    <div class="content">
+      
+
+<h2 id="何の話か">何の話か</h2>
+
+<p>CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、触れません。</p>
+
+<h2 id="動機">動機</h2>
+
+<p>Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。</p>
+
+<p>ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に後追いでこんなものを入れています。</p>
+
+<ul>
+<li>Istio</li>
+<li>Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる)</li>
+<li>HelmのTiller (helm initで作ると守りが緩いので、localhostに限定したdeploymentで入れたい)</li>
+<li>AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics)</li>
+<li>リアルタイムコンテナーログ表示設定</li>
+</ul>
+
+<p>kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。</p>
+
+<p>とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。<a href="https://www.amazon.co.jp/dp/B07L94XGPY">今年のはじめに書いた本</a>でも、Terraformの活用例を紹介しています。サンプルコードは<a href="https://github.com/ToruMakabe/Understanding-K8s">こちら</a>。</p>
+
+<p>で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。ここからがこのエントリーの本題です。</p>
+
+<p>AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。</p>
+
+<ul>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/virtual-nodes-cli">Virtual Node</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/cluster-autoscaler">Cluster Autoscaler (on Virtual Machine Scale Sets)</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/use-network-policies">Network Policy (with Calico)</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/use-pod-security-policies">Pod Security Policy</a></li>
+<li><a href="https://docs.microsoft.com/en-us/cli/azure/ext/aks-preview/aks/nodepool?view=azure-cli-latest">Multi Nodepool</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-live-logs">リアルタイムコンテナーログ表示</a></li>
+</ul>
+
+<p>これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。</p>
+
+<ol>
+<li>Terraformの対応を待つ、貢献する</li>
+<li>Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする</li>
+</ol>
+
+<p>インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。</p>
+
+<p>ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。</p>
+
+<h2 id="意外に知られていない-terraform-data-source">意外に知られていない Terraform Data Source</h2>
+
+<p>Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。</p>
+
+<p>Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
+
+<p>たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは /subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga とかいうやつです。いちいち調べるの、めんどくさい。</p>
+
+<p>そこで、AKSクラスターとLog AnalyticsのWorkspaceをdataとして定義します。</p>
+
+<pre><code>data &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
+  name                = &quot;${var.aks_cluster_name}&quot;
+  resource_group_name = &quot;${var.aks_cluster_rg}&quot;
+}
+
+data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
+  name                = &quot;${var.la_workspace_name_for_aks}&quot;
+  resource_group_name = &quot;${var.la_workspace_rg_for_aks}&quot;
+}
+</code></pre>
+
+<p>次のように定義すれば、resource作成時に参照できます。</p>
+
+<pre><code>resource &quot;azurerm_monitor_diagnostic_setting&quot; &quot;aks&quot; {
+  name                       = &quot;diag_aks&quot;
+  target_resource_id         = &quot;${data.azurerm_kubernetes_cluster.aks.id}&quot;
+  log_analytics_workspace_id = &quot;${data.azurerm_log_analytics_workspace.aks.id}&quot;
+
+  log {
+    category = &quot;kube-apiserver&quot;
+    enabled  = true
+
+    retention_policy {
+      enabled = false
+    }
+  }
+}
+</code></pre>
+
+<p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
+
+<pre><code>provider &quot;kubernetes&quot; {
+  load_config_file       = false
+  host                   = &quot;${data.azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
+  client_certificate     = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&quot;
+  client_key             = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&quot;
+  cluster_ca_certificate = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
+}
+</code></pre>
+
+<p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
+
+<pre><code>resource &quot;kubernetes_service_account&quot; &quot;kured&quot; {
+  metadata {
+    name      = &quot;kured&quot;
+    namespace = &quot;kube-system&quot;
+  }
+}
+</code></pre>
+
+<p>なお、Terraform実行ホスト上のKubernetes configファイルを使って<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">認証する</a>こともできます。要件に合わせて選択しましょう。</p>
+
+<p>ここまでを、まとめます。Azure CLIやポータルを使って作ったAKSクラスターに対し、TerraformのData SourceやKubenetesのconfigファイルを使って属性、認証情報を取得し、追加プロビジョニングを一括で、楽にできる、という話でした。</p>
+
+<h2 id="サンプル">サンプル</h2>
+
+<p>ではどんなことができるのか、サンプルをGistに置いておきました。</p>
+
+<p><a href="https://gist.github.com/ToruMakabe/46ac0b31f7f8a07fa9a1254f862bc15c">サンプルコード</a></p>
+
+<p>冒頭で挙げた、以下リソースの導入や設定ができます。</p>
+
+<ul>
+<li>Istio</li>
+<li>Kured</li>
+<li>HelmのTiller</li>
+<li>AKSマスターコンポーネントのログ転送設定</li>
+<li>リアルタイムコンテナーログ表示設定</li>
+</ul>
+
+<p>HelmとIstioは開発の流れが速いので、ワークアラウンド多めです。詳細はソース上のコメントを参考にしてください。</p>
+
+<h3 id="使い方">使い方</h3>
+
+<ul>
+<li>Gist上の3ファイルを同じディレクトリに置く</li>
+<li>variables.tf.sampleの変数を設定し、ファイルをリネーム(.sampleを消し、.tfにする)</li>
+<li>Terraform導入済みのホストで実行
+
+<ul>
+<li>WSL(Ubuntu 18.04)とmasOS Mojaveで動作検証しています</li>
+<li>Terraformの設定から確認したい場合は以下を参考に</li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/terraform-install-configure">VM などのインフラストラクチャを Azure にプロビジョニングするための Terraform のインストールと構成</a></li>
+<li><a href="https://learn.hashicorp.com/terraform/?track=azure#azure">Getting started with Terraform using the Azure provider</a></li>
+</ul></li>
+</ul>
+
+<p>誰かのお役に、立ちますように。</p>
+
+      
+      <div class="related">
+
+<h3>Similar articles:</h3>
+<ul>
+	
+	<li><a href="/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></li>
+	
+	<li><a href="/post/terraform_azure_secret/">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a></li>
+	
+	<li><a href="/post/myazurecli201804/">俺のAzure CLI 2018春版</a></li>
+	
+	<li><a href="/post/azure_terraform_customimage_desc/">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</a></li>
+	
+	<li><a href="/post/azure_msi_terraform/">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</a></li>
+	
+</ul>
+</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+

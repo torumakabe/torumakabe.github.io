@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-04-26T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,36 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/hp-public-cloud">#HP Public Cloud</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 5, 2014</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-hpcloud/">Vagrant HP Public Cloud Pluginを試す</a></h1>
+      <div class="content">
+        みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作はVagrantでしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。
+VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。
+前提条件  Vagrant 1.5.4 vagrant-hp 0.1.4 HP Public Cloud (2014/5/5)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
+ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、Githubの説明には若干のトラップがありますのでご注意を。
+ イメージにUbuntu 14.04 LTSを使う例です。 Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。 Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。 Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。 ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。  それではさっそくvagrant up $ vagrant up --provider=hp Bringing machine 'default' up with 'hp' provider... WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1 ==&gt; default: Warning! The HP provider doesn't support any of the Vagrant ==&gt; default: high-level network configurations (`config.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/vagrant-hpcloud/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -178,34 +208,6 @@ $curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpclou
         <a class="button is-link" href="https://ToruMakabe.github.io/post/swift-upload/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/cloud">#Cloud</a>
-
-
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">March 16, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/cloud-and-power/">クラウド = 発電所?</a></h1>
-      <div class="content">
-        思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。
-でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。
-本当に発電は大規模発電所任せ? 最近CMでよく見ますが、エネファームってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。
-戸別の発電は、将来的には燃料電池など新しい技術も使われて、さらに普及するんじゃないでしょうか。使う人の近くで、その使い方に合わせて発電した方が、合理的ですものね。
-オンプレIT基盤は無くなる? で、クラウドの話です。オンプレミスのIT基盤は無くなって、全部クラウドに移ってしまうのでしょうか。でも、もしその考えが「発電所のように」という根拠であれば、「従来の」という前提が要ります。なぜなら、発電の仕組みも進化しているので。エネファームのように。
-ネットワーク遅延を考えれば、処理する場所の近くにデータがあったほうがいいですよね。利用者みんなが、クラウドが動くデータセンターの近くにいるわけではないので。
-また、発電所は、ピークに合わせて設備投資をしています。いっぽうで、いざというとき、あなたの契約しているクラウドは、契約者全員が使えるだけの能力を供給できるでしょうか。ピークに合わせて設備投資しているでしょうか。そもそもピークをどう定義しているでしょうか。災害時にそれを期待した利用者の需要で、パンクしないでしょうか。
-そのインフラ知識は捨てないほうがいい 発電の世界で燃料電池が期待されているように、ITの世界でも不揮発性メモリなど、その使い方が大きく変わるイノベーションの種が研究開発されています。普段は電源を切っておいて、処理するときだけ瞬時に起動、処理、また停止するようなコンピュータ。家とかオフィスに置きたくないですか。性能的にも経済的にもリスク管理的にも、合理的かもしれませんよ。
-そして、その設備ではリソースが足りない、読めない、あまり使わないものはクラウドに置き、動かせばいいのではないかと思います。あと、クラウドのほうが、いいものをすぐに使える場合。SaaSとか。
-「未来はどっちだ」という白か黒かの議論をして、どちらかと心中する必要はありません。どっちも使えばいいです。かっこいい言い方をすると、ハイブリッドです。
-なので、「クラウド時代に自分で基盤作ることなんてなくなるから、インフラの知識はもう要らないよね」とか言って、せっかく身につけたハードウェア、ITインフラの知識は、捨てるどころか磨いた方がいいですよ。知識は荷物になりません、あなたを守る懐刀。
         
       </div>
     </article>
