@@ -93,7 +93,7 @@ data &amp;quot;azurerm_log_analytics_workspace&amp;quot; &amp;quot;aks&amp;quot;
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;次のように定義すれば、resource作成時に参照できます。&lt;/p&gt;
+&lt;p&gt;それを次のように、resource作成時に参照できます。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;resource &amp;quot;azurerm_monitor_diagnostic_setting&amp;quot; &amp;quot;aks&amp;quot; {
   name                       = &amp;quot;diag_aks&amp;quot;
