@@ -73,7 +73,12 @@
 
 &lt;p&gt;Terraformはリソースを&amp;rdquo;API Management Resource(resource)&amp;ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。&lt;/p&gt;
 
-&lt;p&gt;たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは /subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga とかいうやつです。いちいち調べるの、めんどくさい。&lt;/p&gt;
+&lt;p&gt;たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;とかいうやつです。いちいち調べるの、めんどくさい。&lt;/p&gt;
 
 &lt;p&gt;そこで、AKSクラスターとLog AnalyticsのWorkspaceをdataとして定義します。&lt;/p&gt;
 
