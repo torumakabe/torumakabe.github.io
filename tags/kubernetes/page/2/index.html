@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title>ChatOps | re-imagine</title>
+<title>Kubernetes | re-imagine</title>
 
-<meta property='og:title' content='Tag: ChatOps - re-imagine'>
+<meta property='og:title' content='Tag: Kubernetes - re-imagine'>
 <meta property='og:description' content=''>
-<meta property='og:url' content='https://ToruMakabe.github.io/tags/chatops/'>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/kubernetes/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
@@ -96,38 +96,26 @@
 
 
   
-  | <a class="subtitle is-6" href="/tags/chatops">#ChatOps</a>
+  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
   
-  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
-  
-  | <a class="subtitle is-6" href="/tags/slack">#Slack</a>
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
   
 
         
       </div>
-      <h2 class="subtitle is-6 date">October 7, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/">SlackとAzure FunctionsでChatOpsする</a></h1>
+      <h2 class="subtitle is-6 date">February 10, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></h1>
       <div class="content">
-        Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
-AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
-素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
-SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
-AZChatOpsSample
-おおまかな流れ 手順書つらいのでポイントだけ。
- SlackのSlash CommandとIncoming Webhookを作る
- 流れは氏の元ネタと同じ  ARM TemplateでFunction Appをデプロイ
- Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
- パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
- Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
- GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&rdquo;IsManualIntegration&rdquo;をtrueにしています
- Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
- Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
- 作成済みのSlack関連パラメータを指定します
-  ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)
- デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
- kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)
+        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
+さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
+せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
+使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
+ Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
+$ helm install stable/nginx-ingress --name my-nginx  バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
+$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80  サービスとしてexposeします。
+$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort  現時点のサービスたちを確認します。
         
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" style="height:28px">
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more
         </a>
         
@@ -141,6 +129,17 @@ AZChatOpsSample
     <nav class="level is-mobile">
       <div class="level-left">
         <div class="level-item">
+          
+          <a class="button" href="/tags/kubernetes/">
+            <span class="icon is-small is-marginless">
+              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <polyline points="15 18 9 12 15 6"/>
+    
+  </svg>
+            </span>
+            Newer
+          </a>
           
         </div>
       </div>

@@ -7,10 +7,35 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Fri, 26 Apr 2019 18:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 01 Jun 2019 09:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kubernetes DeschedulerでPodを再配置する</title>
+      <link>https://ToruMakabe.github.io/post/k8s_descheduler/</link>
+      <pubDate>Sat, 01 Jun 2019 09:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/k8s_descheduler/</guid>
+      <description>何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
+機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
+Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
+ 図で理解する Descheduler
+ これを読んでからプロジェクトのREADMEを読むと理解が進むでしょう。
+ Descheduler for Kubernetes
+ OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
+ Descheduling
+ 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
+Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
+例えばこんなシナリオです。あるある。
+ 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
+では、このシナリオで動きを追ってみましょう。
+事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
+NodeにPodを寄せる はじめのNode数は2です。
+$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
+apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: ３ selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: ５00m  デプロイします。</description>
+    </item>
     
     <item>
       <title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする</title>

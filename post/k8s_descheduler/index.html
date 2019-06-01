@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Kubernetes DeschedulerでPodを再配置する | re-imagine</title>
+
+<meta property='og:title' content='Kubernetes DeschedulerでPodを再配置する - re-imagine'>
+<meta property='og:description' content='何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
+機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
+Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
+ 図で理解する Descheduler
+ これを読んでからプロジェクトのREADMEを読むと理解が進むでしょう。
+ Descheduler for Kubernetes
+ OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
+ Descheduling
+ 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
+Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
+例えばこんなシナリオです。あるある。
+ 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
+では、このシナリオで動きを追ってみましょう。
+事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
+NodeにPodを寄せる はじめのNode数は2です。
+$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
+apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: ３ selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: ５00m  デプロイします。'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/k8s_descheduler/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Kubernetes'><meta property='article:tag' content='Azure'><meta property='article:published_time' content='2019-06-01T09:00:00&#43;09:00'/><meta property='article:modified_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+
+      
+    </div>
+    <h2 class="subtitle is-6">June 1, 2019</h2>
+    <h1 class="title">Kubernetes DeschedulerでPodを再配置する</h1>
+    
+    <div class="content">
+      
+
+<h2 id="何の話か">何の話か</h2>
+
+<p>KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。</p>
+
+<p>機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。</p>
+
+<h2 id="deschedulerとは">Deschedulerとは</h2>
+
+<p><a href="https://twitter.com/ponde_m">@ponde_m</a> さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。</p>
+
+<blockquote>
+<p><a href="https://speakerdeck.com/daikurosawa/introduction-to-descheduler">図で理解する Descheduler</a></p>
+</blockquote>
+
+<p>これを読んでからプロジェクトのREADMEを読むと理解が進むでしょう。</p>
+
+<blockquote>
+<p><a href="https://github.com/kubernetes-incubator/descheduler/tree/master">Descheduler for Kubernetes</a></p>
+</blockquote>
+
+<p>OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。</p>
+
+<blockquote>
+<p><a href="https://docs.openshift.com/container-platform/3.11/admin_guide/scheduling/descheduler.html">Descheduling</a></p>
+</blockquote>
+
+<h2 id="動きを見てみよう">動きを見てみよう</h2>
+
+<p>実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。</p>
+
+<p>Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。</p>
+
+<p>例えばこんなシナリオです。あるある。</p>
+
+<ul>
+<li>諸事情から2Nodeで運用を開始</li>
+<li>知らずにか忘れてか、レプリカ数3のDeploymentを作る</li>
+<li>当たり前だけど片方のNodeに2Pod寄ってる</li>
+<li>Node追加</li>
+<li>Podは寄りっぱなし 残念</li>
+</ul>
+
+<p>Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。</p>
+
+<p>では、このシナリオで動きを追ってみましょう。</p>
+
+<h3 id="事前準備">事前準備</h3>
+
+<p>DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、<a href="https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod">プロジェクトREADME</a>を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。</p>
+
+<h3 id="nodeにpodを寄せる">NodeにPodを寄せる</h3>
+
+<p>はじめのNode数は2です。</p>
+
+<pre><code>$ kubectl get nodes
+NAME                            STATUS   ROLES   AGE   VERSION
+aks-pool1-27450415-vmss000000   Ready    agent   34m   v1.13.5
+aks-pool1-27450415-vmss000001   Ready    agent   34m   v1.13.5
+</code></pre>
+
+<p>レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。</p>
+
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: ３
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        resources:
+          requests:
+            cpu: ５00m
+</code></pre>
+
+<p>デプロイします。</p>
+
+<pre><code>$ kubectl apply -f nginx.yaml
+</code></pre>
+
+<p>aks-pool1-27450415-vmss000000に寄ってますね。</p>
+
+<pre><code>$ kubectl get po -o wide
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                            NOMINATED NODE   READINESS GATES
+nginx-6d4df4db7b-cqrkl   1/1     Running   0          12s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-dg267   1/1     Running   0          12s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-kxmml   1/1     Running   0          12s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</code></pre>
+
+<h3 id="nodeを追加する">Nodeを追加する</h3>
+
+<p>Nodeを追加し、3Nodeにします。以下はマルチノードプール構成クラスター向けのコマンドです。シングルノードプール構成のクラスターでは、<a href="https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale">こちら</a>を参考に。</p>
+
+<pre><code>$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
+
+$ kubectl get nodes
+NAME                            STATUS   ROLES   AGE   VERSION
+aks-pool1-27450415-vmss000000   Ready    agent   38m   v1.13.5
+aks-pool1-27450415-vmss000001   Ready    agent   38m   v1.13.5
+aks-pool1-27450415-vmss000003   Ready    agent   68s   v1.13.5
+</code></pre>
+
+<p>aks-pool1-27450415-vmss000003が追加されました。余談ですが、この検証の前にNodeを増やしたり減らしたりしてるので000002が飛んで採番されています。気にせず。</p>
+
+<p>ではPodの様子を見てみましょう。</p>
+
+<pre><code>$ kubectl get po -o wide
+NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
+nginx-6d4df4db7b-cqrkl   1/1     Running   0          5m39s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-dg267   1/1     Running   0          5m39s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-kxmml   1/1     Running   0          5m39s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</code></pre>
+
+<p>Nodeを増やしたのに、寄りっぱなしですね。</p>
+
+<h3 id="descheduler用のリソースを作る">Descheduler用のリソースを作る</h3>
+
+<p>それではDeschedulerを作る準備を。手順は今後変化すると思うので、試す場合は都度<a href="https://github.com/kubernetes-incubator/descheduler/tree/master">プロジェクトのREADME</a>を確認してください。</p>
+
+<p>わたしはDescheduler動かすのに必要なリソースを、descheduler.yamlにまとめています。</p>
+
+<pre><code>kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: descheduler-cluster-role
+rules:
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;nodes&quot;]
+  verbs: [&quot;get&quot;, &quot;watch&quot;, &quot;list&quot;]
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;pods&quot;]
+  verbs: [&quot;get&quot;, &quot;watch&quot;, &quot;list&quot;, &quot;delete&quot;]
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;pods/eviction&quot;]
+  verbs: [&quot;create&quot;]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: descheduler-sa
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: descheduler-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: descheduler-sa
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: descheduler-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+data:
+  policy.yaml: |
+    apiVersion: &quot;descheduler/v1alpha1&quot;
+    kind: &quot;DeschedulerPolicy&quot;
+    strategies:
+      &quot;RemoveDuplicates&quot;:
+         enabled: true
+      &quot;RemovePodsViolatingInterPodAntiAffinity&quot;:
+         enabled: true
+      &quot;LowNodeUtilization&quot;:
+         enabled: true
+         params:
+           nodeResourceUtilizationThresholds:
+             thresholds:
+               &quot;cpu&quot; : 20
+               &quot;memory&quot;: 20
+               &quot;pods&quot;: 20
+             targetThresholds:
+               &quot;cpu&quot; : 50
+               &quot;memory&quot;: 50
+               &quot;pods&quot;: 50
+kind: ConfigMap
+metadata:
+  name: descheduler-policy-configmap
+  namespace: kube-system
+</code></pre>
+
+<p>Dechedulerのポリシーは、プロジェクトページのexamplesに<a href="https://github.com/kubernetes-incubator/descheduler/blob/master/examples/policy.yaml">あるもののまま</a>としました。先ほど用意したクラスターでは、aks-pool1-27450415-vmss000000にレプリカが2つ寄っているので、RemoveDuplicatesが適用されると期待できます。</p>
+
+<p>では作ります。</p>
+
+<pre><code>$ kubectl apply -f descheduler.yaml
+</code></pre>
+
+<h3 id="descheduler-jobを実行">Descheduler Jobを実行</h3>
+
+<p>descheduler-job.yamlとします。imageの確認をお忘れなく。</p>
+
+<pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: descheduler-job
+  namespace: kube-system
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: descheduler-pod
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: &quot;&quot;
+    spec:
+        containers:
+        - name: descheduler
+          image: oreno.azurecr.io/descheduler:0.9.0
+          volumeMounts:
+          - mountPath: /policy-dir
+            name: policy-volume
+          command: [&quot;/bin/descheduler&quot;,  &quot;--policy-config-file&quot;, &quot;/policy-dir/policy.yaml&quot;]
+        restartPolicy: &quot;Never&quot;
+        serviceAccountName: descheduler-sa
+        volumes:
+        - name: policy-volume
+          configMap:
+            name: descheduler-policy-configmap
+</code></pre>
+
+<p>いざ実行。</p>
+
+<pre><code>$ kubectl apply -f descheduler-job.yaml
+$ kubectl get jobs.batch -n kube-system
+NAME              COMPLETIONS   DURATION   AGE
+descheduler-job   1/1           9s         11s
+</code></pre>
+
+<p>さて、偏りは解消したでしょうか。</p>
+
+<pre><code>$ kubectl get po -o wide
+NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
+nginx-6d4df4db7b-cqrkl   1/1     Running   0          15m     10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-dg267   1/1     Running   0          15m     10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+nginx-6d4df4db7b-w7mb6   1/1     Running   0          7m33s   10.240.0.87   aks-pool1-27450415-vmss000003   &lt;none&gt;           &lt;none&gt;
+</code></pre>
+
+<p>aks-pool1-27450415-vmss000000にあった1つのPodが退出され、新たにaks-pool1-27450415-vmss000003で作成されたことがわかります。</p>
+
+<h2 id="deschedulerプロジェクトの現状">Deschedulerプロジェクトの現状</h2>
+
+<p>このようにDeschedulerは、特に少ないNode數で偏りが大きくなりがちなクラスターでとても有用です。ですが、アクティブなメンテナーの数が少なく、現時点では積極的にKubernetesのコア機能を目指す感じではなさそうです。</p>
+
+<blockquote>
+<p><a href="https://github.com/kubernetes-incubator/descheduler/issues/138">What is the current status of this project?</a></p>
+
+<p><a href="https://github.com/kubernetes-incubator/descheduler/issues/152">Which version of kuberenetes will have this project included?</a></p>
+</blockquote>
+
+<p>アドオンとして使ってもとても便利で感謝ではありますが、コア機能に、というかたはぜひ応援、貢献しましょう。</p>
+
+      
+      <div class="related">
+
+<h3>Similar articles:</h3>
+<ul>
+	
+	<li><a href="/post/additional_aks_provisioning_with_tf/">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</a></li>
+	
+	<li><a href="/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></li>
+	
+	<li><a href="/post/aks_dns/">AKSのService作成時にホスト名を付ける</a></li>
+	
+	<li><a href="/post/aks_tls_autorenewal/">AKSのIngress TLS証明書を自動更新する</a></li>
+	
+	<li><a href="/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></li>
+	
+</ul>
+</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+

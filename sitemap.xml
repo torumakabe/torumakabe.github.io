@@ -4,36 +4,41 @@
   
   <url>
     <loc>https://ToruMakabe.github.io/tags/azure/</loc>
-    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ToruMakabe.github.io/tags/kubernetes/</loc>
-    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
+    <loc>https://ToruMakabe.github.io/post/k8s_descheduler/</loc>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ToruMakabe.github.io/post/</loc>
-    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ToruMakabe.github.io/tags/</loc>
-    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://ToruMakabe.github.io/tags/terraform/</loc>
-    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://ToruMakabe.github.io/</loc>
+    <lastmod>2019-06-01T09:00:00+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/tags/terraform/</loc>
     <lastmod>2019-04-26T18:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
