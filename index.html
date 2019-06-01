@@ -109,7 +109,7 @@
 機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
 Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
  図で理解する Descheduler
- これを読んでからプロジェクトのREADMEを読むと理解が進むでしょう。
+ これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。
  Descheduler for Kubernetes
  OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
  Descheduling
@@ -118,7 +118,7 @@ Deschedulerは、Nodeの数が少ないクラスターで特に有効です。No
 例えばこんなシナリオです。あるある。
  諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
 では、このシナリオで動きを追ってみましょう。
-事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
+事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
 NodeにPodを寄せる はじめのNode数は2です。
 $ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
 apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: ３ selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: ５00m  デプロイします。

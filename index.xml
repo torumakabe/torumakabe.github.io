@@ -35,7 +35,7 @@
 &lt;p&gt;&lt;a href=&#34;https://speakerdeck.com/daikurosawa/introduction-to-descheduler&#34;&gt;図で理解する Descheduler&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;これを読んでからプロジェクトのREADMEを読むと理解が進むでしょう。&lt;/p&gt;
+&lt;p&gt;これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;a href=&#34;https://github.com/kubernetes-incubator/descheduler/tree/master&#34;&gt;Descheduler for Kubernetes&lt;/a&gt;&lt;/p&gt;
@@ -69,7 +69,7 @@
 
 &lt;h3 id=&#34;事前準備&#34;&gt;事前準備&lt;/h3&gt;
 
-&lt;p&gt;DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、&lt;a href=&#34;https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod&#34;&gt;プロジェクトREADME&lt;/a&gt;を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。&lt;/p&gt;
+&lt;p&gt;DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、&lt;a href=&#34;https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod&#34;&gt;プロジェクトのREADME&lt;/a&gt;を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。&lt;/p&gt;
 
 &lt;h3 id=&#34;nodeにpodを寄せる&#34;&gt;NodeにPodを寄せる&lt;/h3&gt;
 
