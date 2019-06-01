@@ -104,7 +104,7 @@ spec:
         image: nginx
         resources:
           requests:
-            cpu: ５00m
+            cpu: 500m
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;デプロイします。&lt;/p&gt;
