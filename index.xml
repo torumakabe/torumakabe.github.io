@@ -12,6 +12,444 @@
     
     
     <item>
+      <title>Azure Kubernetes Serviceでシークレットを管理する6つの方法</title>
+      <link>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</link>
+      <pubDate>Mon, 17 Jun 2019 22:00:00 +0900</pubDate>
+      <author>Toru Makabe</author>
+      <guid>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</guid>
+      <description></description>
+      
+      <content>
+
+&lt;h2 id=&#34;何の話か&#34;&gt;何の話か&lt;/h2&gt;
+
+&lt;p&gt;Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しましょう。この記事では主にDB接続文字列やAPIキーなど、アプリケーションが必要とする、限られた人のみが扱うべき情報を「シークレット」とします。&lt;/p&gt;
+
+&lt;p&gt;それぞれの仕組みには踏み込まず、どんな課題を解決するか、どのように使えるか、その効果を中心に書きます。それでもちょっと長いですがご容赦ください。&lt;/p&gt;
+
+&lt;p&gt;Azure Kubernetes Serviceを題材にしますが、他のKubernetes環境でも参考になると思います。&lt;/p&gt;
+
+&lt;h2 id=&#34;6つの方法&#34;&gt;6つの方法&lt;/h2&gt;
+
+&lt;p&gt;以下の6つの方法を順に説明します。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;アプリケーションに書く&lt;/li&gt;
+&lt;li&gt;マニフェストに書く&lt;/li&gt;
+&lt;li&gt;KubernetesのSecretにする&lt;/li&gt;
+&lt;li&gt;Key Vaultで管理し、その認証情報をKubernetesのSecretにする&lt;/li&gt;
+&lt;li&gt;Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)&lt;/li&gt;
+&lt;li&gt;Key Vaultで管理し、Podにボリュームとしてマウントする (FlexVolume)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;アプリケーションに書く&#34;&gt;アプリケーションに書く&lt;/h2&gt;
+
+&lt;p&gt;いわゆるハードコーディングです。論外、としたいところですが、何が問題なのかざっと確認しておきましょう。代表的な問題点は、次の2つです。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;アプリケーションのソースコードにアクセスできるすべての人がシークレットを知り得る&lt;/li&gt;
+&lt;li&gt;シークレットの変更時、影響するすべてのソースを変更し再ビルドが必要&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;シークレットが平文で書かれたソースコードリポジトリをパブリックに御開帳、という分かりやすい事案だけがリスクではありません。プライベートリポジトリを使っていても、人の出入りがあるチームでの開発運用、シークレット漏洩時の変更やローテーションなどの運用を考えると、ハードコーディングは取りづらい選択肢です。&lt;/p&gt;
+
+&lt;p&gt;よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。&lt;/p&gt;
+
+&lt;h2 id=&#34;マニフェストに書く&#34;&gt;マニフェストに書く&lt;/h2&gt;
+
+&lt;p&gt;Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+[snip]
+    spec:
+      containers:
+      - name: getsecret
+        image: torumakabe/getsecret:from-env
+        env:
+        - name: SECRET_JOKE
+          value: &amp;quot;Selfish sell fish.&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。&lt;/p&gt;
+
+&lt;p&gt;この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io&amp;quot;
+	&amp;quot;net/http&amp;quot;
+	&amp;quot;os&amp;quot;
+)
+
+func getSecret(w http.ResponseWriter, r *http.Request) {
+	secret := os.Getenv(&amp;quot;SECRET_JOKE&amp;quot;)
+
+	io.WriteString(w, fmt.Sprintf(&amp;quot;Can I tell you my awesome dad joke?: %v&amp;quot;, secret))
+}
+
+func main() {
+	http.HandleFunc(&amp;quot;/&amp;quot;, getSecret)
+	http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Goの場合は os.Getenv で環境変数を取得します。これで、とっておきのジョークを、チームメンバーにデプロイ時まで知られることなくアプリを開発できます。また、ジョークの反応がいまいちだった場合や、飽きられた場合はマニフェストを変更して再デプロイすれば済みます。アプリケーションを変更、再ビルドする必要はありません。&lt;/p&gt;
+
+&lt;p&gt;ですが、マニフェストもアプリケーションのソースコードと同様に共有するでしょうから、直書きされたシークレットがチームメンバーの目に触れる可能性は、あります。&lt;/p&gt;
+
+&lt;p&gt;マニフェストを置くリポジトリのアクセス制御は、マニフェストを誰が作り、デプロイするかによります。深いテーマなので踏み込みませんが、少なくともマニフェストにシークレットの値を平文で書くなら、マニフェストにアクセスできる人を限定すべきでしょう。これは開発、運用の大きな制約条件になり得ます。&lt;/p&gt;
+
+&lt;p&gt;なお、シークレットだけを暗号化してソースコードを管理し、デプロイ時に復号化する、という方法もあります。Helmのラッパーで、Helmの実行時に暗号化されたシークレットファイルを復号化する&lt;a href=&#34;https://github.com/futuresimple/helm-secrets&#34;&gt;helm-secrets&lt;/a&gt;がその例です。&lt;a href=&#34;https://github.com/mozilla/sops&#34;&gt;SOPS&lt;/a&gt;を活用しています。&lt;/p&gt;
+
+&lt;p&gt;ただしKubernetesには復号化されて単なる環境変数として送られますので、Podの参照権限があれば値は読めてしまいます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl get po getsecret-hoge -o yaml
+[snip]
+spec:
+  containers:
+  - env:
+    - name: SECRET_JOKE
+      value: Selfish sell fish.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;なので次からは、マニフェストに直接書かずに済む方法を紹介します。&lt;/p&gt;
+
+&lt;h2 id=&#34;kubernetesのsecretにする&#34;&gt;KubernetesのSecretにする&lt;/h2&gt;
+
+&lt;p&gt;KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは &lt;a href=&#34;https://github.com/Azure/kubernetes-kms&#34;&gt;&amp;ldquo;AKS does encrypt secrets-at-rest&amp;rdquo; つまり暗号化されています&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;なおSecretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。&lt;/p&gt;
+
+&lt;p&gt;Secretは以下のようなマニフェストで作成します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: v1
+kind: Secret
+metadata:
+  name: joke
+type: Opaque
+data:
+  joke: U2VsZmlzaCBzZWxsIGZpc2gu
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;値はBase64で符号化した上で書きます。当然ながらBase64でデコードできるので、マニフェストの管理はご注意を。&lt;/p&gt;
+
+&lt;p&gt;このSecretをアプリケーションに環境変数として渡すマニフェストの書き方は、先ほどの環境変数を直接書く方法とあまり変わりません。envのvalueFrom以下でSecretを指定します。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+[snip]
+    spec:
+      containers:
+      - name: getsecret
+        image: torumakabe/getsecret:from-env
+        env:
+        - name: SECRET_JOKE
+          valueFrom:
+            secretKeyRef:
+              name: joke
+              key: joke
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、SecretはBase64で管理されていますが、アプリケーションにはデコードして送られます。&lt;/p&gt;
+
+&lt;p&gt;もちろんPodの参照権限だけでは、中身をそのまま見ることはできません。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ kubectl get po getsecret-fuga -o yaml
+[snip]
+spec:
+  containers:
+  - env:
+    - name: SECRET_JOKE
+      valueFrom:
+        secretKeyRef:
+          key: joke
+          name: joke
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、マニフェストに値を書かないため、シークレットの変更時、影響を受けるマニフェストを変更する必要がないのもメリットです。Secretを更新すれば済みます。&lt;/p&gt;
+
+&lt;p&gt;さて、これでかなり楽になったのですが、まだ改善の余地があります。こんな悩みが残ります。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;シークレットの管理者がKubernetesの管理者とは別で、Kubernetesの操作権限を渡したくない
+
+&lt;ul&gt;
+&lt;li&gt;接続するDBがKuberentes外部にあり、管理者が別、なんてことはよくある&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;etcdが暗号化されているとはいえ、シークレットは明示的に、特化型のサービスでコントロールしたい&lt;/li&gt;
+&lt;li&gt;etcdに入れる前のマニフェストやソース管理、符号化作業が不安&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;そこで、以降はAzureのシークレット管理サービスであるKey Vaultを活用した方法を解説します。&lt;/p&gt;
+
+&lt;h2 id=&#34;key-vaultで管理し-その認証情報をkubernetesのsecretにする&#34;&gt;Key Vaultで管理し、その認証情報をKubernetesのSecretにする&lt;/h2&gt;
+
+&lt;p&gt;Key VaultはシークレットをHSMで保護し、かつきめ細かいアクセスポリシー制御ができる、シークレット管理に特化したサービスです。暗号化キーや証明書の管理もできます。ここへKuberentesで動くアプリケーションのシークレットを入れてみましょう。&lt;/p&gt;
+
+&lt;p&gt;まずはアプリケーションのサンプルです。先ほどのGoで書いたWebアプリを、Azure SDK for Goを使って、Key Vaultからシークレットが読めるように書き換えます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;context&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/http&amp;quot;
+	&amp;quot;os&amp;quot;
+
+	&amp;quot;github.com/Azure/azure-sdk-for-go/services/keyvault/auth&amp;quot;
+	&amp;quot;github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault&amp;quot;
+)
+
+func getKeyvaultSecret(w http.ResponseWriter, r *http.Request) {
+	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	if err != nil {
+		log.Printf(&amp;quot;unable to get your authorizer object: %v&amp;quot;, err)
+		return
+	}
+
+	keyClient := keyvault.New()
+	keyClient.Authorizer = authorizer
+
+	keyvaultName := os.Getenv(&amp;quot;AZURE_KEYVAULT_NAME&amp;quot;)
+	keyvaultSecretName := os.Getenv(&amp;quot;AZURE_KEYVAULT_SECRET_NAME&amp;quot;)
+	keyvaultSecretVersion := os.Getenv(&amp;quot;AZURE_KEYVAULT_SECRET_VERSION&amp;quot;)
+
+	secret, err := keyClient.GetSecret(context.Background(), fmt.Sprintf(&amp;quot;https://%s.vault.azure.net&amp;quot;, keyvaultName), keyvaultSecretName, keyvaultSecretVersion)
+	if err != nil {
+		log.Printf(&amp;quot;unable to get your Keyvault secret: %v&amp;quot;, err)
+		return
+	}
+
+	io.WriteString(w, fmt.Sprintf(&amp;quot;Can I tell you my awesome dad joke?: %v&amp;quot;, *secret.Value))
+}
+
+func main() {
+	http.HandleFunc(&amp;quot;/&amp;quot;, getKeyvaultSecret)
+	http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ポイントは2つです。&lt;/p&gt;
+
+&lt;h3 id=&#34;key-vaultを読めるように認証する&#34;&gt;Key Vaultを読めるように認証する&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/Azure/azure-sdk-for-go/blob/master/services/keyvault/auth/auth.go&#34;&gt;auth.NewAuthorizerFromEnvironment()&lt;/a&gt; は環境変数を確認し、以下の順番で認証を試みます。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;クライアント資格情報(サービスプリンシパル)&lt;/li&gt;
+&lt;li&gt;X509 証明書&lt;/li&gt;
+&lt;li&gt;ユーザー名/パスワード&lt;/li&gt;
+&lt;li&gt;Azure Managed Identiy&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;確認される環境変数名など、詳細は&lt;a href=&#34;https://docs.microsoft.com/ja-jp/go/azure/azure-sdk-go-authorization#use-environment-based-authentication&#34;&gt;公式ドキュメント&lt;/a&gt;をご確認を。&lt;/p&gt;
+
+&lt;p&gt;このサンプルでは、クライアント資格情報、つまりサービスプリンシパルを使ってKey Vaultの認証を行います。環境変数 AZURE_TENANT_ID、AZURE_CLIENT_ID、AZURE_CLIENT_SECRET が設定された環境で auth.NewAuthorizerFromEnvironment() を呼ぶと、クライアント資格情報を使った認証が選択されます。&lt;/p&gt;
+
+&lt;h3 id=&#34;key-vault名-シークレット名-バージョン名を環境変数で渡す&#34;&gt;Key Vault名、シークレット名、バージョン名を環境変数で渡す&lt;/h3&gt;
+
+&lt;p&gt;これは見ての通りですね。シークレットが格納されているKey Vaultを指定するため、 AZURE_KEYVAULT_NAME などを環境変数から読み込みます。&lt;/p&gt;
+
+&lt;p&gt;他言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。&lt;/p&gt;
+
+&lt;p&gt;では、マニフェストを見てみましょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+[snip]
+    spec:
+      containers:
+      - name: getsecret
+        image: torumakabe/getsecret:keyvault
+        env:
+        - name: AZURE_KEYVAULT_NAME
+          value: your-keyvault-name
+        - name: AZURE_KEYVAULT_SECRET_NAME
+          value: joke
+#       - name: AZURE_KEYVAULT_SECRET_VERSION
+#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
+        - name: AZURE_TENANT_ID
+          valueFrom:
+            secretKeyRef:
+              name: joke-sp
+              key: tenantId
+        - name: AZURE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: joke-sp
+              key: clientId
+        - name: AZURE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: joke-sp
+              key: clientSecret
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;クライアント資格情報であるサービスプリンシパルは直接書かず、KubernetesのSecretにして環境変数に渡しましょう。なお、サービスプリンシパルには対象のKey Vaultを参照(Get)のみできるKey Vaultポリシーを設定し、かつRBACもスコープを対象のKey Veultに限定したReaderにしておくと、リスクを限定できます。&lt;/p&gt;
+
+&lt;p&gt;これでKey Vaultのjokeというシークレットにジョークを入れておけば、読み込めます。&lt;/p&gt;
+
+&lt;p&gt;さて、Key Vaultにシークレットを入れてグッと堅くなったわけですが、もう少し追求してみましょう。そう、サービスプリンシパルをSecretに入れる面倒さが残っています。ここを無くせないものか。&lt;/p&gt;
+
+&lt;h2 id=&#34;key-vaultで管理し-podにそのアクセス権を付与する-pod-identity&#34;&gt;Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)&lt;/h2&gt;
+
+&lt;p&gt;先ほどGoの auth.NewAuthorizerFromEnvironment() の認証順を紹介した際に &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/active-directory/managed-identities-azure-resources/overview&#34;&gt;Azure Managed Identiy&lt;/a&gt; を使えることが分かりました。Managed Identityは、仮想マシンなどアプリケーションの動く環境へ事前に資格を付与し、アプリケーションは資格情報を持たずに住む仕組みです。もしManaged IdentiyをPodから使えれば、アプリケーションやマニフェストへ資格情報を書く必要はありません。それを実現するのが、Pod Identityです。&lt;/p&gt;
+
+&lt;p&gt;まず概念を理解するため、ざっと公式ドキュメントを読むことをお勧めします。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/developer-best-practices-pod-security#limit-credential-exposure&#34;&gt;Azure Kubernetes Service (AKS) でのポッドのセキュリティに関するベスト プラクティス - 資格情報の公開を制限する&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;でも、これだけだとピンとこないと思います。導入して何が嬉しいかを理解してから、再度読んでみて下さい。理解が深まると思います。&lt;/p&gt;
+
+&lt;p&gt;Pod Identitiyを導入した環境では、マニフェストはこうなります。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: getsecret
+    aadpodidbinding: joke
+[snip]
+  template:
+    metadata:
+      labels:
+        app: getsecret
+        aadpodidbinding: joke
+[snip]
+    spec:
+      containers:
+      - name: getsecret
+        image: torumakabe/getsecret:keyvault
+        env:
+        - name: AZURE_KEYVAULT_NAME
+          value: your-keyvault-name
+        - name: AZURE_KEYVAULT_SECRET_NAME
+          value: joke
+#       - name: AZURE_KEYVAULT_SECRET_VERSION
+#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;識別子 aadpodidbinding を指定する必要はありますが、Key Vaultの資格情報をマニフェストへ書く必要がありません。素晴らしい。Goの auth.NewAuthorizerFromEnvironment() は他の認証に使われる環境変数が全てセットされていない時、Managed Identity認証を選択します。そしてPod Identityの実体であるNMIやMICが連動し、認証されるわけです。&lt;/p&gt;
+
+&lt;p&gt;なお、このPod Identitiyはオープンソースプロジェクトとして開発されています。試してみたい、詳細な実装を知りたい人はこちらを。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/azure/aad-pod-identity&#34;&gt;AAD Pod Identity&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Pod IdentitiyはAKSとの統合を目的に開発されており、公式サイトでも&lt;a href=&#34;https://azure.microsoft.com/ja-jp/updates/aks-pod-identity/&#34;&gt;状況が公開されています&lt;/a&gt;。オープンに開発してニーズを募り、実績を積んでいる状況であるため、GitHub上でベストエフォートなサポートが行われています。&lt;/p&gt;
+
+&lt;p&gt;さて、ここで終わりでしょうか。いえ、まだ改善の余地があります。&lt;/p&gt;
+
+&lt;h2 id=&#34;key-vaultで管理し-podにボリュームとしてマウントする-flexvolume&#34;&gt;Key Vaultで管理し、Podにボリュームとしてマウントする (FlexVolume)&lt;/h2&gt;
+
+&lt;p&gt;理想では、アプリケーションはプラットフォームをあまり意識せずに書きたいものです。プラットフォームそのものを書く、繋ぐコードであれば仕方ないですが、そうでなければアプリケーションは汎用的に書きたいですよね。ですが、これまでKey Vaultからシークレットを読むアプリケーションのサンプルでは、Azure SDK for Goを使って、Key Vault固有の処理を書いていました。&lt;/p&gt;
+
+&lt;p&gt;それを書かずに済む方法があります。FlexVolumeです。実は先に紹介したPod Identiyのドキュメントで、次に説明されていました。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/aks/developer-best-practices-pod-security#limit-credential-exposure&#34;&gt;Azure Kubernetes Service (AKS) でのポッドのセキュリティに関するベスト プラクティス - 資格情報の公開を制限する&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;これも使い方から理解したほうがいいでしょう。FlexVolumeはKey Vaultのシークレット、暗号化キー、証明書をPodへVolumeとしてマウントできる仕組みです。つまりアプリケーションがシークレットを、あたかもファイルシステム上のファイルであるかのように読むことができます。&lt;/p&gt;
+
+&lt;p&gt;これまでのサンプルアプリケーションは、こう書けます。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import (
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io&amp;quot;
+	&amp;quot;io/ioutil&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;net/http&amp;quot;
+)
+
+func getSecret(w http.ResponseWriter, r *http.Request) {
+	secret, err := ioutil.ReadFile(&amp;quot;/kvmnt/joke&amp;quot;)
+	if err != nil {
+		log.Printf(&amp;quot;unable to read your secret file: %v&amp;quot;, err)
+		return
+	}
+
+	io.WriteString(w, fmt.Sprintf(&amp;quot;Can I tell you my awesome dad joke?: %v&amp;quot;, string(secret)))
+}
+
+func main() {
+	http.HandleFunc(&amp;quot;/&amp;quot;, getSecret)
+	http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ファイルを読んでるだけです。ではマニフェストはどうでしょう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: getsecret
+    aadpodidbinding: joke
+[snip]
+  template:
+    metadata:
+      labels:
+        app: getsecret
+        aadpodidbinding: joke
+[snip]
+    spec:
+      containers:
+      - name: getsecret
+        image: torumakabe/getsecret:flexvol
+        volumeMounts:
+        - name: joke
+          mountPath: /kvmnt
+          readOnly: true
+      volumes:
+      - name: joke
+        flexVolume:
+          driver: &amp;quot;azure/kv&amp;quot;
+          options: 
+            usepodidentity: &amp;quot;true&amp;quot;
+            keyvaultname: &amp;quot;your-keyvault-name&amp;quot;
+            keyvaultobjectnames: joke
+            keyvaultobjecttypes: secret
+            keyvaultobjectversions: &amp;quot;&amp;quot;  #[OPTIONAL] will get latest if empty
+            resourcegroup: &amp;quot;your-keyvault-rg&amp;quot;
+            subscriptionid: &amp;quot;your-subscription-id&amp;quot;
+            tenantid: &amp;quot;your-tenant-id&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。&lt;/p&gt;
+
+&lt;p&gt;Flex VolumeはPod Identitiyと同様にオープンソースプロジェクトとして開発されています。試してみたい場合は、こちらを。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/Azure/kubernetes-keyvault-flexvol&#34;&gt;Kubernetes-KeyVault-FlexVolume&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;なお、HashiCorpのVaultも、似たようなコンセプトです。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s&#34;&gt;Vault Agent with Kubernetes&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+
+&lt;p&gt;ちょっと長くなりましたが、現状Azure Kuberentes Serviceで使えるシークレット管理手法を整理しました。洗練された方法がベストとも限りません。洗練された仕組みを理解できていない状態で使うより、シンプルなやり方を選んだ方がリスクを減らせるかもしれません。組織と役割、セキュリティポリシー、技術的難易度、オープンソースプロジェクトへのスタンスなど、置かれた環境によって評価はそれぞれでしょう。&lt;/p&gt;
+
+&lt;p&gt;唯一の解はありませんが、みなさまの検討の参考になれば幸せです。&lt;/p&gt;
+</content>
+      
+    </item>
+    
+    <item>
       <title>Kubernetes DeschedulerでPodを再配置する</title>
       <link>https://ToruMakabe.github.io/post/k8s_descheduler/</link>
       <pubDate>Sat, 01 Jun 2019 09:00:00 +0900</pubDate>

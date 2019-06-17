@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-17T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,42 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 4, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/">いきなり Terraform OpenStack Provider</a></h1>
+      <div class="content">
+        Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
+小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
+テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
+ OS_AUTH_URL
+ OS_USERNAME
+ OS_PASSWORD
+ OS_REGION_NAME
+ OS_TENANT_NAME
+  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
+さあ実行 まずはterraform planコマンドで、実行計画を確認します。
+$ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -232,37 +268,6 @@ OS_USERNAME: your_username
         <a class="button is-link" href="https://ToruMakabe.github.io/post/openstack-tools/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-  
-  | <a class="subtitle is-6" href="/tags/hp-public-cloud">#HP Public Cloud</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 6, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-openstack/">Vagrant-hpからVagrant-openstack-pluginへ</a></h1>
-      <div class="content">
-         ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
-多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
-さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
-前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
-ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&rdquo;:auto&rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
-スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
-$ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance is snapshoting! ==&gt; default: Snapshot is ok  
         
       </div>
     </article>

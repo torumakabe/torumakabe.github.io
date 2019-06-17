@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-17T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,39 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/docker">#Docker</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/oms">#OMS</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">August 25, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/oms_container_linux/">OMSでLinuxコンテナのログを分析する</a></h1>
+      <div class="content">
+        OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
+さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
+では試しに、1のやり口でUbuntuへ導入してみましょう。
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&rdquo;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください   sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/oms_container_linux/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -221,45 +254,6 @@ Azure Functionsは、
  Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14  Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7   アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
-  
-  | <a class="subtitle is-6" href="/tags/batch">#Batch</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 29, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_batch_docker/">Azure BatchとDockerで管理サーバレスバッチ環境を作る</a></h1>
-      <div class="content">
-        サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
-クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
-ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。
-その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。
-コンセプト  管理サーバを作らない Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納  サンプル Githubにソースを置いておきます。
-バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置 公式ドキュメントで概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。
-ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。
-. ├── blob │ ├── application │ │ ├── starttask.sh │ │ └── task.sh │ ├── input │ │ └── the_star_spangled_banner.txt │ └── output  applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。
- starttask.sh - docker engineをインストールします task.sh - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。サンプルはPythonで書いたシンプルなWord Countアプリです  また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。
-コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。
-さて、いよいよジョブをJSONで定義します。詳細は公式ドキュメントを確認してください。ポイントだけまとめます。
- 2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil 4時間ごとに実行する - schedule/recurrenceInterval ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption ジョブ実行時にtask.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_batch_docker/" style="height:28px">
           Read more
         </a>
         

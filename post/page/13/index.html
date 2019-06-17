@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-17T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,37 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+  
+  | <a class="subtitle is-6" href="/tags/hp-public-cloud">#HP Public Cloud</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 6, 2014</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-openstack/">Vagrant-hpからVagrant-openstack-pluginへ</a></h1>
+      <div class="content">
+         ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
+多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
+さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
+前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
+ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
+ フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&rdquo;:auto&rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
+スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
+$ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance is snapshoting! ==&gt; default: Snapshot is ok  
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -187,26 +218,6 @@ VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブ�
 ユーザーがそのサービスを判断する情報になりますし、電力事業者間で電力をやりとりしているように、事業者間でリソースを融通するような、新しい仕組みにつながる気もします。
 ビジネス上、難しいことは重々承知で書いています。でも、クラウドサービスが本当に「ユーティリティ」を目指すのなら、いつか問われる課題ではないかと。
 みなさんは、どう思われますか?
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-
-
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">March 27, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/openstack-primer/">OpenStack超入門シリーズ</a></h1>
-      <div class="content">
-        基本的な質問が増えてきた OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。
-よく聞かれることはまとめておこう もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。
-第一弾 OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り
         
       </div>
     </article>

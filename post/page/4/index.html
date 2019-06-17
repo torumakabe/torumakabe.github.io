@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-17T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,46 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 8, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/">TerraformでAzure サンプル 2018/1版</a></h1>
+      <div class="content">
+        サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
+インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
+ BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
+チーム、複数端末での運用 BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。
+Workspaceの導入 従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。
+要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。
+Module、Terraform Module Registryの活用 TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。
+リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
+TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
+ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
+terraform workspace select prod  みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
+サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
+このコードをapplyすると、以下のリソースが出来上がります。
+ NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
+├── modules │ ├── computegroup │ │ ├── main.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -210,43 +250,6 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
 検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*, -t 300  送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
-  
-  | <a class="subtitle is-6" href="/tags/eventgrid">#EventGrid</a>
-  
-  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 5, 2017</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_blobevent/">Azure Event GridでBlobイベントを拾う</a></h1>
-      <div class="content">
-        Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。
-プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。
-Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
-イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
-Event Gridに期待する理由はいくつかあります。
- フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
-az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。
-az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_blobevent/" style="height:28px">
           Read more
         </a>
         

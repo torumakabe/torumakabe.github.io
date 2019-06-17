@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-06-01T09:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-06-17T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,42 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+  | <a class="subtitle is-6" href="/tags/dns">#DNS</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 12, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_dns/">AKSのService作成時にホスト名を付ける</a></h1>
+      <div class="content">
+        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
+わたしの知る限り、2つの方法があります。
+ AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
+DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
+[nginx-label.yaml]
+apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80  デプロイ。
+$ kubectl create -f nginx-label.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -226,37 +262,6 @@ terraform workspace select prod  みなまで言わなくても分かります�
 ├── modules │ ├── computegroup │ │ ├── main.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/golang">#Golang</a>
-  
-  | <a class="subtitle is-6" href="/tags/storage">#Storage</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">November 28, 2017</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azblob_golang/">Azure Blob アップローダーをGoで書いた、そしてその理由</a></h1>
-      <div class="content">
-        Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
-ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
-ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azblob_golang/" style="height:28px">
           Read more
         </a>
         
