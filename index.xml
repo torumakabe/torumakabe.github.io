@@ -121,7 +121,7 @@ spec:
 
 &lt;p&gt;KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは &lt;a href=&#34;https://github.com/Azure/kubernetes-kms&#34;&gt;&amp;ldquo;AKS does encrypt secrets-at-rest&amp;rdquo; つまり暗号化されています&lt;/a&gt;。&lt;/p&gt;
 
-&lt;p&gt;なおSecretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。&lt;/p&gt;
+&lt;p&gt;Secretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。&lt;/p&gt;
 
 &lt;p&gt;Secretは以下のようなマニフェストで作成します。&lt;/p&gt;
 
@@ -134,7 +134,7 @@ data:
   joke: U2VsZmlzaCBzZWxsIGZpc2gu
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;値はBase64で符号化した上で書きます。当然ながらBase64でデコードできるので、マニフェストの管理はご注意を。&lt;/p&gt;
+&lt;p&gt;値はBase64符号化した結果を書きます。当然ながらBase64デコードできるので、マニフェストの管理はご注意を。&lt;/p&gt;
 
 &lt;p&gt;このSecretをアプリケーションに環境変数として渡すマニフェストの書き方は、先ほどの環境変数を直接書く方法とあまり変わりません。envのvalueFrom以下でSecretを指定します。&lt;/p&gt;
 
@@ -153,9 +153,9 @@ kind: Deployment
               key: joke
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、SecretはBase64で管理されていますが、アプリケーションにはデコードして送られます。&lt;/p&gt;
+&lt;p&gt;これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、Secretは符号化されていますが、アプリケーションはデコードされた結果を受け取ります。&lt;/p&gt;
 
-&lt;p&gt;もちろんPodの参照権限だけでは、中身をそのまま見ることはできません。&lt;/p&gt;
+&lt;p&gt;もちろんPodの参照権限だけでは、中身をKubernetes API経由で見ることはできません。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ kubectl get po getsecret-fuga -o yaml
 [snip]
@@ -247,15 +247,15 @@ func main() {
 &lt;li&gt;Azure Managed Identiy&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;確認される環境変数名など、詳細は&lt;a href=&#34;https://docs.microsoft.com/ja-jp/go/azure/azure-sdk-go-authorization#use-environment-based-authentication&#34;&gt;公式ドキュメント&lt;/a&gt;をご確認を。&lt;/p&gt;
+&lt;p&gt;確認される環境変数名など、詳細は&lt;a href=&#34;https://docs.microsoft.com/ja-jp/go/azure/azure-sdk-go-authorization#use-environment-based-authentication&#34;&gt;公式ドキュメント&lt;/a&gt;でご確認を。&lt;/p&gt;
 
-&lt;p&gt;このサンプルでは、クライアント資格情報、つまりサービスプリンシパルを使ってKey Vaultの認証を行います。環境変数 AZURE_TENANT_ID、AZURE_CLIENT_ID、AZURE_CLIENT_SECRET が設定された環境で auth.NewAuthorizerFromEnvironment() を呼ぶと、クライアント資格情報を使った認証が選択されます。&lt;/p&gt;
+&lt;p&gt;このサンプルは、クライアント資格情報、つまりサービスプリンシパルを使ってKey Vaultの認証を行います。環境変数 AZURE_TENANT_ID、AZURE_CLIENT_ID、AZURE_CLIENT_SECRET が設定された環境で auth.NewAuthorizerFromEnvironment() を呼ぶと、クライアント資格情報を使った認証が選択されます。&lt;/p&gt;
 
 &lt;h3 id=&#34;key-vault名-シークレット名-バージョン名を環境変数で渡す&#34;&gt;Key Vault名、シークレット名、バージョン名を環境変数で渡す&lt;/h3&gt;
 
 &lt;p&gt;これは見ての通りですね。シークレットが格納されているKey Vaultを指定するため、 AZURE_KEYVAULT_NAME などを環境変数から読み込みます。&lt;/p&gt;
 
-&lt;p&gt;他言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。&lt;/p&gt;
+&lt;p&gt;他の言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。&lt;/p&gt;
 
 &lt;p&gt;では、マニフェストを見てみましょう。&lt;/p&gt;
 
@@ -298,7 +298,7 @@ kind: Deployment
 
 &lt;h2 id=&#34;key-vaultで管理し-podにそのアクセス権を付与する-pod-identity&#34;&gt;Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)&lt;/h2&gt;
 
-&lt;p&gt;先ほどGoの auth.NewAuthorizerFromEnvironment() の認証順を紹介した際に &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/active-directory/managed-identities-azure-resources/overview&#34;&gt;Azure Managed Identiy&lt;/a&gt; を使えることが分かりました。Managed Identityは、仮想マシンなどアプリケーションの動く環境へ事前に資格を付与し、アプリケーションは資格情報を持たずに住む仕組みです。もしManaged IdentiyをPodから使えれば、アプリケーションやマニフェストへ資格情報を書く必要はありません。それを実現するのが、Pod Identityです。&lt;/p&gt;
+&lt;p&gt;先ほどGoの auth.NewAuthorizerFromEnvironment() の認証順を紹介した際に &lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/active-directory/managed-identities-azure-resources/overview&#34;&gt;Azure Managed Identiy&lt;/a&gt; を使えることが分かりました。Managed Identityは、仮想マシンなどアプリケーションの動く環境へ事前に資格を付与し、アプリケーションは資格情報を持たずに済む仕組みです。もしManaged IdentiyをPodから使えれば、アプリケーションやマニフェストへ資格情報を書く必要はありません。それを実現するのが、Pod Identityです。&lt;/p&gt;
 
 &lt;p&gt;まず概念を理解するため、ざっと公式ドキュメントを読むことをお勧めします。&lt;/p&gt;
 
@@ -360,7 +360,7 @@ metadata:
 
 &lt;p&gt;これも使い方から理解したほうがいいでしょう。FlexVolumeはKey Vaultのシークレット、暗号化キー、証明書をPodへVolumeとしてマウントできる仕組みです。つまりアプリケーションがシークレットを、あたかもファイルシステム上のファイルであるかのように読むことができます。&lt;/p&gt;
 
-&lt;p&gt;これまでのサンプルアプリケーションは、こう書けます。&lt;/p&gt;
+&lt;p&gt;これまでのサンプルアプリケーションを、こう変えられます。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;package main
 
@@ -388,7 +388,7 @@ func main() {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;ファイルを読んでるだけです。ではマニフェストはどうでしょう。&lt;/p&gt;
+&lt;p&gt;シークレットはKey Vaultにあるのですが、アプリ的にはファイルを読んでるだけです。ではマニフェストはどうでしょう。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
 kind: Deployment
@@ -426,7 +426,7 @@ metadata:
             tenantid: &amp;quot;your-tenant-id&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。&lt;/p&gt;
+&lt;p&gt;Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。もちろん資格情報を書く必要はありません。&lt;/p&gt;
 
 &lt;p&gt;Flex VolumeはPod Identitiyと同様にオープンソースプロジェクトとして開発されています。試してみたい場合は、こちらを。&lt;/p&gt;
 
@@ -434,7 +434,7 @@ metadata:
 &lt;p&gt;&lt;a href=&#34;https://github.com/Azure/kubernetes-keyvault-flexvol&#34;&gt;Kubernetes-KeyVault-FlexVolume&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;なお、HashiCorpのVaultも、似たようなコンセプトです。&lt;/p&gt;
+&lt;p&gt;ちなみにHashiCorpのVaultも、似たようなコンセプトです。&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;a href=&#34;https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s&#34;&gt;Vault Agent with Kubernetes&lt;/a&gt;&lt;/p&gt;

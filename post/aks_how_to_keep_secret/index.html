@@ -214,7 +214,7 @@ spec:
 
 <p>KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは <a href="https://github.com/Azure/kubernetes-kms">&ldquo;AKS does encrypt secrets-at-rest&rdquo; つまり暗号化されています</a>。</p>
 
-<p>なおSecretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。</p>
+<p>Secretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。</p>
 
 <p>Secretは以下のようなマニフェストで作成します。</p>
 
@@ -227,7 +227,7 @@ data:
   joke: U2VsZmlzaCBzZWxsIGZpc2gu
 </code></pre>
 
-<p>値はBase64で符号化した上で書きます。当然ながらBase64でデコードできるので、マニフェストの管理はご注意を。</p>
+<p>値はBase64符号化した結果を書きます。当然ながらBase64デコードできるので、マニフェストの管理はご注意を。</p>
 
 <p>このSecretをアプリケーションに環境変数として渡すマニフェストの書き方は、先ほどの環境変数を直接書く方法とあまり変わりません。envのvalueFrom以下でSecretを指定します。</p>
 
@@ -246,9 +246,9 @@ kind: Deployment
               key: joke
 </code></pre>
 
-<p>これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、SecretはBase64で管理されていますが、アプリケーションにはデコードして送られます。</p>
+<p>これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、Secretは符号化されていますが、アプリケーションはデコードされた結果を受け取ります。</p>
 
-<p>もちろんPodの参照権限だけでは、中身をそのまま見ることはできません。</p>
+<p>もちろんPodの参照権限だけでは、中身をKubernetes API経由で見ることはできません。</p>
 
 <pre><code>$ kubectl get po getsecret-fuga -o yaml
 [snip]
@@ -340,15 +340,15 @@ func main() {
 <li>Azure Managed Identiy</li>
 </ul>
 
-<p>確認される環境変数名など、詳細は<a href="https://docs.microsoft.com/ja-jp/go/azure/azure-sdk-go-authorization#use-environment-based-authentication">公式ドキュメント</a>をご確認を。</p>
+<p>確認される環境変数名など、詳細は<a href="https://docs.microsoft.com/ja-jp/go/azure/azure-sdk-go-authorization#use-environment-based-authentication">公式ドキュメント</a>でご確認を。</p>
 
-<p>このサンプルでは、クライアント資格情報、つまりサービスプリンシパルを使ってKey Vaultの認証を行います。環境変数 AZURE_TENANT_ID、AZURE_CLIENT_ID、AZURE_CLIENT_SECRET が設定された環境で auth.NewAuthorizerFromEnvironment() を呼ぶと、クライアント資格情報を使った認証が選択されます。</p>
+<p>このサンプルは、クライアント資格情報、つまりサービスプリンシパルを使ってKey Vaultの認証を行います。環境変数 AZURE_TENANT_ID、AZURE_CLIENT_ID、AZURE_CLIENT_SECRET が設定された環境で auth.NewAuthorizerFromEnvironment() を呼ぶと、クライアント資格情報を使った認証が選択されます。</p>
 
 <h3 id="key-vault名-シークレット名-バージョン名を環境変数で渡す">Key Vault名、シークレット名、バージョン名を環境変数で渡す</h3>
 
 <p>これは見ての通りですね。シークレットが格納されているKey Vaultを指定するため、 AZURE_KEYVAULT_NAME などを環境変数から読み込みます。</p>
 
-<p>他言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。</p>
+<p>他の言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。</p>
 
 <p>では、マニフェストを見てみましょう。</p>
 
@@ -391,7 +391,7 @@ kind: Deployment
 
 <h2 id="key-vaultで管理し-podにそのアクセス権を付与する-pod-identity">Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)</h2>
 
-<p>先ほどGoの auth.NewAuthorizerFromEnvironment() の認証順を紹介した際に <a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-identities-azure-resources/overview">Azure Managed Identiy</a> を使えることが分かりました。Managed Identityは、仮想マシンなどアプリケーションの動く環境へ事前に資格を付与し、アプリケーションは資格情報を持たずに住む仕組みです。もしManaged IdentiyをPodから使えれば、アプリケーションやマニフェストへ資格情報を書く必要はありません。それを実現するのが、Pod Identityです。</p>
+<p>先ほどGoの auth.NewAuthorizerFromEnvironment() の認証順を紹介した際に <a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-identities-azure-resources/overview">Azure Managed Identiy</a> を使えることが分かりました。Managed Identityは、仮想マシンなどアプリケーションの動く環境へ事前に資格を付与し、アプリケーションは資格情報を持たずに済む仕組みです。もしManaged IdentiyをPodから使えれば、アプリケーションやマニフェストへ資格情報を書く必要はありません。それを実現するのが、Pod Identityです。</p>
 
 <p>まず概念を理解するため、ざっと公式ドキュメントを読むことをお勧めします。</p>
 
@@ -453,7 +453,7 @@ metadata:
 
 <p>これも使い方から理解したほうがいいでしょう。FlexVolumeはKey Vaultのシークレット、暗号化キー、証明書をPodへVolumeとしてマウントできる仕組みです。つまりアプリケーションがシークレットを、あたかもファイルシステム上のファイルであるかのように読むことができます。</p>
 
-<p>これまでのサンプルアプリケーションは、こう書けます。</p>
+<p>これまでのサンプルアプリケーションを、こう変えられます。</p>
 
 <pre><code>package main
 
@@ -481,7 +481,7 @@ func main() {
 }
 </code></pre>
 
-<p>ファイルを読んでるだけです。ではマニフェストはどうでしょう。</p>
+<p>シークレットはKey Vaultにあるのですが、アプリ的にはファイルを読んでるだけです。ではマニフェストはどうでしょう。</p>
 
 <pre><code>apiVersion: apps/v1
 kind: Deployment
@@ -519,7 +519,7 @@ metadata:
             tenantid: &quot;your-tenant-id&quot;
 </code></pre>
 
-<p>Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。</p>
+<p>Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。もちろん資格情報を書く必要はありません。</p>
 
 <p>Flex VolumeはPod Identitiyと同様にオープンソースプロジェクトとして開発されています。試してみたい場合は、こちらを。</p>
 
@@ -527,7 +527,7 @@ metadata:
 <p><a href="https://github.com/Azure/kubernetes-keyvault-flexvol">Kubernetes-KeyVault-FlexVolume</a></p>
 </blockquote>
 
-<p>なお、HashiCorpのVaultも、似たようなコンセプトです。</p>
+<p>ちなみにHashiCorpのVaultも、似たようなコンセプトです。</p>
 
 <blockquote>
 <p><a href="https://learn.hashicorp.com/vault/identity-access-management/vault-agent-k8s">Vault Agent with Kubernetes</a></p>
