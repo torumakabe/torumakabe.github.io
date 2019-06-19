@@ -121,7 +121,7 @@ spec:
 
 &lt;p&gt;KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは &lt;a href=&#34;https://github.com/Azure/kubernetes-kms&#34;&gt;&amp;ldquo;AKS does encrypt secrets-at-rest&amp;rdquo; つまり暗号化されています&lt;/a&gt;。&lt;/p&gt;
 
-&lt;p&gt;Secretは実行サーバー上で永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。&lt;/p&gt;
+&lt;p&gt;Secretはそれを受け取るPodの実行サーバー上では永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。&lt;/p&gt;
 
 &lt;p&gt;Secretは以下のようなマニフェストで作成します。&lt;/p&gt;
 
@@ -294,7 +294,7 @@ kind: Deployment
 
 &lt;p&gt;これでKey Vaultのjokeというシークレットにジョークを入れておけば、読み込めます。&lt;/p&gt;
 
-&lt;p&gt;さて、Key Vaultにシークレットを入れてグッと堅くなったわけですが、もう少し追求してみましょう。そう、サービスプリンシパルをSecretに入れる面倒さが残っています。ここを無くせないものか。&lt;/p&gt;
+&lt;p&gt;さて、Key Vaultにシークレットを入れてグッと堅くなったわけですが、もう少し追求してみましょう。そう、サービスプリンシパルのクライアントIDとクライアントシークレットをSecretに入れる面倒さが残っています。ここを無くせないものか。&lt;/p&gt;
 
 &lt;h2 id=&#34;key-vaultで管理し-podにそのアクセス権を付与する-pod-identity&#34;&gt;Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)&lt;/h2&gt;
 
@@ -336,7 +336,7 @@ metadata:
 #         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;識別子 aadpodidbinding を指定する必要はありますが、Key Vaultの資格情報をマニフェストへ書く必要がありません。素晴らしい。Goの auth.NewAuthorizerFromEnvironment() は他の認証に使われる環境変数が全てセットされていない時、Managed Identity認証を選択します。そしてPod Identityの実体であるNMIやMICが連動し、認証されるわけです。&lt;/p&gt;
+&lt;p&gt;識別子 aadpodidbinding を指定する必要はありますが、Key Vaultの資格情報をマニフェストへ書く必要がありません。素晴らしい。Goの auth.NewAuthorizerFromEnvironment() は他の認証に使われる環境変数が全てセットされていない時、Managed Identity認証を選択します。そしてPod Identityの基盤であるNMIを通じ、Azure ADから認証トークンを得るわけです。&lt;/p&gt;
 
 &lt;p&gt;なお、このPod Identitiyはオープンソースプロジェクトとして開発されています。試してみたい、詳細な実装を知りたい人はこちらを。&lt;/p&gt;
 
