@@ -105,7 +105,7 @@
 &lt;li&gt;HCLが長いですが、後半のほとんどはサンプルアプリのDeploymentです
 
 &lt;ul&gt;
-&lt;li&gt;実際はDeploymentをTerraformでデリバリーするケースは少ないかと。あくまで今回のサンプル向けです&lt;/li&gt;
+&lt;li&gt;実際はアプリケーションのDeploymentをTerraformでデリバリーするケースは少ないかと。あくまで今回のサンプル向けです&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -277,7 +277,7 @@ annotations:
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-observability-dependency.png?raw=true&#34; alt=&#34;Dependency&#34; title=&#34;Dependency&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後&lt;a href=&#34;https://opentelemetry.io/&#34;&gt;OpenTelemetry&lt;/a&gt;として取り組みを続けることになりました。マイクロソフトからも、OpenCensusに引き続き&lt;a href=&#34;https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/&#34;&gt;支持する&lt;/a&gt;とアナウンスが出ています。&lt;/p&gt;
+&lt;p&gt;ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後&lt;a href=&#34;https://opentelemetry.io/&#34;&gt;OpenTelemetry&lt;/a&gt;として取り組みを続けることになりました。マイクロソフトからも、OpenCensusに引き続き&lt;a href=&#34;https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/&#34;&gt;支持する&lt;/a&gt;とアナウンスが出ています。当面はApplication Insights SDKを使いつつ、OpenTelemetryの本格化を横目でチェックする感じがいいのでは、と思います。&lt;/p&gt;
 
 &lt;h5 id=&#34;application-insights-可用性テスト&#34;&gt;Application Insights 可用性テスト&lt;/h5&gt;
 
@@ -307,9 +307,9 @@ annotations:
 
 &lt;h2 id=&#34;最後に-お試しキットを超えて&#34;&gt;最後に: お試しキットを超えて&lt;/h2&gt;
 
-&lt;p&gt;冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多くあります。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。&lt;/p&gt;
+&lt;p&gt;冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多いです。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。&lt;/p&gt;
 
-&lt;p&gt;特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをまとめてくれる仕組みは、検討する価値があると思います。自分で作ってもいいですが。&lt;/p&gt;
+&lt;p&gt;特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをまとめてくれる仕組みは、検討する価値があると思います。&lt;/p&gt;
 
 &lt;p&gt;ではでは Enjoy Observability&lt;/p&gt;
 </content>

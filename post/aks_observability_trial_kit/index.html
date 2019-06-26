@@ -201,7 +201,7 @@ Gistに置いたHCLで、以下のような環境を作れます。
 <li>HCLが長いですが、後半のほとんどはサンプルアプリのDeploymentです
 
 <ul>
-<li>実際はDeploymentをTerraformでデリバリーするケースは少ないかと。あくまで今回のサンプル向けです</li>
+<li>実際はアプリケーションのDeploymentをTerraformでデリバリーするケースは少ないかと。あくまで今回のサンプル向けです</li>
 </ul></li>
 </ul>
 
@@ -373,7 +373,7 @@ annotations:
 
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-observability-dependency.png?raw=true" alt="Dependency" title="Dependency" /></p>
 
-<p>ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後<a href="https://opentelemetry.io/">OpenTelemetry</a>として取り組みを続けることになりました。マイクロソフトからも、OpenCensusに引き続き<a href="https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/">支持する</a>とアナウンスが出ています。</p>
+<p>ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後<a href="https://opentelemetry.io/">OpenTelemetry</a>として取り組みを続けることになりました。マイクロソフトからも、OpenCensusに引き続き<a href="https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/">支持する</a>とアナウンスが出ています。当面はApplication Insights SDKを使いつつ、OpenTelemetryの本格化を横目でチェックする感じがいいのでは、と思います。</p>
 
 <h5 id="application-insights-可用性テスト">Application Insights 可用性テスト</h5>
 
@@ -403,9 +403,9 @@ annotations:
 
 <h2 id="最後に-お試しキットを超えて">最後に: お試しキットを超えて</h2>
 
-<p>冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多くあります。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。</p>
+<p>冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多いです。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。</p>
 
-<p>特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをまとめてくれる仕組みは、検討する価値があると思います。自分で作ってもいいですが。</p>
+<p>特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをまとめてくれる仕組みは、検討する価値があると思います。</p>
 
 <p>ではでは Enjoy Observability</p>
 
