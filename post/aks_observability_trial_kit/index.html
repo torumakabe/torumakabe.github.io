@@ -262,7 +262,7 @@ Gistに置いたHCLで、以下のような環境を作れます。
 
 <p>ブラウザでlocalhost:3000にアクセスすると、ポート転送されてGrafanaのログイン画面が出ます。ユーザー名はadmin、パスワードは先ほどTerraformのapply時に出力されたものを使ってください。忘れた場合はterraform outputで再出力できます。</p>
 
-<p>サンプルのKubernetes向けダッシュボードをGrafanaコミュニティサイトからインポートしていますので、画面左のメニュー &ldquo;Dashboards&rdquo;から、 &gt; Manage &gt; smaple と辿って表示してください。</p>
+<p>サンプルのKubernetes向けダッシュボードをGrafanaコミュニティサイトからインポートしています。画面左のメニュー &ldquo;Dashboards&rdquo;から、 &gt; Manage &gt; smaple と辿って表示してください。</p>
 
 <blockquote>
 <p><a href="https://grafana.com/dashboards/6417">Kubernetes Cluster (Prometheus)</a></p>
@@ -301,7 +301,7 @@ annotations:
 <pre><code>kubectl port-forward -n monitoring svc/prometheus-operator-alertmanager 9093:9093
 </code></pre>
 
-<p>AzureはVMからのメール送信を<a href="https://docs.microsoft.com/ja-jp/azure/virtual-network/troubleshoot-outbound-smtp-connectivity">制限している</a>ため、お試しキットではPrometheusからの通知設定をしていません。もしメールやWebhook通知を試してみたい場合は、<a href="https://prometheus.io/docs/alerting/overview/">こちら</a>を参考にConfigを書いてみてください。Configの投入は環境作成時に使ったTerraforrm HCLに追記してapplyすると楽です。</p>
+<p>AzureはVMからのメール送信を<a href="https://docs.microsoft.com/ja-jp/azure/virtual-network/troubleshoot-outbound-smtp-connectivity">制限している</a>ため、お試しキットではPrometheusからの通知設定をしていません。もしWebhook通知などを試してみたい場合は、<a href="https://prometheus.io/docs/alerting/overview/">こちら</a>を参考にConfigを書いてみてください。Configの投入は環境作成時に使ったTerraforrm HCLに追記してapplyすると楽です。</p>
 
 <p>PrometheusはKubernetesと同じCNCFプロジェクトということもあり、親和性は大きな利点です。エコシステムも魅力で、試す価値はあります。いっぽうでKubernetesクラスター上に導入する場合は、監視主体と対象が同居するため独立性、客観性が懸念です。これは利点とのトレードオフなので、Azure Monitorなど外部からの監視をうまく組み合わせましょう。</p>
 
@@ -373,7 +373,7 @@ annotations:
 
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-observability-dependency.png?raw=true" alt="Dependency" title="Dependency" /></p>
 
-<p>ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後<a href="https://opentelemetry.io/">OpenTelemetry</a>として取り組みを続けることになりました。マイクロソフトからも、OpenCensusに引き続き<a href="https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/">支持する</a>とアナウンスが出ています。当面はApplication Insights SDKを使いつつ、OpenTelemetryの本格化を横目でチェックする感じがいいのでは、と思います。</p>
+<p>ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後<a href="https://opentelemetry.io/">OpenTelemetry</a>が存続プロジェクトになりました。マイクロソフトからも、OpenCensusに引き続き<a href="https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/">支持する</a>とアナウンスが出ています。当面はApplication Insights SDKを使いつつ、OpenTelemetryの本格化を横目でチェックする感じがいいのでは、と思います。</p>
 
 <h5 id="application-insights-可用性テスト">Application Insights 可用性テスト</h5>
 
@@ -383,7 +383,7 @@ annotations:
 <p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/app/monitor-web-app-availability">Web サイトの可用性と応答性の監視</a></p>
 </blockquote>
 
-<p>Terraformでの環境構築中、KubernetesのサービスにIPを割り当てたあと、Webテストを自動設定することもできます。TerraformのWebテストリソースからはまだアラートの設定ができないため、お試しキットでは設定していません。(Terraformの対応後に参考となるよう、アラート設定なしのHCLはコメントとして残しておきました)</p>
+<p>Terraformでの環境構築中、KubernetesのサービスにIPを割り当てたあと、Webテストを自動設定することもできます。ですがTerraformのWebテストリソースからはまだアラートの設定ができないため、お試しキットでは設定していません。(Terraformの対応後に参考となるよう、アラート設定なしのHCLはコメントとして残しておきました)</p>
 
 <h4 id="サービスメッシュは">サービスメッシュは?</h4>
 
@@ -399,13 +399,13 @@ annotations:
 <p><a href="https://smi-spec.io/">Service Mesh Interface: A standard interface for service meshes on Kubernetes</a></p>
 </blockquote>
 
-<p>もしサービスメッシュへの期待が分散トレーシング中心であれば、現時点では無理してサービスメッシュに取り組むよりも、アプリケーションにトレーシングのコードを埋め込んだほうが、リスク低く実現できます。</p>
+<p>もしサービスメッシュへの期待が分散トレーシング中心であれば、現時点では無理してサービスメッシュに取り組むよりも、アプリケーションにトレーシングのコードを埋め込む方がいいのではないかと考えます。</p>
 
 <h2 id="最後に-お試しキットを超えて">最後に: お試しキットを超えて</h2>
 
 <p>冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多いです。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。</p>
 
-<p>特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをまとめてくれる仕組みは、検討する価値があると思います。</p>
+<p>特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをいい感じにまとめてくれる仕組みは、検討する価値があると思います。</p>
 
 <p>ではでは Enjoy Observability</p>
 
