@@ -139,7 +139,7 @@
 &lt;p&gt;&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-monitor/platform/metrics-supported#microsoftcontainerservicemanagedclusters&#34;&gt;Microsoft.ContainerService/managedClusters&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;ノードの平均CPU、メモリ利用率、ノードの状態やポッドの状態が対象です。種類は多くありませんが、クリティカルなメトリックを取得できます。&lt;/p&gt;
+&lt;p&gt;ノードの平均CPU、メモリ利用率、ノードやポッドの状態が対象です。種類は多くありませんが、クリティカルなメトリックを取得できます。&lt;/p&gt;
 
 &lt;p&gt;お試しキットでは1分おきに&amp;rdquo;NotReady&amp;rdquo;、&amp;rdquo;Unknown&amp;rdquo;のノードがないか確認し、5分単位でカウントが0より大きければ管理者にメールを通知するように設定しています。疑似的にノード障害を起こすには、ノードをVMレベルで割り当て解除してみてください。メールが飛んできます。メールの他には、WebhookやLogic Appなどが通知手段、通知先として&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-monitor/platform/action-groups&#34;&gt;使えます&lt;/a&gt;。&lt;/p&gt;
 
@@ -159,7 +159,7 @@
 &lt;p&gt;&lt;a href=&#34;https://github.com/coreos/prometheus-operator&#34;&gt;Prometheus Operator&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;メトリクスバックエンドとしてPrometeus、メトリクス可視化としてGrafanaを導入し、Kubernetes向けの基本的な設定は済ませています。まずは分かりやすく、Grafanaでメトリクスを見てみましょう。&lt;/p&gt;
+&lt;p&gt;メトリクスバックエンドとしてPrometeusを、メトリクス可視化のためにGrafanaを導入し、Kubernetes向けの基本的な設定は済ませています。まずは分かりやすく、Grafanaでメトリクスを見てみましょう。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;kubectl port-forward -n monitoring svc/prometheus-operator-grafana 3000:80
 &lt;/code&gt;&lt;/pre&gt;
@@ -186,7 +186,7 @@
 &lt;pre&gt;&lt;code&gt;kubectl run --generator=run-pod/v1 phoenix --image=busybox --restart=Always -- /bin/sh -c &#39;exit 1&#39;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;すると、以下のルール KubePodCrashLooping にマッチし、Pending状態になります。&lt;/p&gt;
+&lt;p&gt;すると、以下のルール KubePodCrashLooping にマッチし、アラートがPending状態になります。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;alert: KubePodCrashLooping
 expr: rate(kube_pod_container_status_restarts_total{job=&amp;quot;kube-state-metrics&amp;quot;}[15m])
