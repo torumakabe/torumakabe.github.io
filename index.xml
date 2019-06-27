@@ -113,7 +113,7 @@
 
 &lt;h3 id=&#34;メトリクス&#34;&gt;メトリクス&lt;/h3&gt;
 
-&lt;p&gt;まずはメトリクスから。メトリクスとは「状態を数値で表せるもの」です。単数系はメトリック。CPUやメモリの使用率、Kubernetes固有ではNotReady状態のノード数やPendingのノード数などがそれにあたります。&lt;/p&gt;
+&lt;p&gt;まずはメトリクスから。メトリクスとは「状態を数値で表せるもの」です。単数系はメトリック。CPUやメモリの使用率、Kubernetes固有ではNotReady状態のノード数やPendingのポッド数などがそれにあたります。&lt;/p&gt;
 
 &lt;p&gt;Kubernetesでどのようなメトリクスに注目すべきかについては、議論が活発です。探せば参考になる情報が数多くあります。&amp;rdquo;Golden signals&amp;rdquo;、&amp;rdquo;RED Method&amp;rdquo;、&amp;rdquo;USE Method&amp;rdquo;で検索すると、いろいろ見つかるでしょう。&lt;/p&gt;
 
