@@ -16,12 +16,12 @@ Kubernetesのポッド停止処理 Kubernetesのポッド停止については�
  PreStop処理を書いて、コンテナー停止に備える コンテナー停止時に送られるシグナルを、適切に扱う  ACIでは現在PreStop処理を書けません。なので、シグナルをどう扱うかがポイントです。
 DockerのPID 1問題 シグナルハンドリングの前に、DockerのPID 1問題について触れておきます。
  Docker and the PID 1 zombie reaping problem
- Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられ、すべてのプロセスの親になります。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役を担います。
-しかしDockerでは、はじめにコンテナーで起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。
+ Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられます。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役も担います。
+しかしDockerでは、コンテナーではじめに起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。
 この仕様には、次の課題があります。
  コンテナーにゾンビプロセスのお掃除をするinitがいない docker stopを実行するとPID 1のプロセスに対してSIGTERMが、一定時間の経過後(既定は10秒)にSIGKILLが送られる。PID 1はLinuxで特別な扱いであり、SIGTERMのハンドラーがない場合、それを無視する。ただしinitの他はSIGKILLを無視できない。つまりPID 1で動いたアプリは待たされた挙句、強制終了してしまう。また、転送しなければ子プロセスにSIGTERMが伝わらない  前者が問題になるかは、コンテナーでどれだけプロセスを起動するかにもよります。いっぽうで後者は、PID 1となるアプリで意識してSIGTERMを処理しなければ、常に強制終了されることを意味します。穏やかではありません。
 解決の選択肢 シグナルハンドリングについては、解決の選択肢がいくつかあります。
- SIGTERMを受け取って、終了処理をするようアプリを書く PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)  Docker APIを触れる環境であれば、docker run時に&ndash;initオプションをつければ擬似init(tini)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。別の方法を使います。
+ SIGTERMを受け取って、終了処理をするようアプリを書く PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)  Docker APIを触れる環境であれば、docker run時に&ndash;initオプションをつければ擬似init(tini)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。
 それぞれのやり方と動き ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。
 package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot;syscall&quot; ) func main() { sigs := make(chan os.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aci_gracefull_shutdown/'>
@@ -153,9 +153,9 @@ package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot
 <p><a href="https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/">Docker and the PID 1 zombie reaping problem</a></p>
 </blockquote>
 
-<p>Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられ、すべてのプロセスの親になります。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役を担います。</p>
+<p>Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられます。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役も担います。</p>
 
-<p>しかしDockerでは、はじめにコンテナーで起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。</p>
+<p>しかしDockerでは、コンテナーではじめに起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。</p>
 
 <p>この仕様には、次の課題があります。</p>
 
@@ -176,7 +176,7 @@ package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot
 <li>PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)</li>
 </ol>
 
-<p>Docker APIを触れる環境であれば、docker run時に<a href="https://docs.docker.com/engine/reference/run/#specify-an-init-process">&ndash;initオプション</a>をつければ擬似init(<a href="https://github.com/krallin/tini">tini</a>)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。別の方法を使います。</p>
+<p>Docker APIを触れる環境であれば、docker run時に<a href="https://docs.docker.com/engine/reference/run/#specify-an-init-process">&ndash;initオプション</a>をつければ擬似init(<a href="https://github.com/krallin/tini">tini</a>)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。</p>
 
 <h2 id="それぞれのやり方と動き">それぞれのやり方と動き</h2>
 
@@ -209,7 +209,7 @@ func main() {
 }
 </code></pre>
 
-<p>SIGTERMとSIGQUITを受け取ったら、受け取ったシグナルの種類をログに書いて終了します。</p>
+<p>SIGTERMかSIGQUITを受け取ったら、受け取ったシグナルの種類をログに書いて終了します。</p>
 
 <h3 id="sigtermを意識できていない場合">SIGTERMを意識できていない場合</h3>
 
