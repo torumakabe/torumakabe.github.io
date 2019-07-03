@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-06-26T18:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,44 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/arm-template">#ARM Template</a>
+  
+  | <a class="subtitle is-6" href="/tags/managed-disk">#Managed Disk</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 23, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_template_managed_disk/">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a></h1>
+      <div class="content">
+        お伝えしたいこと  ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでManaged Diskを作る時のコツ 可用性セットを意識しよう  ARMテンプレートのドキュメントが使いやすくなった docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも使いやすくなりました。ARMテンプレート使いのみなさまは https://docs.microsoft.com/ja-jp/azure/templates/ をブックマークして、サクサク調べちゃってください。
+Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり知られてないようなのでアピールしておきます。
+コードアシストしてくれます。
+画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。
+Get VS Code and extension
+ARMテンプレートでManaged Diskを作る時のコツ Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。
+Managed Diskは Microsoft.Compute/disks で個別に定義できますが、省略もできます。Microsoft.Compute/virtualMachines の中に書いてしまうやり口です。
+&quot;osDisk&quot;: { &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;, &quot;createOption&quot;: &quot;FromImage&quot;, &quot;managedDisk&quot;: { &quot;storageAccountType&quot;: &quot;Standard_LRS&quot; }, &quot;diskSizeGB&quot;: 128 }  こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。
+可用性セットを意識しよう Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。
+Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。
+参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_template_managed_disk/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -226,42 +264,6 @@ AZChatOpsSample
  kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/node">#Node</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/bash">#Bash</a>
-  
-  | <a class="subtitle is-6" href="/tags/windows">#Windows</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 14, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/bashonwindows_nvm/">Bash on WindowsでNode開発環境を作る</a></h1>
-      <div class="content">
-        Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。
-たとえばNodeのバージョン管理。Windowsにはnodistがありますが、Linux/Macでは動きません。Linux/Macで使ってるNVMがWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。
-最近、Azure FunctionsでNode v6.4.0が使えるようになったので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。
-NVMのインストール  Bash on Ubuntu on Windowsを入れます (参考) Bash on Ubuntu on Windowsを起動します build-essentialとlibssl-devを入れます  sudo apt-get install build-essential checkinstall sudo apt-get install libssl-dev   インストールスクリプトを流します  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash  バージョンアップを考慮し、インストールのつど公式ページを確認してください。
-以上。
-NVMの使い方 nvm install 6.4.0  指定のバージョンをインストールします。
-nvm use 6.4.0  使うバージョンを指定します。
-簡単ですね。
-cd /mnt/c/your_work_directory node .
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/bashonwindows_nvm/" style="height:28px">
           Read more
         </a>
         

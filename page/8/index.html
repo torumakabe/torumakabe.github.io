@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-06-26T18:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,40 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 13, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_osstools_iac/">VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</a></h1>
+      <div class="content">
+        端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
+解決したい課題 こんな悩みを解決します。
+ WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&gt;IP指定-&gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
+ Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
+ Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
+サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don't touch unless you know what you're doing! VAGRANTFILE_API_VERSION = &quot;2&quot; $bootstrap=&lt;&lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_osstools_iac/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -226,43 +260,6 @@ C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレ�
  azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください    うし、デプロイ。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_cntk/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/automation">#Automation</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 6, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_auditlog_alert/">Azureの監査ログアラートからWebhookの流れで楽をする</a></h1>
-      <div class="content">
-        監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利な機能です。日々の運用に効きます。
-どんな風に使えるか ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。
-たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。
-これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
-これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
-実装例 例としてこんな仕組みを作ってみましょう。
- 西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
- Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
-勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
-Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
-ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
-param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" style="height:28px">
           Read more
         </a>
         

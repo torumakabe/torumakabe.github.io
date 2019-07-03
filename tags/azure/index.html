@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-06-26T18:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,48 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/aci">#ACI</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">July 3, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci_gracefull_shutdown/">Azure Cotainer InstancesのGraceful Shutdown事情</a></h1>
+      <div class="content">
+        何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
+ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
+Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
+ Kubernetes: 詳解 Pods の終了
+ 書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。
+ざっくりまとめると、ポッドをGraceful Shutdownする方法は次の2つです。
+ PreStop処理を書いて、コンテナー停止に備える コンテナー停止時に送られるシグナルを、適切に扱う  ACIでは現在PreStop処理を書けません。なので、シグナルをどう扱うかがポイントです。
+DockerのPID 1問題 シグナルハンドリングの前に、DockerのPID 1問題について触れておきます。
+ Docker and the PID 1 zombie reaping problem
+ Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられ、すべてのプロセスの親になります。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役を担います。
+しかしDockerでは、はじめにコンテナーで起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。
+この仕様には、次の課題があります。
+ コンテナーにゾンビプロセスのお掃除をするinitがいない docker stopを実行するとPID 1のプロセスに対してSIGTERMが、一定時間の経過後(既定は10秒)にSIGKILLが送られる。PID 1はLinuxで特別な扱いであり、SIGTERMのハンドラーがない場合、それを無視する。ただしinitの他はSIGKILLを無視できない。つまりPID 1で動いたアプリは待たされた挙句、強制終了してしまう。また、転送しなければ子プロセスにSIGTERMが伝わらない  前者が問題になるかは、コンテナーでどれだけプロセスを起動するかにもよります。いっぽうで後者は、PID 1となるアプリで意識してSIGTERMを処理しなければ、常に強制終了されることを意味します。穏やかではありません。
+解決の選択肢 シグナルハンドリングについては、解決の選択肢がいくつかあります。
+ SIGTERMを受け取って、終了処理をするようアプリを書く PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)  Docker APIを触れる環境であれば、docker run時に&ndash;initオプションをつければ擬似init(tini)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。別の方法を使います。
+それぞれのやり方と動き ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。
+package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot;syscall&quot; ) func main() { sigs := make(chan os.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aci_gracefull_shutdown/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -239,42 +281,6 @@ Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;とし
 CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/github">#GitHub</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">December 22, 2018</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></h1>
-      <div class="content">
-        GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
-GitHub Actions
-数時間、触った印象。
- GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
-Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
- KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
-コードは ここ に。
-ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
           Read more
         </a>
         

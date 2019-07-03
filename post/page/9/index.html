@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-26T18:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,43 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/automation">#Automation</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 6, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_auditlog_alert/">Azureの監査ログアラートからWebhookの流れで楽をする</a></h1>
+      <div class="content">
+        監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利な機能です。日々の運用に効きます。
+どんな風に使えるか ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。
+たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。
+これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
+これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
+実装例 例としてこんな仕組みを作ってみましょう。
+ 西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
+ Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
+勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
+Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
+ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
+param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -237,42 +274,6 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
 { &quot;variables&quot;: { &quot;client_id&quot;: &quot;&quot;, &quot;client_secret&quot;: &quot;&quot;, &quot;resource_group&quot;: &quot;&quot;, &quot;storage_account&quot;: &quot;&quot;, &quot;subscription_id&quot;: &quot;&quot;, &quot;tenant_id&quot;: &quot;&quot; }, &quot;builders&quot;: [{ &quot;type&quot;: &quot;azure-arm&quot;, &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;, &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;, &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;, &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;, &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;, &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;, &quot;capture_container_name&quot;: &quot;images&quot;, &quot;capture_name_prefix&quot;: &quot;packer&quot;, &quot;image_publisher&quot;: &quot;Canonical&quot;, &quot;image_offer&quot;: &quot;UbuntuServer&quot;, &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;, &quot;location&quot;: &quot;Japan West&quot;, &quot;vm_size&quot;: &quot;Standard_D1&quot; }], &quot;provisioners&quot;: [{ &quot;type&quot;: &quot;shell&quot;, &quot;scripts&quot;: [ &quot;.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-  
-  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">March 9, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/">Terraform &amp; Azure デプロイ設計4原則</a></h1>
-      <div class="content">
-        注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。
-情報がありそうでない 以前のエントリで書いたとおり、TerraformでAzureへデプロイする方式をClassicからResource Managerへ移行しているところです。
-今後も継続して試行錯誤するとは思うのですが、ふらふらしないように原則を作りました。この手の情報はありそうでないので、参考になればと思いこのエントリを書いています。
-なお、考え方は他のクラウドやデプロイツールでも応用できるかと。
-4原則  セキュリティファースト 手順書をなくそう 分割境界にこだわりすぎない 早すぎる最適化は悪  なお、サンプルのTerraformファイル群を、Githubに置いておきました。
-今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
-. ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
-1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
- 認証情報は変数指定し、設定ファイルから読み込む
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
           Read more
         </a>
         

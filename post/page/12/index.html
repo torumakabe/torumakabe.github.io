@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-06-26T18:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,39 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">November 5, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_extension/">Azure Docker VM Extensionを使う3つの理由</a></h1>
+      <div class="content">
+        まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
+もちろん、技術者個人として、中立的に、公開できるネタを書きます。
+AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。
+なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。
+Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
+このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
+ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
+ Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)  ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
+Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
+ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
+Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
+なお、このDocker拡張、ARM属性で言うpublisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -209,45 +242,6 @@ Monitoring as a Service 監視をサービスとして提供するって、ど�
 最後に、最新のOpenStack User Surveyを紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。
 OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&rdquo;Ability to innovate&rdquo;なんですよね。 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。
 メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-
-
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">December 6, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/handsome-openstack/">ハンサムOpenStack</a></h1>
-      <div class="content">
-        このエントリーは、OpenStack (2枚目) Advent Calendar 2014の6夜目担当作品です。
-出オチ OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。
-こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。
-そもそも2枚目とは 「二枚目」という用語は、歌舞伎用語をもとに、江戸時代に生まれた。歌舞伎の看板は、通常は8枚から成っていた。一枚目の看板は「書き出し」と言われ、主役の名が書かれ、二枚目の看板には若い色男の役者の名が書かれることになっていた。また、三枚目の看板には道化役の名が書かれることになっていた。  「二枚目」（2013年5月28日 (火) 02:17 UTCの版）『ウィキペディア日本語版』
-8枚あるらしいぞ いじってみよう  一枚目：主役：そのまま主役。「一枚看板」という用法もある。
-Novaですね。主役です。
- 二枚目：色男：優男で色事担当
-これはあとにとっておきましょう。
- 三枚目：道化：お笑い担当
-Glanceですね。何も変なことしてないのにネタにされる。
- 四枚目：中軸：中堅役者　まとめ役
-Cinderでしょうか。主役のNovaを活かす名脇役。
- 五枚目：敵役：一般的な敵役
-Heatかな。はじめのCloudFormation形式ってのが気に入らなかった。HOTが出てきたので許す。
- 六枚目：実敵：憎めない善要素のある敵役
-Ceilometerです。重いです。絶賛チューニング中です。
- 七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕
-Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなかったのよきっと。これから良くなるよ。
- 八枚目：座長：元締め
-Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。
-  じゃあ二枚目は? *Trove*です。若さと期待の大きさを込めてキャスティングしました。というかこれを見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。
-2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。
         
       </div>
     </article>
