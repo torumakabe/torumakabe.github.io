@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>Azure Cotainer InstancesのGraceful Shutdown事情</title>
+      <title>Azure Container InstancesのGraceful Shutdown事情</title>
       <link>https://ToruMakabe.github.io/post/aci_gracefull_shutdown/</link>
       <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
       <author>Toru Makabe</author>

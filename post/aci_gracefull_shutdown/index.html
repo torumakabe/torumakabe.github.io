@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title>Azure Cotainer InstancesのGraceful Shutdown事情 | re-imagine</title>
+<title>Azure Container InstancesのGraceful Shutdown事情 | re-imagine</title>
 
-<meta property='og:title' content='Azure Cotainer InstancesのGraceful Shutdown事情 - re-imagine'>
+<meta property='og:title' content='Azure Container InstancesのGraceful Shutdown事情 - re-imagine'>
 <meta property='og:description' content='何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
 ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
 Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
@@ -115,7 +115,7 @@ package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot
       
     </div>
     <h2 class="subtitle is-6">July 3, 2019</h2>
-    <h1 class="title">Azure Cotainer InstancesのGraceful Shutdown事情</h1>
+    <h1 class="title">Azure Container InstancesのGraceful Shutdown事情</h1>
     
     <div class="content">
       
