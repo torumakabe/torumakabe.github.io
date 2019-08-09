@@ -15,10 +15,10 @@ MicroScannerのコンセプトは、以下のリンク先にある記事やス�
 What&rsquo;s so hard about vulnerability scanning?
 Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
  トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
-$ docker run --rm -it aquasec/microscanner  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
+$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
 ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
 まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
-FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.aquasec.com/microscanner / RUN chmod &#43;x /microscanner ARG token RUN /microscanner ${token} &amp;&amp; rm /microscanner RUN echo &quot;No vulnerabilities!'>
+FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aqua_acr/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Aqua'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Container'><meta property='article:published_time' content='2019-08-09T13:00:00&#43;09:00'/><meta property='article:modified_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -141,7 +141,7 @@ FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.aquasec.c
 
 <p>MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。</p>
 
-<pre><code>$ docker run --rm -it aquasec/microscanner
+<pre><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
 </code></pre>
 
 <h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
