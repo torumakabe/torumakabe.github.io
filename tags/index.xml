@@ -7,10 +7,37 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Wed, 03 Jul 2019 23:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 09 Aug 2019 13:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Aqua</title>
+      <link>https://ToruMakabe.github.io/tags/aqua/</link>
+      <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/aqua/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Azure</title>
+      <link>https://ToruMakabe.github.io/tags/azure/</link>
+      <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Container</title>
+      <link>https://ToruMakabe.github.io/tags/container/</link>
+      <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/container/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>ACI</title>
@@ -18,15 +45,6 @@
       <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/aci/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Azure</title>
-      <link>https://ToruMakabe.github.io/tags/azure/</link>
-      <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
       <description></description>
     </item>
     

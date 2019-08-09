@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,43 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/">TerraformをAzure ARMで使う時の認証</a></h1>
+      <div class="content">
+        高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
+Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
+そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
+client_id/client_secret って何よ 以下がARM向けのProvider設定です。
+# Configure the Azure Resource Manager Provider provider &quot;azurerm&quot; { subscription_id = &quot;...&quot; client_id = &quot;...&quot; client_secret = &quot;...&quot; tenant_id = &quot;...&quot; }  subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、client_id/client_secret って何よ。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。
+&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;  おっとそういうことか。OAuth。
+サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
+&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
+&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
+以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -229,58 +266,6 @@ Linuxで使える代表的なストライプ実装は、LVMとMD。
 &ldquo;Configure Software RAID on Linux&rdquo;
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/striping_linuxonazure/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/cloud">#Cloud</a>
-  
-  | <a class="subtitle is-6" href="/tags/performance">#Performance</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">January 24, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/">クラウドは本当に性能不足なのか</a></h1>
-      <div class="content">
-        このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。
-具体的な数値で、正しい理解を &ldquo;クラウドは性能不足、企業システムが重すぎる&rdquo;という記事が身の回りで話題になりました。公開から4日たっても「いま読まれている記事」の上位にあり、注目されているようです。
-記事で訴えたかったことは、クラウドを過信しないように、そして、クラウドはクラウドらしい使い方をしよう、ということでしょう。ユーザの声は貴重ですし、同意できるところも多い。でも、「企業システム」とひとくくりにしてしまったこと。タイトルのバイアスが強いこと。そして、具体的な根拠に欠けることから、誤解を招いている印象です。
-どんな技術、製品、サービスにも限界や制約はあります。具体的な数値や仕様で語らないと、そこから都市伝説が生まれます。
-いい機会なので、わたしの主戦場であるAzureを例に、クラウドでどのくらいの性能を期待できるか、まとめてみようと思います。
-シングルVMでどれだけ 話題となった記事でも触れられているように、クラウドはその生まれから、分散、スケールアウトな作りのアプリに向いています。ですが世の中には「そうできない」「そうするのが妥当ではない」システムもあります。記事ではそれを「企業システム」とくくっているようです。
-わたしは原理主義者ではないので「クラウドに載せたかったら、そのシステムを作り直せ」とは思いません。作りを大きく変えなくても載せられる、それでクラウドの特徴を活かして幸せになれるのであれば、それでいいです。もちろん最適化するにこしたことはありませんが。
-となると、クラウド活用の検討を進めるか、あきらめるか、判断材料のひとつは「スケールアウトできなくても、性能足りるか?」です。
-この場合、1サーバ、VMあたりの性能上限が制約です。なので、AzureのシングルVM性能が鍵になります。
-では、Azureの仮想マシンの提供リソースを確認しましょう。
-&ldquo;仮想マシンのサイズ&rdquo;
-ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。
-企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。
- Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS   メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
-なお、現時点でまだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。
-32仮想CPUコアの規模感 クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。
-&ldquo;パフォーマンスに関する考慮事項&rdquo;
-ACUはAzure内で相対評価をする場合にはいいのですが、「じゃあAzureの外からシステムもってきたとき、実際どのくらいさばけるのよ。いま持ってる/買えるサーバ製品でいうと、どのくらいよ」という問いには向きません。
-クラウドや仮想化に関わらず、アプリの作りと処理するデータ、ハードの組み合わせで性能は変わります。動かしてみるのが一番です。せっかくイニシャルコストのかからないクラウドです。試しましょう。でもその前に、試す価値があるか判断しなければいけない。なにかしらの参考値が欲しい。予算と組織で動いてますから。わかります。
-では例をあげましょう。俺のベンチマークを出したいところですが、「それじゃない」と突っ込まれそうです。ここはぐっと我慢して、企業でよく使われているERP、SAPのSAP SDベンチマークにしましょう。
-&ldquo;SAP Standard Application Benchmarks in Cloud Environments&rdquo;
-&ldquo;SAP Standard Application Benchmarks&rdquo;
-SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。
-比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。
-    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012&frasl;4 2015&frasl;9 2015&frasl;7 2015&frasl;7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" style="height:28px">
           Read more
         </a>
         

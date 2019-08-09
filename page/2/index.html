@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,47 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 26, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</a></h1>
+      <div class="content">
+        何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、それには触れません。インフラ担当者向け。
+動機 Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。
+ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に、後追いでこんなものを入れています。
+ Istio Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる) HelmのTiller (helm initで作ると守りが緩いので、localhostに限定したdeploymentで入れる) AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics) リアルタイムコンテナーログ表示設定  kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、過渡期に多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。
+とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。今年のはじめに書いた本でも、Terraformの活用例を紹介しています。サンプルコードはこちら。
+で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。リソースのライフサイクル管理はTerraformに集約しましょう。
+そしてここからが、このエントリーの本題です。
+AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。
+ Virtual Node Cluster Autoscaler (on Virtual Machine Scale Sets) Network Policy (with Calico) Pod Security Policy Multi Nodepool リアルタイムコンテナーログ表示  これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。
+ Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
+ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
+意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
+Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -218,35 +259,6 @@ Azure CLI 2.0 のエイリアス拡張機能
         <a class="button is-link" href="https://ToruMakabe.github.io/post/myazurecli201804/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 6, 2018</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</a></h1>
-      <div class="content">
-        カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。
-ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。
- 最新のイメージ名を確認のうえ、手で指定する 自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する  2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。
-Terraformではイメージ名取得に正規表現とソートが可能 Terraformでは見出しの通り、捗る表現ができます。
-イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の文字列比較なので、末尾の番号の決めた桁は埋めること。
-ということで降順で最上位、つまり最新のイメージ名を取得できます。
-data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; }  あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
- storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; }  便利である。
         
       </div>
     </article>

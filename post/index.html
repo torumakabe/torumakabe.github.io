@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,45 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/aqua">#Aqua</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/container">#Container</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">August 9, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aqua_acr/">Azure Container Registry TasksでAqua MicroScannerを自動実行する</a></h1>
+      <div class="content">
+        何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。
+@ehotinger のブログを読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!
+Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
+MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
+ Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
+What&rsquo;s so hard about vulnerability scanning?
+Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
+ トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
+$ docker run --rm -it aquasec/microscanner  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
+ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
+まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
+FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.aquasec.com/microscanner / RUN chmod +x /microscanner ARG token RUN /microscanner ${token} &amp;&amp; rm /microscanner RUN echo &quot;No vulnerabilities!
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aqua_acr/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -240,47 +279,6 @@ $ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 
 apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m  デプロイします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 26, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</a></h1>
-      <div class="content">
-        何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、それには触れません。インフラ担当者向け。
-動機 Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。
-ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に、後追いでこんなものを入れています。
- Istio Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる) HelmのTiller (helm initで作ると守りが緩いので、localhostに限定したdeploymentで入れる) AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics) リアルタイムコンテナーログ表示設定  kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、過渡期に多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。
-とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。今年のはじめに書いた本でも、Terraformの活用例を紹介しています。サンプルコードはこちら。
-で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。リソースのライフサイクル管理はTerraformに集約しましょう。
-そしてここからが、このエントリーの本題です。
-AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。
- Virtual Node Cluster Autoscaler (on Virtual Machine Scale Sets) Network Policy (with Calico) Pod Security Policy Multi Nodepool リアルタイムコンテナーログ表示  これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。
- Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
-ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
-意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
-CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
           Read more
         </a>
         

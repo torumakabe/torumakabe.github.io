@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Container on re-imagine</title>
+    <link>https://ToruMakabe.github.io/tags/container/</link>
+    <description>Recent content in Container on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
+    <lastBuildDate>Fri, 09 Aug 2019 13:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://ToruMakabe.github.io/tags/container/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Azure Container Registry TasksでAqua MicroScannerを自動実行する</title>
+      <link>https://ToruMakabe.github.io/post/aqua_acr/</link>
+      <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aqua_acr/</guid>
+      <description>何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。
+@ehotinger のブログを読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!
+Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
+MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
+ Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
+What&amp;rsquo;s so hard about vulnerability scanning?
+Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
+ トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
+$ docker run --rm -it aquasec/microscanner  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
+ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
+まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
+FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.aquasec.com/microscanner / RUN chmod +x /microscanner ARG token RUN /microscanner ${token} &amp;amp;&amp;amp; rm /microscanner RUN echo &amp;quot;No vulnerabilities!</description>
+    </item>
+    
+  </channel>
+</rss>

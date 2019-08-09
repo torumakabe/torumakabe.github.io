@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-07-03T23:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,41 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+  | <a class="subtitle is-6" href="/tags/deep-learning">#Deep Learning</a>
+  
+  | <a class="subtitle is-6" href="/tags/cntk">#CNTK</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 17, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_cntk/">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a></h1>
+      <div class="content">
+        気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
+試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+リソースグループを作ります。
+C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
+ azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください    うし、デプロイ。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_cntk/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -242,38 +277,6 @@ Terraformは扱うリソースごとにAPIをコールするので、数が多�
 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_terraform_429_workaround/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/packer">#Packer</a>
-  
-  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">March 17, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</a></h1>
-      <div class="content">
-        いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
-ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
-手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
-前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。  ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
-{ &quot;variables&quot;: { &quot;client_id&quot;: &quot;&quot;, &quot;client_secret&quot;: &quot;&quot;, &quot;resource_group&quot;: &quot;&quot;, &quot;storage_account&quot;: &quot;&quot;, &quot;subscription_id&quot;: &quot;&quot;, &quot;tenant_id&quot;: &quot;&quot; }, &quot;builders&quot;: [{ &quot;type&quot;: &quot;azure-arm&quot;, &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;, &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;, &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;, &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;, &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;, &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;, &quot;capture_container_name&quot;: &quot;images&quot;, &quot;capture_name_prefix&quot;: &quot;packer&quot;, &quot;image_publisher&quot;: &quot;Canonical&quot;, &quot;image_offer&quot;: &quot;UbuntuServer&quot;, &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;, &quot;location&quot;: &quot;Japan West&quot;, &quot;vm_size&quot;: &quot;Standard_D1&quot; }], &quot;provisioners&quot;: [{ &quot;type&quot;: &quot;shell&quot;, &quot;scripts&quot;: [ &quot;.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" style="height:28px">
           Read more
         </a>
         
