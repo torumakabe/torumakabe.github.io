@@ -151,7 +151,9 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
-      <description>GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
+      <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。
+ Migrating GitHub Actions from HCL syntax to YAML syntax
+ GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
 GitHub Actions
 数時間、触った印象。
  GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
@@ -159,7 +161,7 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
  KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
 コードは ここ に。
 ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .</description>
+. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.</description>
     </item>
     
     <item>
@@ -232,7 +234,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &amp;quot;type&amp;quot;: &amp;quot;Microsoft.</description>
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング</description>
     </item>
     
     <item>
@@ -361,7 +363,8 @@ terraform workspace select prod  みなまで言わなくても分かります�
       <description>Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
 ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
 ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &amp;quot;context&amp;quot; &amp;quot;flag&amp;quot; &amp;quot;fmt&amp;quot; &amp;quot;log&amp;quot; &amp;quot;net/url&amp;quot; &amp;quot;os&amp;quot; &amp;quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&amp;quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;amp;accountName, &amp;quot;account-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Name&amp;quot;) flag.</description>
+(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加
+package main import ( &amp;quot;context&amp;quot; &amp;quot;flag&amp;quot; &amp;quot;fmt&amp;quot; &amp;quot;log&amp;quot; &amp;quot;net/url&amp;quot; &amp;quot;os&amp;quot; &amp;quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&amp;quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;amp;accountName, &amp;quot;account-name&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Name&amp;quot;) flag.StringVar(&amp;amp;accountKey, &amp;quot;account-key&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;(Required) Storage Account Key&amp;quot;) flag.</description>
     </item>
     
     <item>
@@ -521,7 +524,9 @@ AZChatOpsSample
 何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;rdquo;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください   sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.</description>
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;rdquo;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
+ 先ほど入手したOMSのワークスペースIDとKeyを入れてください
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.</description>
     </item>
     
     <item>

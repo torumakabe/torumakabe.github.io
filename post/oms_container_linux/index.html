@@ -12,7 +12,9 @@
 何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&rdquo;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください   sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.'>
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&rdquo;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
+ 先ほど入手したOMSのワークスペースIDとKeyを入れてください
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/oms_container_linux/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Docker'><meta property='article:tag' content='Azure'><meta property='article:tag' content='OMS'><meta property='article:published_time' content='2016-08-25T16:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-08-25T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -156,15 +158,16 @@
 <li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
 <li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
 </ul></li>
-<li>OMSエージェントコンテナを導入
+
+<li><p>OMSエージェントコンテナを導入</p>
 
 <ul>
-<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
-</ul></li>
-</ul>
+<li><p>先ほど入手したOMSのワークスペースIDとKeyを入れてください</p>
 
 <pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
-</code></pre>
+</code></pre></li>
+</ul></li>
+</ul>
 
 <p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
 

@@ -315,29 +315,27 @@ module.exports = function (context, req) {
 <ul>
 <li>好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが</li>
 </ul></li>
-<li>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
+
+<li><p>sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します</p>
 
 <ul>
-<li>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ
-<br /></li>
+<li><p>コレクション&rdquo;beer&rdquo;、&rdquo;eom(end of message)&ldquo;の構造はそれぞれこんな感じ</p>
+
+<pre><code>{
+&quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
+&quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
+&quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
+}
+</code></pre>
+
+<pre><code>{
+&quot;msg&quot;: &quot;はウマい&quot;,
+&quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
+}
+</code></pre></li>
 </ul></li>
-</ul>
 
-<pre><code>{
-  &quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
-  &quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
-  &quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
-}
-</code></pre>
-
-<pre><code>{
-  &quot;msg&quot;: &quot;はウマい&quot;,
-  &quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
-}
-</code></pre>
-
-<ul>
-<li>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</li>
+<li><p>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</p></li>
 </ul>
 
 <p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。</p>

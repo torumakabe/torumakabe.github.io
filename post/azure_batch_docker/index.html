@@ -178,88 +178,89 @@
 <li>ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine</li>
 <li>サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration</li>
 <li>サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
-<li>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
-</ul>
 
-<pre><code>  {
-  &quot;odata.metadata&quot;:&quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;,
-  &quot;id&quot;:&quot;myjobschedule1&quot;,
-  &quot;schedule&quot;: {
-    &quot;doNotRunUntil&quot;:&quot;2016-04-29T05:30:00.000Z&quot;,
-    &quot;recurrenceInterval&quot;:&quot;PT4H&quot;
+<li><p>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</p>
+
+<pre><code>{
+&quot;odata.metadata&quot;:&quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;,
+&quot;id&quot;:&quot;myjobschedule1&quot;,
+&quot;schedule&quot;: {
+&quot;doNotRunUntil&quot;:&quot;2016-04-29T05:30:00.000Z&quot;,
+&quot;recurrenceInterval&quot;:&quot;PT4H&quot;
+},
+&quot;jobSpecification&quot;: {
+&quot;priority&quot;:100,
+&quot;constraints&quot;: {
+  &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
+  &quot;maxTaskRetryCount&quot;:-1
+},
+&quot;jobManagerTask&quot;: {
+  &quot;id&quot;:&quot;mytask1&quot;,
+  &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./task.sh'&quot;,
+  &quot;resourceFiles&quot;: [ {
+    &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
+    &quot;filePath&quot;:&quot;task.sh&quot;
+  }], 
+  &quot;environmentSettings&quot;: [ {
+    &quot;name&quot;:&quot;VAR1&quot;,
+    &quot;value&quot;:&quot;hello&quot;
+  } ],
+  &quot;constraints&quot;: {
+    &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
+    &quot;maxTaskRetryCount&quot;:0,
+    &quot;retentionTime&quot;:&quot;PT1H&quot;
   },
-  &quot;jobSpecification&quot;: {
-    &quot;priority&quot;:100,
-    &quot;constraints&quot;: {
-      &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-      &quot;maxTaskRetryCount&quot;:-1
-    },
-    &quot;jobManagerTask&quot;: {
-      &quot;id&quot;:&quot;mytask1&quot;,
-      &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./task.sh'&quot;,
-      &quot;resourceFiles&quot;: [ {
-        &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-        &quot;filePath&quot;:&quot;task.sh&quot;
-      }], 
-      &quot;environmentSettings&quot;: [ {
-        &quot;name&quot;:&quot;VAR1&quot;,
-        &quot;value&quot;:&quot;hello&quot;
-      } ],
-      &quot;constraints&quot;: {
-        &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-        &quot;maxTaskRetryCount&quot;:0,
-        &quot;retentionTime&quot;:&quot;PT1H&quot;
-      },
-      &quot;killJobOnCompletion&quot;:false,
-      &quot;runElevated&quot;:true,
-      &quot;runExclusive&quot;:true
-      },
-      &quot;poolInfo&quot;: {
-        &quot;autoPoolSpecification&quot;: {
-          &quot;autoPoolIdPrefix&quot;:&quot;mypool&quot;,
-          &quot;poolLifetimeOption&quot;:&quot;job&quot;,
-          &quot;pool&quot;: {
-            &quot;vmSize&quot;:&quot;STANDARD_D1&quot;,
-            &quot;virtualMachineConfiguration&quot;: {
-              &quot;imageReference&quot;: {
-                &quot;publisher&quot;:&quot;Canonical&quot;,
-                &quot;offer&quot;:&quot;UbuntuServer&quot;,
-                &quot;sku&quot;:&quot;14.04.4-LTS&quot;,
-                &quot;version&quot;:&quot;latest&quot;
-              },
-              &quot;nodeAgentSKUId&quot;:&quot;batch.node.ubuntu 14.04&quot;
-            },
-            &quot;resizeTimeout&quot;:&quot;PT15M&quot;,
-            &quot;targetDedicated&quot;:1,
-            &quot;maxTasksPerNode&quot;:1,
-            &quot;taskSchedulingPolicy&quot;: {
-              &quot;nodeFillType&quot;:&quot;Spread&quot;
-            },
-            &quot;enableAutoScale&quot;:false,
-            &quot;enableInterNodeCommunication&quot;:false,
-            &quot;startTask&quot;: {
-              &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./starttask.sh'&quot;,
-              &quot;resourceFiles&quot;: [ {
-                &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-                &quot;filePath&quot;:&quot;starttask.sh&quot;
-              } ],
-              &quot;environmentSettings&quot;: [ {
-                &quot;name&quot;:&quot;VAR2&quot;,
-                &quot;value&quot;:&quot;Chao&quot;
-              } ],
-              &quot;runElevated&quot;:true,
-              &quot;waitForSuccess&quot;:true
-            },
-            &quot;metadata&quot;: [ {
-              &quot;name&quot;:&quot;myproperty&quot;,
-              &quot;value&quot;:&quot;myvalue&quot;
-            } ]
-          }
-        }
+  &quot;killJobOnCompletion&quot;:false,
+  &quot;runElevated&quot;:true,
+  &quot;runExclusive&quot;:true
+  },
+  &quot;poolInfo&quot;: {
+    &quot;autoPoolSpecification&quot;: {
+      &quot;autoPoolIdPrefix&quot;:&quot;mypool&quot;,
+      &quot;poolLifetimeOption&quot;:&quot;job&quot;,
+      &quot;pool&quot;: {
+        &quot;vmSize&quot;:&quot;STANDARD_D1&quot;,
+        &quot;virtualMachineConfiguration&quot;: {
+          &quot;imageReference&quot;: {
+            &quot;publisher&quot;:&quot;Canonical&quot;,
+            &quot;offer&quot;:&quot;UbuntuServer&quot;,
+            &quot;sku&quot;:&quot;14.04.4-LTS&quot;,
+            &quot;version&quot;:&quot;latest&quot;
+          },
+          &quot;nodeAgentSKUId&quot;:&quot;batch.node.ubuntu 14.04&quot;
+        },
+        &quot;resizeTimeout&quot;:&quot;PT15M&quot;,
+        &quot;targetDedicated&quot;:1,
+        &quot;maxTasksPerNode&quot;:1,
+        &quot;taskSchedulingPolicy&quot;: {
+          &quot;nodeFillType&quot;:&quot;Spread&quot;
+        },
+        &quot;enableAutoScale&quot;:false,
+        &quot;enableInterNodeCommunication&quot;:false,
+        &quot;startTask&quot;: {
+          &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./starttask.sh'&quot;,
+          &quot;resourceFiles&quot;: [ {
+            &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
+            &quot;filePath&quot;:&quot;starttask.sh&quot;
+          } ],
+          &quot;environmentSettings&quot;: [ {
+            &quot;name&quot;:&quot;VAR2&quot;,
+            &quot;value&quot;:&quot;Chao&quot;
+          } ],
+          &quot;runElevated&quot;:true,
+          &quot;waitForSuccess&quot;:true
+        },
+        &quot;metadata&quot;: [ {
+          &quot;name&quot;:&quot;myproperty&quot;,
+          &quot;value&quot;:&quot;myvalue&quot;
+        } ]
       }
     }
   }
-</code></pre>
+}
+}
+</code></pre></li>
+</ul>
 
 <p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
 

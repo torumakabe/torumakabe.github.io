@@ -1829,6 +1829,14 @@ data &amp;quot;azurerm_log_analytics_workspace&amp;quot; &amp;quot;aks&amp;quot;
       
       <content>
 
+&lt;h2 id=&#34;注-2019-8-19追記&#34;&gt;(注: 2019/8/19追記)&lt;/h2&gt;
+
+&lt;p&gt;GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&#34;https://help.github.com/en/articles/migrating-github-actions-from-hcl-syntax-to-yaml-syntax&#34;&gt;Migrating GitHub Actions from HCL syntax to YAML syntax&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
 &lt;h2 id=&#34;github-actionsのプレビュー招待がきた&#34;&gt;GitHub Actionsのプレビュー招待がきた&lt;/h2&gt;
 
 &lt;p&gt;ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。&lt;/p&gt;
@@ -2770,69 +2778,70 @@ command = group deployment create --mode Complete --template-uri https://gist.gi
 &lt;ul&gt;
 &lt;li&gt;MSI VM拡張の導入&lt;/li&gt;
 &lt;li&gt;VMに対してリソースグループスコープでContributorロールを割り当て&lt;/li&gt;
-&lt;li&gt;スクリプト実行 VM拡張でTerraform関連のプロビジョニング&lt;/li&gt;
-&lt;/ul&gt;
+
+&lt;li&gt;&lt;p&gt;スクリプト実行 VM拡張でTerraform関連のプロビジョニング&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;[snip]
-        {
-            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
-            &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&amp;quot;,
-            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-12-01&amp;quot;,
-            &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
-            &amp;quot;properties&amp;quot;: {
-                &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.ManagedIdentity&amp;quot;,
-                &amp;quot;type&amp;quot;: &amp;quot;ManagedIdentityExtensionForLinux&amp;quot;,
-                &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;1.0&amp;quot;,
-                &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
-                &amp;quot;settings&amp;quot;: {
-                    &amp;quot;port&amp;quot;: 50342
-                },
-                &amp;quot;protectedSettings&amp;quot;: {}
+    {
+        &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
+        &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&amp;quot;,
+        &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-12-01&amp;quot;,
+        &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
+        &amp;quot;properties&amp;quot;: {
+            &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.ManagedIdentity&amp;quot;,
+            &amp;quot;type&amp;quot;: &amp;quot;ManagedIdentityExtensionForLinux&amp;quot;,
+            &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;1.0&amp;quot;,
+            &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
+            &amp;quot;settings&amp;quot;: {
+                &amp;quot;port&amp;quot;: 50342
             },
-            &amp;quot;dependsOn&amp;quot;: [
-                &amp;quot;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&amp;quot;
-            ]
+            &amp;quot;protectedSettings&amp;quot;: {}
         },
-        {
-            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Authorization/roleAssignments&amp;quot;,
-            &amp;quot;name&amp;quot;: &amp;quot;[variables(&#39;resourceGuid&#39;)]&amp;quot;,
-            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-09-01&amp;quot;,
-            &amp;quot;properties&amp;quot;: {
-                &amp;quot;roleDefinitionId&amp;quot;: &amp;quot;[variables(&#39;contributor&#39;)]&amp;quot;,
-                &amp;quot;principalId&amp;quot;: &amp;quot;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&amp;quot;,
-                &amp;quot;scope&amp;quot;: &amp;quot;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&amp;quot;
-            },
-            &amp;quot;dependsOn&amp;quot;: [
-                &amp;quot;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&amp;quot;
-            ]
+        &amp;quot;dependsOn&amp;quot;: [
+            &amp;quot;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&amp;quot;
+        ]
+    },
+    {
+        &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Authorization/roleAssignments&amp;quot;,
+        &amp;quot;name&amp;quot;: &amp;quot;[variables(&#39;resourceGuid&#39;)]&amp;quot;,
+        &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-09-01&amp;quot;,
+        &amp;quot;properties&amp;quot;: {
+            &amp;quot;roleDefinitionId&amp;quot;: &amp;quot;[variables(&#39;contributor&#39;)]&amp;quot;,
+            &amp;quot;principalId&amp;quot;: &amp;quot;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&amp;quot;,
+            &amp;quot;scope&amp;quot;: &amp;quot;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&amp;quot;
         },
-        {
-            &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
-            &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&amp;quot;,
-            &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-03-30&amp;quot;,
-            &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
-            &amp;quot;properties&amp;quot;: {
-                &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.Azure.Extensions&amp;quot;,
-                &amp;quot;type&amp;quot;: &amp;quot;CustomScript&amp;quot;,
-                &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;2.0&amp;quot;,
-                &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
-                &amp;quot;settings&amp;quot;: {
-                    &amp;quot;fileUris&amp;quot;: [
-                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
-                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
-                        &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;
-                    ]
-                },
-                &amp;quot;protectedSettings&amp;quot;: {
-                    &amp;quot;commandToExecute&amp;quot;: &amp;quot;[concat(&#39;bash infra.sh &amp;amp;&amp;amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&amp;quot;
-                }
+        &amp;quot;dependsOn&amp;quot;: [
+            &amp;quot;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&amp;quot;
+        ]
+    },
+    {
+        &amp;quot;type&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/extensions&amp;quot;,
+        &amp;quot;name&amp;quot;: &amp;quot;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&amp;quot;,
+        &amp;quot;apiVersion&amp;quot;: &amp;quot;2017-03-30&amp;quot;,
+        &amp;quot;location&amp;quot;: &amp;quot;[parameters(&#39;location&#39;)]&amp;quot;,
+        &amp;quot;properties&amp;quot;: {
+            &amp;quot;publisher&amp;quot;: &amp;quot;Microsoft.Azure.Extensions&amp;quot;,
+            &amp;quot;type&amp;quot;: &amp;quot;CustomScript&amp;quot;,
+            &amp;quot;typeHandlerVersion&amp;quot;: &amp;quot;2.0&amp;quot;,
+            &amp;quot;autoUpgradeMinorVersion&amp;quot;: true,
+            &amp;quot;settings&amp;quot;: {
+                &amp;quot;fileUris&amp;quot;: [
+                    &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
+                    &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;,
+                    &amp;quot;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&amp;quot;
+                ]
             },
-            &amp;quot;dependsOn&amp;quot;: [
-                &amp;quot;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&amp;quot;
-            ]
-        }
+            &amp;quot;protectedSettings&amp;quot;: {
+                &amp;quot;commandToExecute&amp;quot;: &amp;quot;[concat(&#39;bash infra.sh &amp;amp;&amp;amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&amp;quot;
+            }
+        },
+        &amp;quot;dependsOn&amp;quot;: [
+            &amp;quot;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&amp;quot;
+        ]
+    }
 [snip]
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3 id=&#34;vmにログインし-環境を確認&#34;&gt;VMにログインし、環境を確認&lt;/h3&gt;
 
@@ -4677,8 +4686,8 @@ terraform apply
 &lt;li&gt;SDKバージョンを 2017-07-29 へ変更&lt;/li&gt;
 &lt;li&gt;関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更&lt;/li&gt;
 &lt;li&gt;Parallelism オプションを追加&lt;/li&gt;
-&lt;li&gt;ヘルパー関数 handleErrors を追加&lt;/li&gt;
-&lt;/ul&gt;
+
+&lt;li&gt;&lt;p&gt;ヘルパー関数 handleErrors を追加&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;package main
 
@@ -4768,7 +4777,8 @@ func main() {
 
 	fmt.Println(&amp;quot;Done&amp;quot;)
 }
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。&lt;/p&gt;
 
@@ -6468,19 +6478,18 @@ Fri Feb  3 06:43:18 2017
 &lt;ul&gt;
 &lt;li&gt;Bash on Ubuntu on Windowsを入れます (&lt;a href=&#34;http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html&#34;&gt;参考&lt;/a&gt;)&lt;/li&gt;
 &lt;li&gt;Bash on Ubuntu on Windowsを起動します&lt;/li&gt;
-&lt;li&gt;build-essentialとlibssl-devを入れます&lt;/li&gt;
-&lt;/ul&gt;
+
+&lt;li&gt;&lt;p&gt;build-essentialとlibssl-devを入れます&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;sudo apt-get install build-essential checkinstall
 sudo apt-get install libssl-dev
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 
-&lt;ul&gt;
-&lt;li&gt;インストールスクリプトを流します&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;&lt;p&gt;インストールスクリプトを流します&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;バージョンアップを考慮し、インストールのつど&lt;a href=&#34;https://github.com/creationix/nvm&#34;&gt;公式ページ&lt;/a&gt;を確認してください。&lt;/p&gt;
 
@@ -6723,15 +6732,16 @@ node ./index.js
 &lt;li&gt;&lt;a href=&#34;https://docs.docker.com/engine/installation/linux/ubuntulinux/&#34;&gt;参考&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;OMSエージェントコンテナを導入
+
+&lt;li&gt;&lt;p&gt;OMSエージェントコンテナを導入&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;先ほど入手したOMSのワークスペースIDとKeyを入れてください&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;&lt;p&gt;先ほど入手したOMSのワークスペースIDとKeyを入れてください&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&amp;quot;omsagent&amp;quot; --log-driver=none --restart=always microsoft/oms
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;以上。これでOMSポータルからログ分析ができます。こんな感じで。&lt;/p&gt;
 
@@ -7427,29 +7437,27 @@ module.exports = function (context, req) {
 &lt;ul&gt;
 &lt;li&gt;好みは聞いてないので、以降、受け取ったテキストが読まれることはありませんが&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します
+
+&lt;li&gt;&lt;p&gt;sendTextMessage関数内、getDataFromDocDB関数呼び出しでDocumentDBへ問い合わせてビールと文末表現をランダムに取り出します&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ
-&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;コレクション&amp;rdquo;beer&amp;rdquo;、&amp;rdquo;eom(end of message)&amp;ldquo;の構造はそれぞれこんな感じ&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+&amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
+&amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
+&amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+&amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
+&amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;url&amp;quot;: &amp;quot;http://beertaster.org/beerstyle/web/001A.html#japanese&amp;quot;,
-  &amp;quot;beer&amp;quot;: &amp;quot;酵母なし、ライトアメリカン・ウィートビール&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;bf3636c5-4284-4e7a-b587-9002a771f214&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;{
-  &amp;quot;msg&amp;quot;: &amp;quot;はウマい&amp;quot;,
-  &amp;quot;id&amp;quot;: &amp;quot;acd63222-2138-4e19-894e-dc85a950be64&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの&lt;a href=&#34;http://azu.github.io/promises-book/&#34;&gt;Promise&lt;/a&gt;を使っています&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。&lt;/p&gt;
@@ -7530,88 +7538,89 @@ module.exports = function (context, req) {
 &lt;li&gt;ジョブ実行時にtask.shを呼び出す  - jobSpecification/jobManagerTask/commandLine&lt;/li&gt;
 &lt;li&gt;サーバはUbuntu 14.04とする - jobSpecification/poolInfo/autoPoolSpecification/virtualMachineConfiguration&lt;/li&gt;
 &lt;li&gt;サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated&lt;/li&gt;
-&lt;li&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/li&gt;
-&lt;/ul&gt;
 
-&lt;pre&gt;&lt;code&gt;  {
-  &amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
-  &amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
-  &amp;quot;schedule&amp;quot;: {
-    &amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
-    &amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
+&lt;li&gt;&lt;p&gt;サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+&amp;quot;odata.metadata&amp;quot;:&amp;quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&amp;quot;,
+&amp;quot;id&amp;quot;:&amp;quot;myjobschedule1&amp;quot;,
+&amp;quot;schedule&amp;quot;: {
+&amp;quot;doNotRunUntil&amp;quot;:&amp;quot;2016-04-29T05:30:00.000Z&amp;quot;,
+&amp;quot;recurrenceInterval&amp;quot;:&amp;quot;PT4H&amp;quot;
+},
+&amp;quot;jobSpecification&amp;quot;: {
+&amp;quot;priority&amp;quot;:100,
+&amp;quot;constraints&amp;quot;: {
+  &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
+  &amp;quot;maxTaskRetryCount&amp;quot;:-1
+},
+&amp;quot;jobManagerTask&amp;quot;: {
+  &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
+  &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
+  &amp;quot;resourceFiles&amp;quot;: [ {
+    &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
+    &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
+  }], 
+  &amp;quot;environmentSettings&amp;quot;: [ {
+    &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
+    &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
+  } ],
+  &amp;quot;constraints&amp;quot;: {
+    &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
+    &amp;quot;maxTaskRetryCount&amp;quot;:0,
+    &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
   },
-  &amp;quot;jobSpecification&amp;quot;: {
-    &amp;quot;priority&amp;quot;:100,
-    &amp;quot;constraints&amp;quot;: {
-      &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-      &amp;quot;maxTaskRetryCount&amp;quot;:-1
-    },
-    &amp;quot;jobManagerTask&amp;quot;: {
-      &amp;quot;id&amp;quot;:&amp;quot;mytask1&amp;quot;,
-      &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&amp;quot;,
-      &amp;quot;resourceFiles&amp;quot;: [ {
-        &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-        &amp;quot;filePath&amp;quot;:&amp;quot;task.sh&amp;quot;
-      }], 
-      &amp;quot;environmentSettings&amp;quot;: [ {
-        &amp;quot;name&amp;quot;:&amp;quot;VAR1&amp;quot;,
-        &amp;quot;value&amp;quot;:&amp;quot;hello&amp;quot;
-      } ],
-      &amp;quot;constraints&amp;quot;: {
-        &amp;quot;maxWallClockTime&amp;quot;:&amp;quot;PT1H&amp;quot;,
-        &amp;quot;maxTaskRetryCount&amp;quot;:0,
-        &amp;quot;retentionTime&amp;quot;:&amp;quot;PT1H&amp;quot;
-      },
-      &amp;quot;killJobOnCompletion&amp;quot;:false,
-      &amp;quot;runElevated&amp;quot;:true,
-      &amp;quot;runExclusive&amp;quot;:true
-      },
-      &amp;quot;poolInfo&amp;quot;: {
-        &amp;quot;autoPoolSpecification&amp;quot;: {
-          &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
-          &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
-          &amp;quot;pool&amp;quot;: {
-            &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
-            &amp;quot;virtualMachineConfiguration&amp;quot;: {
-              &amp;quot;imageReference&amp;quot;: {
-                &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
-                &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
-                &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
-                &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
-              },
-              &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
-            },
-            &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
-            &amp;quot;targetDedicated&amp;quot;:1,
-            &amp;quot;maxTasksPerNode&amp;quot;:1,
-            &amp;quot;taskSchedulingPolicy&amp;quot;: {
-              &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
-            },
-            &amp;quot;enableAutoScale&amp;quot;:false,
-            &amp;quot;enableInterNodeCommunication&amp;quot;:false,
-            &amp;quot;startTask&amp;quot;: {
-              &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
-              &amp;quot;resourceFiles&amp;quot;: [ {
-                &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
-                &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
-              } ],
-              &amp;quot;environmentSettings&amp;quot;: [ {
-                &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
-                &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
-              } ],
-              &amp;quot;runElevated&amp;quot;:true,
-              &amp;quot;waitForSuccess&amp;quot;:true
-            },
-            &amp;quot;metadata&amp;quot;: [ {
-              &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
-              &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
-            } ]
-          }
-        }
+  &amp;quot;killJobOnCompletion&amp;quot;:false,
+  &amp;quot;runElevated&amp;quot;:true,
+  &amp;quot;runExclusive&amp;quot;:true
+  },
+  &amp;quot;poolInfo&amp;quot;: {
+    &amp;quot;autoPoolSpecification&amp;quot;: {
+      &amp;quot;autoPoolIdPrefix&amp;quot;:&amp;quot;mypool&amp;quot;,
+      &amp;quot;poolLifetimeOption&amp;quot;:&amp;quot;job&amp;quot;,
+      &amp;quot;pool&amp;quot;: {
+        &amp;quot;vmSize&amp;quot;:&amp;quot;STANDARD_D1&amp;quot;,
+        &amp;quot;virtualMachineConfiguration&amp;quot;: {
+          &amp;quot;imageReference&amp;quot;: {
+            &amp;quot;publisher&amp;quot;:&amp;quot;Canonical&amp;quot;,
+            &amp;quot;offer&amp;quot;:&amp;quot;UbuntuServer&amp;quot;,
+            &amp;quot;sku&amp;quot;:&amp;quot;14.04.4-LTS&amp;quot;,
+            &amp;quot;version&amp;quot;:&amp;quot;latest&amp;quot;
+          },
+          &amp;quot;nodeAgentSKUId&amp;quot;:&amp;quot;batch.node.ubuntu 14.04&amp;quot;
+        },
+        &amp;quot;resizeTimeout&amp;quot;:&amp;quot;PT15M&amp;quot;,
+        &amp;quot;targetDedicated&amp;quot;:1,
+        &amp;quot;maxTasksPerNode&amp;quot;:1,
+        &amp;quot;taskSchedulingPolicy&amp;quot;: {
+          &amp;quot;nodeFillType&amp;quot;:&amp;quot;Spread&amp;quot;
+        },
+        &amp;quot;enableAutoScale&amp;quot;:false,
+        &amp;quot;enableInterNodeCommunication&amp;quot;:false,
+        &amp;quot;startTask&amp;quot;: {
+          &amp;quot;commandLine&amp;quot;:&amp;quot;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&amp;quot;,
+          &amp;quot;resourceFiles&amp;quot;: [ {
+            &amp;quot;blobSource&amp;quot;:&amp;quot;yourbloburi&amp;amp;sas&amp;quot;,
+            &amp;quot;filePath&amp;quot;:&amp;quot;starttask.sh&amp;quot;
+          } ],
+          &amp;quot;environmentSettings&amp;quot;: [ {
+            &amp;quot;name&amp;quot;:&amp;quot;VAR2&amp;quot;,
+            &amp;quot;value&amp;quot;:&amp;quot;Chao&amp;quot;
+          } ],
+          &amp;quot;runElevated&amp;quot;:true,
+          &amp;quot;waitForSuccess&amp;quot;:true
+        },
+        &amp;quot;metadata&amp;quot;: [ {
+          &amp;quot;name&amp;quot;:&amp;quot;myproperty&amp;quot;,
+          &amp;quot;value&amp;quot;:&amp;quot;myvalue&amp;quot;
+        } ]
       }
     }
   }
-&lt;/code&gt;&lt;/pre&gt;
+}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。&lt;/p&gt;
 

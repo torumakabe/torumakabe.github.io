@@ -24,7 +24,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.'>
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_msi_terraform/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='MSI'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-03-30T16:30:00&#43;09:00'/><meta property='article:modified_time' content='2018-03-30T16:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -179,69 +179,70 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
 <ul>
 <li>MSI VM拡張の導入</li>
 <li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
-<li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
-</ul>
+
+<li><p>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</p>
 
 <pre><code>[snip]
-        {
-            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
-            &quot;location&quot;: &quot;[parameters('location')]&quot;,
-            &quot;properties&quot;: {
-                &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
-                &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
-                &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
-                &quot;autoUpgradeMinorVersion&quot;: true,
-                &quot;settings&quot;: {
-                    &quot;port&quot;: 50342
-                },
-                &quot;protectedSettings&quot;: {}
+    {
+        &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+        &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
+        &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
+        &quot;location&quot;: &quot;[parameters('location')]&quot;,
+        &quot;properties&quot;: {
+            &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
+            &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
+            &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
+            &quot;autoUpgradeMinorVersion&quot;: true,
+            &quot;settings&quot;: {
+                &quot;port&quot;: 50342
             },
-            &quot;dependsOn&quot;: [
-                &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
-            ]
+            &quot;protectedSettings&quot;: {}
         },
-        {
-            &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
-            &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
-            &quot;properties&quot;: {
-                &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
-                &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
-                &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
-            },
-            &quot;dependsOn&quot;: [
-                &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
-            ]
+        &quot;dependsOn&quot;: [
+            &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
+        ]
+    },
+    {
+        &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
+        &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
+        &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
+        &quot;properties&quot;: {
+            &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
+            &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
+            &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
         },
-        {
-            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
-            &quot;location&quot;: &quot;[parameters('location')]&quot;,
-            &quot;properties&quot;: {
-                &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
-                &quot;type&quot;: &quot;CustomScript&quot;,
-                &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
-                &quot;autoUpgradeMinorVersion&quot;: true,
-                &quot;settings&quot;: {
-                    &quot;fileUris&quot;: [
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
-                    ]
-                },
-                &quot;protectedSettings&quot;: {
-                    &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
-                }
+        &quot;dependsOn&quot;: [
+            &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
+        ]
+    },
+    {
+        &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+        &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
+        &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
+        &quot;location&quot;: &quot;[parameters('location')]&quot;,
+        &quot;properties&quot;: {
+            &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
+            &quot;type&quot;: &quot;CustomScript&quot;,
+            &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
+            &quot;autoUpgradeMinorVersion&quot;: true,
+            &quot;settings&quot;: {
+                &quot;fileUris&quot;: [
+                    &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                    &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                    &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
+                ]
             },
-            &quot;dependsOn&quot;: [
-                &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
-            ]
-        }
+            &quot;protectedSettings&quot;: {
+                &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
+            }
+        },
+        &quot;dependsOn&quot;: [
+            &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
+        ]
+    }
 [snip]
-</code></pre>
+</code></pre></li>
+</ul>
 
 <h3 id="vmにログインし-環境を確認">VMにログインし、環境を確認</h3>
 
