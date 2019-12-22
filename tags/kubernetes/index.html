@@ -115,9 +115,9 @@ Gistに置いたHCLで、以下のような環境を作れます。
 メトリクス、ロギング、トレーシング 可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。
 外からか、内からか Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。
 いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。
-お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)    実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
+お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)   実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
 セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。
-補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです   環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など   以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる)  azurerm_role_assignment.
+補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです  環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など  以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる) azurerm_role_assignment.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/" style="height:28px">
           Read more
@@ -151,9 +151,9 @@ Azure Kubernetes Serviceを題材にしますが、他のKubernetes環境でも�
  アプリケーションのソースコードにアクセスできるすべての人がシークレットを知り得る シークレットの変更時、影響するすべてのソースを変更し再ビルドが必要  シークレットが平文で書かれたソースコードリポジトリをパブリックに御開帳、という分かりやすい事案だけがリスクではありません。プライベートリポジトリを使っていても、人の出入りがあるチームでの開発運用、シークレット漏洩時の変更やローテーションなどの運用を考えると、ハードコーディングは取りづらい選択肢です。
 よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。
 マニフェストに書く Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。
-apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot; これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
+apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot;  これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
 この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。
-package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.Request) { secret := os.
+package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/" style="height:28px">
           Read more
@@ -194,8 +194,8 @@ Deschedulerは、Nodeの数が少ないクラスターで特に有効です。No
 では、このシナリオで動きを追ってみましょう。
 事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
 NodeにPodを寄せる はじめのNode数は2です。
-$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5 レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
-apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m デプロイします。
+$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
+apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m  デプロイします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
           Read more
@@ -235,9 +235,8 @@ AKSはインパクトの大きな機能を、プレビューというかたち�
  Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
 ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
 意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
 CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
-たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
           Read more

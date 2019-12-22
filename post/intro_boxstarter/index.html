@@ -11,10 +11,10 @@
 でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
 Boxstarter
 わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
-Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入   設定ファイルをネットワーク経由で読み込める  Gistから   ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
+Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入  設定ファイルをネットワーク経由で読み込める  Gistから  ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
  スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force  Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
-Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots 以上。
+. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force   Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
+Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots  以上。
 サンプルスクリプト スクリプトはこんな感じに書きます。
 ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
 # Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.'>
@@ -114,44 +114,67 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
     <h1 class="title">自動化を愛するWindows使いへ Boxstarterのすすめ</h1>
     
     <div class="content">
-      <h2 id="windows">Windowsのセットアップどうする問題</h2>
+      
+
+<h2 id="windowsのセットアップどうする問題">Windowsのセットアップどうする問題</h2>
+
 <p>そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。</p>
+
 <p>でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。</p>
+
 <p><a href="http://boxstarter.org/">Boxstarter</a></p>
+
 <p>わたしはマイクロソフトの仲間、Jessieの<a href="https://blog.jessfraz.com/post/windows-for-linux-nerds/">ポスト</a>で知りました。サンクスJessie。</p>
-<h2 id="boxstarter">Boxstarterで出来ること</h2>
+
+<h2 id="boxstarterで出来ること">Boxstarterで出来ること</h2>
+
 <ul>
 <li>シンプルなスクリプトで
+
 <ul>
 <li>Windowsの各種設定</li>
 <li>Chocolateyパッケージの導入</li>
-</ul>
-</li>
+</ul></li>
 <li>設定ファイルをネットワーク経由で読み込める
+
 <ul>
 <li>Gistから</li>
-</ul>
-</li>
+</ul></li>
 <li>ベアメタルでも仮想マシンでもOK</li>
 </ul>
-<h2 id="heading">実行手順</h2>
+
+<h2 id="実行手順">実行手順</h2>
+
 <p>手順は<a href="http://boxstarter.org/Learn/WebLauncher">Boxstarterのサイト</a>で紹介されています。</p>
+
 <ul>
 <li>スクリプトを作る</li>
 <li>Gistに上げる</li>
 <li>Boxstarterを導入する</li>
 </ul>
+
 <p>PowerShell 3以降であれば</p>
+
 <pre><code>. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-</code></pre><ul>
+</code></pre>
+
+<ul>
 <li>Gist上のスクリプトを指定して実行する</li>
 </ul>
+
 <p>なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)</p>
+
 <pre><code>Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots
-</code></pre><p>以上。</p>
-<h2 id="heading-1">サンプルスクリプト</h2>
+</code></pre>
+
+<p>以上。</p>
+
+<h2 id="サンプルスクリプト">サンプルスクリプト</h2>
+
 <p>スクリプトは<a href="https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac">こんな感じ</a>に書きます。</p>
+
 <p>ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。</p>
+
 <pre><code># Learn more: http://boxstarter.org/Learn/WebLauncher
 
 # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
@@ -195,8 +218,12 @@ choco install visualstudiocode
 Enable-UAC
 Enable-MicrosoftUpdate
 Install-WindowsUpdate -acceptEula
-</code></pre><p>便利。</p>
+</code></pre>
+
+<p>便利。</p>
+
 <p>ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio Code <a href="https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync">Settings Sync拡張</a>を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。</p>
+
 <p>新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。</p>
 
       

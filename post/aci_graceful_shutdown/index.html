@@ -8,7 +8,7 @@
 
 <meta property='og:title' content='Azure Container InstancesのGraceful Shutdown事情 - re-imagine'>
 <meta property='og:description' content='何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
-ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&ldquo;Kubernetesである&quot;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
+ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
 Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
  Kubernetes: 詳解 Pods の終了
  書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。
@@ -118,44 +118,70 @@ package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot
     <h1 class="title">Azure Container InstancesのGraceful Shutdown事情</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      
+
+<h2 id="何の話か">何の話か</h2>
+
 <p>Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。</p>
-<p>ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&ldquo;Kubernetesである&quot;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。</p>
-<h2 id="kubernetes">Kubernetesのポッド停止処理</h2>
+
+<p>ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。</p>
+
+<h2 id="kubernetesのポッド停止処理">Kubernetesのポッド停止処理</h2>
+
 <p>Kubernetesのポッド停止については、<a href="https://twitter.com/superbrothers">@superbrothers</a>さんの素晴らしい解説記事があります。</p>
+
 <blockquote>
 <p><a href="https://qiita.com/superbrothers/items/3ac78daba3560ea406b2">Kubernetes: 詳解 Pods の終了</a></p>
 </blockquote>
+
 <p>書籍 <a href="https://gihyo.jp/book/2019/978-4-297-10461-0">みんなのDocker/Kubernetes</a>のPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。</p>
+
 <p>ざっくりまとめると、ポッドをGraceful Shutdownする方法は次の2つです。</p>
+
 <ul>
 <li>PreStop処理を書いて、コンテナー停止に備える</li>
 <li>コンテナー停止時に送られるシグナルを、適切に扱う</li>
 </ul>
+
 <p>ACIでは現在PreStop処理を書けません。なので、シグナルをどう扱うかがポイントです。</p>
-<h2 id="dockerpid-1">DockerのPID 1問題</h2>
+
+<h2 id="dockerのpid-1問題">DockerのPID 1問題</h2>
+
 <p>シグナルハンドリングの前に、DockerのPID 1問題について触れておきます。</p>
+
 <blockquote>
 <p><a href="https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/">Docker and the PID 1 zombie reaping problem</a></p>
 </blockquote>
+
 <p>Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられます。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役も担います。</p>
+
 <p>しかしDockerでは、コンテナーではじめに起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。</p>
+
 <p>この仕様には、次の課題があります。</p>
+
 <ul>
 <li>コンテナーにゾンビプロセスのお掃除をするinitがいない</li>
 <li><a href="https://docs.docker.com/engine/reference/commandline/stop/">docker stop</a>を実行するとPID 1のプロセスに対してSIGTERMが、一定時間の経過後(既定は10秒)にSIGKILLが送られる。PID 1はLinuxで特別な扱いであり、SIGTERMのハンドラーがない場合、それを無視する。ただしinitの他はSIGKILLを無視できない。つまりPID 1で動いたアプリは待たされた挙句、強制終了してしまう。また、転送しなければ子プロセスにSIGTERMが伝わらない</li>
 </ul>
+
 <p>前者が問題になるかは、コンテナーでどれだけプロセスを起動するかにもよります。いっぽうで後者は、PID 1となるアプリで意識してSIGTERMを処理しなければ、常に強制終了されることを意味します。穏やかではありません。</p>
-<h2 id="heading-1">解決の選択肢</h2>
+
+<h2 id="解決の選択肢">解決の選択肢</h2>
+
 <p>シグナルハンドリングについては、解決の選択肢がいくつかあります。</p>
+
 <ol>
 <li>SIGTERMを受け取って、終了処理をするようアプリを書く</li>
 <li>PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす</li>
 <li>PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)</li>
 </ol>
+
 <p>Docker APIを触れる環境であれば、docker run時に<a href="https://docs.docker.com/engine/reference/run/#specify-an-init-process">&ndash;initオプション</a>をつければ擬似init(<a href="https://github.com/krallin/tini">tini</a>)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。</p>
-<h2 id="heading-2">それぞれのやり方と動き</h2>
+
+<h2 id="それぞれのやり方と動き">それぞれのやり方と動き</h2>
+
 <p>ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。</p>
+
 <pre><code>package main
 
 import (
@@ -181,11 +207,19 @@ func main() {
 	&lt;-done
 	log.Println(&quot;exiting&quot;)
 }
-</code></pre><p>SIGTERMかSIGQUITを受け取ったら、受け取ったシグナルの種類をログに書いて終了します。</p>
-<h3 id="sigterm">SIGTERMを意識できていない場合</h3>
+</code></pre>
+
+<p>SIGTERMかSIGQUITを受け取ったら、受け取ったシグナルの種類をログに書いて終了します。</p>
+
+<h3 id="sigtermを意識できていない場合">SIGTERMを意識できていない場合</h3>
+
 <p>まずは何もしなかった時の動きを見るため、SIGTERMを無視するようにアプリを書き換えます。</p>
+
 <pre><code>signal.Notify(sigs, syscall.SIGQUIT)
-</code></pre><p>以下のDockerfileでコンテナーをビルドします。終わったらレジストリにpushしておきます。</p>
+</code></pre>
+
+<p>以下のDockerfileでコンテナーをビルドします。終わったらレジストリにpushしておきます。</p>
+
 <pre><code>ARG GO_VERSION=1.12.6
 FROM golang:${GO_VERSION}-alpine AS build-stage
 RUN apk add --no-cache git
@@ -198,70 +232,119 @@ RUN go build -o /goapp main.go
 FROM alpine:3.9
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
-</code></pre><p>ではACIにデプロイしましょう。コンテナー停止後もログを見たいので、Azure Monitorへログを送るオプションも指定します。</p>
+</code></pre>
+
+<p>ではACIにデプロイしましょう。コンテナー停止後もログを見たいので、Azure Monitorへログを送るオプションも指定します。</p>
+
 <pre><code>$ az container create -g YOUR-RG -n YOUR-CONTAINER-GROUP --image YOUR-REGISTRY/handle-signal:1.0.0 --log-analytics-workspace YOUR-WORKSPACE-ID --log-analytics-workspace-key YOUR-WORKSPACE-KEY
-</code></pre><p>できあがったら、PIDを確認します。</p>
+</code></pre>
+
+<p>できあがったら、PIDを確認します。</p>
+
 <pre><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
 PID   USER     TIME  COMMAND
     1 root      0:00 /goapp
    10 root      0:00 ps
-</code></pre><p>アプリがPID 1です。ではコンテナーを止めます。</p>
+</code></pre>
+
+<p>アプリがPID 1です。ではコンテナーを止めます。</p>
+
 <pre><code>$ az container stop -g YOUR-RG -n YOUR-CONTAINER-GROUP
-</code></pre><p>Azure Monitorに送られたログを見てみます。</p>
+</code></pre>
+
+<p>Azure Monitorに送られたログを見てみます。</p>
+
 <pre><code>2019/07/03 00:49:52 awaiting signal
-</code></pre><p>コンテナーが停止した後、待てど暮らせどこのままです。つまり送られたSIGTERMを受け取らず、SIGKILLで強制終了したと考えられます。そう書いたのですから、期待通りの動きです。</p>
-<h3 id="sigterm-1">SIGTERMを処理する</h3>
+</code></pre>
+
+<p>コンテナーが停止した後、待てど暮らせどこのままです。つまり送られたSIGTERMを受け取らず、SIGKILLで強制終了したと考えられます。そう書いたのですから、期待通りの動きです。</p>
+
+<h3 id="sigtermを処理する">SIGTERMを処理する</h3>
+
 <p>ではアプリをSIGTERMを受け取るように変更します。</p>
+
 <pre><code>	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGQUIT)
-</code></pre><p>ひとつ前と同じDockerfileでビルドし、レジストリにpushします。そして、コンテナーを実行、停止します。ログはどう出力されたでしょうか。</p>
+</code></pre>
+
+<p>ひとつ前と同じDockerfileでビルドし、レジストリにpushします。そして、コンテナーを実行、停止します。ログはどう出力されたでしょうか。</p>
+
 <pre><code>2019/07/03 00:57:42 awaiting signal
 2019/07/03 00:59:17 terminated
 2019/07/03 00:59:17 exiting
-</code></pre><p>うまくSIGTERMを受け取れたようです。</p>
-<h3 id="init">擬似initを挟む</h3>
+</code></pre>
+
+<p>うまくSIGTERMを受け取れたようです。</p>
+
+<h3 id="擬似initを挟む">擬似initを挟む</h3>
+
 <p>擬似initとして、Yelpの開発した<a href="https://github.com/Yelp/dumb-init">dumb-init</a>を使ってみましょう。あとで触れますが、シグナルを変換できる優れものです。</p>
+
 <p>dumb-initを仕込むよう、Dockerfileを変更します。build-stageは同じです。</p>
+
 <pre><code>FROM alpine:3.9
 RUN apk add --no-cache dumb-init
 ENTRYPOINT [&quot;/usr/bin/dumb-init&quot;, &quot;--&quot;]
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
-</code></pre><p>このイメージを動かすと、PIDはこのように割り当てられます。</p>
+</code></pre>
+
+<p>このイメージを動かすと、PIDはこのように割り当てられます。</p>
+
 <pre><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
 PID   USER     TIME  COMMAND
     1 root      0:00 /usr/bin/dumb-init -- /goapp
     5 root      0:00 /goapp
    11 root      0:00 /bin/sh
    15 root      0:00 ps
-</code></pre><p>PID 1はdumb-initに割り当てられました。このコンテナーを停止すると、SIGTERMはdumb-initに送られます。</p>
+</code></pre>
+
+<p>PID 1はdumb-initに割り当てられました。このコンテナーを停止すると、SIGTERMはdumb-initに送られます。</p>
+
 <pre><code>2019/07/03 01:13:36 awaiting signal
 2019/07/03 01:18:46 terminated
 2019/07/03 01:18:46 exiting
-</code></pre><p>そして、SIGTERMがdumb-initからアプリに伝搬されたことがわかります。</p>
-<h3 id="init-">擬似initを挟む (シグナル変換)</h3>
+</code></pre>
+
+<p>そして、SIGTERMがdumb-initからアプリに伝搬されたことがわかります。</p>
+
+<h3 id="擬似initを挟む-シグナル変換">擬似initを挟む (シグナル変換)</h3>
+
 <p>自分が作るアプリであればSIGTERMを適切に扱うよう書けばいいのですが、製品やコミュニティで配布されているソフトウェアをコンテナーに入れる場合は注意が必要です。ソフトウェアによってはSIGTERMをGraceful Shutdownの合図としないものもあります。たとえば、<a href="http://nginx.org/en/docs/control.html">NGINX</a>はSIGTERMを強制終了(Fast Shutdown)のシグナルとして扱います。SIGQUITがGraceful Shutdown向けです。</p>
+
 <p>そのような場合は、dumb-initのシグナル変換機能が役立ちます。コンテナーのビルド時にオプションを指定します。</p>
+
 <pre><code>FROM alpine:3.9
 RUN apk add --no-cache dumb-init
 ENTRYPOINT [&quot;/usr/bin/dumb-init&quot;, &quot;--rewrite&quot;, &quot;15:3&quot;, &quot;--&quot;]
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
-</code></pre><p>これで、docker stop時に送られるSIGTERM(15)を、SIGQUIT(3)に変換できます。ではコンテナーを動かし、止めます。</p>
+</code></pre>
+
+<p>これで、docker stop時に送られるSIGTERM(15)を、SIGQUIT(3)に変換できます。ではコンテナーを動かし、止めます。</p>
+
 <pre><code>2019/07/03 01:19:40 awaiting signal
 2019/07/03 01:21:04 quit
 2019/07/03 01:21:04 exiting
-</code></pre><p>アプリは変換後のSIGQUITを受け取っています。</p>
+</code></pre>
+
+<p>アプリは変換後のSIGQUITを受け取っています。</p>
+
 <p>なお、すべてのパターンで同じですが、ACIではコンテナーを削除(delete)した場合も、停止(stop)時と同様にSIGTERMが送られます。</p>
-<h2 id="windows">Windowsの場合</h2>
+
+<h2 id="windowsの場合">Windowsの場合</h2>
+
 <p>これまでの例はLinuxですが、Windowsの場合はコンテナー停止時にアプリへCTRL_SHUTDOWN_EVENTが送られます。ただしイベント発行から5秒後に強制終了が走るため注意が必要です。5秒は固定値です。値を変えたい場合、コンテナー作成時にレジストリを編集する<a href="https://github.com/moby/moby/issues/25982#issuecomment-426441183">ワークアラウンド</a>があります。</p>
+
 <p>なおWindowsコンテナーの仕様に影響力を持つKubernetes Windows-SIGでは、コンテナーランタイムのDocker EEからCRI-ContainerDへの移行など、まだ大きなテーマが議論され、対応中です。過渡期であることを意識しておきましょう。</p>
+
 <blockquote>
 <p><a href="https://github.com/kubernetes/enhancements/blob/master/keps/sig-windows/20190103-windows-node-support.md#v1pod">Windows node support - V1.Pod</a></p>
-</blockquote>
-<blockquote>
+
 <p><a href="https://github.com/kubernetes/enhancements/blob/master/keps/sig-windows/20190424-windows-cri-containerd.md">Supporting CRI-ContainerD on Windows</a></p>
 </blockquote>
-<h2 id="heading-3">まとめ</h2>
+
+<h2 id="まとめ">まとめ</h2>
+
 <p>ACIで動かすアプリを行儀よく止めたいなら、停止時のシグナル処理を意識しましょう。</p>
 
       

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OMS on re-imagine</title>
@@ -20,10 +20,12 @@
       <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
-何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details   導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる    1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;quot;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです   OMSポータルのソリューションギャラリーから、&amp;ldquo;Containers&amp;quot;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください   OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください    sudo docker run --privileged -d -v /var/run/docker.</description>
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;rdquo;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
+ 先ほど入手したOMSのワークスペースIDとKeyを入れてください
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.</description>
     </item>
     
   </channel>

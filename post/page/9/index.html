@@ -111,7 +111,7 @@
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
 Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
 書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
- RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時    課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+ RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
 $Blob = Get-AzureStorageBlob yourDataDisk.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" style="height:28px">
@@ -144,10 +144,10 @@ $Blob = Get-AzureStorageBlob yourDataDisk.
       <div class="content">
         気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
-方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース   CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで   Docker Hub上のリポジトリは torumakabe/cntk-cpu   ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull   VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
 リソースグループを作ります。
 C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
- azuredeploy.json  編集不要です   azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.
+ azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください    うし、デプロイ。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_cntk/" style="height:28px">
           Read more
@@ -179,12 +179,12 @@ C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレ�
 これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
 これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
 実装例 例としてこんな仕組みを作ってみましょう。
- 西日本リージョンのリソースグループ&quot;dev&quot;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
+ 西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
  Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
 勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
 Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
 ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
-param ( [object]$WebhookData	) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
+param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" style="height:28px">
           Read more
@@ -216,14 +216,14 @@ param ( [object]$WebhookData	) if ($WebhookData -ne $null) { $WebhookName = $Web
 参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。GoogleのSREについては断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。
 共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。
 以下、印象に残ったこと。
-  Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。
-  インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするために、コードを書く。
-  日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。
-  アプリ/製品チームとSREチームは&quot;Error Budget&quot;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。
-  インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。
-  Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。
-  SLA違反など、重大な障害では&quot;Postmortem(過激だが死体解剖の意)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。
-  他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミュレーションや演習、通信業の輻輳対策など。
+ Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。
+ インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするために、コードを書く。
+ 日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。
+ アプリ/製品チームとSREチームは&rdquo;Error Budget&rdquo;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。
+ インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。
+ Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。
+ SLA違反など、重大な障害では&rdquo;Postmortem(過激だが死体解剖の意)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。
+ 他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミュレーションや演習、通信業の輻輳対策など。
   もう一回読んだら、また違う発見があるんじゃないかと。
 自分ごととして読みたい 今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。
 DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。
@@ -257,13 +257,13 @@ DevOpsムーブメントが来るか来ないかという今、Opsとしての�
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&ldquo;azurerm_template_deployment&rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
 でも、現時点の実装では、おすすめしません。
-ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&quot;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
 リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
 つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
 タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
 せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
 読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
-それでも&quot;terraformコマンドに操作を統一したい&quot;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
 2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&ldquo;depends_on&rdquo;で明示してあげましょう。
 例えば、以前のエントリで紹介した下記の問題。
 Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.

@@ -110,24 +110,38 @@ name: gh-actions-trigger-label on: issues: types: - labeled - unlabeled env: AZU
     <h1 class="title">GitHub Actionsでオンデマンドに環境を再現する</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      
+
+<h2 id="何の話か">何の話か</h2>
+
 <p>GitHubを使ってインフラや環境のコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフローに取り組むケースも増えてきました。</p>
+
 <ul>
 <li>プルリクエストイベントをトリガーにコードの検証やテストを行い、マージの判断に使う</li>
 <li>マージされたら、ステージングや本番環境へデプロイする</li>
 </ul>
+
 <p>こんなワークフローが一般的と思います。ですが一時的に「コードは変えてないけど、一時的に環境を再現したい」なんてこともあります。不具合対応とか。環境を作るコードはあるので、どこかにコードを持っていって実行すればいいのですが、せっかくGitHub Actionsで環境を作った手前、チョイっといじってできるなら、そうしたい。</p>
-<h2 id="heading-1">アイデア</h2>
+
+<h2 id="アイデア">アイデア</h2>
+
 <p>GitHub Actionsを使ってコードから環境をデプロイする環境はすでにある、という前提なので、論点は「どのトリガーを使うか」です。</p>
+
 <blockquote>
 <p><a href="https://help.github.com/ja/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows">ワークフローをトリガーするイベント</a></p>
 </blockquote>
+
 <p>トリガーにできるイベントは多いのですが「コードを変えていない」という条件だと、悩みます。プルリクやプッシュでの発火がわかりやすいのですが、そのためのファイルを作りたくはありません。</p>
+
 <p>GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、Issueイベントで発火させましょうか。でも、キーワードでフィルタするにしても、チェックなしで環境ができてしまいます。それがプライベートリポジトリの運用であっても、気前良すぎ良太郎な感は否めません。</p>
+
 <p>そこで、ラベルイベントを使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け外しした時に発火するようなワークフローを作ります。</p>
-<h2 id="heading-2">ワークフロー例</h2>
+
+<h2 id="ワークフロー例">ワークフロー例</h2>
+
 <p>以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合にデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、リポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">name: gh-actions-trigger-label
+
+<pre><code class="language-yaml">name: gh-actions-trigger-label
 
 on:
   issues:
@@ -148,34 +162,39 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - if: github.event.label.name == <span style="color:#e6db74">&#39;repro&#39;</span> <span style="color:#75715e">&amp;&amp;</span> github.event.action == <span style="color:#e6db74">&#39;labeled&#39;</span>
-        run: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">az group create -n ${{ env.AZURE_GROUP_NAME }} -l japaneast</span>
+      - if: github.event.label.name == 'repro' &amp;&amp; github.event.action == 'labeled'
+        run: |
+          az group create -n ${{ env.AZURE_GROUP_NAME }} -l japaneast
           az group deployment create -n repro -g ${{ env.AZURE_GROUP_NAME }} --template-file deployment/azuredeploy.json --parameters name=${{ env.YOUR_PARAM }}
 
-      - if: github.event.label.name == <span style="color:#e6db74">&#39;repro&#39;</span> <span style="color:#75715e">&amp;&amp;</span> github.event.action == <span style="color:#e6db74">&#39;unlabeled&#39;</span>
-        run: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">az group delete -n ${{ env.AZURE_GROUP_NAME }} -y</span>
+      - if: github.event.label.name == 'repro' &amp;&amp; github.event.action == 'unlabeled'
+        run: |
+          az group delete -n ${{ env.AZURE_GROUP_NAME }} -y
 
-      - run: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">         </span><span style="color:#e6db74"> </span><span style="color:#e6db74">az logout</span>
-</code></pre></div><p>ポイントは以下の通りです。</p>
+      - run: |
+          az logout
+</code></pre>
+
+<p>ポイントは以下の通りです。</p>
+
 <ul>
 <li>ラベル「repro」を作っておく(再現環境という意図が分かればなんでも)</li>
 <li>if文でステップ実行の条件を書く
+
 <ul>
 <li>ラベルがIssueに付与され、それがreproだった場合にAzure CLIでリソースグループ作成、テンプレートデプロイが実行される</li>
 <li>ラベルが外され、それがreproだった場合にAzure CLIでリソースグループごと削除する</li>
-</ul>
-</li>
+</ul></li>
 <li>環境の違いはパラメーターで調整する
+
 <ul>
 <li>この例ではenvで定義したパラメーターをテンプレートデプロイのパラメーターとして渡している</li>
-</ul>
-</li>
+</ul></li>
 <li>対象となるブランチはデフォルトブランチ</li>
 </ul>
+
 <p>なお、Terraformでも同じようにやりたいところですが、terraform-github-actionsがdestroyに未対応です。<a href="https://github.com/hashicorp/terraform-github-actions/pull/77">プルリク</a>は出ているので期待しましょう。また、GitHub Actionsには発火までにして、以降のデプロイは<a href="https://github.com/Azure/pipelines">Azure Pipelinesに任せてしまう</a>、という手もあります。</p>
+
 <p>ラベルを駆使するリポジトリでは、その度にワークフローが走るのが気になるところですが、もっと良いやり口がないかは、今後も模索しようと思います。</p>
 
       

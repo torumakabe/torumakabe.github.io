@@ -114,7 +114,7 @@
 今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
 . ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
 1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
-  認証情報は変数指定し、設定ファイルから読み込む
+ 認証情報は変数指定し、設定ファイルから読み込む
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
           Read more
@@ -152,7 +152,6 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 &ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
 &ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
 以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
-まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
           Read more
@@ -219,7 +218,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
 環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
 環境は以下の通り。
- Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)   Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan   Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています   Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい   対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7   転送ファイル  Ubuntu 15.
+ Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)  Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan  Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています  Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい  対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7  転送ファイル  Ubuntu 15.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobupload_perf/" style="height:28px">
           Read more
@@ -258,8 +257,8 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 &ldquo;Linux で Azure File Storage を使用する方法&rdquo;
 もうちょっと情報欲しいですね。補足のためにわたしも流します。
 Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
-local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
-local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: Executing command storage account connectionstring show+ Getting storage account keysdata: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==info: storage account connectionstring show command OK shareを作成します。share名はfspocshareとしました。
+local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc  ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
+local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: Executing command storage account connectionstring show + Getting storage account keys data: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm== info: storage account connectionstring show command OK  shareを作成します。share名はfspocshareとしました。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/fileshare_linuxonazure/" style="height:28px">
           Read more

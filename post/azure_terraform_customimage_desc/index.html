@@ -13,8 +13,8 @@
 Terraformではイメージ名取得に正規表現とソートが可能 Terraformでは見出しの通り、捗る表現ができます。
 イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の文字列比較なので、末尾の番号の決めた桁は埋めること。
 ということで降順で最上位、つまり最新のイメージ名を取得できます。
-data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; } あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
- storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; } 便利である。'>
+data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; }  あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
+ storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; }  便利である。'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-04-06T18:00:00&#43;09:00'/><meta property='article:modified_time' content='2018-04-06T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -109,28 +109,44 @@ data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[
     <h1 class="title">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</h1>
     
     <div class="content">
-      <h2 id="latest">カスタムイメージではlatest指定できない</h2>
+      
+
+<h2 id="カスタムイメージではlatest指定できない">カスタムイメージではlatest指定できない</h2>
+
 <p>Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。</p>
+
 <p>ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。</p>
+
 <ol>
 <li>最新のイメージ名を確認のうえ、手で指定する</li>
 <li>自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する</li>
 </ol>
+
 <p>2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。</p>
-<h2 id="terraform">Terraformではイメージ名取得に正規表現とソートが可能</h2>
+
+<h2 id="terraformではイメージ名取得に正規表現とソートが可能">Terraformではイメージ名取得に正規表現とソートが可能</h2>
+
 <p>Terraformでは見出しの通り、捗る表現ができます。</p>
+
 <p>イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/data_source_image.go#L164">文字列比較</a>なので、末尾の番号の決めた桁は埋めること。</p>
+
 <p>ということで降順で最上位、つまり最新のイメージ名を取得できます。</p>
+
 <pre><code>data &quot;azurerm_image&quot; &quot;poc&quot; {
   name_regex          = &quot;ubuntu1604-[0-9]*&quot;
   sort_descending     = true
   resource_group_name = &quot;${var.managed_image_resource_group_name}&quot;
 }
-</code></pre><p>あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。</p>
+</code></pre>
+
+<p>あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。</p>
+
 <pre><code>  storage_profile_image_reference {
     id = &quot;${data.azurerm_image.poc.id}&quot;
   }
-</code></pre><p>便利である。</p>
+</code></pre>
+
+<p>便利である。</p>
 
       
       <div class="related">

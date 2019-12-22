@@ -109,9 +109,9 @@ WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ
 TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。
 Share Environment Vars between WSL and Windows
 Go開発環境を例に 前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。
-想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮   とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています   GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする   VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
+想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮  とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています  GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする  VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
 まず、Windowsで環境変数GOPATHを確認します。
-PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
+PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go  GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/wslenv_golang/" style="height:28px">
           Read more
@@ -139,9 +139,9 @@ PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH
       <h2 class="subtitle is-6 date">December 4, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/">Windows上でLinux向けGoバイナリをDockerでビルドする</a></h1>
       <div class="content">
-        小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
-条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
-docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
+         小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
         
       </div>
     </article>
@@ -168,7 +168,8 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
         Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
 ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
 ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.
+(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加
+package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azblob_golang/" style="height:28px">
           Read more

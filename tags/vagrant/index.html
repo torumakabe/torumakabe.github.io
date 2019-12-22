@@ -112,7 +112,7 @@
  Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
  Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
 サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!VAGRANTFILE_API_VERSION = &quot;2&quot;$bootstrap=&lt;&lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don't touch unless you know what you're doing! VAGRANTFILE_API_VERSION = &quot;2&quot; $bootstrap=&lt;&lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_osstools_iac/" style="height:28px">
           Read more
@@ -143,15 +143,15 @@
         タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
 なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
 やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
-  VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。
-  実行ディレクトリにprovision.shを置きます。
-  provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。
-  実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。
-  hostsファイルには以下のようにlocalhostを定義します。
+ VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。 実行ディレクトリにprovision.shを置きます。 provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。 実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。 hostsファイルには以下のようにlocalhostを定義します。
 [localhost]
 127.0.0.1 ansible_connection=local
   provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
-playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定義したenv.
+playbook(site.yml)解説   varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。
+OS_TENANT_NAME: your_tenant_name
+OS_USERNAME: your_username
+&hellip;.
+  という感じで並べてください。.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/openstack-tools/" style="height:28px">
           Read more
@@ -179,14 +179,14 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
       <h2 class="subtitle is-6 date">September 6, 2014</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-openstack/">Vagrant-hpからVagrant-openstack-pluginへ</a></h1>
       <div class="content">
-        ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
+         ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
 多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
 さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
 前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
 ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&rdquo;:auto&quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
+ フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&rdquo;:auto&rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
 スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
-$ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance is snapshoting! ==&gt; default: Snapshot is ok 
+$ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance is snapshoting! ==&gt; default: Snapshot is ok  
         
       </div>
     </article>

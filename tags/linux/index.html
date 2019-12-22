@@ -111,10 +111,10 @@
         CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&quot;appservice web config container&quot;コマンドがあります。これでコンテナイメージを更新できます。
+Azure CLI 2.0 Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; } これで更新されます。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; }  これで更新されます。
         
       </div>
     </article>
@@ -143,7 +143,7 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &qu
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
 Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
 書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
- RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時    課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+ RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
 $Blob = Get-AzureStorageBlob yourDataDisk.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" style="height:28px">
@@ -183,8 +183,8 @@ $Blob = Get-AzureStorageBlob yourDataDisk.
 &ldquo;Linux で Azure File Storage を使用する方法&rdquo;
 もうちょっと情報欲しいですね。補足のためにわたしも流します。
 Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
-local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
-local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: Executing command storage account connectionstring show+ Getting storage account keysdata: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==info: storage account connectionstring show command OK shareを作成します。share名はfspocshareとしました。
+local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc  ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
+local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: Executing command storage account connectionstring show + Getting storage account keys data: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm== info: storage account connectionstring show command OK  shareを作成します。share名はfspocshareとしました。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/fileshare_linuxonazure/" style="height:28px">
           Read more
@@ -214,10 +214,10 @@ local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: 
       <h2 class="subtitle is-6 date">January 27, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/striping_linuxonazure/">Linux on AzureでDisk IO性能を確保する方法</a></h1>
       <div class="content">
-        &ldquo;俺の鉄板&quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
+        &ldquo;俺の鉄板&rdquo;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
 クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
 ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
- 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い   ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる   ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある   コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく   動かす  やっぱり動かしてみないと   提案する  リスクがあれば明示します   問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
+ 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い  ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる  ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある  コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく  動かす  やっぱり動かしてみないと  提案する  リスクがあれば明示します  問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
 Linux on AzureでDisk IO性能を確保する方法 さて今回の主題です。
 結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。
 Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。
@@ -225,6 +225,7 @@ Linux on AzureでDisk IO性能を必要とする案件がありました。検�
 Linuxで使える代表的なストライプ実装は、LVMとMD。
 ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。
 前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。
+&ldquo;Configure Software RAID on Linux&rdquo;
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/striping_linuxonazure/" style="height:28px">
           Read more

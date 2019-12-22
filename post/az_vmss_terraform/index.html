@@ -7,8 +7,8 @@
 <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る | re-imagine</title>
 
 <meta property='og:title' content='AzureのAvailability Zonesへ分散するVMSSをTerraformで作る - re-imagine'>
-<meta property='og:description' content='動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
-前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)    コード 以下のファイルを同じディレクトリに作成します。
+<meta property='og:description' content='動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018&frasl;3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
+前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)   コード 以下のファイルを同じディレクトリに作成します。
 Terraform メインコード VMSSと周辺リソースを作ります。
  最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。 クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。  [main.tf]
 resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var.resource_group_name}&quot; location = &quot;East US 2&quot; } resource &quot;azurerm_virtual_network&quot; &quot;poc&quot; { name = &quot;vnet01&quot; resource_group_name = &quot;${azurerm_resource_group.'>
@@ -110,31 +110,43 @@ resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var
     <h1 class="title">AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</h1>
     
     <div class="content">
-      <h2 id="heading">動機</h2>
-<p>Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように<a href="https://github.com/terraform-providers/terraform-provider-azurerm/pull/811">なりました</a>。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。</p>
-<h2 id="heading-1">前提条件</h2>
+      
+
+<h2 id="動機">動機</h2>
+
+<p>Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように<a href="https://github.com/terraform-providers/terraform-provider-azurerm/pull/811">なりました</a>。Availability Zonesはインフラの根っこの仕組みなので、現在(<sup>2018</sup>&frasl;<sub>3</sub>)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。</p>
+
+<h2 id="前提条件">前提条件</h2>
+
 <ul>
 <li>Availability Zones対応リージョンを選びます。現在は<a href="https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#regions-that-support-availability-zones">5リージョン</a>です。この記事ではEast US 2とします。</li>
 <li>Availability Zonesのプレビューに<a href="https://docs.microsoft.com/ja-jp/azure/availability-zones/az-overview">サインアップ</a>済みとします。</li>
 <li>bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。</li>
 <li>動作確認した環境は以下です。
+
 <ul>
 <li>Terraform 0.11.2</li>
 <li>Terraform Azure Provider 1.3.0</li>
 <li>WSL (ubuntu 16.04)</li>
 <li>macos (High Sierra 10.13.3)</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="heading-2">コード</h2>
+
+<h2 id="コード">コード</h2>
+
 <p>以下のファイルを同じディレクトリに作成します。</p>
-<h3 id="terraform-">Terraform メインコード</h3>
+
+<h3 id="terraform-メインコード">Terraform メインコード</h3>
+
 <p>VMSSと周辺リソースを作ります。</p>
+
 <ul>
 <li>最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。</li>
 <li>クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。</li>
 </ul>
+
 <p>[main.tf]</p>
+
 <pre><code>resource &quot;azurerm_resource_group&quot; &quot;poc&quot; {
   name     = &quot;${var.resource_group_name}&quot;
   location = &quot;East US 2&quot;
@@ -312,23 +324,35 @@ resource &quot;azurerm_virtual_machine_scale_set&quot; &quot;poc&quot; {
 
   zones = [1, 2, 3]
 }
-</code></pre><h3 id="cloud-init-config">cloud-init configファイル</h3>
+</code></pre>
+
+<h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
+
 <p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
+
 <p>[cloud-config.yaml]</p>
+
 <pre><code>#cloud-config
 package_upgrade: true
 packages:
   - nginx
 runcmd:
   - 'echo &quot;[Instance Name]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;format=text&quot;`    [Zone]: `curl -H Metadata:true &quot;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;format=text&quot;`&quot; &gt; /var/www/html/index.nginx-debian.html'
-</code></pre><p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
+</code></pre>
+
+<p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
+
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer">Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法</a></li>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl">Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する</a></li>
 </ul>
-<h3 id="terraform--1">Terraform 変数ファイル</h3>
+
+<h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
+
 <p>変数は別ファイルへ。</p>
+
 <p>[variables.tf]</p>
+
 <pre><code>variable &quot;resource_group_name&quot; {
   default = &quot;your-rg&quot;
 }
@@ -340,30 +364,47 @@ variable &quot;scaleset_name&quot; {
 variable &quot;admin_username&quot; {
   default = &quot;yourname&quot;
 }
-</code></pre><h2 id="heading-3">実行</h2>
+</code></pre>
+
+<h2 id="実行">実行</h2>
+
 <p>では実行。</p>
+
 <pre><code>$ terraform init
 $ terraform plan
 $ terraform apply
-</code></pre><p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
+</code></pre>
+
+<p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
+
 <p>インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。</p>
+
 <pre><code>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
 $ tail -f /var/log/cloud-init-output.log
 Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
-</code></pre><p>ではWebサーバーにアクセスしてみましょう。</p>
+</code></pre>
+
+<p>ではWebサーバーにアクセスしてみましょう。</p>
+
 <pre><code>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
 [Instance Name]: yourvmss01_2    [Zone]: 3
 [Instance Name]: yourvmss01_0    [Zone]: 1
 [Instance Name]: yourvmss01_2    [Zone]: 3
 [Instance Name]: yourvmss01_1    [Zone]: 2
-</code></pre><p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
+</code></pre>
+
+<p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
+
 <p>では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。</p>
+
 <pre><code>[Instance Name]: yourvmss01_1    [Zone]: 2
 [Instance Name]: yourvmss01_3    [Zone]: 1
 [Instance Name]: yourvmss01_3    [Zone]: 1
 [Instance Name]: yourvmss01_1    [Zone]: 2
 [Instance Name]: yourvmss01_3    [Zone]: 1
-</code></pre><p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
+</code></pre>
+
+<p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
 
       
       <div class="related">

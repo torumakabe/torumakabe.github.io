@@ -113,31 +113,50 @@ Monitoring as a Service 監視をサービスとして提供するって、ど�
     <h1 class="title">君はOpenStack Monascaを知っているか</h1>
     
     <div class="content">
-      <p>このエントリーは、<a href="http://www.adventar.org/calendars/602">OpenStack (2枚目) Advent Calendar 2014</a>の12夜目担当作品です。</p>
+      
+
+<p>このエントリーは、<a href="http://www.adventar.org/calendars/602">OpenStack (2枚目) Advent Calendar 2014</a>の12夜目担当作品です。</p>
+
 <h3 id="monitoring-as-a-service">Monitoring as a Service</h3>
+
 <p>監視をサービスとして提供するって、どういうことでしょうか。</p>
-<p>[Monitoring]<br>
+
+<p>[Monitoring]<br />
 従来の監視。担当者が事前に監視項目を定義する。静的。</p>
+
 <p>[Monitoring as a Service]
 監視機能をサービスとして提供する。不特定多数のユーザーが、自分の監視したい測定項目を定義し、自分の好きなタイミングでチェックする。GUIはもちろん、APIでデータ取得できる。動的。</p>
+
 <p>まあ、AWSのCloudWatchみたいなものです。先に言うべきでしたね、すいません。</p>
+
 <p>このMonitoring as a Service、技術的なハードルは結構高いんです。刻々と上がってくるイベントをさばき、蓄積し、APIをバシバシ叩くユーザーリクエストに応えなきゃいけない。監視というと裏方のイメージがありますが、これは、対価をいただくに値する、立派なサービスです。</p>
+
 <p>そこでOpenStackのMonitoring as a Service事情はどうでしょうか。一見、それを実現できそうなCeilometerがあります。ただ、もともとCeilomerは課金のための利用情報収集をする、という生まれなので、マルチテナントで、ユーザーが自らメトリックを定義し、チェックするという使い方に向いていません。ユーザー向けというより、管理者向けなんです。</p>
+
 <p>そこで<a href="https://wiki.openstack.org/wiki/Monasca">Monasca</a>の登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。</p>
-<p>では、アーキテクチャーを見てみましょう。<br>
-<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc"></p>
+
+<p>では、アーキテクチャーを見てみましょう。<br />
+<img src="https://wiki.openstack.org/w/images/4/4a/Monasca-arch-component-diagram.png" alt="MonascaArc" /></p>
+
 <p>ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。</p>
+
 <p>と思っていたら。</p>
+
 <p>なんと、<a href="https://github.com/stackforge/monasca-vagrant">Monasca-Vagrant</a>なんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。</p>
-<h3 id="heading">気をつけること</h3>
+
+<h3 id="気をつけること">気をつけること</h3>
+
 <ul>
 <li>動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。</li>
 <li>Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。</li>
 <li>git cloneしたディレクトリ直下にansibleのrequirementファイルが置かれるので、そこで作業</li>
 <li>vagrant upで2つのVM、devstackとmini-monが作られる、ここは時間と帯域がいるので、スタバな人は要注意</li>
 </ul>
+
 <p>気をつけるのはこれくらいです。レッツトライ。</p>
+
 <p>年末年始休暇のお楽しみが増えましたね。</p>
+
 <p>これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp; 良いお年を。</p>
 
       

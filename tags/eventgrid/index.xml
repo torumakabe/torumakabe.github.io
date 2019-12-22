@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>EventGrid on re-imagine</title>
@@ -23,9 +23,9 @@
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
 イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
 Event Gridに期待する理由はいくつかあります。
- フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます   信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます   スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう   ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます   Azureの外やサードパーティーとの連携  Webhookでシンプルにできます    前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
-az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid 以下のコマンドで確認し、statusが&amp;quot;Registered&amp;quot;であれば使えます。
-az feature show --name storageEventSubscriptions --namespace Microsoft.</description>
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&amp;rdquo;Registered&amp;rdquo;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</description>
     </item>
     
   </channel>

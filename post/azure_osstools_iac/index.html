@@ -13,7 +13,7 @@
  Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
  Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
 サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!VAGRANTFILE_API_VERSION = &quot;2&quot;$bootstrap=&lt;&lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.'>
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing! VAGRANTFILE_API_VERSION = &quot;2&quot; $bootstrap=&lt;&lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_osstools_iac/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Vagrant'><meta property='article:tag' content='Docker'><meta property='article:published_time' content='2016-05-13T18:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-05-13T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -110,10 +110,16 @@
     <h1 class="title">VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</h1>
     
     <div class="content">
-      <h2 id="heading">端末だってコード化されたい</h2>
+      
+
+<h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
+
 <p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
-<h2 id="heading-1">解決したい課題</h2>
+
+<h2 id="解決したい課題">解決したい課題</h2>
+
 <p>こんな悩みを解決します。</p>
+
 <ul>
 <li>WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい</li>
 <li>WindowsもMacも使っているので、どちらでも同じ環境を作りたい</li>
@@ -127,8 +133,11 @@
 <li>不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変</li>
 <li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
 </ul>
-<h2 id="heading-2">やり口</h2>
+
+<h2 id="やり口">やり口</h2>
+
 <p>VagrantとDockerで解決します。</p>
+
 <ul>
 <li>Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る</li>
 <li>Vagrantでセットアップを自動化する</li>
@@ -137,17 +146,24 @@
 <li>公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る</li>
 <li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
 </ul>
-<h2 id="heading-3">セットアップ概要</h2>
+
+<h2 id="セットアップ概要">セットアップ概要</h2>
+
 <p>簡単す。</p>
+
 <ol>
 <li>Virtualboxを<a href="https://www.virtualbox.org/">インストール</a></li>
 <li>Vagrantを<a href="https://www.vagrantup.com/downloads.html">インストール</a></li>
 <li>Vagrant Putty Plugin(vagrant-multi-putty)を<a href="https://github.com/nickryand/vagrant-multi-putty">インストール</a> #Windowsのみ。Puttyは別途入れてください</li>
 <li>作業フォルダを作り、Vagrant ファイルを書く</li>
 </ol>
+
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
-<h2 id="heading-4">サンプル解説</h2>
+
+<h2 id="サンプル解説">サンプル解説</h2>
+
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
+
 <pre><code># -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -212,51 +228,90 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, inline: $bootstrap, privileged: false
 
 end
-</code></pre><p>$bootstrap=&laquo;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
+</code></pre>
+
+<p>$bootstrap=&lt;&lt;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
+
 <h3 id="common-tools">Common tools</h3>
+
 <p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
-<h3 id="docker-engine--machine">Docker Engine &amp; Machine</h3>
+
+<h3 id="docker-engine-machine">Docker Engine &amp; Machine</h3>
+
 <p>この後前提となるDockerをインストール。Dockerのバージョンは1.11.1を明示しています。Dockerは他への影響が大きいので、バージョンアップは慎重めの方針です。</p>
+
 <h3 id="azure-cli">Azure CLI</h3>
+
 <p>インストールせずに<a href="https://hub.docker.com/r/microsoft/azure-cli/">MS公式のDockerイメージ</a>を引っ張ります。なのでalias設定だけ。
 -v オプションで、ホストLinuxとコンテナ間でデータを共有します。CLIが使う認証トークン($HOME/.azure下)やCLI実行時に渡すjsonファイル(作業ディレクトリ)など。詳細は後ほど。
 また、azureコマンド発行ごとにコンテナが溜まっていくのがつらいので、&ndash;rmで消します。</p>
-<h3 id="terraform--packer">Terraform &amp; Packer</h3>
+
+<h3 id="terraform-packer">Terraform &amp; Packer</h3>
+
 <p>Azure CLIと同様です。Hashicorpが<a href="https://hub.docker.com/u/hashicorp/">公式イメージ</a>を提供しているので、それを活用します。
 方針はlatest追いですが、不具合があればバージョンを指定します。たとえば、現状Terraformのlatestイメージに不具合があるので、0.6.14を指定しています。
 -v オプションもAzure CLIと同じ。ホストとコンテナ間のファイルマッピングに使います。</p>
+
 <p>なお、公式とはいえ他人のイメージを使う時には、Dockerfileの作りやビルド状況は確認しましょう。危険がデンジャラスですし、ENTRYPOINTとか知らずにうっかり使うと途方に暮れます。</p>
+
 <h3 id="nodebrew">nodebrew</h3>
+
 <p>nodeのバージョンを使い分けるため。セットアップ時にv5.9.1を入れています。Azure Functions開発向け。</p>
+
 <h3 id="python3">Python3</h3>
+
 <p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
+
 <p>みなさん他にもいろいろあるでしょう。シェルなのでお好みで。</p>
-<p>さて、ここまでがプロビジョニング時の処理です。以降の&quot;Vagrant.configure～&quot;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
-<h2 id="heading-5">どれだけ楽か</h2>
+
+<p>さて、ここまでがプロビジョニング時の処理です。以降の&rdquo;Vagrant.configure～&rdquo;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
+
+<h2 id="どれだけ楽か">どれだけ楽か</h2>
+
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
+
 <pre><code>vagrant up
-</code></pre><p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
+</code></pre>
+
+<p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
+
 <p>できましたか。できたら、</p>
+
 <pre><code>vagrant putty
-</code></pre><p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
+</code></pre>
+
+<p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
+
 <p>あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら</p>
+
 <pre><code>vagrant destroy
-</code></pre><p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
+</code></pre>
+
+<p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
+
 <p>なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。</p>
+
 <p>わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。</p>
+
 <p>ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。</p>
+
 <p>また、Dockerコンテナを引っ張るAzure CLI、Terraform、Packerの注意点。</p>
+
 <ul>
 <li>初回実行時にイメージのPullを行うので、帯域の十分なところでやりましょう</li>
 <li>サンプルでは -v $PWD:/data オプションにて、ホストのカレントディレクトリをコンテナの/dataにひもづけています。そして、-w /data にて、コンテナ内ワーキングディレクトリを指定しています。コマンドの引数でファイル名を指定したい場合は、実行したいファイルがあるディレクトリに移動して実行してください
+
 <ul>
 <li>(例) azure group deployment create RG01 DEP01 -f ./azuredeploy.json -e ./azuredeploy.parameters.json</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="bash-on-windows">Bash on Windowsまで待つとか言わない</h2>
+
+<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
+
 <p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
+
 <p>インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。</p>
+
 <p>夏近し、楽して早く帰ってビール呑みましょう。</p>
 
       

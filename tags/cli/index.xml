@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>CLI on re-imagine</title>
@@ -32,7 +32,7 @@ X-Plat CLIでの定義方法 2016/4リリースのv0.9.20から、X-Plat CLIで�
 X-Plat CLI固有部分に絞って紹介します。
 ポリシー定義ファイルを作る CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。
 例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。
-{ &amp;quot;if&amp;quot;: { &amp;quot;allOf&amp;quot;: [ { &amp;quot;field&amp;quot;: &amp;quot;type&amp;quot;, &amp;quot;equals&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot; }, { &amp;quot;not&amp;quot;: { &amp;quot;field&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/sku.name&amp;quot;, &amp;quot;in&amp;quot;: [ &amp;quot;Standard_D1_v2&amp;quot;, &amp;quot;Standard_D2_v2&amp;quot;,&amp;quot;Standard_D3_v2&amp;quot;, &amp;quot;Standard_D4_v2&amp;quot;, &amp;quot;Standard_D5_v2&amp;quot; ] } } ] }, &amp;quot;then&amp;quot;: { &amp;quot;effect&amp;quot;: &amp;quot;deny&amp;quot; } } policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</description>
+{ &amp;quot;if&amp;quot;: { &amp;quot;allOf&amp;quot;: [ { &amp;quot;field&amp;quot;: &amp;quot;type&amp;quot;, &amp;quot;equals&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines&amp;quot; }, { &amp;quot;not&amp;quot;: { &amp;quot;field&amp;quot;: &amp;quot;Microsoft.Compute/virtualMachines/sku.name&amp;quot;, &amp;quot;in&amp;quot;: [ &amp;quot;Standard_D1_v2&amp;quot;, &amp;quot;Standard_D2_v2&amp;quot;,&amp;quot;Standard_D3_v2&amp;quot;, &amp;quot;Standard_D4_v2&amp;quot;, &amp;quot;Standard_D5_v2&amp;quot; ] } } ] }, &amp;quot;then&amp;quot;: { &amp;quot;effect&amp;quot;: &amp;quot;deny&amp;quot; } }  policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</description>
     </item>
     
   </channel>

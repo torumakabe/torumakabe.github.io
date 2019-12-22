@@ -7,9 +7,9 @@
 <title>Windows上でLinux向けGoバイナリをDockerでビルドする | re-imagine</title>
 
 <meta property='og:title' content='Windows上でLinux向けGoバイナリをDockerでビルドする - re-imagine'>
-<meta property='og:description' content='小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
-条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
-docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  '>
+<meta property='og:description' content=' 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  '>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Windows'><meta property='article:tag' content='Golang'><meta property='article:tag' content='Docker'><meta property='article:published_time' content='2017-12-04T22:00:00&#43;09:00'/><meta property='article:modified_time' content='2017-12-04T22:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -106,21 +106,31 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
     <h1 class="title">Windows上でLinux向けGoバイナリをDockerでビルドする</h1>
     
     <div class="content">
-      <h2 id="heading">小ネタです</h2>
+      
+
+<h2 id="小ネタです">小ネタです</h2>
+
 <p>Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。</p>
-<h2 id="heading-1">条件</h2>
+
+<h2 id="条件">条件</h2>
+
 <ul>
 <li>Docker for Windows
+
 <ul>
 <li>Linuxモード</li>
 <li>ドライブ共有</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="powershell">PowerShell窓で実行</h2>
+
+<h2 id="powershell窓で実行">PowerShell窓で実行</h2>
+
 <p>ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。</p>
+
 <pre><code>docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux
-</code></pre><ul>
+</code></pre>
+
+<ul>
 <li>golang:1.9.2-alpine DockerイメージはGOPATHに/goを<a href="https://github.com/docker-library/golang/blob/0f5ee2149d00dcdbf48fca05acf582e45d8fa9a5/1.9/alpine3.6/Dockerfile">設定して</a>ビルドされていますが、念のため実行時にも設定</li>
 <li>-v オプションでのマウントは<a href="https://docs.docker.com/engine/admin/volumes/bind-mounts/">非推奨</a>になったので &ndash;mount で</li>
 <li>スタティックリンク</li>

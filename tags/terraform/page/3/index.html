@@ -116,7 +116,6 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 &ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
 &ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
 以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
-まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
           Read more
@@ -145,7 +144,12 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
         Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
 小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
 テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
- OS_AUTH_URL OS_USERNAME OS_PASSWORD OS_REGION_NAME OS_TENANT_NAME  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
+ OS_AUTH_URL
+ OS_USERNAME
+ OS_PASSWORD
+ OS_REGION_NAME
+ OS_TENANT_NAME
+  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
 さあ実行 まずはterraform planコマンドで、実行計画を確認します。
 $ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
         

@@ -108,41 +108,71 @@
     <h1 class="title">Azure DDoS対策ことはじめ</h1>
     
     <div class="content">
-      <h2 id="faq">すこぶるFAQ</h2>
+      
+
+<h2 id="すこぶるfaq">すこぶるFAQ</h2>
+
 <p>攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。</p>
-<h2 id="heading">公式ホワイトペーパー</h2>
+
+<h2 id="公式ホワイトペーパー">公式ホワイトペーパー</h2>
+
 <p><a href="http://download.microsoft.com/download/C/A/3/CA3FC5C0-ECE0-4F87-BF4B-D74064A00846/AzureNetworkSecurity_v3_Feb2015.pdf">Microsoft Azure Network Security Whitepaper V3</a>が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。</p>
+
 <p>今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。</p>
+
 <p><strong>2016//3/4 追記 <a href="http://download.microsoft.com/download/8/0/A/80ABD45E-BF1B-4235-A1C4-C8C43113CE70/AzureNetworkSecurity_v3_Mar2015.pdf">日本語訳</a>がありました</strong></p>
-<h3 id="22-security-management-and-threat-defense---protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+
+<h3 id="2-2-security-management-and-threat-defense-protecting-against-ddos">2.2 Security Management and Threat Defense - Protecting against DDoS</h3>
+
 <pre><code>&quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;
 </code></pre>
+
 <p>MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。</p>
-<h2 id="azure">Azureがやってくれること</h2>
+
+<h2 id="azureがやってくれること">Azureがやってくれること</h2>
+
 <p>では、具体的に。</p>
+
 <pre><code>&quot;1. Network-layer high volume attacks. These attacks choke network pipes and packet processing capabilities by flooding the network with packets. The Azure DDoS defense technology provides detection and mitigation techniques such as SYN cookies, rate limiting, and connection limits to help ensure that such attacks do not impact customer environments.&quot;
 </code></pre>
+
 <p>ネットワークレイヤで検知できる力押しは、AzureのDDoS防御システムが検知、緩和します。このホワイトペーパーのAppendixで図解されていますが、それはファイヤウォールの前段に配置され、SYN Cookieやレート制限、コネクション制限などのテクニックを使っています。</p>
-<h2 id="heading-1">お客様対応が必要なこと</h2>
+
+<h2 id="お客様対応が必要なこと">お客様対応が必要なこと</h2>
+
 <p>ですが、アプリケーションレイヤの攻撃は、AzureのDDoS防御システムだけでは防ぎきれません。お客様のアプリや通信の内容、要件まで踏み込めないからです。</p>
+
 <pre><code>&quot;2. Application-layer attacks. These attacks can be launched against a customer VM. Azure does not provide mitigation or actively block network traffic affecting individual customer deployments, because the infrastructure does not interpret the expected behavior of customer applications. In this case, similar to on-premises deployments, mitigations include:&quot;
 </code></pre>
+
 <p>以下のような対処が有効です。</p>
+
 <pre><code>&quot;Running multiple VM instances behind a load-balanced Public IP address.&quot;
 </code></pre>
+
 <p>攻撃されるポイントを負荷分散装置のパブリックIPに限定し、複数のVMへ負荷を散らします。 攻撃されても、できる限り踏ん張るアプローチです。AzureのDDoS防御システムで緩和しきれなかったトラフィックを受け止め、ダウンしないようにします。攻撃規模は事前に判断できないので、どれだけスケールさせるかは、ダウンした場合のビジネスインパクトとコストの兼ね合いで決める必要があります。</p>
+
 <pre><code>&quot;Using firewall proxy devices such as Web Application Firewalls (WAFs) that terminate and forward traffic to endpoints running in a VM. This provides some protection against a broad range of DoS and other attacks, such as low-rate, HTTP, and other application-layer threats. Some virtualized solutions, such as Barracuda Networks, are available that perform both intrusion detection and prevention.&quot;
 </code></pre>
+
 <p>WAFを入れて、通信の中身を見ないとわからない攻撃を検知、緩和します。一見ノーマルなトラフィックでも「ゆっくりと攻撃」するようなケースもあります。たとえば、ゆっくりWebサーバのコネクションを枯渇させるような攻撃などです。Azureでは仮想アプライアンスとして、Barracuda NetworksのWAFなどが使えます。</p>
+
 <pre><code>&quot; Web Server add-ons that protect against certain DoS attacks.&quot;
 </code></pre>
+
 <p>Webサーバへアドインを入れましょう。パッチも適用しましょう。構成も見直しましょう。ちょっと古いですが<a href="http://blogs.msdn.com/b/friis/archive/2014/12/30/security-guidelines-to-detect-and-prevent-dos-attacks-targeting-iis-azure-web-role-paas.aspx">ここ</a>が参考になります。</p>
+
 <pre><code>&quot;Network ACLs, which can prevent packets from certain IP addresses from reaching VMs.&quot;
 </code></pre>
+
 <p>もしブロックしたいアクセス元IPアドレスがわかるなら、ACLで遮断しましょう。逆に通信可能な範囲のみ指定することもできます。</p>
-<h2 id="heading-2">ホワイトペーパーに加えて</h2>
+
+<h2 id="ホワイトペーパーに加えて">ホワイトペーパーに加えて</h2>
+
 <p><a href="https://azure.microsoft.com/ja-jp/services/cdn/">CDN</a>も有効ですので検討ください。2段構えでの負荷分散、防御ができます。Akamaiとの統合ソリューションも今後<a href="https://azure.microsoft.com/ja-jp/blog/microsoft-and-akamai-bring-cdn-to-azure-customers/">提供される予定</a>です。</p>
+
 <p>CDNは常に世界中からのトラフィックで揉まれているだけあって、DDoS防御四天王で最強の漢が最初に出てくるくらい強力です。</p>
+
 <p>最後に。攻撃されている感があれば、カスタマーサポートまで。</p>
 
       

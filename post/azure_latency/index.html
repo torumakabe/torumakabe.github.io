@@ -9,7 +9,7 @@
 <meta property='og:title' content='Azureユーザー視点のLatency測定 2017/4版 - re-imagine'>
 <meta property='og:description' content='関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。
 せっかくなので、
- 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ   自宅Wi-Fi環境  802.11ac(5GHz)   自宅加入インターネット接続サービス  OCN 光 マンション 100M   OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです   米国リージョン  US WEST (カリフォルニア)    測定結果 1.'>
+ 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ  自宅Wi-Fi環境  802.11ac(5GHz)  自宅加入インターネット接続サービス  OCN 光 マンション 100M  OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです  米国リージョン  US WEST (カリフォルニア)   測定結果 1.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_latency/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Network'><meta property='article:tag' content='Latency'><meta property='article:published_time' content='2017-04-09T15:15:00&#43;09:00'/><meta property='article:modified_time' content='2017-04-09T15:15:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -106,14 +106,21 @@
     <h1 class="title">Azureユーザー視点のLatency測定 2017/4版</h1>
     
     <div class="content">
-      <h2 id="heading">関東の片隅で遅延を測る</h2>
+      
+
+<h2 id="関東の片隅で遅延を測る">関東の片隅で遅延を測る</h2>
+
 <p>Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。</p>
+
 <p>せっかくなので、</p>
+
 <ul>
 <li>太平洋のそれも測定しましょう</li>
 <li><a href="https://azure.microsoft.com/en-us/blog/how-microsoft-builds-its-fast-and-reliable-global-network/">Azureバックボーンを通るリージョン間通信</a>も測りましょう</li>
 </ul>
-<h2 id="heading-1">計測パターン</h2>
+
+<h2 id="計測パターン">計測パターン</h2>
+
 <ol>
 <li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</li>
 <li>自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</li>
@@ -121,68 +128,92 @@
 <li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</li>
 <li>Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</li>
 </ol>
-<h2 id="heading-2">もろもろの条件</h2>
+
+<h2 id="もろもろの条件">もろもろの条件</h2>
+
 <ul>
 <li>遅延測定ツール
+
 <ul>
 <li><a href="https://technet.microsoft.com/en-us/sysinternals/psping.aspx">PsPing</a></li>
 <li>Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing</li>
 <li>NSGでデフォルト許可されているRDPポートへのPsPing</li>
 <li>VPN接続せず、パブリックIPへPsPing</li>
 <li>リージョン間PsPingは仮想マシンから仮想マシンへ</li>
-</ul>
-</li>
+</ul></li>
 <li>自宅Wi-Fi環境
+
 <ul>
 <li>802.11ac(5GHz)</li>
-</ul>
-</li>
+</ul></li>
 <li>自宅加入インターネット接続サービス
+
 <ul>
 <li>OCN 光 マンション 100M</li>
-</ul>
-</li>
+</ul></li>
 <li>OCNゲートウェイ
+
 <ul>
 <li>(ほげほげ)hodogaya.kanagawa.ocn.ne.jp</li>
 <li>神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです</li>
-</ul>
-</li>
+</ul></li>
 <li>米国リージョン
+
 <ul>
 <li>US WEST (カリフォルニア)</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="heading-3">測定結果</h2>
-<h3 id="1----ocn------azure">1. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</h3>
+
+<h2 id="測定結果">測定結果</h2>
+
+<h3 id="1-自宅-神奈川-ocn光-インターネット-azure東日本リージョン">1. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン</h3>
+
 <pre><code>TCP connect statistics for 104.41.187.55:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
   Minimum = 11.43ms, Maximum = 15.66ms, Average = 12.88ms
-</code></pre><h3 id="2----ocn------azure">2. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</h3>
+</code></pre>
+
+<h3 id="2-自宅-神奈川-ocn光-インターネット-azure西日本リージョン">2. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン</h3>
+
 <pre><code>TCP connect statistics for 52.175.148.28:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
   Minimum = 17.96ms, Maximum = 19.64ms, Average = 18.92ms
-</code></pre><h3 id="3----ocn------azure">3. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</h3>
+</code></pre>
+
+<h3 id="3-自宅-神奈川-ocn光-インターネット-azure米国西海岸リージョン">3. 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン</h3>
+
 <pre><code>TCP connect statistics for 40.83.220.19:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
   Minimum = 137.73ms, Maximum = 422.56ms, Average = 218.85ms
-</code></pre><h3 id="4-azure---azure---azure">4. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</h3>
+</code></pre>
+
+<h3 id="4-azure東日本リージョン-azureバックボーン-azure西日本リージョン">4. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン</h3>
+
 <pre><code>TCP connect statistics for 52.175.148.28:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
   Minimum = 8.61ms, Maximum = 9.38ms, Average = 9.00ms
-</code></pre><h3 id="5-azure---azure---azure">5. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</h3>
+</code></pre>
+
+<h3 id="5-azure東日本リージョン-azureバックボーン-azure米国西海岸リージョン">5. Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン</h3>
+
 <pre><code>TCP connect statistics for 40.83.220.19:3389:
   Sent = 4, Received = 4, Lost = 0 (0% loss),
   Minimum = 106.38ms, Maximum = 107.38ms, Average = 106.65ms
-</code></pre><p>Azureバックボーンを通すと首都圏からの遅延が半分になりました。Wi-Fiの有無など、ちょっと条件は違いますが。</p>
-<h2 id="heading-4">ひとこと</h2>
+</code></pre>
+
+<p>Azureバックボーンを通すと首都圏からの遅延が半分になりました。Wi-Fiの有無など、ちょっと条件は違いますが。</p>
+
+<h2 id="ひとこと">ひとこと</h2>
+
 <p>インターネット、および接続サービスの遅延が性能の上がらない原因になっている場合は、Azureで完結させてみるのも手です。</p>
+
 <p>たとえば、</p>
+
 <ul>
 <li>会社で契約しているインターネット接続サービスが、貧弱</li>
 <li>シリコンバレーの研究所からインターネット経由でデータを取得しているが、遅い</li>
 </ul>
+
 <p>こんなケースではAzureを間に入れると、幸せになれるかもしれません。なったユーザーもいらっしゃいます。</p>
 
       

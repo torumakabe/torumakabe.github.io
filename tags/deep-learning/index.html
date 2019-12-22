@@ -110,10 +110,10 @@
       <div class="content">
         気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
-方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース   CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで   Docker Hub上のリポジトリは torumakabe/cntk-cpu   ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull   VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
 リソースグループを作ります。
 C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
- azuredeploy.json  編集不要です   azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.
+ azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください    うし、デプロイ。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_cntk/" style="height:28px">
           Read more

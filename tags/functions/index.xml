@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Functions on re-imagine</title>
@@ -23,9 +23,9 @@
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
 イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
 Event Gridに期待する理由はいくつかあります。
- フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます   信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます   スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう   ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます   Azureの外やサードパーティーとの連携  Webhookでシンプルにできます    前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
-az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid 以下のコマンドで確認し、statusが&amp;quot;Registered&amp;quot;であれば使えます。
-az feature show --name storageEventSubscriptions --namespace Microsoft.</description>
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&amp;rdquo;Registered&amp;rdquo;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</description>
     </item>
     
     <item>
@@ -40,17 +40,18 @@ AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な
 SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
 AZChatOpsSample
 おおまかな流れ 手順書つらいのでポイントだけ。
-  SlackのSlash CommandとIncoming Webhookを作る
- 流れは氏の元ネタと同じ    ARM TemplateでFunction Appをデプロイ
-  Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
-  パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
-  Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
-  GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&amp;quot;IsManualIntegration&amp;quot;をtrueにしています
-  Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
-  Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
-  作成済みのSlack関連パラメータを指定します
-    ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)
-  デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更</description>
+ SlackのSlash CommandとIncoming Webhookを作る
+ 流れは氏の元ネタと同じ  ARM TemplateでFunction Appをデプロイ
+ Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
+ パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
+ Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
+ GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&amp;rdquo;IsManualIntegration&amp;rdquo;をtrueにしています
+ Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
+ Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
+ 作成済みのSlack関連パラメータを指定します
+  ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)
+ デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
+ kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)</description>
     </item>
     
     <item>
@@ -61,7 +62,7 @@ AZChatOpsSample
       <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
 さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
- 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&amp;quot;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.</description>
+ 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう  Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください   デプロイ  Function Appを作成  ポータル左上&amp;rdquo;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.azurewebsites.net空間でユニークになるように App Seriviceプランは、占有型の&amp;rdquo;クラシック&amp;rdquo;か、共有で実行したぶん課金の&amp;rdquo;動的&amp;rdquo;かを選べます。今回の使い方だと動的がお得でしょう メモリは128MBあれば十分です 他のパラメータはお好みで  環境変数の設定  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; アプリケーション設定の構成 -&amp;gt; アプリ設定 先ほど控えた環境変数を設定します(CLIENT_ID、DOMAIN、APPLICATION_SECRET、AZURE_SUBSCRIPTION_ID、azfuncpoc_STORAGE)  サンプルコードを取得  githubに置いてますので、作業するマシンにcloneしてください -&amp;gt; AZFuncTimerTriggerSample  準備済みのGithubリポジトリにpush リポジトリとFunction Appを同期  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; 継続的インテグレーションの構成 -&amp;gt; セットアップ Githubリポジトリとブランチを設定し、同期を待ちます  Nodeのモジュールをインストール  Function Appへポータルからアクセス -&amp;gt; Function Appの設定 -&amp;gt; kuduに移動 -&amp;gt; site/wwwroot/getUsageData へ移動 このディレクトリが、実行する関数、functionの単位です &amp;ldquo;npm install&amp;rdquo; を実行 (package.</description>
     </item>
     
     <item>
@@ -76,7 +77,7 @@ Azure Functionsは、
 何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。
 基本方針  FunctionsはAzure内の様々な機能とイベント連動できるが、あえてサンプルの少ないAzure外とつないでみる Facebook Messenger APIを使って、webhook連動する Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す ビールはCraft Beer Associationの分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す Botらしく、それらしい文末表現をランダムで返す 好みとか文脈は全く聞かないぜSorry アプリはNodeで書く。C#のサンプルは増えてきたので 静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する #サンプル FunctionsとGithubを連携し、GithubへのPush -&amp;gt; Functionsへのデプロイというフローを作る 拡張性はひとまず目をつぶる #この辺の話  ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。
 必要な作業 以下が必要な作業の流れです。
- Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14   Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7    アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</description>
+ Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14  Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7   アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。</description>
     </item>
     
   </channel>

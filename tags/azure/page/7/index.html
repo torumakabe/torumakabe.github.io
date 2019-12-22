@@ -120,7 +120,7 @@ X-Plat CLIでの定義方法 2016/4リリースのv0.9.20から、X-Plat CLIで�
 X-Plat CLI固有部分に絞って紹介します。
 ポリシー定義ファイルを作る CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。
 例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。
-{ &quot;if&quot;: { &quot;allOf&quot;: [ { &quot;field&quot;: &quot;type&quot;, &quot;equals&quot;: &quot;Microsoft.Compute/virtualMachines&quot; }, { &quot;not&quot;: { &quot;field&quot;: &quot;Microsoft.Compute/virtualMachines/sku.name&quot;, &quot;in&quot;: [ &quot;Standard_D1_v2&quot;, &quot;Standard_D2_v2&quot;,&quot;Standard_D3_v2&quot;, &quot;Standard_D4_v2&quot;, &quot;Standard_D5_v2&quot; ] } } ] }, &quot;then&quot;: { &quot;effect&quot;: &quot;deny&quot; } } policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。
+{ &quot;if&quot;: { &quot;allOf&quot;: [ { &quot;field&quot;: &quot;type&quot;, &quot;equals&quot;: &quot;Microsoft.Compute/virtualMachines&quot; }, { &quot;not&quot;: { &quot;field&quot;: &quot;Microsoft.Compute/virtualMachines/sku.name&quot;, &quot;in&quot;: [ &quot;Standard_D1_v2&quot;, &quot;Standard_D2_v2&quot;,&quot;Standard_D3_v2&quot;, &quot;Standard_D4_v2&quot;, &quot;Standard_D5_v2&quot; ] } } ] }, &quot;then&quot;: { &quot;effect&quot;: &quot;deny&quot; } }  policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/" style="height:28px">
           Read more
@@ -154,7 +154,7 @@ X-Plat CLI固有部分に絞って紹介します。
  Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
  Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
 サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!VAGRANTFILE_API_VERSION = &quot;2&quot;$bootstrap=&lt;&lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don't touch unless you know what you're doing! VAGRANTFILE_API_VERSION = &quot;2&quot; $bootstrap=&lt;&lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_osstools_iac/" style="height:28px">
           Read more
@@ -190,7 +190,7 @@ Azure Functionsは、
 何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。
 基本方針  FunctionsはAzure内の様々な機能とイベント連動できるが、あえてサンプルの少ないAzure外とつないでみる Facebook Messenger APIを使って、webhook連動する Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す ビールはCraft Beer Associationの分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す Botらしく、それらしい文末表現をランダムで返す 好みとか文脈は全く聞かないぜSorry アプリはNodeで書く。C#のサンプルは増えてきたので 静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する #サンプル FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る 拡張性はひとまず目をつぶる #この辺の話  ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。
 必要な作業 以下が必要な作業の流れです。
- Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14   Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7    アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。
+ Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14  Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7   アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/" style="height:28px">
           Read more
@@ -262,7 +262,7 @@ Azure Functionsは、
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
 Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
 書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
- RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時    課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+ RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
 $Blob = Get-AzureStorageBlob yourDataDisk.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" style="height:28px">

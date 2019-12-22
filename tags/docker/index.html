@@ -106,9 +106,9 @@
       <h2 class="subtitle is-6 date">December 4, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/">Windows上でLinux向けGoバイナリをDockerでビルドする</a></h1>
       <div class="content">
-        小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
-条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
-docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
+         小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
         
       </div>
     </article>
@@ -137,10 +137,10 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
         CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&quot;appservice web config container&quot;コマンドがあります。これでコンテナイメージを更新できます。
+Azure CLI 2.0 Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; } これで更新されます。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; }  これで更新されます。
         
       </div>
     </article>
@@ -166,10 +166,12 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &qu
       <div class="content">
         OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
-何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details   導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる    1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&quot;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです   OMSポータルのソリューションギャラリーから、&ldquo;Containers&quot;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください   OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください    sudo docker run --privileged -d -v /var/run/docker.
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&rdquo;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
+ 先ほど入手したOMSのワークスペースIDとKeyを入れてください
+sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/oms_container_linux/" style="height:28px">
           Read more
@@ -203,7 +205,7 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &qu
  Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
  Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
 サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!VAGRANTFILE_API_VERSION = &quot;2&quot;$bootstrap=&lt;&lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.
+# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don't touch unless you know what you're doing! VAGRANTFILE_API_VERSION = &quot;2&quot; $bootstrap=&lt;&lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_osstools_iac/" style="height:28px">
           Read more

@@ -111,10 +111,10 @@
         CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&quot;appservice web config container&quot;コマンドがあります。これでコンテナイメージを更新できます。
+Azure CLI 2.0 Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; } これで更新されます。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; }  これで更新されます。
         
       </div>
     </article>

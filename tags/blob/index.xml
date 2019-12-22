@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blob on re-imagine</title>
@@ -23,9 +23,9 @@
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
 イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
 Event Gridに期待する理由はいくつかあります。
- フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます   信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます   スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう   ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます   Azureの外やサードパーティーとの連携  Webhookでシンプルにできます    前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
-az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid 以下のコマンドで確認し、statusが&amp;quot;Registered&amp;quot;であれば使えます。
-az feature show --name storageEventSubscriptions --namespace Microsoft.</description>
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&amp;rdquo;Registered&amp;rdquo;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</description>
     </item>
     
     <item>
@@ -37,7 +37,9 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.</descrip
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
 でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
 調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
-ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線   自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ  ゲートウェイ名から推測    いい感じの回線   日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」  コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10   Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)   Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)  対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え + 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy    結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.</description>
+ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線
+ 自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ ゲートウェイ名から推測  いい感じの回線
+ 日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」   コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10  Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)  Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)   対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え + 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy   結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.</description>
     </item>
     
     <item>
@@ -51,7 +53,7 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.</descrip
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
 Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
 書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
- RHEL 7.2 on Azure XFS &amp;amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時    課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+ RHEL 7.2 on Azure XFS &amp;amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
 $Blob = Get-AzureStorageBlob yourDataDisk.</description>
     </item>
     
@@ -68,7 +70,7 @@ $Blob = Get-AzureStorageBlob yourDataDisk.</description>
 なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
 環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
 環境は以下の通り。
- Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)   Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&amp;hellip; 有線テストは省きます El Capitan   Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています   Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい   対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7   転送ファイル  Ubuntu 15.</description>
+ Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)  Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&amp;hellip; 有線テストは省きます El Capitan  Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています  Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい  対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7  転送ファイル  Ubuntu 15.</description>
     </item>
     
   </channel>

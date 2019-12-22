@@ -10,15 +10,15 @@
 <meta property='og:description' content='タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
 なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
 やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
-  VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。
-  実行ディレクトリにprovision.shを置きます。
-  provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。
-  実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。
-  hostsファイルには以下のようにlocalhostを定義します。
+ VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。 実行ディレクトリにprovision.shを置きます。 provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。 実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。 hostsファイルには以下のようにlocalhostを定義します。
 [localhost]
 127.0.0.1 ansible_connection=local
   provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
-playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定義したenv.'>
+playbook(site.yml)解説   varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。
+OS_TENANT_NAME: your_tenant_name
+OS_USERNAME: your_username
+&hellip;.
+  という感じで並べてください。.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/openstack-tools/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Vagrant'><meta property='article:tag' content='OpenStack'><meta property='article:tag' content='Ansible'><meta property='article:published_time' content='2014-09-14T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2014-09-14T00:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -115,11 +115,18 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
     <h1 class="title">OpenStackのツール環境をImmutableに整える</h1>
     
     <div class="content">
-      <h3 id="heading">タイトルは釣りです</h3>
+      
+
+<h3 id="タイトルは釣りです">タイトルは釣りです</h3>
+
 <p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
-<h3 id="heading-1">なぜ必要か?</h3>
+
+<h3 id="なぜ必要か">なぜ必要か?</h3>
+
 <p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
-<h3 id="heading-2">やりたいこと</h3>
+
+<h3 id="やりたいこと">やりたいこと</h3>
+
 <ul>
 <li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
 <li>Windows、Macどちらでも同様の環境にしたい</li>
@@ -128,64 +135,69 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
 <li>コマンド2、3発程度で、気軽に作って消せる</li>
 <li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
 </ul>
-<h3 id="heading-3">方針</h3>
+
+<h3 id="方針">方針</h3>
+
 <ul>
 <li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
 <li>VagrantでWindows/Macの違いを吸収する</li>
 <li>VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う</li>
 <li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
 </ul>
-<h3 id="heading-4">前提条件</h3>
+
+<h3 id="前提条件">前提条件</h3>
+
 <ul>
 <li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
 <li>OSX 10.9.4 &amp; VirtualBox 4.3.16</li>
 <li>Vagrant 1.6.5  (VMware用ライセンス買いました)</li>
 <li>ひとまずOpenStack CLIを使えるところまで作る</li>
 </ul>
-<h3 id="vagrantfile">ではVagrantfileを見てみましょう</h3>
+
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
+
 <script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
+
 <p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
+
 <ul>
-<li>
-<p>VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの<a href="https://github.com/opscode/bento">Bento</a>で、事前にboxファイルを作ってます。ubuntu14.04としました。</p>
-</li>
-<li>
-<p>実行ディレクトリにprovision.shを置きます。</p>
-</li>
-<li>
-<p>provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。</p>
-</li>
-<li>
-<p>実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。</p>
-</li>
-<li>
-<p>hostsファイルには以下のようにlocalhostを定義します。</p>
-<p>[localhost]<br>
-127.0.0.1 ansible_connection=local</p>
-</li>
+<li>VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeの<a href="https://github.com/opscode/bento">Bento</a>で、事前にboxファイルを作ってます。ubuntu14.04としました。</li>
+<li>実行ディレクトリにprovision.shを置きます。</li>
+<li>provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。</li>
+<li>実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。</li>
+
+<li><p>hostsファイルには以下のようにlocalhostを定義します。</p>
+
+<p>[localhost]<br />
+127.0.0.1 ansible_connection=local</p></li>
 </ul>
-<h4 id="provisionsh">provision.sh解説</h4>
+
+<h4 id="provision-sh解説">provision.sh解説</h4>
+
 <script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
+
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
-<h4 id="playbooksiteyml">playbook(site.yml)解説</h4>
+
+<h4 id="playbook-site-yml-解説">playbook(site.yml)解説</h4>
+
 <script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
+
 <ul>
-<li>
-<p>varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。</p>
-<p>OS_TENANT_NAME: your_tenant_name<br>
-OS_USERNAME: your_username<br>
-&hellip;.</p>
-<p>という感じで並べてください。.bashrcに追加されます。</p>
-</li>
-<li>
-<p>タイムゾーンをAsia/Tokyoにします。</p>
-</li>
-<li>
-<p>必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
-</li>
+<li><p>varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。</p>
+
+<p>OS_TENANT_NAME: your_tenant_name<br />
+OS_USERNAME: your_username<br />
+&hellip;.</p></li>
 </ul>
-<h3 id="windows">Windowsでの実行例</h3>
+
+<p>という感じで並べてください。.bashrcに追加されます。
+- タイムゾーンをAsia/Tokyoにします。
+- 必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
+
+<h3 id="windowsでの実行例">Windowsでの実行例</h3>
+
 <p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
+
 <pre><code>PS C:\Users\hoge&gt; vagrant up
 Bringing machine 'default' up with 'vmware_workstation' provider...
 ==&gt; default: Cloning VMware VM: 'opscode-ubuntu1404'. This can take some time...
@@ -204,7 +216,9 @@ Bringing machine 'default' up with 'vmware_workstation' provider...
 ==&gt; default: PLAY RECAP ********************************************************************
 ==&gt; default: 127.0.0.1                  : ok=8    changed=7    unreachable=0    failed=0
 </code></pre>
+
 <p>うまく動いたようです。</p>
+
 <pre><code>PS C:\Users\hoge&gt; vagrant ssh
 cygwin warning:
   MS-DOS style path detected: C:/Users/hoge/.vagrant.d/insecure_private_key
@@ -217,14 +231,18 @@ Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
  * Documentation:  https://help.ubuntu.com/
 Last login: Sun Apr 20 02:21:46 2014 from 172.16.230.1
 </code></pre>
+
 <p>vagrant sshでサクッとログイン。ちなみに、これだけのためにcygwin入れてます。負けは認めます。</p>
+
 <pre><code>vagrant@vagrant:~$ nova list
 +----+------+--------+------------+-------------+----------+
 | ID | Name | Status | Task State | Power State | Networks |
 +----+------+--------+------------+-------------+----------+
 +----+------+--------+------------+-------------+----------+
 </code></pre>
+
 <p>いきなりnovaコマンド使えます。</p>
+
 <p>なおproxy環境下では、/etc/apt/apt.conf、.bashrcやplaybookにproxy設定をするよう、provision.shとplaybook(site.yml)をいじれば動くと思います。まだやってませんが。</p>
 
       
