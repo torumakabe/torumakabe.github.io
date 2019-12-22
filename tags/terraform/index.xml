@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Terraform on re-imagine</title>
@@ -30,8 +30,9 @@ AKSはインパクトの大きな機能を、プレビューというかたち�
  Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
 ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
 意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&amp;rdquo;API Management Resource(resource)&amp;ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
-CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。</description>
+Terraformはリソースを&amp;quot;API Management Resource(resource)&amp;ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
+たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、</description>
     </item>
     
     <item>
@@ -41,9 +42,9 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
       
       <guid>https://ToruMakabe.github.io/post/terraform_azure_secret/</guid>
       <description>動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。
- いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る  データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁  もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？  kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる   つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
+ いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る   データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁   もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？   kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる    つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
 シナリオ Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。
- Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる ACI  コンテナー作成時に環境変数として接続文字列を渡す  AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す    検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み  Terraform Azure Provider v1.4 Terraform kubernetes Provider v1.</description>
+ Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる  ACI  コンテナー作成時に環境変数として接続文字列を渡す   AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す        検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み   Terraform Azure Provider v1.</description>
     </item>
     
     <item>
@@ -53,16 +54,16 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
       
       <guid>https://ToruMakabe.github.io/post/myazurecli201804/</guid>
       <description>春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
-俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
+俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる   エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる   VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる    デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
 Azure CLI 2.0 の構成
 まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。
-[core] output = table  そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
-[defaults] group = default-ejp-rg  他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
+[core] output = table そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
+[defaults] group = default-ejp-rg 他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
 ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。
 デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。
-az vm create -n yoursmplvm01 --image UbuntuLTS  エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
+az vm create -n yoursmplvm01 --image UbuntuLTS エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
 Azure CLI 2.0 のエイリアス拡張機能
-前提はAzure CLI v2.</description>
+前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</description>
     </item>
     
     <item>
@@ -77,8 +78,8 @@ Azure CLI 2.0 のエイリアス拡張機能
 Terraformではイメージ名取得に正規表現とソートが可能 Terraformでは見出しの通り、捗る表現ができます。
 イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の文字列比較なので、末尾の番号の決めた桁は埋めること。
 ということで降順で最上位、つまり最新のイメージ名を取得できます。
-data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; { name_regex = &amp;quot;ubuntu1604-[0-9]*&amp;quot; sort_descending = true resource_group_name = &amp;quot;${var.managed_image_resource_group_name}&amp;quot; }  あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
- storage_profile_image_reference { id = &amp;quot;${data.azurerm_image.poc.id}&amp;quot; }  便利である。</description>
+data &amp;quot;azurerm_image&amp;quot; &amp;quot;poc&amp;quot; { name_regex = &amp;quot;ubuntu1604-[0-9]*&amp;quot; sort_descending = true resource_group_name = &amp;quot;${var.managed_image_resource_group_name}&amp;quot; } あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
+ storage_profile_image_reference { id = &amp;quot;${data.azurerm_image.poc.id}&amp;quot; } 便利である。</description>
     </item>
     
     <item>
@@ -104,7 +105,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング</description>
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &amp;quot;type&amp;quot;: &amp;quot;Microsoft.</description>
     </item>
     
     <item>
@@ -113,8 +114,8 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
-      <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018&amp;frasl;3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
-前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)   コード 以下のファイルを同じディレクトリに作成します。
+      <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
+前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)    コード 以下のファイルを同じディレクトリに作成します。
 Terraform メインコード VMSSと周辺リソースを作ります。
  最終行近くの &amp;ldquo;zones = [1, 2, 3]&amp;rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。 クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。  [main.tf]
 resource &amp;quot;azurerm_resource_group&amp;quot; &amp;quot;poc&amp;quot; { name = &amp;quot;${var.resource_group_name}&amp;quot; location = &amp;quot;East US 2&amp;quot; } resource &amp;quot;azurerm_virtual_network&amp;quot; &amp;quot;poc&amp;quot; { name = &amp;quot;vnet01&amp;quot; resource_group_name = &amp;quot;${azurerm_resource_group.</description>
@@ -136,7 +137,7 @@ Module、Terraform Module Registryの活用 TerraformのModuleはとても強力
 リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
 TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
 ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
-terraform workspace select prod  みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
+terraform workspace select prod みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
 サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
 このコードをapplyすると、以下のリソースが出来上がります。
  NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
@@ -153,13 +154,13 @@ terraform workspace select prod  みなまで言わなくても分かります�
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&amp;ldquo;azurerm_template_deployment&amp;rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
 でも、現時点の実装では、おすすめしません。
-ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&amp;rdquo;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&amp;quot;Complete(完全)&amp;ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
 リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
 つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
 タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&amp;hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
 せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp;amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
 読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
-それでも&amp;rdquo;terraformコマンドに操作を統一したい&amp;rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+それでも&amp;quot;terraformコマンドに操作を統一したい&amp;quot;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
 2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&amp;ldquo;depends_on&amp;rdquo;で明示してあげましょう。
 例えば、以前のエントリで紹介した下記の問題。
 Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.</description>
@@ -174,7 +175,7 @@ Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autores
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
 追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
 エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
-Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&amp;ldquo;Too many requests&amp;rdquo;です。何かが多すぎたようです。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&amp;ldquo;Too many requests&amp;quot;です。何かが多すぎたようです。
 対処法 もう一度applyしてください
 冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
 背景 エラーになった背景ですが、2つの可能性があります。
@@ -202,7 +203,7 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
 今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
 . ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
 1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
- 認証情報は変数指定し、設定ファイルから読み込む</description>
+  認証情報は変数指定し、設定ファイルから読み込む</description>
     </item>
     
     <item>
@@ -220,7 +221,8 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
 &amp;ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&amp;rdquo;
 &amp;ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&amp;rdquo;
-以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</description>
+以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+まずは、Terraformをアプリとして登録します。&amp;ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&amp;ndash;passwordはclient_secretになるので、おぼえておきましょう。</description>
     </item>
     
     <item>
@@ -232,12 +234,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
 小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
 テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
- OS_AUTH_URL
- OS_USERNAME
- OS_PASSWORD
- OS_REGION_NAME
- OS_TENANT_NAME
-  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
+ OS_AUTH_URL OS_USERNAME OS_PASSWORD OS_REGION_NAME OS_TENANT_NAME  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
 さあ実行 まずはterraform planコマンドで、実行計画を確認します。
 $ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.</description>
     </item>

@@ -13,12 +13,12 @@
 これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
 これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
 実装例 例としてこんな仕組みを作ってみましょう。
- 西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
+ 西日本リージョンのリソースグループ&quot;dev&quot;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
  Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
 勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
 Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
 ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
-param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name &#39;SPAppID&#39; $Tenant = Get-AutomationVariable -Name &#39;TenantID&#39; $OMSWorkspaceId = Get-AutomationVariable -Name &#39;OMSWorkspaceId&#39; $OMSWorkspaceKey = Get-AutomationVariable -Name &#39;OMSWorkspaceKey&#39; $CertificationName = Get-AutomationVariable -Name &#39;CertificationName&#39; $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.'>
+param ( [object]$WebhookData	) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name &#39;SPAppID&#39; $Tenant = Get-AutomationVariable -Name &#39;TenantID&#39; $OMSWorkspaceId = Get-AutomationVariable -Name &#39;OMSWorkspaceId&#39; $OMSWorkspaceKey = Get-AutomationVariable -Name &#39;OMSWorkspaceKey&#39; $CertificationName = Get-AutomationVariable -Name &#39;CertificationName&#39; $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_auditlog_alert/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Automation'><meta property='article:published_time' content='2016-04-06T17:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-04-06T17:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -113,36 +113,22 @@ param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $Web
     <h1 class="title">Azureの監査ログアラートからWebhookの流れで楽をする</h1>
     
     <div class="content">
-      
-
-<h2 id="監査ログからアラートを上げられるようになります">監査ログからアラートを上げられるようになります</h2>
-
+      <h2 id="heading">監査ログからアラートを上げられるようになります</h2>
 <p>Azureの監査ログからアラートを上げる機能のプレビューが<a href="https://azure.microsoft.com/ja-jp/blog/new-features-for-azure-alerts-and-autoscale/">はじまりました</a>。これ、地味ですが便利な機能です。日々の運用に効きます。</p>
-
-<h2 id="どんな風に使えるか">どんな風に使えるか</h2>
-
+<h2 id="heading-1">どんな風に使えるか</h2>
 <p>ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。</p>
-
 <p>たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。</p>
-
 <p>これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。</p>
-
 <p>これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。</p>
-
-<h2 id="実装例">実装例</h2>
-
+<h2 id="heading-2">実装例</h2>
 <p>例としてこんな仕組みを作ってみましょう。</p>
-
 <ul>
-<li>西日本リージョンのリソースグループ&rdquo;dev&rdquo;にVMが作成されたら、自動的にメール通知とWebhookを実行</li>
+<li>西日本リージョンのリソースグループ&quot;dev&quot;にVMが作成されたら、自動的にメール通知とWebhookを実行</li>
 <li>WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する</li>
 <li>OMSでログ分析</li>
 </ul>
-
-<h2 id="準備">準備</h2>
-
+<h2 id="heading-3">準備</h2>
 <p>以下の準備ができているか確認します。</p>
-
 <ul>
 <li>Azure Automation向けADアプリ、サービスプリンシパル作成</li>
 <li>サービスプリンシパルへのロール割り当て</li>
@@ -151,28 +137,22 @@ param ( [object]$WebhookData ) if ($WebhookData -ne $null) { $WebhookName = $Web
 <li>Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています)</li>
 <li>OMSワークスペースの作成</li>
 </ul>
-
 <p>もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。</p>
-
 <p><strong><a href="http://qiita.com/sengoku/items/1c3994ac8a2f0f0e88c5">勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）</a></strong></p>
-
-<h2 id="azure-automation側の仕掛け">Azure Automation側の仕掛け</h2>
-
+<h2 id="azure-automation">Azure Automation側の仕掛け</h2>
 <p>先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。</p>
-
 <p>ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。</p>
-
 <pre><code>param ( 
-    [object]$WebhookData          
+    [object]$WebhookData		  
 )
 
 if ($WebhookData -ne $null) {  
     $WebhookName    =   $WebhookData.WebhookName
     $WebhookBody    =   $WebhookData.RequestBody  
     $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody)
-
+       
     $AlertContext = [object]$WebhookBody.context
-
+    
     $SPAppID = Get-AutomationVariable -Name 'SPAppID'
     $Tenant = Get-AutomationVariable -Name 'TenantID'
     $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId'
@@ -206,24 +186,17 @@ else
     Write-Error &quot;This runbook is meant to only be started from a webhook.&quot; 
 }
 </code></pre>
-
 <p>Runbookができたら、Webhookを作ります。詳しくは<a href="https://azure.microsoft.com/ja-jp/documentation/articles/automation-webhooks/">こちら</a>。</p>
-
 <p>WebhookのURLを控えておいてください。</p>
-
-<h2 id="azure-監査ログアラート側の仕掛け">Azure 監査ログアラート側の仕掛け</h2>
-
+<h2 id="azure-">Azure 監査ログアラート側の仕掛け</h2>
 <p>Powershellでアラートルールを作ります。実行アカウントの権限に気をつけてください。</p>
-
 <pre><code>PS C:\work&gt; $actionEmail = New-AzureRmAlertRuleEmail -CustomEmail yourname@example.com
 
 PS C:\work&gt; $actionWebhook = New-AzureRmAlertRuleWebhook -ServiceUri https://abcdefgh.azure-automation.net/webhooks?token=your_token
 
 PS C:\work&gt; Add-AzureRmLogAlertRule -Name createdVM -Location &quot;Japan West&quot; -ResourceGroup dev -OperationName Microsoft.Compute/virtualMachines/write -Status Succeeded  -SubStatus Created -TargetResourceGroup dev -Actions $actionEmail,$actionWebhook
 </code></pre>
-
-<p>以上。これで&rdquo;dev&rdquo;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。</p>
-
+<p>以上。これで&quot;dev&quot;リソースグループにVMが作られた場合、自動でOMSエージェントがインストールされ、ログ収集がはじまります。</p>
 <p>なお、メールも飛んできますので、うっとおしくなったらメール通知はアクションから外すか、ルールでさばいてくださいね。</p>
 
       

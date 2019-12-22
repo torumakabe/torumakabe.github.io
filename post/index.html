@@ -111,10 +111,10 @@
 Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
 MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
  Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-What&rsquo;s so hard about vulnerability scanning?
-Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
+  What's so hard about vulnerability scanning?
+  Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
  トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
-$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
+$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt; コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
 ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
 まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
 FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.
@@ -144,7 +144,7 @@ FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci_graceful_shutdown/">Azure Container InstancesのGraceful Shutdown事情</a></h1>
       <div class="content">
         何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
-ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
+ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&ldquo;Kubernetesである&quot;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
 Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
  Kubernetes: 詳解 Pods の終了
  書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。
@@ -196,9 +196,9 @@ Gistに置いたHCLで、以下のような環境を作れます。
 メトリクス、ロギング、トレーシング 可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。
 外からか、内からか Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。
 いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。
-お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)   実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
+お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)    実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
 セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。
-補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです  環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など  以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる) azurerm_role_assignment.
+補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです   環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など   以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる)  azurerm_role_assignment.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/" style="height:28px">
           Read more
@@ -232,9 +232,9 @@ Azure Kubernetes Serviceを題材にしますが、他のKubernetes環境でも�
  アプリケーションのソースコードにアクセスできるすべての人がシークレットを知り得る シークレットの変更時、影響するすべてのソースを変更し再ビルドが必要  シークレットが平文で書かれたソースコードリポジトリをパブリックに御開帳、という分かりやすい事案だけがリスクではありません。プライベートリポジトリを使っていても、人の出入りがあるチームでの開発運用、シークレット漏洩時の変更やローテーションなどの運用を考えると、ハードコーディングは取りづらい選択肢です。
 よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。
 マニフェストに書く Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。
-apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot;  これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
+apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot; これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
 この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。
-package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.
+package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.Request) { secret := os.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/" style="height:28px">
           Read more
@@ -275,8 +275,8 @@ Deschedulerは、Nodeの数が少ないクラスターで特に有効です。No
 では、このシナリオで動きを追ってみましょう。
 事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
 NodeにPodを寄せる はじめのNode数は2です。
-$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
-apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m  デプロイします。
+$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5 レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
+apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m デプロイします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
           Read more

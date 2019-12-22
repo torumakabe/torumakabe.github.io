@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.57.2" />
+	<meta name="generator" content="Hugo 0.61.0" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -91,197 +91,11 @@
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
         
-        
-<a class="subtitle is-6" href="/tags/aqua">#Aqua</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/container">#Container</a>
-  
-
-        
       </div>
       <h2 class="subtitle is-6 date">August 9, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aqua_acr/">Azure Container Registry TasksでAqua MicroScannerを自動実行する</a></h1>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/">Posts</a></h1>
       <div class="content">
-        何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。
-@ehotinger のブログを読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!
-Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
-MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
- Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-What&rsquo;s so hard about vulnerability scanning?
-Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
- トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
-$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
-ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
-まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
-FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.
         
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aqua_acr/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/aci">#ACI</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">July 3, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci_graceful_shutdown/">Azure Container InstancesのGraceful Shutdown事情</a></h1>
-      <div class="content">
-        何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
-ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
-Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
- Kubernetes: 詳解 Pods の終了
- 書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。
-ざっくりまとめると、ポッドをGraceful Shutdownする方法は次の2つです。
- PreStop処理を書いて、コンテナー停止に備える コンテナー停止時に送られるシグナルを、適切に扱う  ACIでは現在PreStop処理を書けません。なので、シグナルをどう扱うかがポイントです。
-DockerのPID 1問題 シグナルハンドリングの前に、DockerのPID 1問題について触れておきます。
- Docker and the PID 1 zombie reaping problem
- Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられます。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役も担います。
-しかしDockerでは、コンテナーではじめに起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。
-この仕様には、次の課題があります。
- コンテナーにゾンビプロセスのお掃除をするinitがいない docker stopを実行するとPID 1のプロセスに対してSIGTERMが、一定時間の経過後(既定は10秒)にSIGKILLが送られる。PID 1はLinuxで特別な扱いであり、SIGTERMのハンドラーがない場合、それを無視する。ただしinitの他はSIGKILLを無視できない。つまりPID 1で動いたアプリは待たされた挙句、強制終了してしまう。また、転送しなければ子プロセスにSIGTERMが伝わらない  前者が問題になるかは、コンテナーでどれだけプロセスを起動するかにもよります。いっぽうで後者は、PID 1となるアプリで意識してSIGTERMを処理しなければ、常に強制終了されることを意味します。穏やかではありません。
-解決の選択肢 シグナルハンドリングについては、解決の選択肢がいくつかあります。
- SIGTERMを受け取って、終了処理をするようアプリを書く PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)  Docker APIを触れる環境であれば、docker run時に&ndash;initオプションをつければ擬似init(tini)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。
-それぞれのやり方と動き ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。
-package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot;syscall&quot; ) func main() { sigs := make(chan os.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aci_graceful_shutdown/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">June 26, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></h1>
-      <div class="content">
-        何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多くなってきたので、まるっと試せるTerraform HCLとサンプルアプリを作りました。
-Gistに置いたHCLで、以下のような環境を作れます。
-動機 監視とは、ビジネスとそれを支える仕組みがどのような状態かを把握し、判断や行動につなげるものです。そして何を監視し、何をもって健全、危険と判断するかは、人や組織によります。安易にベストプラクティスを求めるものではないでしょう。
-とはいえ、コンテナー技術が本格的に普及し始めたのは最近ですし、手を動かしていない段階では、議論が発散しがちです。そこでお試しキットを作りました。AKSクラスターとサンプルアプリケーション、それらを監視するサービスとツールをまるっと試せます。
-このお試しキットは、Azureの提供するサービスとオープンソースのツールのみでまとめました。ですが、世にはいい感じのKubernetes対応ツールやサービスが多くあります。このキットであたりをつけてから、他も探ってみてください。
-視点 クラウド、コンテナー、サーバーレスの監視という文脈で、可観測性(Observability)という言葉を目にすることが多くなりました。オブザーバビブベボ、いまだに口が回りません。
-制御理論用語である可観測性がITの世界で使われるようになった理由は、諸説あるようです。監視を行為とすると、可観測性は性質です。「監視対象側に、状態を把握しやすくする仕組みを備えよう」というニュアンスを感じませんか。後付けではなく、監視をあらかじめ考慮したうえでアプリや基盤を作ろう、ということだと捉えています。いわゆるバズワードかもしれませんが、監視を考え直すいいきっかけになりそうで、わたしは好意的です。
-お試しキットは、3つの要素と2つの配置を意識して作りました。
-メトリクス、ロギング、トレーシング 可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。
-外からか、内からか Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。
-いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。
-お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)   実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
-セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。
-補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです  環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など  以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる) azurerm_role_assignment.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">June 17, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/">Azure Kubernetes Serviceでシークレットを管理する6つの方法</a></h1>
-      <div class="content">
-        何の話か Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しましょう。この記事では主にDB接続文字列やAPIキーなど、アプリケーションが必要とする、限られた人のみが扱うべき情報を「シークレット」とします。
-それぞれの仕組みには踏み込まず、どんな課題を解決するか、どのように使えるか、その効果を中心に書きます。それでもちょっと長いですがご容赦ください。
-Azure Kubernetes Serviceを題材にしますが、他のKubernetes環境でも参考になると思います。
-6つの方法 以下の6つの方法を順に説明します。
- アプリケーションに書く マニフェストに書く KubernetesのSecretにする Key Vaultで管理し、その認証情報をKubernetesのSecretにする Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity) Key Vaultで管理し、Podにボリュームとしてマウントする (FlexVolume)  アプリケーションに書く いわゆるハードコーディングです。論外、としたいところですが、何が問題なのかざっと確認しておきましょう。代表的な問題点は、次の2つです。
- アプリケーションのソースコードにアクセスできるすべての人がシークレットを知り得る シークレットの変更時、影響するすべてのソースを変更し再ビルドが必要  シークレットが平文で書かれたソースコードリポジトリをパブリックに御開帳、という分かりやすい事案だけがリスクではありません。プライベートリポジトリを使っていても、人の出入りがあるチームでの開発運用、シークレット漏洩時の変更やローテーションなどの運用を考えると、ハードコーディングは取りづらい選択肢です。
-よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。
-マニフェストに書く Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。
-apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot;  これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
-この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。
-package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">June 1, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></h1>
-      <div class="content">
-        何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
-機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
-Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
- 図で理解する Descheduler
- これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。
- Descheduler for Kubernetes
- OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
- Descheduling
- 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
-Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
-例えばこんなシナリオです。あるある。
- 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
-では、このシナリオで動きを追ってみましょう。
-事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
-NodeにPodを寄せる はじめのNode数は2です。
-$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5  レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
-apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m  デプロイします。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>
@@ -298,17 +112,6 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
       </div>
       <div class="level-right is-marginless">
         <div class="level-item">
-          
-          <a class="button" href="/page/2/">
-            Older
-            <span class="icon is-small is-marginless">
-              <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <polyline points="14 6 20 12 14 18"/>
-    
-  </svg>
-            </span>
-          </a>
           
         </div>
       </div>

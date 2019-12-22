@@ -117,8 +117,8 @@
 &ldquo;Linux で Azure File Storage を使用する方法&rdquo;
 もうちょっと情報欲しいですね。補足のためにわたしも流します。
 Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
-local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc  ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
-local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: Executing command storage account connectionstring show + Getting storage account keys data: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm== info: storage account connectionstring show command OK  shareを作成します。share名はfspocshareとしました。
+local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
+local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: Executing command storage account connectionstring show+ Getting storage account keysdata: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==info: storage account connectionstring show command OK shareを作成します。share名はfspocshareとしました。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/fileshare_linuxonazure/" style="height:28px">
           Read more

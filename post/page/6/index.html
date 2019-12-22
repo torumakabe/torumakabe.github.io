@@ -108,7 +108,7 @@
       <div class="content">
         関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。
 せっかくなので、
- 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ  自宅Wi-Fi環境  802.11ac(5GHz)  自宅加入インターネット接続サービス  OCN 光 マンション 100M  OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです  米国リージョン  US WEST (カリフォルニア)   測定結果 1.
+ 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ   自宅Wi-Fi環境  802.11ac(5GHz)   自宅加入インターネット接続サービス  OCN 光 マンション 100M   OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです   米国リージョン  US WEST (カリフォルニア)    測定結果 1.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_latency/" style="height:28px">
           Read more
@@ -143,7 +143,7 @@ Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり
 Get VS Code and extension
 ARMテンプレートでManaged Diskを作る時のコツ Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。
 Managed Diskは Microsoft.Compute/disks で個別に定義できますが、省略もできます。Microsoft.Compute/virtualMachines の中に書いてしまうやり口です。
-&quot;osDisk&quot;: { &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;, &quot;createOption&quot;: &quot;FromImage&quot;, &quot;managedDisk&quot;: { &quot;storageAccountType&quot;: &quot;Standard_LRS&quot; }, &quot;diskSizeGB&quot;: 128 }  こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&rdquo;managedDisk&rdquo;の下ではありません。おじさんちょっと悩みました。
+&quot;osDisk&quot;: { &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;, &quot;createOption&quot;: &quot;FromImage&quot;, &quot;managedDisk&quot;: { &quot;storageAccountType&quot;: &quot;Standard_LRS&quot; }, &quot;diskSizeGB&quot;: 128 } こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&ldquo;managedDisk&quot;の下ではありません。おじさんちょっと悩みました。
 可用性セットを意識しよう Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。
 Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。
 参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)
@@ -173,7 +173,7 @@ Azureのストレージサービスは、多数のサーバーで構成された
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a></h1>
       <div class="content">
         Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。
-動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る &ldquo;az_cli&rdquo;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]  PowerShell functionを作成  のちほど詳しく   PowerShellのfunctionを作る ここが作業のハイライト。
+動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る &ldquo;az_cli&quot;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]   PowerShell functionを作成  のちほど詳しく    PowerShellのfunctionを作る ここが作業のハイライト。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/" style="height:28px">
           Read more
@@ -244,10 +244,10 @@ $ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest l
         CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&rdquo;appservice web config container&rdquo;コマンドがあります。これでコンテナイメージを更新できます。
+Azure CLI 2.0 Azure CLI 2.0に&quot;appservice web config container&quot;コマンドがあります。これでコンテナイメージを更新できます。
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; }  これで更新されます。
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; } これで更新されます。
         
       </div>
     </article>

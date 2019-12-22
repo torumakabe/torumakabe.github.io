@@ -106,32 +106,20 @@ VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブ�
     <h1 class="title">Vagrant HP Public Cloud Pluginを試す</h1>
     
     <div class="content">
-      
-
-<h3 id="みんな大好きhashicorp">みんな大好きHashiCorp</h3>
-
+      <h3 id="hashicorp">みんな大好きHashiCorp</h3>
 <p>クラウド界隈のデベロッパーから熱く注目されているHashiCorp。<a href="http://www.packer.io/">Packer</a>、<a href="http://www.serfdom.io/">Serf</a>、<a href="http://www.consul.io/">Consul</a>と立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作は<a href="http://www.vagrantup.com/">Vagrant</a>でしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。</p>
-
 <p>VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。</p>
-
-<h3 id="前提条件">前提条件</h3>
-
+<h3 id="heading">前提条件</h3>
 <ul>
 <li>Vagrant 1.5.4</li>
 <li>vagrant-hp 0.1.4</li>
 <li>HP Public Cloud (2014/5/5)</li>
 </ul>
-
-<h3 id="プラグインのインストールと前準備">プラグインのインストールと前準備</h3>
-
+<h3 id="heading-1">プラグインのインストールと前準備</h3>
 <p><a href="https://github.com/mohitsethi/vagrant-hp">Github</a>を見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。</p>
-
-<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
-
+<h3 id="vagrantfile">ではVagrantfileを見てみましょう</h3>
 <script type="text/javascript" src="http://gist.github.com/25a33c679492676bb626.js"></script>
-
 <p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、<a href="https://github.com/mohitsethi/vagrant-hp">Github</a>の説明には若干のトラップがありますのでご注意を。</p>
-
 <ul>
 <li>イメージにUbuntu 14.04 LTSを使う例です。</li>
 <li>Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。</li>
@@ -139,9 +127,7 @@ VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブ�
 <li>Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。</li>
 <li>ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。</li>
 </ul>
-
-<h3 id="それではさっそくvagrant-up">それではさっそくvagrant up</h3>
-
+<h3 id="vagrant-up">それではさっそくvagrant up</h3>
 <pre><code>$ vagrant up --provider=hp
 Bringing machine 'default' up with 'hp' provider...
 WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
@@ -163,11 +149,8 @@ WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically lo
 ==&gt; default: Machine is booted and ready for use!
 ==&gt; default: Rsyncing folder: /your_path/data/ =&gt; /vagrant/data
 </code></pre>
-
 <p>できたっぽい。&ndash;provider=hpを忘れずに。</p>
-
-<h3 id="間髪入れずにvagrant-ssh">間髪入れずにvagrant ssh</h3>
-
+<h3 id="vagrant-ssh">間髪入れずにvagrant ssh</h3>
 <pre><code>$ vagrant ssh
 WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1
 Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-24-generic x86_64)
@@ -186,9 +169,7 @@ Get cloud support with Ubuntu Advantage Cloud Guest:
 ubuntu@hogehoge:~$ ls /vagrant/data
 test.txt
 </code></pre>
-
 <p>フォルダ同期も効いてますね。んー、楽ちん。</p>
-
 <p>それではお楽しみ下さい。</p>
 
       

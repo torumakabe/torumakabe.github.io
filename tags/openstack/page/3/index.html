@@ -106,8 +106,8 @@
       <div class="content">
         Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。
 アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO  そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。 DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。 SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。  動きを見てみよう 環境は以下の通り。
- HP Public Cloud US-West Region Swift Clientを動かすCompute Node &ndash; standard.large / ubuntu 12.04 Swift CLI &ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &quot;keystoneclient.httpclient&quot; non-seg.iso real 0m24.557s user 0m12.617s sys 0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
-$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.
+ HP Public Cloud US-West Region Swift Clientを動かすCompute Node &ndash; standard.large / ubuntu 12.04 Swift CLI &ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &quot;keystoneclient.httpclient&quot; non-seg.iso real	0m24.557s user	0m12.617s sys	0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
+$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.1 200 OK Content-Length: 925892608 Content-Type: application/x-iso9660-image Accept-Ranges: bytes Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT Etag: 21ec41563ff34da27d4a0b56f2680c4f X-Timestamp: 1395537413.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/swift-upload/" style="height:28px">
           Read more

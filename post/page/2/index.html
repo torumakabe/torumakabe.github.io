@@ -118,8 +118,9 @@ AKSはインパクトの大きな機能を、プレビューというかたち�
  Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
 ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
 意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
 CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
+たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
           Read more
@@ -188,9 +189,9 @@ WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ
 TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。
 Share Environment Vars between WSL and Windows
 Go開発環境を例に 前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。
-想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮  とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています  GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする  VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
+想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮   とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています   GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする   VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
 まず、Windowsで環境変数GOPATHを確認します。
-PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go  GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
+PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/wslenv_golang/" style="height:28px">
           Read more
@@ -217,9 +218,9 @@ PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform_azure_secret/">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</a></h1>
       <div class="content">
         動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。
- いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る  データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁  もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？  kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる   つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
+ いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない  めんどくさいし手が滑る   データベース管理者がアプリ開発者に接続文字列を何らかの手段で渡さないといけない  メールとかチャットとかファイルサーバーとか勘弁   もしくはアプリ開発者にデータベースの接続文字列が読める権限を与えなければいけない  本番でも、それやる？   kubernetes(k8s)のSecretをいちいちkubectlを使って作りたくない  Base64符号化とか、うっかり忘れる    つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。
 シナリオ Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。
- Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる ACI  コンテナー作成時に環境変数として接続文字列を渡す  AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す    検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み  Terraform Azure Provider v1.4 Terraform kubernetes Provider v1.
+ Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる  ACI  コンテナー作成時に環境変数として接続文字列を渡す   AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す        検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み   Terraform Azure Provider v1.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_secret/" style="height:28px">
           Read more
@@ -246,16 +247,16 @@ PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/myazurecli201804/">俺のAzure CLI 2018春版</a></h1>
       <div class="content">
         春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
-俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
+俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる   エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる   VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる    デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
 Azure CLI 2.0 の構成
 まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。
-[core] output = table  そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
-[defaults] group = default-ejp-rg  他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
+[core] output = table そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
+[defaults] group = default-ejp-rg 他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
 ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。
 デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。
-az vm create -n yoursmplvm01 --image UbuntuLTS  エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
+az vm create -n yoursmplvm01 --image UbuntuLTS エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
 Azure CLI 2.0 のエイリアス拡張機能
-前提はAzure CLI v2.
+前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/myazurecli201804/" style="height:28px">
           Read more

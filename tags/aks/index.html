@@ -113,7 +113,7 @@
  AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
 DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
 [nginx-label.yaml]
-apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80  デプロイ。
+apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80 デプロイ。
 $ kubectl create -f nginx-label.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">
@@ -145,10 +145,10 @@ $ kubectl create -f nginx-label.
         カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
 さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
 そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
- TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&rsquo;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待   なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
+ TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let's Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待    なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
 使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
  Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。この記事も参考に。
-$ helm install stable/nginx-ingress --name my-nginx  サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。
+$ helm install stable/nginx-ingress --name my-nginx サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。
 $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.0.0.1 &lt;none&gt; 443/TCP 79d my-nginx-nginx-ingress-controller LoadBalancer 10.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" style="height:28px">
@@ -182,9 +182,10 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
 せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
 使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
  Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx  バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80  サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort  現時点のサービスたちを確認します。
+$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
+$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
+$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
+$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more

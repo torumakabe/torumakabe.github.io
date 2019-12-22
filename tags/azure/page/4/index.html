@@ -111,9 +111,10 @@
 せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
 使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
  Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx  バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80  サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort  現時点のサービスたちを確認します。
+$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
+$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
+$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
+$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more
@@ -140,15 +141,15 @@ $ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment ap
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_rg_contributor/">Azureのリソースグループ限定 共同作成者をいい感じに作る</a></h1>
       <div class="content">
         共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
-ユースケースのひとつに、&rdquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
+ユースケースのひとつに、&ldquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
 なのですが、このようなケースで、権限付与の落とし穴があります。
  サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
 いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
 シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
-{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] }  組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
+{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] } 組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
 では、カスタムロールを作成します。
-$ az role definition create --role-definition ./role.json  出力にカスタムロールのIDが入っていますので、控えておきます。
-&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.
+$ az role definition create --role-definition ./role.json 出力にカスタムロールのIDが入っていますので、控えておきます。
+&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot; カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる 次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_rg_contributor/" style="height:28px">
           Read more
@@ -184,7 +185,7 @@ Module、Terraform Module Registryの活用 TerraformのModuleはとても強力
 リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
 TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
 ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
-terraform workspace select prod  みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
+terraform workspace select prod みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
 サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
 このコードをapplyすると、以下のリソースが出来上がります。
  NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
@@ -219,8 +220,7 @@ terraform workspace select prod  みなまで言わなくても分かります�
         Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
 ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
 ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加
-package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.
+(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azblob_golang/" style="height:28px">
           Read more
@@ -254,7 +254,7 @@ package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot
  ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。
 そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる
  遅延 リージョン間通信に関するサムシング  を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。
-検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*, -t 300  送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.
+検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*,-t 300   送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/" style="height:28px">
           Read more

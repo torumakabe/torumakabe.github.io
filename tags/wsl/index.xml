@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WSL on re-imagine</title>
@@ -23,9 +23,9 @@ WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ
 TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。
 Share Environment Vars between WSL and Windows
 Go開発環境を例に 前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。
-想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮  とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています  GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &amp;ldquo;$env:USERPROFILE\go&amp;rdquo; で設定 WSLでもこのディレクトリをGOPATHとする  VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
+想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮   とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています   GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &amp;ldquo;$env:USERPROFILE\go&amp;rdquo; で設定 WSLでもこのディレクトリをGOPATHとする   VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
 まず、Windowsで環境変数GOPATHを確認します。
-PS C:\WINDOWS\system32&amp;gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go  GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</description>
+PS C:\WINDOWS\system32&amp;gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</description>
     </item>
     
   </channel>

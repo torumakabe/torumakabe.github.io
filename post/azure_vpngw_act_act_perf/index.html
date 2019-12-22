@@ -13,7 +13,7 @@
  ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。
 そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる
  遅延 リージョン間通信に関するサムシング  を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。
-検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*, -t 300  送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.'>
+検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*,-t 300   送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='VPN Gateway'><meta property='article:tag' content='Network'><meta property='article:published_time' content='2017-10-08T10:30:00&#43;09:00'/><meta property='article:modified_time' content='2017-10-08T10:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -110,55 +110,40 @@
     <h1 class="title">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</h1>
     
     <div class="content">
-      
-
-<h2 id="動機">動機</h2>
-
+      <h2 id="heading">動機</h2>
 <p><a href="https://kogelog.com/">焦げlogさん</a>で、とても興味深いエントリを拝見しました。</p>
-
 <ul>
 <li><a href="https://kogelog.com/2017/10/06/20171006-01/">Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました</a></li>
 </ul>
-
 <p>確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは</p>
-
 <blockquote>
 <p>※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…</p>
 </blockquote>
-
 <p>ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。</p>
-
 <p>そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる</p>
-
 <ul>
 <li>遅延</li>
 <li>リージョン間通信に関するサムシング</li>
 </ul>
-
 <p>を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。</p>
-
-<h2 id="検証方針">検証方針</h2>
-
+<h2 id="heading-1">検証方針</h2>
 <ul>
 <li>同一リージョン(東日本)に、2つのVNETを作る</li>
 <li>それぞれのVNETにVPN Gatewayを配置し、接続する</li>
 <li>比較しやすいよう、焦げlogさんの検証と条件を合わせる
-
 <ul>
 <li>同じ仮想マシンサイズ: DS3_V2</li>
 <li>同じストレージ: Premium Storage Managed Disk</li>
 <li>同じOS: Ubuntu 16.04</li>
 <li>同じツール: ntttcp</li>
-<li>同じパラメータ: ntttcp -r -m 16,*,<IP> -t 300</li>
-</ul></li>
+<li>同じパラメータ: ntttcp -r -m 16,*,<!-- raw HTML omitted --> -t 300</li>
+</ul>
+</li>
 <li>送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る</li>
 <li>スループットのポテンシャルを引き出す検証はしない</li>
 </ul>
-
-<h2 id="結果">結果</h2>
-
-<h3 id="vpngw1-650mbps">VpnGW1(650Mbps)</h3>
-
+<h2 id="heading-2">結果</h2>
+<h3 id="vpngw1650mbps">VpnGW1(650Mbps)</h3>
 <table>
 <thead>
 <tr>
@@ -171,7 +156,6 @@
 <th align="right">　パターン1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">パターン1　</td>
@@ -182,7 +166,6 @@
 <td align="right">676.93Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">パターン2　</td>
 <td align="left">Act/Stb</td>
@@ -192,7 +175,6 @@
 <td align="right">674.10Mbps</td>
 <td align="right">99%</td>
 </tr>
-
 <tr>
 <td align="left">パターン3　</td>
 <td align="left">Act/Act</td>
@@ -204,9 +186,7 @@
 </tr>
 </tbody>
 </table>
-
-<h3 id="vpngw2-1gbps">VpnGW2(1Gbps)</h3>
-
+<h3 id="vpngw21gbps">VpnGW2(1Gbps)</h3>
 <table>
 <thead>
 <tr>
@@ -219,7 +199,6 @@
 <th align="right">　パターン1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">パターン1　</td>
@@ -230,7 +209,6 @@
 <td align="right">809.35Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">パターン2　</td>
 <td align="left">Act/Stb</td>
@@ -240,7 +218,6 @@
 <td align="right">1.18Gbps</td>
 <td align="right">149%</td>
 </tr>
-
 <tr>
 <td align="left">パターン3　</td>
 <td align="left">Act/Act</td>
@@ -252,9 +229,7 @@
 </tr>
 </tbody>
 </table>
-
-<h3 id="vpngw3-1-25gbps">VpnGW3(1.25Gbps)</h3>
-
+<h3 id="vpngw3125gbps">VpnGW3(1.25Gbps)</h3>
 <table>
 <thead>
 <tr>
@@ -267,7 +242,6 @@
 <th align="right">　パターン1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">パターン1　</td>
@@ -278,7 +252,6 @@
 <td align="right">956.14Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">パターン2　</td>
 <td align="left">Act/Stb</td>
@@ -288,7 +261,6 @@
 <td align="right">1.39Gbps</td>
 <td align="right">149%</td>
 </tr>
-
 <tr>
 <td align="left">パターン3　</td>
 <td align="left">Act/Act</td>
@@ -300,9 +272,7 @@
 </tr>
 </tbody>
 </table>
-
-<h3 id="sku視点-パターン1-act-stb-to-act-stb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
-
+<h3 id="sku-1actstb-to-actstb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
 <table>
 <thead>
 <tr>
@@ -311,20 +281,17 @@
 <th align="right">　VpnGw1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">VpnGw1　</td>
 <td align="right">676.93Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw2　</td>
 <td align="right">809.35Mbps</td>
 <td align="right">119%</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw3　</td>
 <td align="right">956.14Mbps</td>
@@ -332,9 +299,7 @@
 </tr>
 </tbody>
 </table>
-
-<h3 id="sku視点-パターン2-act-stb-to-act-act">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
-
+<h3 id="sku-2actstb-to-actact">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
 <table>
 <thead>
 <tr>
@@ -343,20 +308,17 @@
 <th align="right">　VpnGw1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">VpnGw1　</td>
 <td align="right">674.10Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw2　</td>
 <td align="right">1.18Gbps</td>
 <td align="right">179%</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw3　</td>
 <td align="right">1.39Gbps</td>
@@ -364,9 +326,7 @@
 </tr>
 </tbody>
 </table>
-
-<h3 id="sku視点-パターン3-act-act-to-act-act">SKU視点 パターン3(Act/Act to Act/Act)</h3>
-
+<h3 id="sku-3actact-to-actact">SKU視点 パターン3(Act/Act to Act/Act)</h3>
 <table>
 <thead>
 <tr>
@@ -375,20 +335,17 @@
 <th align="right">　VpnGw1との比較</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">VpnGw1　</td>
 <td align="right">700.55Mbps</td>
 <td align="right">-</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw2　</td>
 <td align="right">2.03Gbps</td>
 <td align="right">297%</td>
 </tr>
-
 <tr>
 <td align="left">VpnGw3　</td>
 <td align="right">2.19Gbps</td>
@@ -396,21 +353,19 @@
 </tr>
 </tbody>
 </table>
-
-<h2 id="考察と推奨">考察と推奨</h2>
-
+<h2 id="heading-3">考察と推奨</h2>
 <ul>
 <li>リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
-
 <ul>
 <li>Act/Actでないパターン1(Act/Stb to Act/Stb)で、その差がわかる</li>
-</ul></li>
+</ul>
+</li>
 <li>公式ドキュメントの通り、GatewayのAct/Act構成は可用性向上が目的であるため、スループットの向上はボーナスポイントと心得る
-
 <ul>
 <li>期待しちゃうのが人情ではありますが</li>
 <li>VpnGw2がコストパフォーマンス的に最適という人が多いかもしれませんね 知らんけど</li>
-</ul></li>
+</ul>
+</li>
 </ul>
 
       

@@ -123,7 +123,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_msi_terraform/" style="height:28px">
           Read more

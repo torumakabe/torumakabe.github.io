@@ -16,7 +16,8 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
 &ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
 &ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
-以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。'>
+以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_tf_arm_sp/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Terraform'><meta property='article:tag' content='ARM'><meta property='article:published_time' content='2016-02-27T12:30:00&#43;09:00'/><meta property='article:modified_time' content='2016-02-27T12:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -113,20 +114,12 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     <h1 class="title">TerraformをAzure ARMで使う時の認証</h1>
     
     <div class="content">
-      
-
-<h2 id="高まってまいりました">高まってまいりました</h2>
-
+      <h2 id="heading">高まってまいりました</h2>
 <p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
-
 <p>Terraformのマイナーバージョンアップのたびに、<a href="https://www.terraform.io/docs/providers/azurerm/index.html">Azure Resource Manager Providerのリソース</a>が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。</p>
-
 <p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
-
-<h2 id="client-id-client-secret-って何よ">client_id/client_secret って何よ</h2>
-
+<h2 id="client-idclient-secret-">client_id/client_secret って何よ</h2>
 <p>以下がARM向けのProvider設定です。</p>
-
 <pre><code># Configure the Azure Resource Manager Provider
 provider &quot;azurerm&quot; {
   subscription_id = &quot;...&quot;
@@ -135,26 +128,16 @@ provider &quot;azurerm&quot; {
   tenant_id       = &quot;...&quot;
 }
 </code></pre>
-
 <p>subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、<strong>client_id/client_secret って何よ</strong>。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。</p>
-
 <pre><code>&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;
 </code></pre>
-
 <p>おっとそういうことか。OAuth。</p>
-
-<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
-
+<h2 id="heading-1">サービスプリンシパルを使おう</h2>
 <p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
-
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/">&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;</a></p>
-
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;</a></p>
-
 <p>以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。</p>
-
 <p>まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。</p>
-
 <pre><code>$ azure ad app create --name &quot;My Terraform&quot; --home-page &quot;http://tftest.makabe.info&quot; --identifier-uris &quot;http://tftest.makabe.info&quot; --password pAssw0rd%
 info:    Executing command ad app create
 + Creating application My Terraform
@@ -179,9 +162,7 @@ data:                             userConsentDisplayName:  Access My Terraform
 data:                             lang:
 info:    ad app create command OK
 </code></pre>
-
 <p>次にサービスプリンシパルを作ります。AppIdは先ほどアプリを登録した際に生成されたものです。</p>
-
 <pre><code>$ azure ad sp create AppId-AppId-AppId-AppId-AppId
 info:    Executing command ad sp create
 + Creating service principal for application AppId-AppId-AppId-AppId-AppId
@@ -192,11 +173,8 @@ data:                             AppId-AppId-AppId-AppId-AppId
 data:                             http://tftest.makabe.info
 info:    ad sp create command OK
 </code></pre>
-
 <p>サービスプリンシパルの役割を設定します。&ndash;objectIdは、サービスプリンシパルのObject Idなのでご注意を。アプリのObject Idではありません。</p>
-
 <p>この例では、サブスクリプションのContributorとして位置づけました。権限設定は慎重に。</p>
-
 <pre><code>$ azure role assignment create --objectId SpObjId-SpObjId-SpObjId-SpObjId-SpObjId -o Contributor -c /subscriptions/SubId-SubId-SubId-SubId-SubId/
 info:    Executing command role assignment create
 + Finding role with specified name
@@ -212,11 +190,8 @@ data:
 +
 info:    role assignment create command OK
 </code></pre>
-
 <p>サービスプリンシパルまわりの設定は以上です。</p>
-
 <p>テナントIDを確認しておきましょう。</p>
-
 <pre><code>$ azure account list --json
 [
   {
@@ -234,9 +209,7 @@ info:    role assignment create command OK
   }
 ]
 </code></pre>
-
 <p>これでようやく.tfファイルが書けます。さくっとリソースグループでも作ってみましょう。</p>
-
 <pre><code># Configure the Azure Resource Manager Provider
 provider &quot;azurerm&quot; {
   subscription_id = &quot;SubId-SubId-SubId-SubId-SubId&quot;
@@ -251,9 +224,7 @@ resource &quot;azurerm_resource_group&quot; &quot;test&quot; {
     location = &quot;Japan West&quot;
 }
 </code></pre>
-
 <p>apply。もちろんplanしましたよ。</p>
-
 <pre><code>$ terraform apply
 azurerm_resource_group.test: Creating...
   location: &quot;&quot; =&gt; &quot;japanwest&quot;
@@ -262,7 +233,6 @@ azurerm_resource_group.test: Creation complete
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.  
 </code></pre>
-
 <p>これで、ARM認証難民がうまれなくなりますように。</p>
 
       

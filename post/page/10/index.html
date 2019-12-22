@@ -109,7 +109,7 @@
         いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
 ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
 手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
-前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。  ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
+前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。   ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
 { &quot;variables&quot;: { &quot;client_id&quot;: &quot;&quot;, &quot;client_secret&quot;: &quot;&quot;, &quot;resource_group&quot;: &quot;&quot;, &quot;storage_account&quot;: &quot;&quot;, &quot;subscription_id&quot;: &quot;&quot;, &quot;tenant_id&quot;: &quot;&quot; }, &quot;builders&quot;: [{ &quot;type&quot;: &quot;azure-arm&quot;, &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;, &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;, &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;, &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;, &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;, &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;, &quot;capture_container_name&quot;: &quot;images&quot;, &quot;capture_name_prefix&quot;: &quot;packer&quot;, &quot;image_publisher&quot;: &quot;Canonical&quot;, &quot;image_offer&quot;: &quot;UbuntuServer&quot;, &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;, &quot;location&quot;: &quot;Japan West&quot;, &quot;vm_size&quot;: &quot;Standard_D1&quot; }], &quot;provisioners&quot;: [{ &quot;type&quot;: &quot;shell&quot;, &quot;scripts&quot;: [ &quot;.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" style="height:28px">
@@ -146,7 +146,7 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
 今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
 . ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
 1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
- 認証情報は変数指定し、設定ファイルから読み込む
+  認証情報は変数指定し、設定ファイルから読み込む
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
           Read more
@@ -184,6 +184,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 &ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
 &ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
 以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
           Read more
@@ -250,7 +251,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
 環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
 環境は以下の通り。
- Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)  Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan  Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています  Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい  対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7  転送ファイル  Ubuntu 15.
+ Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)   Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan   Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています   Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい   対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7   転送ファイル  Ubuntu 15.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobupload_perf/" style="height:28px">
           Read more

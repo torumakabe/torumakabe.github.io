@@ -10,8 +10,7 @@
 <meta property='og:description' content='Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
 ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
 ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加
-package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.'>
+(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azblob_golang/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Golang'><meta property='article:tag' content='Storage'><meta property='article:published_time' content='2017-11-28T08:45:00&#43;09:00'/><meta property='article:modified_time' content='2017-11-28T08:45:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -108,27 +107,18 @@ package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot
     <h1 class="title">Azure Blob アップローダーをGoで書いた、そしてその理由</h1>
     
     <div class="content">
-      
-
-<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
-
+      <h2 id="azure-blob-go">Azure Blob アップローダーをGoで書いた</h2>
 <p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
-
-<h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
-
+<h2 id="-sdk">ひとつめの理由: SDKが新しくなったから</h2>
 <p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
-
 <p>ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。</p>
-
-<h3 id="2018-6-17-更新">(2018/6/17) 更新</h3>
-
+<h3 id="2018617-">(2018/6/17) 更新</h3>
 <ul>
 <li>SDKバージョンを 2017-07-29 へ変更</li>
 <li>関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更</li>
 <li>Parallelism オプションを追加</li>
-
-<li><p>ヘルパー関数 handleErrors を追加</p>
-
+<li>ヘルパー関数 handleErrors を追加</li>
+</ul>
 <pre><code>package main
 
 import (
@@ -217,23 +207,13 @@ func main() {
 
 	fmt.Println(&quot;Done&quot;)
 }
-</code></pre></li>
-</ul>
-
-<p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
-
+</code></pre><p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
 <p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
-
-<h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
-
+<h2 id="-">ふたつめの理由: レガシー対応</h2>
 <p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
-
 <p>たとえば。Azure CLI(2.0)はPythonで書かれています。なので、Pythonのバージョンや依存パッケージの兼ね合いで、「ちょっとそれウチのサーバーに入れるの？汚さないでくれる？ウチはPython2.6よ」と苦い顔をされることが、あるんですね。気持ちはわかります。立場の数だけ正義があります。Docker?その1歩半くらい前の話です。</p>
-
 <p>ですが、オンプレのシステムからクラウドにデータをアップロードして処理したい、なんていうニーズが急増している昨今、あきらめたくないわけであります。どうにか既存環境に影響なく入れられないものかと。そこでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。</p>
-
 <p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
-
 <p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
 
       

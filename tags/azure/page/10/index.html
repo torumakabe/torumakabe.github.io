@@ -119,7 +119,7 @@
 &ldquo;仮想マシンのサイズ&rdquo;
 ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。
 企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。
- Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS   メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
+ Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS    メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
 なお、現時点でまだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。
 32仮想CPUコアの規模感 クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。
 &ldquo;パフォーマンスに関する考慮事項&rdquo;
@@ -130,7 +130,7 @@ ACUはAzure内で相対評価をする場合にはいいのですが、「じゃ
 &ldquo;SAP Standard Application Benchmarks&rdquo;
 SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。
 比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。
-    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012&frasl;4 2015&frasl;9 2015&frasl;7 2015&frasl;7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
+    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012/4 2015/9 2015/7 2015/7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" style="height:28px">
           Read more
@@ -178,6 +178,7 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
 マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
 また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
 ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。
+よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" style="height:28px">
           Read more
@@ -206,7 +207,7 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
         宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
 さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
 Azure リソース マネージャーの概要  &ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;
-&ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
+  &ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
  冪等と言い切ってはいませんが、目的は似ています。
 なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
 残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
@@ -216,17 +217,16 @@ PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -Tem
 さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
 コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
  ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
-・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
  すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
 いっぽうで、完全モードです。
  ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
-・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
  2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
 動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
 パラメータファイル(azuredeploy.parameters.json)は以下とします。
-{ &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&quot;, &quot;contentVersion&quot;: &quot;1.0.0.0&quot;, &quot;parameters&quot;: { &quot;adminUsername&quot;: { &quot;value&quot;: &quot;azureUser&quot; }, &quot;adminPassword&quot;: { &quot;value&quot;: &quot;password1234!
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_idempotent/" style="height:28px">
           Read more
@@ -264,13 +264,13 @@ OpenStackの最前線から離れて3か月がたちました。OpenStackつな�
 そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&ldquo;このは&rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
 では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
 今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
-ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1   ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
+ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1    ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
 いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
 Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
-$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge $ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem  Conoha向けにOpenStack関連の環境変数をセットします。
-$ export OS_USERNAME=yourname $ export OS_TENANT_NAME=yourtenantname $ export OS_PASSWORD=yourpass $ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0  次はローカルコンテナ環境を整えます。
+$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem Conoha向けにOpenStack関連の環境変数をセットします。
+$ export OS_USERNAME=yourname$ export OS_TENANT_NAME=yourtenantname$ export OS_PASSWORD=yourpass$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0 次はローカルコンテナ環境を整えます。
 Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
-$ docker-machine create -d virtualbox local $ eval &quot;$(docker-machine env local)&quot; $ docker run swarm create Status: Downloaded newer image for swarm:latest tokentokentokentoken  このトークンは控えておきましょう。
+$ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env local)&quot;$ docker run swarm create Status: Downloaded newer image for swarm:latesttokentokentokentoken このトークンは控えておきましょう。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_openstack_swarm/" style="height:28px">
           Read more
@@ -303,11 +303,11 @@ AzureはMicrosoftテクノロジーとオープンソースの交差点です。
 Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
 このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
 ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
- Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)  ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
+ Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)   ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
 Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
 ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
 Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
-なお、このDocker拡張、ARM属性で言うpublisherは&rdquo;Microsoft.Azure.Extensions&rdquo;ですが、古い&rdquo;MSOpenTech.Extensions&rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
+なお、このDocker拡張、ARM属性で言うpublisherは&quot;Microsoft.Azure.Extensions&quot;ですが、古い&quot;MSOpenTech.Extensions&quot;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
         
       </div>
     </article>

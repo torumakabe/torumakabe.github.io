@@ -24,7 +24,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング'>
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_msi_terraform/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='MSI'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-03-30T16:30:00&#43;09:00'/><meta property='article:modified_time' content='2018-03-30T16:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -121,14 +121,9 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
     <h1 class="title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</h1>
     
     <div class="content">
-      
-
-<h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
-
+      <h2 id="terraformmarketplace">TerraformのプロビジョニングがMarketplaceから可能に</h2>
 <p>Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは<a href="https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code">この資料</a>も参考に。</p>
-
 <p>さて、先日Azure Marketplaceから<a href="https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform">Terraform入りの仮想マシン</a>をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。</p>
-
 <ul>
 <li>Terraform (latest)</li>
 <li>Azure CLI 2.0</li>
@@ -137,134 +132,99 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
 <li>JQ</li>
 <li>apt-transport-https</li>
 </ul>
-
 <p>いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。</p>
-
-<h2 id="シークレットをコードにベタ書きする問題">シークレットをコードにベタ書きする問題</h2>
-
+<h2 id="heading">シークレットをコードにベタ書きする問題</h2>
 <p>MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。</p>
-
 <p><a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-service-identity/overview">Azure リソースの管理対象サービス ID (MSI)</a></p>
-
 <p>詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると</p>
-
 <p><strong>アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ</strong></p>
-
 <p>です。</p>
-
 <p>GitHub上に疑わしいシークレットがないかスキャンする<a href="https://azure.microsoft.com/ja-jp/blog/managing-azure-secrets-on-github-repositories/">取り組み</a>もはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。</p>
-
-<h2 id="terraformはmsiに対応している">TerraformはMSIに対応している</h2>
-
+<h2 id="terraformmsi">TerraformはMSIに対応している</h2>
 <p>TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。</p>
-
 <p>ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。</p>
-
 <p><a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_msi.html">Authenticating to Azure Resource Manager using Managed Service Identity</a></p>
-
 <p>Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。</p>
-
-<h2 id="試してみよう">試してみよう</h2>
-
+<h2 id="heading-1">試してみよう</h2>
 <p>実は、すでに使い方を解説した公式ドキュメントがあります。</p>
-
 <p><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-vm-msi">Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する</a></p>
-
 <p>手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。</p>
-
-<h3 id="marketplaceからterraform入り仮想マシンを作る">MarketplaceからTerraform入り仮想マシンを作る</h3>
-
+<h3 id="marketplaceterraform">MarketplaceからTerraform入り仮想マシンを作る</h3>
 <p>まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。</p>
-
 <ul>
 <li>MSI VM拡張の導入</li>
 <li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
-
-<li><p>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</p>
-
-<pre><code>[snip]
-    {
-        &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-        &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
-        &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
-        &quot;location&quot;: &quot;[parameters('location')]&quot;,
-        &quot;properties&quot;: {
-            &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
-            &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
-            &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
-            &quot;autoUpgradeMinorVersion&quot;: true,
-            &quot;settings&quot;: {
-                &quot;port&quot;: 50342
-            },
-            &quot;protectedSettings&quot;: {}
-        },
-        &quot;dependsOn&quot;: [
-            &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
-        ]
-    },
-    {
-        &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
-        &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
-        &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
-        &quot;properties&quot;: {
-            &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
-            &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
-            &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
-        },
-        &quot;dependsOn&quot;: [
-            &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
-        ]
-    },
-    {
-        &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-        &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
-        &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
-        &quot;location&quot;: &quot;[parameters('location')]&quot;,
-        &quot;properties&quot;: {
-            &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
-            &quot;type&quot;: &quot;CustomScript&quot;,
-            &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
-            &quot;autoUpgradeMinorVersion&quot;: true,
-            &quot;settings&quot;: {
-                &quot;fileUris&quot;: [
-                    &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                    &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                    &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
-                ]
-            },
-            &quot;protectedSettings&quot;: {
-                &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
-            }
-        },
-        &quot;dependsOn&quot;: [
-            &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
-        ]
-    }
-[snip]
-</code></pre></li>
+<li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
 </ul>
-
-<h3 id="vmにログインし-環境を確認">VMにログインし、環境を確認</h3>
-
+<pre><code>[snip]
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
+                &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;port&quot;: 50342
+                },
+                &quot;protectedSettings&quot;: {}
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
+            &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
+            &quot;properties&quot;: {
+                &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
+                &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
+                &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
+            ]
+        },
+        {
+            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
+            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
+            &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
+            &quot;location&quot;: &quot;[parameters('location')]&quot;,
+            &quot;properties&quot;: {
+                &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
+                &quot;type&quot;: &quot;CustomScript&quot;,
+                &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
+                &quot;autoUpgradeMinorVersion&quot;: true,
+                &quot;settings&quot;: {
+                    &quot;fileUris&quot;: [
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
+                        &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
+                    ]
+                },
+                &quot;protectedSettings&quot;: {
+                    &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
+                }
+            },
+            &quot;dependsOn&quot;: [
+                &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
+            ]
+        }
+[snip]
+</code></pre><h3 id="vm">VMにログインし、環境を確認</h3>
 <p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
-
 <pre><code>$ ssh your-vm-public-ip
-</code></pre>
-
-<p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
-
+</code></pre><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
 <pre><code>$ terraform -v
 Terraform v0.11.5
-</code></pre>
-
-<p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
-
+</code></pre><p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
 <pre><code>$ echo $ARM_USE_MSI
 true
-</code></pre>
-
-<p>MSIも有効化されています(SystemAssigned)。</p>
-
+</code></pre><p>MSIも有効化されています(SystemAssigned)。</p>
 <pre><code>$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
 {
   &quot;additionalProperties&quot;: {},
@@ -273,10 +233,7 @@ true
   &quot;tenantId&quot;: &quot;tttt-tttt-tttt-tttt&quot;,
   &quot;type&quot;: &quot;SystemAssigned&quot;
 }
-</code></pre>
-
-<p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
-
+</code></pre><p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
 <pre><code>$ ls
 tfEnv.sh  tfTemplate
 
@@ -297,18 +254,11 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
   &quot;scope&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc&quot;,
   &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;
 }
-</code></pre>
-
-<p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&rdquo;はContributorを指します。</p>
-
+</code></pre><p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&quot;はContributorを指します。</p>
 <p>tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。</p>
-
 <pre><code>$ ls tfTemplate/
 azureProviderAndCreds.tf  remoteState.tf
-</code></pre>
-
-<p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
-
+</code></pre><p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
 <pre><code>$ cat tfTemplate/azureProviderAndCreds.tf
 #
 #
@@ -329,10 +279,7 @@ provider &quot;azurerm&quot; {
 #    client_id = &quot;${var.client_id}&quot;
 #    client_secret = &quot;${var.client_secret}&quot;
 }
-</code></pre>
-
-<p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
-
+</code></pre><p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
 <pre><code>$ cat tfTemplate/remoteState.tf
 terraform {
  backend &quot;azurerm&quot; {
@@ -342,27 +289,15 @@ terraform {
   access_key           = &quot;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&quot;
   }
 }
-</code></pre>
-
-<p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
-
-<h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
-
+</code></pre><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
+<h3 id="heading-2">プロビジョニングしてみる</h3>
 <p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
-
 <pre><code>$ mkdir sample
 $ cd sample/
-</code></pre>
-
-<p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
-
+</code></pre><p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
 <pre><code>$ cp ../tfTemplate/remoteState.tf ./
-</code></pre>
-
-<p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
-
+</code></pre><p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
 <p>ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。</p>
-
 <pre><code>$ vim main.tf
 resource &quot;azurerm_resource_group&quot; &quot;tf-msi-poc&quot; {
     name     = &quot;tf-msi-poc-aci-wus-rg&quot;
@@ -390,19 +325,13 @@ resource &quot;azurerm_container_group&quot; &quot;aci-example&quot; {
         port    = &quot;80&quot;
     }
 }
-</code></pre>
-
-<p>init、plan、アプラーイ。アプライ王子。</p>
-
+</code></pre><p>init、plan、アプラーイ。アプライ王子。</p>
 <pre><code>$ terraform init
 $ terraform plan
 $ terraform apply -auto-approve
 [snip]
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-</code></pre>
-
-<p>できたか確認。</p>
-
+</code></pre><p>できたか確認。</p>
 <pre><code>$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
 Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
 ----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
@@ -413,18 +342,12 @@ $ curl 13.91.90.117
 &lt;head&gt;
 &lt;title&gt;Welcome to nginx!&lt;/title&gt;
 [snip]
-</code></pre>
-
-<h2 id="おまけ">おまけ</h2>
-
+</code></pre><h2 id="heading-3">おまけ</h2>
 <p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
-
 <p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
-
 <pre><code>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
 Resource 'aaaa-aaaa-aaaa-aaaa-aaaa' does not exist or one of its queried reference-property objects are not present.
 </code></pre>
-
       
       <div class="related">
 
