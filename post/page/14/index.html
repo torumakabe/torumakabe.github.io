@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,34 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+  
+  | <a class="subtitle is-6" href="/tags/icehouse">#Icehouse</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 6, 2014</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-icehouse/">いま最も楽にIcehouse環境を作る方法</a></h1>
+      <div class="content">
+        あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
+では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
+ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
+この環境だと30分でできた  Vagrant 1.5.4 VirtualBox 4.3.10 Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB  デモや新機能の試用くらいであればこれで十分ですね。
+著者に感謝。わたしは買いました。 &ndash; OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -179,35 +207,6 @@ VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブ�
         基本的な質問が増えてきた OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増えてきた気がします。なぜかというとユーザー・デベロッパー目線での基本的な質問が増えてきたからです。これはいい傾向。
 よく聞かれることはまとめておこう もちろん気軽に質問していただきたいのですが、ググってすぐ見つかったほうがいいので、今後、よく聞かれることは資料にまとめておこうかと思います。
 第一弾 OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/swift">#Swift</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">March 23, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/swift-upload/">OpenStack Swiftへのファイル分割アップロード</a></h1>
-      <div class="content">
-        Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。
-アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO  そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。 DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。 SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。  動きを見てみよう 環境は以下の通り。
- HP Public Cloud US-West Region Swift Clientを動かすCompute Node &ndash; standard.large / ubuntu 12.04 Swift CLI &ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &quot;keystoneclient.httpclient&quot; non-seg.iso real	0m24.557s user	0m12.617s sys	0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
-$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.1 200 OK Content-Length: 925892608 Content-Type: application/x-iso9660-image Accept-Ranges: bytes Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT Etag: 21ec41563ff34da27d4a0b56f2680c4f X-Timestamp: 1395537413.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/swift-upload/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>

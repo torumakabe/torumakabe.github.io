@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -86,6 +86,48 @@
 <section class="section">
   <div class="container">
     
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">June 1, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></h1>
+      <div class="content">
+        何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
+機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
+Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
+ 図で理解する Descheduler
+ これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。
+ Descheduler for Kubernetes
+ OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
+ Descheduling
+ 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
+Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
+例えばこんなシナリオです。あるある。
+ 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
+では、このシナリオで動きを追ってみましょう。
+事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
+NodeにPodを寄せる はじめのNode数は2です。
+$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5 レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
+apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m デプロイします。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -223,42 +265,6 @@ PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH
  Nodeとデータストアを組み合わせた、Todoアプリケーション コンテナーイメージはDocker Hubにある コンテナーでデータストアを運用したくないので、データストアはマネージドサービスを使う データストアはCosmos DB(MongoDB API) Cosmos DBへのアクセスに必要な属性をTerraformで参照し、接続文字列(MONGO_URL)を作る  接続文字列の渡し方はACI/AKSで異なる  ACI  コンテナー作成時に環境変数として接続文字列を渡す   AKS  k8sのSecretとして接続文字列をストアする コンテナー作成時にSecretを参照し、環境変数として渡す        検証環境  Azure Cloud Shell  Terraform v0.11.7 Terraformの認証はCloud Shell組み込み   Terraform Azure Provider v1.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_secret/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 9, 2018</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/myazurecli201804/">俺のAzure CLI 2018春版</a></h1>
-      <div class="content">
-        春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
-俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる   エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる   VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる    デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
-Azure CLI 2.0 の構成
-まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。
-[core] output = table そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
-[defaults] group = default-ejp-rg 他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
-ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。
-デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。
-az vm create -n yoursmplvm01 --image UbuntuLTS エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
-Azure CLI 2.0 のエイリアス拡張機能
-前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/myazurecli201804/" style="height:28px">
           Read more
         </a>
         

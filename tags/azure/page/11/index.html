@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title>Tags | re-imagine</title>
+<title>Azure | re-imagine</title>
 
-<meta property='og:title' content='Tags - re-imagine'>
+<meta property='og:title' content='Tag: Azure - re-imagine'>
 <meta property='og:description' content=''>
-<meta property='og:url' content='https://ToruMakabe.github.io/tags/'>
+<meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
@@ -90,23 +90,32 @@
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
         
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
       </div>
-      <h2 class="subtitle is-6 date">March 23, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/tags/swift/">Swift</a></h1>
+      <h2 class="subtitle is-6 date">November 5, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_extension/">Azure Docker VM Extensionを使う3つの理由</a></h1>
       <div class="content">
-        
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-      </div>
-      <h2 class="subtitle is-6 date">February 2, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/tags/opensource/">OpenSource</a></h1>
-      <div class="content">
-        
+        まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
+もちろん、技術者個人として、中立的に、公開できるネタを書きます。
+AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。
+なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。
+Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
+このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
+ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
+ Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)   ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
+Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
+ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
+Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
+なお、このDocker拡張、ARM属性で言うpublisherは&quot;Microsoft.Azure.Extensions&quot;ですが、古い&quot;MSOpenTech.Extensions&quot;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
         
       </div>
     </article>
@@ -119,7 +128,7 @@
       <div class="level-left">
         <div class="level-item">
           
-          <a class="button" href="/tags/page/13/">
+          <a class="button" href="/tags/azure/page/10/">
             <span class="icon is-small is-marginless">
               <svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
     

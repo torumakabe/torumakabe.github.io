@@ -3,12 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://ToruMakabe.github.io/tags/aqua/</loc>
-    <lastmod>2019-08-09T13:00:00+09:00</lastmod>
+    <loc>https://ToruMakabe.github.io/tags/azure/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ToruMakabe.github.io/tags/azure/</loc>
+    <loc>https://ToruMakabe.github.io/tags/github/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/post/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/tags/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ToruMakabe.github.io/tags/aqua/</loc>
     <lastmod>2019-08-09T13:00:00+09:00</lastmod>
   </url>
   
@@ -19,21 +44,6 @@
   
   <url>
     <loc>https://ToruMakabe.github.io/tags/container/</loc>
-    <lastmod>2019-08-09T13:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ToruMakabe.github.io/post/</loc>
-    <lastmod>2019-08-09T13:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ToruMakabe.github.io/</loc>
-    <lastmod>2019-08-09T13:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ToruMakabe.github.io/tags/</loc>
     <lastmod>2019-08-09T13:00:00+09:00</lastmod>
   </url>
   
@@ -75,11 +85,6 @@
   <url>
     <loc>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</loc>
     <lastmod>2019-04-26T18:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ToruMakabe.github.io/tags/github/</loc>
-    <lastmod>2018-12-22T20:00:00+09:00</lastmod>
   </url>
   
   <url>
