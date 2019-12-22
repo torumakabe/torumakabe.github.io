@@ -23,14 +23,14 @@
 
 &lt;h2 id=&#34;何の話か&#34;&gt;何の話か&lt;/h2&gt;
 
-&lt;p&gt;GitHubを使ってインフラや環境のコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフローに取り組むケースも増えてきました。&lt;/p&gt;
+&lt;p&gt;GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフローに取り組むケースも増えてきました。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;プルリクエストイベントをトリガーにコードの検証やテストを行い、マージの判断に使う&lt;/li&gt;
 &lt;li&gt;マージされたら、ステージングや本番環境へデプロイする&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;こんなワークフローが一般的と思います。ですが一時的に「コードは変えてないけど、一時的に環境を再現したい」なんてこともあります。不具合対応とか。環境を作るコードはあるので、どこかにコードを持っていって実行すればいいのですが、せっかくGitHub Actionsで環境を作った手前、チョイっといじってできるなら、そうしたい。&lt;/p&gt;
+&lt;p&gt;こんなワークフローが一般的と思います。ですが一時的に「コードは変えてないけど、一時的に環境を再現したい」なんてこともあります。不具合対応とか。環境を作るコードはあるので、どこかにコードを持っていって実行すればいいのですが、せっかくGitHub Actionsで仕組みを作った手前、チョイっといじってできるなら、そうしたい。&lt;/p&gt;
 
 &lt;h2 id=&#34;アイデア&#34;&gt;アイデア&lt;/h2&gt;
 
@@ -40,15 +40,15 @@
 &lt;p&gt;&lt;a href=&#34;https://help.github.com/ja/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows&#34;&gt;ワークフローをトリガーするイベント&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;トリガーにできるイベントは多いのですが「コードを変えていない」という条件だと、悩みます。プルリクやプッシュでの発火がわかりやすいのですが、そのためのファイルを作りたくはありません。&lt;/p&gt;
+&lt;p&gt;トリガーにできるイベントは多くありますが「コードは変えない」という条件だと、悩みます。プルリクやプッシュでの発火がわかりやすいからといって、そのためのフラグファイル的なものを作りたくもありません。&lt;/p&gt;
 
-&lt;p&gt;GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、Issueイベントで発火させましょうか。でも、キーワードでフィルタするにしても、チェックなしで環境ができてしまいます。それがプライベートリポジトリの運用であっても、気前良すぎ良太郎な感は否めません。&lt;/p&gt;
+&lt;p&gt;GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。&lt;/p&gt;
 
-&lt;p&gt;そこで、ラベルイベントを使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け外しした時に発火するようなワークフローを作ります。&lt;/p&gt;
+&lt;p&gt;そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。&lt;/p&gt;
 
 &lt;h2 id=&#34;ワークフロー例&#34;&gt;ワークフロー例&lt;/h2&gt;
 
-&lt;p&gt;以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合にデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、リポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。&lt;/p&gt;
+&lt;p&gt;以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;name: gh-actions-trigger-label
 
@@ -87,24 +87,24 @@ jobs:
 &lt;p&gt;ポイントは以下の通りです。&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;ラベル「repro」を作っておく(再現環境という意図が分かればなんでも)&lt;/li&gt;
+&lt;li&gt;ラベル「repro」を作っておく(環境を再現してるという意図が分かればなんでも)&lt;/li&gt;
 &lt;li&gt;if文でステップ実行の条件を書く
 
 &lt;ul&gt;
 &lt;li&gt;ラベルがIssueに付与され、それがreproだった場合にAzure CLIでリソースグループ作成、テンプレートデプロイが実行される&lt;/li&gt;
 &lt;li&gt;ラベルが外され、それがreproだった場合にAzure CLIでリソースグループごと削除する&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;環境の違いはパラメーターで調整する
+&lt;li&gt;環境の違いはパラメーターで注入する
 
 &lt;ul&gt;
 &lt;li&gt;この例ではenvで定義したパラメーターをテンプレートデプロイのパラメーターとして渡している&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;対象となるブランチはデフォルトブランチ&lt;/li&gt;
+&lt;li&gt;Issueトリガーで対象となるブランチはデフォルトブランチ&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;なお、Terraformでも同じようにやりたいところですが、terraform-github-actionsがdestroyに未対応です。&lt;a href=&#34;https://github.com/hashicorp/terraform-github-actions/pull/77&#34;&gt;プルリク&lt;/a&gt;は出ているので期待しましょう。また、GitHub Actionsには発火までにして、以降のデプロイは&lt;a href=&#34;https://github.com/Azure/pipelines&#34;&gt;Azure Pipelinesに任せてしまう&lt;/a&gt;、という手もあります。&lt;/p&gt;
+&lt;p&gt;Terraformでも同じようにやりたいところですが、残念ながら terraform-github-actions がdestroyに未対応です。&lt;a href=&#34;https://github.com/hashicorp/terraform-github-actions/pull/77&#34;&gt;プルリク&lt;/a&gt;は出ているので期待しましょう。なお、GitHub Actionsは発火までにして、以降のデプロイは&lt;a href=&#34;https://github.com/Azure/pipelines&#34;&gt;Azure Pipelinesに任せてしまう&lt;/a&gt;、という手もあります。&lt;/p&gt;
 
-&lt;p&gt;ラベルを駆使するリポジトリでは、その度にワークフローが走るのが気になるところですが、もっと良いやり口がないかは、今後も模索しようと思います。&lt;/p&gt;
+&lt;p&gt;ラベルを駆使するリポジトリでは、その度にワークフローが走ってしまうのが気になる方法ではありますが、ご参考になれば。&lt;/p&gt;
 </content>
       
     </item>
