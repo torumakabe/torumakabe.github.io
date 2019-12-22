@@ -114,7 +114,7 @@
 GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
 そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
 ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-label on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == 'repro' &amp;&amp; github.event.action == 'labeled' run: | az group create -n ${{ env.
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == 'repro' &amp;&amp; github.event.action == 'labeled' run: | az group create -n ${{ env.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/" style="height:28px">
           Read more

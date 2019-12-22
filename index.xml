@@ -50,7 +50,7 @@
 
 &lt;p&gt;以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;name: gh-actions-trigger-label
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;name: gh-actions-trigger-labeled
 
 on:
   issues:
@@ -100,6 +100,11 @@ jobs:
 &lt;li&gt;この例ではenvで定義したパラメーターをテンプレートデプロイのパラメーターとして渡している&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;li&gt;Issueトリガーで対象となるブランチはデフォルトブランチ&lt;/li&gt;
+&lt;li&gt;この例は再現環境をリポジトリで1つとしたケース
+
+&lt;ul&gt;
+&lt;li&gt;他のIssueでラベルを付けられてもいいように、繰り返し実行可能な作りにする&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Terraformでも同じようにやりたいところですが、残念ながら terraform-github-actions がdestroyに未対応です。&lt;a href=&#34;https://github.com/hashicorp/terraform-github-actions/pull/77&#34;&gt;プルリク&lt;/a&gt;は出ているので期待しましょう。なお、GitHub Actionsは発火までにして、以降のデプロイは&lt;a href=&#34;https://github.com/Azure/pipelines&#34;&gt;Azure Pipelinesに任せてしまう&lt;/a&gt;、という手もあります。&lt;/p&gt;

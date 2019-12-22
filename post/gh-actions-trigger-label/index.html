@@ -15,7 +15,7 @@
 GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
 そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
 ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-label on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: | az group create -n ${{ env.'>
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: | az group create -n ${{ env.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/gh-actions-trigger-label/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='Azure'><meta property='article:published_time' content='2019-12-22T23:30:00&#43;09:00'/><meta property='article:modified_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -143,7 +143,7 @@ name: gh-actions-trigger-label on: issues: types: - labeled - unlabeled env: AZU
 
 <p>以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。</p>
 
-<pre><code class="language-yaml">name: gh-actions-trigger-label
+<pre><code class="language-yaml">name: gh-actions-trigger-labeled
 
 on:
   issues:
@@ -193,6 +193,11 @@ jobs:
 <li>この例ではenvで定義したパラメーターをテンプレートデプロイのパラメーターとして渡している</li>
 </ul></li>
 <li>Issueトリガーで対象となるブランチはデフォルトブランチ</li>
+<li>この例は再現環境をリポジトリで1つとしたケース
+
+<ul>
+<li>他のIssueでラベルを付けられてもいいように、繰り返し実行可能な作りにする</li>
+</ul></li>
 </ul>
 
 <p>Terraformでも同じようにやりたいところですが、残念ながら terraform-github-actions がdestroyに未対応です。<a href="https://github.com/hashicorp/terraform-github-actions/pull/77">プルリク</a>は出ているので期待しましょう。なお、GitHub Actionsは発火までにして、以降のデプロイは<a href="https://github.com/Azure/pipelines">Azure Pipelinesに任せてしまう</a>、という手もあります。</p>
