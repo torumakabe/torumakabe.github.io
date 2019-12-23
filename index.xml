@@ -104,8 +104,10 @@ jobs:
 
 &lt;ul&gt;
 &lt;li&gt;他のIssueでラベルを付けられてもいいように、繰り返し実行可能な作りにする&lt;/li&gt;
-&lt;li&gt;Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/deployment-modes&#34;&gt;実行されません&lt;/a&gt;が、動的にパラメーターを作っている場合は気を付けましょう&lt;/li&gt;
+&lt;li&gt;Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/deployment-modes&#34;&gt;実行されない&lt;/a&gt;が、動的にパラメーターを作っている場合は気を付けましょう&lt;/li&gt;
+&lt;li&gt;Issueごとに環境をつくりたい場合は、github.event.issue.idなどを活用してリソースを作る&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;イベントのペイロードは&lt;a href=&#34;https://developer.github.com/v3/activity/events/types/&#34;&gt;公式サイト&lt;/a&gt;を参考に&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Terraformでも同じようにやりたいところですが、残念ながら terraform-github-actions がdestroyに未対応です。&lt;a href=&#34;https://github.com/hashicorp/terraform-github-actions/pull/77&#34;&gt;プルリク&lt;/a&gt;は出ているので期待しましょう。なお、GitHub Actionsは発火までにして、以降のデプロイは&lt;a href=&#34;https://github.com/Azure/pipelines&#34;&gt;Azure Pipelinesに任せてしまう&lt;/a&gt;、という手もあります。&lt;/p&gt;

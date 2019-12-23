@@ -197,8 +197,10 @@ jobs:
 
 <ul>
 <li>他のIssueでラベルを付けられてもいいように、繰り返し実行可能な作りにする</li>
-<li>Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば<a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/deployment-modes">実行されません</a>が、動的にパラメーターを作っている場合は気を付けましょう</li>
+<li>Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば<a href="https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/deployment-modes">実行されない</a>が、動的にパラメーターを作っている場合は気を付けましょう</li>
+<li>Issueごとに環境をつくりたい場合は、github.event.issue.idなどを活用してリソースを作る</li>
 </ul></li>
+<li>イベントのペイロードは<a href="https://developer.github.com/v3/activity/events/types/">公式サイト</a>を参考に</li>
 </ul>
 
 <p>Terraformでも同じようにやりたいところですが、残念ながら terraform-github-actions がdestroyに未対応です。<a href="https://github.com/hashicorp/terraform-github-actions/pull/77">プルリク</a>は出ているので期待しましょう。なお、GitHub Actionsは発火までにして、以降のデプロイは<a href="https://github.com/Azure/pipelines">Azure Pipelinesに任せてしまう</a>、という手もあります。</p>
