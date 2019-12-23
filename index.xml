@@ -104,7 +104,7 @@ jobs:
 
 &lt;ul&gt;
 &lt;li&gt;他のIssueでラベルを付けられてもいいように、繰り返し実行可能な作りにする&lt;/li&gt;
-&lt;li&gt;Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば実行されませんが、動的にパラメーターを作っている場合は気を付けましょう&lt;/li&gt;
+&lt;li&gt;Azure Resource Manager テンプレートデプロイはが既存リソースがあった時、投入内容が同じであれば&lt;a href=&#34;https://docs.microsoft.com/ja-jp/azure/azure-resource-manager/deployment-modes&#34;&gt;実行されません&lt;/a&gt;が、動的にパラメーターを作っている場合は気を付けましょう&lt;/li&gt;
 &lt;/ul&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
