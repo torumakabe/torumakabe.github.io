@@ -9,12 +9,10 @@
 <meta property='og:title' content='OMSでLinuxコンテナのログを分析する - re-imagine'>
 <meta property='og:description' content='OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
-何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details   導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる    1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&rdquo;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
- 先ほど入手したOMSのワークスペースIDとKeyを入れてください
-sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.'>
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&quot;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです   OMSポータルのソリューションギャラリーから、&ldquo;Containers&quot;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください   OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください    sudo docker run --privileged -d -v /var/run/docker.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/oms_container_linux/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Docker'><meta property='article:tag' content='Azure'><meta property='article:tag' content='OMS'><meta property='article:published_time' content='2016-08-25T16:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-08-25T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -113,72 +111,52 @@ sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e 
     <h1 class="title">OMSでLinuxコンテナのログを分析する</h1>
     
     <div class="content">
-      
-
-<h2 id="oms-container-solution-for-linux-プレビュー開始">OMS Container Solution for Linux プレビュー開始</h2>
-
+      <h2 id="oms-container-solution-for-linux-">OMS Container Solution for Linux プレビュー開始</h2>
 <p>OMS Container Solution for Linuxのプレビューが<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">はじまりました</a>。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。</p>
-
 <p>さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。</p>
-
-<h2 id="何ができるか-とその特徴">何ができるか、とその特徴</h2>
-
+<h2 id="heading">何ができるか、とその特徴</h2>
 <ul>
 <li>Dockerコンテナに関わるログの収集と分析、ダッシュボード表示
-
 <ul>
 <li>収集データの詳細 - <a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/#containers-data-collection-details">Containers data collection details</a></li>
-</ul></li>
+</ul>
+</li>
 <li>導入が楽ちん
-
 <ol>
 <li>OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる</li>
 <li>コンテナホストに直接OMS Agentを導入することもできる</li>
-</ol></li>
+</ol>
+</li>
 </ul>
-
 <p>1がコンテナ的でいいですよね。実現イメージはこんな感じです。</p>
-
-<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" title="from microsoft.com" /></p>
-
+<p><img src="https://msdnshared.blob.core.windows.net/media/2016/08/3-OMS-082416.png" alt="OMS Agent Installation Type" title="from microsoft.com"></p>
 <p>これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。</p>
-
 <p>では試しに、1のやり口でUbuntuへ導入してみましょう。</p>
-
-<h2 id="手順">手順</h2>
-
+<h2 id="heading-1">手順</h2>
 <ul>
 <li>OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/">参考</a>)
-
 <ul>
-<li>Azureのサブスクリプションを持っている場合、&rdquo;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
-</ul></li>
-<li>OMSポータルのソリューションギャラリーから、&rdquo;Containers&rdquo;を追加</li>
+<li>Azureのサブスクリプションを持っている場合、&quot;<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-get-started/#microsoft-azure">Microsoft Azure を使用した迅速なサインアップ</a>&ldquo;から読むと、話が早いです</li>
+</ul>
+</li>
+<li>OMSポータルのソリューションギャラリーから、&ldquo;Containers&quot;を追加</li>
 <li>UbuntuにDockerを導入
-
 <ul>
 <li><a href="https://docs.docker.com/engine/installation/linux/ubuntulinux/">参考</a></li>
 <li>現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください</li>
-</ul></li>
-
-<li><p>OMSエージェントコンテナを導入</p>
-
-<ul>
-<li><p>先ほど入手したOMSのワークスペースIDとKeyを入れてください</p>
-
-<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
-</code></pre></li>
-</ul></li>
 </ul>
-
-<p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com" /></p>
-
-<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com" /></p>
-
+</li>
+<li>OMSエージェントコンテナを導入
+<ul>
+<li>先ほど入手したOMSのワークスペースIDとKeyを入れてください</li>
+</ul>
+</li>
+</ul>
+<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
+</code></pre><p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com"></p>
+<p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com"></p>
 <p>なんと簡単じゃありませんか。詳細が気になるかたは、<a href="https://azure.microsoft.com/ja-jp/documentation/articles/log-analytics-containers/">こちら</a>から。</p>
-
 <p>なお、フィードバック<a href="https://blogs.technet.microsoft.com/msoms/2016/08/24/announcing-public-preview-oms-container-solution-for-linux/">熱烈歓迎</a>だそうです。</p>
 
       

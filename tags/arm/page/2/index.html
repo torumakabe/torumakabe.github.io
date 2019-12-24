@@ -111,13 +111,13 @@
 小生、v0.6.14以前から触っていたこともあり、土地勘があります。そこで現時点でのTipsをいくつかご紹介します。
 この3つは触る前から意識しよう  ARMテンプレートリソースは分離して使う リソース競合したら依存関係を定義する 公開鍵認証SSH指定でエラーが出ても驚かない  1. ARMテンプレートリソースは分離して使う v0.6.14で、リソース&ldquo;azurerm_template_deployment&rdquo;が追加されました。なんとARMテンプレートを、Terraformの定義ファイル内にインラインで書けます。
 でも、現時点の実装では、おすすめしません。
-ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&rdquo;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
+ARMテンプレートのデプロイ機能とTerraformで作ったリソースが不整合を起こす 避けるべきなのは&quot;Complete(完全)&ldquo;モードでのARMテンプレートデプロイです。なぜなら完全モードでは、ARM リソースマネージャーは次の動きをするからです。
 リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
 つまり、ARMテンプレートで作ったリソース以外、Terraform担当部分を消しにいきます。恐怖! デプロイ vs デプロイ!!。リソースグループを分ければ回避できますが、リスク高めです。
 タイムアウトしがち それでもTerraformの外でARMテンプレートデプロイは継続します。成功すれば結果オーライですが&hellip;Terraform上はエラーが残ります。「ああそれ無視していいよ」ではあるのですが、割れ窓理論的によろしくないです。
 せっかくのリソースグラフを活用できない Terraformはグラフ構造で賢くリソース間の依存関係を管理し、整合性を維持しています。サクサク apply &amp; destroyできるのもそれのおかげです。ARMテンプレートでデプロイしたリソースはそれに入れられないので、もったいないです。
 読みづらい Terraform DSLにJSONが混ざって読みにくいです。Terraform DSLを使わない手もありますが、それでいいのかという話です。
-それでも&rdquo;terraformコマンドに操作を統一したい&rdquo;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
+それでも&quot;terraformコマンドに操作を統一したい&quot;など、どうしても使いたい人は、ARMテンプレート実行部は管理も実行も分離した方がいいと思います。
 2. リソース競合したら依存関係を定義する Terraformはリソース間の依存関係を明示する必要がありません。ですが、行き届かないこともあります。その場合は&ldquo;depends_on&rdquo;で明示してあげましょう。
 例えば、以前のエントリで紹介した下記の問題。
 Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429 Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state.
@@ -151,7 +151,7 @@ Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autores
         Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
 追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
 エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
-Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&ldquo;Too many requests&rdquo;です。何かが多すぎたようです。
+Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&ldquo;Too many requests&quot;です。何かが多すぎたようです。
 対処法 もう一度applyしてください
 冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
 背景 エラーになった背景ですが、2つの可能性があります。
@@ -193,7 +193,7 @@ Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/
         いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
 ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
 手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
-前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。  ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
+前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。   ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
 { &quot;variables&quot;: { &quot;client_id&quot;: &quot;&quot;, &quot;client_secret&quot;: &quot;&quot;, &quot;resource_group&quot;: &quot;&quot;, &quot;storage_account&quot;: &quot;&quot;, &quot;subscription_id&quot;: &quot;&quot;, &quot;tenant_id&quot;: &quot;&quot; }, &quot;builders&quot;: [{ &quot;type&quot;: &quot;azure-arm&quot;, &quot;client_id&quot;: &quot;{{user `client_id`}}&quot;, &quot;client_secret&quot;: &quot;{{user `client_secret`}}&quot;, &quot;resource_group_name&quot;: &quot;{{user `resource_group`}}&quot;, &quot;storage_account&quot;: &quot;{{user `storage_account`}}&quot;, &quot;subscription_id&quot;: &quot;{{user `subscription_id`}}&quot;, &quot;tenant_id&quot;: &quot;{{user `tenant_id`}}&quot;, &quot;capture_container_name&quot;: &quot;images&quot;, &quot;capture_name_prefix&quot;: &quot;packer&quot;, &quot;image_publisher&quot;: &quot;Canonical&quot;, &quot;image_offer&quot;: &quot;UbuntuServer&quot;, &quot;image_sku&quot;: &quot;14.04.3-LTS&quot;, &quot;location&quot;: &quot;Japan West&quot;, &quot;vm_size&quot;: &quot;Standard_D1&quot; }], &quot;provisioners&quot;: [{ &quot;type&quot;: &quot;shell&quot;, &quot;scripts&quot;: [ &quot;.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/" style="height:28px">
@@ -230,7 +230,7 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
 今後ガラガラポンする可能性は大いにありますが、現時点ではこんな構造です。
 . ├── .gitignore ├── main.tf ├── availability_set │ ├── avset_web.tf │ ├── avset_db.tf │ └── variables.tf ├── network │ ├── sg_backend.tf │ ├── sg_frontend.tf │ ├── variables.tf │ └── vnets.tf ├── storage │ ├── storage_backend.tf │ ├── storage_frontend.tf │ └── variables.tf └── terraform.tfvars  Availability Setに対するVMのデプロイはTerraformの外でやっています。まだTerraformのAzure RM Providerにない、ということもありますが、VMの増減はアドホックだったり、別ツールを使いたいケースが多いので。
 1. セキュリティファースト セキュリティはデザイン時に考慮すべき時代です。機密情報が漏れないように、また、身内がうっかりリソースを壊して泣かないようにしましょう。
- 認証情報は変数指定し、設定ファイルから読み込む
+  認証情報は変数指定し、設定ファイルから読み込む
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
           Read more
@@ -268,6 +268,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 &ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
 &ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
 以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
+まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
           Read more
@@ -315,6 +316,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
 マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
 また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
 ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。
+よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" style="height:28px">
           Read more
@@ -343,7 +345,7 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
         宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
 さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
 Azure リソース マネージャーの概要  &ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;
-&ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
+  &ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
  冪等と言い切ってはいませんが、目的は似ています。
 なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
 残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
@@ -353,17 +355,16 @@ PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -Tem
 さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
 コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
  ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
-・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
  すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
 いっぽうで、完全モードです。
  ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
-・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
  2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
 動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
 パラメータファイル(azuredeploy.parameters.json)は以下とします。
-{ &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#&quot;, &quot;contentVersion&quot;: &quot;1.0.0.0&quot;, &quot;parameters&quot;: { &quot;adminUsername&quot;: { &quot;value&quot;: &quot;azureUser&quot; }, &quot;adminPassword&quot;: { &quot;value&quot;: &quot;password1234!
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_idempotent/" style="height:28px">
           Read more

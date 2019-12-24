@@ -12,10 +12,10 @@
 Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
 MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
  Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-What&rsquo;s so hard about vulnerability scanning?
-Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
+  What&#39;s so hard about vulnerability scanning?
+  Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
  トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
-$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;  コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
+$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt; コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
 ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
 まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
 FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.'>
@@ -117,43 +117,28 @@ FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.'>
     <h1 class="title">Azure Container Registry TasksでAqua MicroScannerを自動実行する</h1>
     
     <div class="content">
-      
-
-<h2 id="何の話か">何の話か</h2>
-
+      <h2 id="heading">何の話か</h2>
 <p>コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。</p>
-
 <p>@ehotinger の<a href="https://ehotinger.github.io/blog/acr-tasks-image-scanning/">ブログ</a>を読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!</p>
-
-<h2 id="aqua-microscannerとは">Aqua MicroScannerとは</h2>
-
+<h2 id="aqua-microscanner">Aqua MicroScannerとは</h2>
 <p>Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差は<a href="https://github.com/aquasecurity/microscanner#aqua-security-edition-comparison">こちら</a>を。</p>
-
 <p>MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。</p>
-
 <blockquote>
 <p><a href="https://blog.aquasec.com/microscanner-free-image-vulnerability-scanner-for-developers">Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers</a></p>
-
-<p><a href="https://speakerdeck.com/lizrice/whats-so-hard-about-vulnerability-scanning">What&rsquo;s so hard about vulnerability scanning?</a></p>
-
+</blockquote>
+<blockquote>
+<p><a href="https://speakerdeck.com/lizrice/whats-so-hard-about-vulnerability-scanning">What's so hard about vulnerability scanning?</a></p>
+</blockquote>
+<blockquote>
 <p><a href="https://github.com/aquasecurity/microscanner">Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub</a></p>
 </blockquote>
-
-<h2 id="トークンの取得">トークンの取得</h2>
-
+<h2 id="heading-1">トークンの取得</h2>
 <p>MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。</p>
-
 <pre><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
-</code></pre>
-
-<h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
-
+</code></pre><h2 id="heading-2">コンテナービルド時に実行してみる</h2>
 <p>以降、<a href="https://github.com/ToruMakabe/aqua-sample/tree/master">ここ</a>にサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。</p>
-
 <p>ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。</p>
-
 <p>まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。</p>
-
 <pre><code>FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
 ADD https://get.aquasec.com/microscanner /
@@ -162,10 +147,7 @@ ARG token
 RUN /microscanner ${token} &amp;&amp; rm /microscanner
 RUN echo &quot;No vulnerabilities!&quot;
 CMD [&quot;echo&quot;, &quot;Hello&quot;]
-</code></pre>
-
-<p>Apline Linuxをベースに、実行したらHelloとechoするだけのコンテナーです。ビルド時にイメージ作成環境内でMicroScannerをダウンロードし、実行します。Alpineのバージョンは3.3で、ちょっと古いものを指定しています。さあ何が起こるでしょう。</p>
-
+</code></pre><p>Apline Linuxをベースに、実行したらHelloとechoするだけのコンテナーです。ビルド時にイメージ作成環境内でMicroScannerをダウンロードし、実行します。Alpineのバージョンは3.3で、ちょっと古いものを指定しています。さあ何が起こるでしょう。</p>
 <pre><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.3
@@ -260,12 +242,8 @@ Step 6/8 : RUN /microscanner ${token} &amp;&amp; rm /microscanner
   &quot;function_metadata&quot;: {}
 }
 The command '/bin/sh -c /microscanner ${token} &amp;&amp; rm /microscanner' returned a non-zero code: 4
-</code></pre>
-
-<p>スペースの都合で省きましたが、いっぱいひっかかりましたね。そして深刻度highの脆弱性が検出されたので、そこで終了しています。</p>
-
+</code></pre><p>スペースの都合で省きましたが、いっぱいひっかかりましたね。そして深刻度highの脆弱性が検出されたので、そこで終了しています。</p>
 <p>では、alpineのバージョンを現時点で最新の3.10にしてみましょう。</p>
-
 <pre><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.10
@@ -301,52 +279,31 @@ Step 8/8 : CMD [&quot;echo&quot;, &quot;Hello&quot;]
 Removing intermediate container 33b0f554bb3f
  ---&gt; a4f61c940dce
 Successfully built a4f61c940dce
-</code></pre>
-
-<p>脆弱性は検出されず、ビルドが正常終了しました。これがMicroScannerの基本的な動きです。ちなみに&ndash;continue-on-failureオプションで、脆弱性highのブツが見つかっても処理を継続することはできます。</p>
-
-<h2 id="acr-tasksでのビルドに組み込む">ACR Tasksでのビルドに組み込む</h2>
-
+</code></pre><p>脆弱性は検出されず、ビルドが正常終了しました。これがMicroScannerの基本的な動きです。ちなみに&ndash;continue-on-failureオプションで、脆弱性highのブツが見つかっても処理を継続することはできます。</p>
+<h2 id="acr-tasks">ACR Tasksでのビルドに組み込む</h2>
 <p>ではACR Tasksに組み込みましょう。ポイントはMicroScannerに渡すトークンをいかに秘匿し、ACR Tasksに渡すかです。GitHubとかでご開帳しないように気を付けましょう。</p>
-
 <ul>
 <li>Key Vaultにトークンを保管</li>
 <li>Managed IdentityへKey Vaultシークレットの読み取り権限を付与</li>
 <li>ACR TasksへManaged Identityを実行時に割り当て</li>
 </ul>
-
 <p>この方針とします。これであればトークンをDockerfileやタスク定義ファイルに書く必要がなく、ご開帳のリスクを減らせます。</p>
-
 <p>リソースグループ、Key Vaultとシークレットを作成します。</p>
-
 <pre><code>$ az group create -n rg-aqua-sample -l japaneast
 $ az keyvault create -g rg-aqua-sample -n your-aqua-sample
 $ az keyvault secret set --vault-name your-aqua-sample -n aqua-key --value &quot;&lt;your token&gt;&quot;
-</code></pre>
-
-<p>ユーザー割り当てManaged Identityを作り、IDを取得して変数へ入れておきます。</p>
-
+</code></pre><p>ユーザー割り当てManaged Identityを作り、IDを取得して変数へ入れておきます。</p>
 <pre><code>$ az identity create -g rg-aqua-sample -n aqua-identity
 $ resourceID=$(az identity show -g rg-aqua-sample -n aqua-identity --query id -o tsv)
 $ principalID=$(az identity show -g rg-aqua-sample -n aqua-identity --query principalId -o tsv)
-</code></pre>
-
-<p>Key Vaultシークレットの読み取り権限を、先ほど作ったManaged Identityに付与します。</p>
-
+</code></pre><p>Key Vaultシークレットの読み取り権限を、先ほど作ったManaged Identityに付与します。</p>
 <pre><code>$ az keyvault set-policy -g rg-aqua-sample -n your-aqua-sample --object-id $principalID --secret-permissions get
-</code></pre>
-
-<p>これで準備はOKです。次はACR Tasksでのビルド定義をします。</p>
-
+</code></pre><p>これで準備はOKです。次はACR Tasksでのビルド定義をします。</p>
 <p>まずはDockerfileです。先ほどはビルド時にコンテナー作成環境内でMicroScannerを実行しましたが、ACR Tasksはマルチステップ定義ができるので、コンテナーイメージのビルドとスキャンをステップ分離します。なのでDockerfileはシンプルです。脆弱性検出時の動きを見たいので、Alpineのバージョンは3.3としました。</p>
-
 <pre><code>FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
 CMD [&quot;echo&quot;, &quot;Hello&quot;]
-</code></pre>
-
-<p>そしてACR Tasksのタスク定義をします。ファイルはaqua-scan.yamlです。コンテナーイメージビルドのステップと、脆弱性スキャンのステップを分離しています。脆弱性スキャンのステップが失敗したらそこでタスクは終了し、レジストリへpushしません。</p>
-
+</code></pre><p>そしてACR Tasksのタスク定義をします。ファイルはaqua-scan.yamlです。コンテナーイメージビルドのステップと、脆弱性スキャンのステップを分離しています。脆弱性スキャンのステップが失敗したらそこでタスクは終了し、レジストリへpushしません。</p>
 <pre><code>version: v1.0.0
 
 secrets:
@@ -368,15 +325,9 @@ steps:
 
   # Only push the image if the scan was successful.
   - push: [&quot;{{.Run.Registry}}/alpine-hello:{{.Run.ID}}&quot;]
-</code></pre>
-
-<p>MicroScannerのトークンをKey Vaultシークレットから渡していますね。それではタスクを作成してみましょう。</p>
-
+</code></pre><p>MicroScannerのトークンをKey Vaultシークレットから渡していますね。それではタスクを作成してみましょう。</p>
 <pre><code>$ az acr task create -r your-acr -n aqua-scan -c https://github.com/your-repo/aqua-sample.git -f aqua-scan.yaml --commit-trigger-enabled false --pull-request-trigger-enabled false --assign-identity $resourceID
-</code></pre>
-
-<p>タスクを実行します。</p>
-
+</code></pre><p>タスクを実行します。</p>
 <pre><code>$ az acr task run -r your-acr -n aqua-scan                                                                           
 Queued a run with ID: ce9                                                                                               
 Waiting for an agent...                                                                                                 
@@ -443,10 +394,7 @@ The command '/bin/sh -c /microscanner your-token' returned a non-zero code: 4
 failed to run step ID: acb_step_2: exit status 4
 
 Run ID: ce9 failed after 34s. Error: failed during run, err: exit status 1
-</code></pre>
-
-<p>コンテナーイメージに脆弱性のあるパッケージが含まれているため、レジストリへpushをせずに終了しました。ではDockerfileのベースイメージバージョンをAlpine 3.10に変えてタスクを再実行してみます。</p>
-
+</code></pre><p>コンテナーイメージに脆弱性のあるパッケージが含まれているため、レジストリへpushをせずに終了しました。ではDockerfileのベースイメージバージョンをAlpine 3.10に変えてタスクを再実行してみます。</p>
 <pre><code>$ az acr task run -r your-acr -n aqua-scan
 Queued a run with ID: cea                                                                                               
 Waiting for an agent...                                                                                                 
@@ -481,9 +429,7 @@ Waiting for an agent...
 
 
 Run ID: cea was successful after 38s
-</code></pre>
-
-<p>pushできました。</p>
+</code></pre><p>pushできました。</p>
 
       
       <div class="related">

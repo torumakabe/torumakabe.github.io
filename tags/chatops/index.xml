@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ChatOps on re-imagine</title>
@@ -24,18 +24,17 @@ AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な
 SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
 AZChatOpsSample
 おおまかな流れ 手順書つらいのでポイントだけ。
- SlackのSlash CommandとIncoming Webhookを作る
- 流れは氏の元ネタと同じ  ARM TemplateでFunction Appをデプロイ
- Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
- パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
- Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
- GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&amp;rdquo;IsManualIntegration&amp;rdquo;をtrueにしています
- Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
- Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
- 作成済みのSlack関連パラメータを指定します
-  ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)
- デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
- kuduでdata/Functions/secrets/postJob.jsonの値を、Slackが生成したSlash Commandのtokenに書き換え  Slack上で、Slash Commandのリクエスト先URLを変更 (例: https://yourchatops.azurewebsites.net/api/postJob?code=TokenTokenToken)</description>
+  SlackのSlash CommandとIncoming Webhookを作る
+ 流れは氏の元ネタと同じ    ARM TemplateでFunction Appをデプロイ
+  Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
+  パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
+  Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
+  GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&amp;quot;IsManualIntegration&amp;quot;をtrueにしています
+  Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
+  Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
+  作成済みのSlack関連パラメータを指定します
+    ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&amp;gt;継続的インテグレーションの構成から進捗が見えます)
+  デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更</description>
     </item>
     
   </channel>

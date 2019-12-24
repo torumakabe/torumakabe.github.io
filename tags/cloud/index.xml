@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Cloud on re-imagine</title>
@@ -31,7 +31,7 @@
 &amp;ldquo;仮想マシンのサイズ&amp;rdquo;
 ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。
 企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。
- Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS   メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
+ Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS    メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
 なお、現時点でまだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。
 32仮想CPUコアの規模感 クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。
 &amp;ldquo;パフォーマンスに関する考慮事項&amp;rdquo;
@@ -42,7 +42,7 @@ ACUはAzure内で相対評価をする場合にはいいのですが、「じゃ
 &amp;ldquo;SAP Standard Application Benchmarks&amp;rdquo;
 SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。
 比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。
-    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012&amp;frasl;4 2015&amp;frasl;9 2015&amp;frasl;7 2015&amp;frasl;7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。</description>
+    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012/4 2015/9 2015/7 2015/7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。</description>
     </item>
     
     <item>

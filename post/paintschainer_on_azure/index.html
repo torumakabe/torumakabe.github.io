@@ -116,47 +116,28 @@ $ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest l
     <h1 class="title">Azure N-SeriesでPaintsChainerを動かす</h1>
     
     <div class="content">
-      
-
-<h2 id="paintschainer面白い">PaintsChainer面白い</h2>
-
+      <h2 id="paintschainer">PaintsChainer面白い</h2>
 <p>クラスメソッドさんのDevelopers.IOでのエントリ<a href="http://dev.classmethod.jp/cloud/paintschainer-on-ec2/">&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;</a>が、とても面白いです。</p>
-
 <p>畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。</p>
-
 <p>せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。</p>
-
-<h2 id="試した環境">試した環境</h2>
-
+<h2 id="heading">試した環境</h2>
 <ul>
 <li>米国中南部リージョン</li>
 <li>Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80)</li>
 <li>Ubuntu 16.04</li>
 <li>NSGはSSH(22)の他にHTTP(80)を受信許可</li>
 </ul>
-
-<h2 id="導入手順">導入手順</h2>
-
-<h3 id="nvidia-tesla-driversのインストール">NVIDIA Tesla driversのインストール</h3>
-
+<h2 id="heading-1">導入手順</h2>
+<h3 id="nvidia-tesla-drivers">NVIDIA Tesla driversのインストール</h3>
 <p>マイクロソフト公式ドキュメントの通りに導入します。</p>
-
 <p><a href="https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-n-series-driver-setup">Set up GPU drivers for N-series VMs</a></p>
-
-<h3 id="dockerのインストール">Dockerのインストール</h3>
-
+<h3 id="docker">Dockerのインストール</h3>
 <p>Docker公式ドキュメントの通りに導入します。</p>
-
 <p><a href="https://docs.docker.com/engine/installation/linux/ubuntu/">Get Docker for Ubuntu</a></p>
-
-<h3 id="nvidia-dockerのインストール">NVIDIA Dockerのインストール</h3>
-
+<h3 id="nvidia-docker">NVIDIA Dockerのインストール</h3>
 <p>GitHub上のNVIDIAのドキュメント通りに導入します。</p>
-
 <p><a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Docker</a></p>
-
 <p>ここまでの作業に問題がないか、確認します。</p>
-
 <pre><code>$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
 Using default tag: latest
 latest: Pulling from nvidia/cuda
@@ -180,21 +161,12 @@ Fri Feb  3 06:43:18 2017
 |=============================================================================|
 |  No running processes found                                                 |
 +-----------------------------------------------------------------------------+
-</code></pre>
-
-<h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
-
+</code></pre><h3 id="paintschainer-docker">PaintsChainer-Dockerのインストール</h3>
 <p>Liam Jones氏が公開している<a href="https://github.com/liamjones/PaintsChainer-Docker">PaintsChainer-Docker</a>を使って、PaintsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。</p>
-
 <pre><code>$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
-</code></pre>
-
-<h2 id="paintschainerを使ってみる">PaintsChainerを使ってみる</h2>
-
+</code></pre><h2 id="paintschainer-1">PaintsChainerを使ってみる</h2>
 <p>VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintsChainerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia" /></p>
-
+<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia"></p>
 <p>PaintsChainer、すごいなぁ。
 クラウディアさん、おなか寒そうだけど。</p>
 

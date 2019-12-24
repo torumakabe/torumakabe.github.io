@@ -12,7 +12,7 @@
 仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか? 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。  詳細な定義は、以下で。
 Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity
 書き込み方はOSやファイルシステム次第 じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。
- RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時   課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
+ RHEL 7.2 on Azure XFS &amp; Ext4 10GBytesのPage Blobの上にファイルシステムを作成 mkfsはデフォルト mountはデフォルトとdiscardオプションありの2パターン MD、LVM構成にしない 以下のタイミングで課金対象容量を確認  Page BlobのVMアタッチ時 ファイルシステム作成時 マウント時 約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み) 5GBytesのファイル削除時    課金対象容量は、以下のPowerShellで取得します。リファレンスはここ。
 $Blob = Get-AzureStorageBlob yourDataDisk.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/'>
 <meta property='og:site_name' content='re-imagine'>
@@ -112,27 +112,17 @@ $Blob = Get-AzureStorageBlob yourDataDisk.'>
     <h1 class="title">Azure Linux VMのディスク利用料節約Tips</h1>
     
     <div class="content">
-      
-
-<h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
-
+      <h2 id="heading">定義領域全てが課金されるわけではありません</h2>
 <p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
-
 <p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
-
 <pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
 
 空の 100 GB ディスクが Premium Storage アカウントによって保持されている場合、P10 (128 GB) ディスクの料金が課金されます。その他の種類の Storage アカウントが使用されている場合、割り当てられたディスク サイズに関わらず、ディスクに書き込まれたデータを保存するために使用しているストレージ領域分のみ請求されます。
 </code></pre>
-
 <p>詳細な定義は、以下で。</p>
-
 <p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
-
-<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
-
+<h2 id="os">書き込み方はOSやファイルシステム次第</h2>
 <p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
-
 <ul>
 <li>RHEL 7.2 on Azure</li>
 <li>XFS &amp; Ext4</li>
@@ -141,18 +131,16 @@ $Blob = Get-AzureStorageBlob yourDataDisk.'>
 <li>mountはデフォルトとdiscardオプションありの2パターン</li>
 <li>MD、LVM構成にしない</li>
 <li>以下のタイミングで課金対象容量を確認
-
 <ul>
 <li>Page BlobのVMアタッチ時</li>
 <li>ファイルシステム作成時</li>
 <li>マウント時</li>
 <li>約5GBytesのデータ書き込み時 (ddで/dev/zeroをbs=1M、count=5000で書き込み)</li>
 <li>5GBytesのファイル削除時</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>課金対象容量は、以下のPowerShellで取得します。リファレンスは<a href="https://gallery.technet.microsoft.com/scriptcenter/Get-Billable-Size-of-32175802">ここ</a>。</p>
-
 <pre><code>$Blob = Get-AzureStorageBlob yourDataDisk.vhd -Container vhds -Context $Ctx
 
 $blobSizeInBytes = 124 + $Blob.Name.Length * 2
@@ -168,13 +156,9 @@ $Blob.ICloudBlob.GetPageRanges() |
 
 return $blobSizeInBytes
 </code></pre>
-
 <p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
-
-<h2 id="結果">結果</h2>
-
+<h2 id="heading-1">結果</h2>
 <h3 id="xfs">XFS</h3>
-
 <table>
 <thead>
 <tr>
@@ -182,42 +166,34 @@ return $blobSizeInBytes
 <th align="right">　課金対象容量(Bytes)　</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">Page BlobのVMアタッチ時</td>
 <td align="right">960</td>
 </tr>
-
 <tr>
 <td align="left">ファイルシステム作成時</td>
 <td align="right">10,791,949</td>
 </tr>
-
 <tr>
 <td align="left">マウント時</td>
 <td align="right">10,791,949</td>
 </tr>
-
 <tr>
 <td align="left">5GBytesのデータ書き込み時</td>
 <td align="right">5,253,590,051</td>
 </tr>
-
 <tr>
 <td align="left">5Gbytesのファイル削除時</td>
 <td align="right">5,253,590,051</td>
 </tr>
-
 <tr>
 <td align="left">5Gbytesのファイル削除時 (discard)</td>
 <td align="right">10,710,029</td>
 </tr>
 </tbody>
 </table>
-
 <h3 id="ext4">Ext4</h3>
-
 <table>
 <thead>
 <tr>
@@ -225,56 +201,45 @@ return $blobSizeInBytes
 <th align="right">　課金対象容量(Bytes)　</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">Page BlobのVMアタッチ時</td>
 <td align="right">960</td>
 </tr>
-
 <tr>
 <td align="left">ファイルシステム作成時</td>
 <td align="right">138,683,592</td>
 </tr>
-
 <tr>
 <td align="left">マウント時</td>
 <td align="right">306,451,689</td>
 </tr>
-
 <tr>
 <td align="left">5GBytesのデータ書き込み時</td>
 <td align="right">5,549,470,887</td>
 </tr>
-
 <tr>
 <td align="left">5Gbytesのファイル削除時</td>
 <td align="right">5,549,470,887</td>
 </tr>
-
 <tr>
 <td align="left">5Gbytesのファイル削除時 (discard)</td>
 <td align="right">306,586,780</td>
 </tr>
 </tbody>
 </table>
-
 <p>この結果から、以下のことがわかります。</p>
-
 <ul>
 <li>10GBytesのBlobを作成しても、全てが課金対象ではない</li>
 <li>当然だが、ファイルシステムによってメタデータの書き方が違う、よって書き込み容量も異なる</li>
 <li>discardオプションなしでマウントすると、ファイルを消しても課金対象容量は減らない
-
 <ul>
-<li>OSがPage Blobに&rdquo;消した&rdquo;と伝えないから</li>
+<li>OSがPage Blobに&quot;消した&quot;と伝えないから</li>
 <li>discardオプションにてSCSI UNMAPがPage Blobに伝えられ、領域は解放される(課金対象容量も減る)</li>
-<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a>
-
-<br /></li>
-</ul></li>
+<li>discardオプションはリアルタイムであるため便利。でも性能影響があるため、実運用ではバッチ適用(fstrim)が<a href="https://access.redhat.com/documentation/ja-JP/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/ch02s05.html">おすすめ</a></li>
 </ul>
-
+</li>
+</ul>
 <p>知っているとコスト削減に役立つTipsでした。ぜひ運用前には、利用予定のファイルシステムやオプションで、事前に検証してみてください。</p>
 
       

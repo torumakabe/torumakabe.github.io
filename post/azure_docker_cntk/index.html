@@ -9,10 +9,10 @@
 <meta property='og:title' content='AzureとDockerでDeep Learning(CNTK)環境をサク作する - re-imagine'>
 <meta property='og:description' content='気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
-方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース   CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで   Docker Hub上のリポジトリは torumakabe/cntk-cpu   ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull   VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
 リソースグループを作ります。
 C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
- azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください    うし、デプロイ。'>
+ azuredeploy.json  編集不要です   azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_docker_cntk/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Docker'><meta property='article:tag' content='Deep Learning'><meta property='article:tag' content='CNTK'><meta property='article:published_time' content='2016-04-17T10:30:00&#43;09:00'/><meta property='article:modified_time' content='2016-04-17T10:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -113,103 +113,76 @@ C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレ�
     <h1 class="title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</h1>
     
     <div class="content">
-      
-
-<h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
-
+      <h2 id="heading">気軽に作って壊せる環境を作る</h2>
 <p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
-
 <p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
-
-<h2 id="方針">方針</h2>
-
+<h2 id="heading-1">方針</h2>
 <ul>
 <li>インフラはAzure Resource Manager Templateでデプロイする
-
 <ul>
 <li>Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース</li>
-</ul></li>
+</ul>
+</li>
 <li>CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく
-
 <ul>
 <li>Dockerfileの元ネタは<a href="https://github.com/Microsoft/CNTK/tree/master/Tools/docker">ここ</a>
-
 <ul>
 <li>GPUむけもあるけどグッと我慢、今回はCPUで</li>
-</ul></li>
+</ul>
+</li>
 <li>Docker Hub上のリポジトリは <a href="https://hub.docker.com/r/torumakabe/cntk-cpu/">torumakabe/cntk-cpu</a></li>
-</ul></li>
+</ul>
+</li>
 <li>ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける
-
 <ul>
 <li>docker extensionでdocker engineを導入</li>
 <li>custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull</li>
-</ul></li>
+</ul>
+</li>
 <li>VMにログインしたら即CNTKを使える、幸せ</li>
 </ul>
-
-<h2 id="使い方">使い方</h2>
-
+<h2 id="heading-2">使い方</h2>
 <p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
-
 <p>リソースグループを作ります。</p>
-
 <pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
 </code></pre>
-
 <p>ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。</p>
-
 <ul>
 <li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.json">azuredeploy.json</a>
-
 <ul>
 <li>編集不要です</li>
-</ul></li>
+</ul>
+</li>
 <li><a href="https://github.com/ToruMakabe/CNTK/blob/master/deploy_singlenode/azuredeploy.parameters.sample.json">azuredeploy.parameters.json</a>
-
 <ul>
 <li>テンプレートに直で書かきたくないパラメータです</li>
 <li>fileUris、commandToExecute以外は、各々で</li>
 <li>fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください</li>
-<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&rdquo;sample&rdquo;を外して読み替えてください
-<br /></li>
-</ul></li>
+<li>ファイル名がazuredeploy.parameters.&ldquo;sample&rdquo;.jsonなので、以降の手順では&quot;sample&quot;を外して読み替えてください</li>
 </ul>
-
+</li>
+</ul>
 <p>うし、デプロイ。</p>
-
 <pre><code>C:\Work&gt; azure group deployment create CNTK dep01 -f .\azuredeploy.json -e .\azuredeploy.parameters.json
 </code></pre>
-
 <p>10分くらい待つと、できあがります。VMのパブリックIPを確認し、sshしましょう。</p>
-
 <p>docker engine入ってますかね。</p>
-
 <pre><code>yourname@yournamecntkr0:~$ docker -v
 Docker version 1.11.0, build 4dc5990
 </code></pre>
-
 <p>CNTKビルド済みのdockerイメージ、pullできてますかね。</p>
-
 <pre><code>yourname@yournamecntkr0:~$ docker images
 REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
 yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago         2.049 GB
 </code></pre>
-
 <p>問題なし。ではエンジョイ Deep Learning。</p>
-
 <pre><code>yourname@yournamecntkr0:~$ docker run -it torumakabe/cntk-cpu
 root@a1234bc5d67d:/cntk#
 </code></pre>
-
 <p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
-
-<h2 id="今後の展開">今後の展開</h2>
-
+<h2 id="heading-3">今後の展開</h2>
 <p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
-
 <p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
-
 <p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>
 
       

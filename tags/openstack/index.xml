@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OpenStack on re-imagine</title>
@@ -28,13 +28,13 @@ OpenStackの最前線から離れて3か月がたちました。OpenStackつな�
 そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&amp;ldquo;このは&amp;rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
 では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
 今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
-ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1   ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
+ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1    ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
 いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
 Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
-$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge $ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem  Conoha向けにOpenStack関連の環境変数をセットします。
-$ export OS_USERNAME=yourname $ export OS_TENANT_NAME=yourtenantname $ export OS_PASSWORD=yourpass $ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0  次はローカルコンテナ環境を整えます。
+$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem Conoha向けにOpenStack関連の環境変数をセットします。
+$ export OS_USERNAME=yourname$ export OS_TENANT_NAME=yourtenantname$ export OS_PASSWORD=yourpass$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0 次はローカルコンテナ環境を整えます。
 Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
-$ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine env local)&amp;quot; $ docker run swarm create Status: Downloaded newer image for swarm:latest tokentokentokentoken  このトークンは控えておきましょう。</description>
+$ docker-machine create -d virtualbox local$ eval &amp;quot;$(docker-machine env local)&amp;quot;$ docker run swarm create Status: Downloaded newer image for swarm:latesttokentokentokentoken このトークンは控えておきましょう。</description>
     </item>
     
     <item>
@@ -46,12 +46,7 @@ $ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine en
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
 小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
 テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
- OS_AUTH_URL
- OS_USERNAME
- OS_PASSWORD
- OS_REGION_NAME
- OS_TENANT_NAME
-  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
+ OS_AUTH_URL OS_USERNAME OS_PASSWORD OS_REGION_NAME OS_TENANT_NAME  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
 さあ実行 まずはterraform planコマンドで、実行計画を確認します。
 $ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.</description>
     </item>
@@ -91,21 +86,14 @@ Monitoring as a Service 監視をサービスとして提供するって、ど�
 進化著しいソフト、OpenStackでは OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして公式サイトを見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。
 でも、長期バージョン固定するとどうなるか では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。
 [とあるクラウド その1]
-- (Dev) 今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。
-- (Ops) あー、うちの環境Jよ。
-- (Dev) そうすか。じゃあ他のにするわ。
-使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。
+ (Dev) 今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。 (Ops) あー、うちの環境Jよ。 (Dev) そうすか。じゃあ他のにするわ。  使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。
 [とあるクラウド その2]
-- (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!!
-- (Dev) おーいいね。決定。3年のんびりするわ。
-〜3年後〜
-- (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!!
-- (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。
-リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。
+ (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!! (Dev) おーいいね。決定。3年のんびりするわ。
+〜3年後〜 (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!! (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。  リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。
 アップデートの仕組みに投資したほうが建設的と思う もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。
 それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。
 最後に、最新のOpenStack User Surveyを紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。
-OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&amp;rdquo;Ability to innovate&amp;rdquo;なんですよね。 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。
+OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&amp;ldquo;Ability to innovate&amp;quot;なんですよね。 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。
 メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。</description>
     </item>
     
@@ -119,23 +107,23 @@ OpenStackのBusiness Driverとして、最もユーザーが重視している�
 出オチ OpenStackも人気が出て、Advent Calendarが1枚ではおさまさなくなりました。2枚目です。ハンサムです。だからハンサムOpenStackです。
 こんなテーマで何か書けるんでしょうか? 何をおっしゃる、芸術とは制約から生まれるのです。
 そもそも2枚目とは 「二枚目」という用語は、歌舞伎用語をもとに、江戸時代に生まれた。歌舞伎の看板は、通常は8枚から成っていた。一枚目の看板は「書き出し」と言われ、主役の名が書かれ、二枚目の看板には若い色男の役者の名が書かれることになっていた。また、三枚目の看板には道化役の名が書かれることになっていた。  「二枚目」（2013年5月28日 (火) 02:17 UTCの版）『ウィキペディア日本語版』
-8枚あるらしいぞ いじってみよう  一枚目：主役：そのまま主役。「一枚看板」という用法もある。
+8枚あるらしいぞ いじってみよう   一枚目：主役：そのまま主役。「一枚看板」という用法もある。
 Novaですね。主役です。
- 二枚目：色男：優男で色事担当
+  二枚目：色男：優男で色事担当
 これはあとにとっておきましょう。
- 三枚目：道化：お笑い担当
+  三枚目：道化：お笑い担当
 Glanceですね。何も変なことしてないのにネタにされる。
- 四枚目：中軸：中堅役者　まとめ役
+  四枚目：中軸：中堅役者　まとめ役
 Cinderでしょうか。主役のNovaを活かす名脇役。
- 五枚目：敵役：一般的な敵役
+  五枚目：敵役：一般的な敵役
 Heatかな。はじめのCloudFormation形式ってのが気に入らなかった。HOTが出てきたので許す。
- 六枚目：実敵：憎めない善要素のある敵役
+  六枚目：実敵：憎めない善要素のある敵役
 Ceilometerです。重いです。絶賛チューニング中です。
- 七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕
+  七枚目：実悪：巨悪　ラスボス　全ての悪事の黒幕
 Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなかったのよきっと。これから良くなるよ。
- 八枚目：座長：元締め
+  八枚目：座長：元締め
 Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。
-  じゃあ二枚目は? *Trove*です。若さと期待の大きさを込めてキャスティングしました。というかこれを見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。
+  じゃあ二枚目は? Troveです。若さと期待の大きさを込めてキャスティングしました。というかこれを見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。
 2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。</description>
     </item>
     
@@ -148,15 +136,15 @@ Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3�
       <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
 なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
 やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp;amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp;amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。 実行ディレクトリにprovision.shを置きます。 provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。 実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。 hostsファイルには以下のようにlocalhostを定義します。
+  VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。
+  実行ディレクトリにprovision.shを置きます。
+  provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。
+  実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。
+  hostsファイルには以下のようにlocalhostを定義します。
 [localhost]
 127.0.0.1 ansible_connection=local
   provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
-playbook(site.yml)解説   varsディレクトリ配下に、環境変数を定義したenv.ymlを置きます。ここで対象のOpenStack環境を指定します。
-OS_TENANT_NAME: your_tenant_name
-OS_USERNAME: your_username
-&amp;hellip;.
-  という感じで並べてください。.</description>
+playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定義したenv.</description>
     </item>
     
     <item>
@@ -165,14 +153,14 @@ OS_USERNAME: your_username
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
-      <description> ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
+      <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
 多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
 さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
 前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
 ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;rdquo;:auto&amp;rdquo;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
+ フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;rdquo;:auto&amp;quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
 スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
-$ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server instance is snapshoting! ==&amp;gt; default: Snapshot is ok  </description>
+$ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server instance is snapshoting! ==&amp;gt; default: Snapshot is ok </description>
     </item>
     
     <item>
@@ -194,7 +182,7 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
       <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/openstack-3primer/</guid>
-      <description> よく聞かれることをまとめました ひとまず、初期3部作完結。また書くかもしれません。
+      <description>よく聞かれることをまとめました ひとまず、初期3部作完結。また書くかもしれません。
  OpenStack超入門シリーズ いまさら聞けない Novaのディスク周り OpenStack超入門シリーズ いまさら聞けない Swiftの使い方 OpenStack超入門シリーズ いまさら聞けない Neutronの使い方  </description>
     </item>
     
@@ -217,8 +205,8 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
       <guid>https://ToruMakabe.github.io/post/swift-upload/</guid>
       <description>Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。
 アップロード形式は大きく3つ &amp;ndash; そのまま、DLO、SLO  そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。 DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。 SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。  動きを見てみよう 環境は以下の通り。
- HP Public Cloud US-West Region Swift Clientを動かすCompute Node &amp;ndash; standard.large / ubuntu 12.04 Swift CLI &amp;ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot; non-seg.iso real 0m24.557s user 0m12.617s sys 0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
-$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.</description>
+ HP Public Cloud US-West Region Swift Clientを動かすCompute Node &amp;ndash; standard.large / ubuntu 12.04 Swift CLI &amp;ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &amp;quot;keystoneclient.httpclient&amp;quot; non-seg.iso real	0m24.557s user	0m12.617s sys	0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
+$curl -H &amp;quot;X-Auth-Token: hoge&amp;quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.1 200 OK Content-Length: 925892608 Content-Type: application/x-iso9660-image Accept-Ranges: bytes Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT Etag: 21ec41563ff34da27d4a0b56f2680c4f X-Timestamp: 1395537413.</description>
     </item>
     
     <item>

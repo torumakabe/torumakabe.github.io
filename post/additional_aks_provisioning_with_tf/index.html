@@ -19,8 +19,9 @@ AKSはインパクトの大きな機能を、プレビューというかたち�
  Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
 ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
 意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
-CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。'>
+Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
+CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
+たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Terraform'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2019-04-26T18:00:00&#43;09:00'/><meta property='article:modified_time' content='2019-04-26T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -119,18 +120,11 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
     <h1 class="title">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</h1>
     
     <div class="content">
-      
-
-<h2 id="何の話か">何の話か</h2>
-
+      <h2 id="heading">何の話か</h2>
 <p>CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、それには触れません。インフラ担当者向け。</p>
-
-<h2 id="動機">動機</h2>
-
+<h2 id="heading-1">動機</h2>
 <p>Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。</p>
-
 <p>ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に、後追いでこんなものを入れています。</p>
-
 <ul>
 <li>Istio</li>
 <li>Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる)</li>
@@ -138,17 +132,11 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
 <li>AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics)</li>
 <li>リアルタイムコンテナーログ表示設定</li>
 </ul>
-
 <p>kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、過渡期に多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。</p>
-
 <p>とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。<a href="https://www.amazon.co.jp/dp/B07L94XGPY">今年のはじめに書いた本</a>でも、Terraformの活用例を紹介しています。サンプルコードは<a href="https://github.com/ToruMakabe/Understanding-K8s">こちら</a>。</p>
-
 <p>で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。リソースのライフサイクル管理はTerraformに集約しましょう。</p>
-
 <p>そしてここからが、このエントリーの本題です。</p>
-
 <p>AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。</p>
-
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/aks/virtual-nodes-cli">Virtual Node</a></li>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/aks/cluster-autoscaler">Cluster Autoscaler (on Virtual Machine Scale Sets)</a></li>
@@ -157,35 +145,21 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
 <li><a href="https://docs.microsoft.com/en-us/cli/azure/ext/aks-preview/aks/nodepool?view=azure-cli-latest">Multi Nodepool</a></li>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-live-logs">リアルタイムコンテナーログ表示</a></li>
 </ul>
-
 <p>これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。</p>
-
 <ol>
 <li>Terraformの対応を待つ、貢献する</li>
 <li>Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする</li>
 </ol>
-
 <p>インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。</p>
-
 <p>ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。</p>
-
-<h2 id="意外に知られていない-terraform-data-source">意外に知られていない Terraform Data Source</h2>
-
+<h2 id="-terraform-data-source">意外に知られていない Terraform Data Source</h2>
 <p>Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。</p>
-
-<p>Terraformはリソースを&rdquo;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
-
+<p>Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
 <p>CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。</p>
-
 <p>たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、</p>
-
 <pre><code>/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
-</code></pre>
-
-<p>とかいうやつです。いちいち調べるの、めんどくさい。</p>
-
+</code></pre><p>とかいうやつです。いちいち調べるの、めんどくさい。</p>
 <p>そこで、AKSクラスターとLog AnalyticsのWorkspaceをdataとして定義します。</p>
-
 <pre><code>data &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
   name                = &quot;${var.aks_cluster_name}&quot;
   resource_group_name = &quot;${var.aks_cluster_rg}&quot;
@@ -195,10 +169,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
   name                = &quot;${var.la_workspace_name_for_aks}&quot;
   resource_group_name = &quot;${var.la_workspace_rg_for_aks}&quot;
 }
-</code></pre>
-
-<p>それを次のように、resource作成時に参照できます。</p>
-
+</code></pre><p>それを次のように、resource作成時に参照できます。</p>
 <pre><code>resource &quot;azurerm_monitor_diagnostic_setting&quot; &quot;aks&quot; {
   name                       = &quot;diag_aks&quot;
   target_resource_id         = &quot;${data.azurerm_kubernetes_cluster.aks.id}&quot;
@@ -213,10 +184,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
     }
   }
 }
-</code></pre>
-
-<p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
-
+</code></pre><p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
 <pre><code>provider &quot;kubernetes&quot; {
   load_config_file       = false
   host                   = &quot;${data.azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
@@ -224,30 +192,19 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
   client_key             = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&quot;
   cluster_ca_certificate = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
 }
-</code></pre>
-
-<p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
-
+</code></pre><p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
 <pre><code>resource &quot;kubernetes_service_account&quot; &quot;kured&quot; {
   metadata {
     name      = &quot;kured&quot;
     namespace = &quot;kube-system&quot;
   }
 }
-</code></pre>
-
-<p>なお、Terraform実行ホスト上のKubernetes configファイルを使って対象のクラスターを<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">指定、認証する</a>こともできます。要件に合わせて選択しましょう。</p>
-
+</code></pre><p>なお、Terraform実行ホスト上のKubernetes configファイルを使って対象のクラスターを<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">指定、認証する</a>こともできます。要件に合わせて選択しましょう。</p>
 <p>ここまでを、まとめます。Azure CLIやポータルを使って作ったAKSクラスターに対し、TerraformのData SourceやKubenetesのconfigファイルを使って属性、認証情報を取得し、追加プロビジョニングを一括で、楽にできる、という話でした。</p>
-
-<h2 id="サンプル">サンプル</h2>
-
+<h2 id="heading-2">サンプル</h2>
 <p>ではどんなことができるのか、サンプルをGistに置いておきました。</p>
-
 <p><a href="https://gist.github.com/ToruMakabe/46ac0b31f7f8a07fa9a1254f862bc15c">サンプルコード</a></p>
-
 <p>冒頭で挙げた、以下リソースの導入や設定ができます。</p>
-
 <ul>
 <li>Istio</li>
 <li>Kured</li>
@@ -255,25 +212,24 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
 <li>AKSマスターコンポーネントのログ転送設定</li>
 <li>リアルタイムコンテナーログ表示設定</li>
 </ul>
-
 <p>HelmとIstioは開発の流れが速いので、ワークアラウンド多めです。詳細はソース上のコメントを参考にしてください。</p>
-
-<h3 id="使い方">使い方</h3>
-
+<h3 id="heading-3">使い方</h3>
 <ul>
 <li>Gist上の3ファイルを同じディレクトリに置く</li>
 <li>variables.tf.sampleの変数を設定し、ファイルをリネーム(.sampleを消し、.tfにする)</li>
 <li>AKSクラスターの管理クレデンシャルをAzure CLIで取得 (az aks get-credentials -a)</li>
 <li>Terraform導入済みのホストで実行
-
 <ul>
 <li>WSL(Ubuntu 18.04)とmasOS Mojaveで動作検証しています</li>
-<li>Terraformの設定から確認したい場合は以下を参考に</li>
+<li>Terraformの設定から確認したい場合は以下を参考に
+<ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/terraform-install-configure">VM などのインフラストラクチャを Azure にプロビジョニングするための Terraform のインストールと構成</a></li>
 <li><a href="https://learn.hashicorp.com/terraform/?track=azure#azure">Getting started with Terraform using the Azure provider</a></li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
+</li>
+</ul>
 <p>誰かのお役に、立ちますように。</p>
 
       

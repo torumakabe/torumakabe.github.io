@@ -10,9 +10,7 @@
 <meta property='og:description' content='ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
 でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
 調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
-ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線
- 自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ ゲートウェイ名から推測  いい感じの回線
- 日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」   コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10  Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)  Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)   対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え &#43; 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy   結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.'>
+ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線   自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ  ゲートウェイ名から推測    いい感じの回線   日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」  コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10   Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)   Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)  対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え &#43; 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy    結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azureblobcopy_perf/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Blob'><meta property='article:tag' content='Copy'><meta property='article:published_time' content='2017-06-13T17:00:00&#43;09:00'/><meta property='article:modified_time' content='2017-06-13T17:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -111,96 +109,77 @@
     <h1 class="title">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</h1>
     
     <div class="content">
-      
-
-<h2 id="ファイルコピーの需要は根強い">ファイルコピーの需要は根強い</h2>
-
+      <h2 id="heading">ファイルコピーの需要は根強い</h2>
 <p>グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。</p>
-
 <p>でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。</p>
-
-<h2 id="調べてみた">調べてみた</h2>
-
+<h2 id="heading-1">調べてみた</h2>
 <p>ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。</p>
-
-<h3 id="ツールと実行環境">ツールと実行環境</h3>
-
+<h3 id="heading-2">ツールと実行環境</h3>
 <ul>
 <li>AzCopy 6.1.0</li>
 <li>Azure PowerShell 4.1.0</li>
 <li>Windows 10 1703</li>
 <li>ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory</li>
 </ul>
-
-<h3 id="アクセス回線パターン">アクセス回線パターン</h3>
-
+<h3 id="heading-3">アクセス回線パターン</h3>
 <ol>
-<li><p>一般的な回線</p>
-
+<li>一般的な回線</li>
+</ol>
 <ul>
 <li>自宅(川崎)</li>
 <li>OCN光 100M マンションタイプ</li>
 <li>宅内は802.11ac(5GHz)</li>
-<li>川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ</li>
+<li>川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ
+<ul>
 <li>ゲートウェイ名から推測</li>
-</ul></li>
-
-<li><p>いい感じの回線</p>
-
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>いい感じの回線</li>
+</ol>
 <ul>
 <li>日本マイクロソフト 品川オフィス</li>
 <li>1Gbps 有線</li>
 <li>Azureデータセンターへ「ネットワーク的に近くて広帯域」</li>
-</ul></li>
-</ol>
-
-<h3 id="コピーするファイル">コピーするファイル</h3>
-
+</ul>
+<h3 id="heading-4">コピーするファイル</h3>
 <ul>
 <li>総容量: 約60GB
-
 <ul>
 <li>6160ファイル</li>
 <li>1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10</li>
-</ul></li>
+</ul>
+</li>
 <li>Linux fallocateコマンドで作成</li>
 </ul>
-
-<h3 id="ファイル形式パターン">ファイル形式パターン</h3>
-
+<h3 id="heading-5">ファイル形式パターン</h3>
 <ol>
 <li>ファイル、Blobそのまま送る (6160ファイル)</li>
-<li>ディスクイメージで送る (1ファイル)
-
+<li>ディスクイメージで送る (1ファイル)</li>
+</ol>
 <ul>
 <li>Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置</li>
 <li>転送前にデタッチ、エクスポート(Blob SAS形式)</li>
 <li>AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)</li>
-</ul></li>
-</ol>
-
-<h3 id="対象のazureリージョン">対象のAzureリージョン</h3>
-
+</ul>
+<h3 id="azure">対象のAzureリージョン</h3>
 <ul>
 <li>東日本 (マスター、複製元と位置づける)</li>
 <li>米国中南部 (太平洋越え + 米国内を見たい)</li>
 <li>ブラジル南部</li>
 </ul>
-
-<h3 id="転送パターン">転送パターン</h3>
-
+<h3 id="heading-6">転送パターン</h3>
 <ul>
 <li>ユーザー拠点の端末からAzureリージョン: AzCopy Upload</li>
 <li>Azureリージョン間 (Storage to Storage)
-
 <ul>
 <li>ファイル: AzCopy Copy</li>
 <li>イメージ: PowerShell Start-AzureStorageBlobCopy</li>
-</ul></li>
 </ul>
-
-<h2 id="結果">結果</h2>
-
+</li>
+</ul>
+<h2 id="heading-7">結果</h2>
 <table>
 <thead>
 <tr>
@@ -212,7 +191,6 @@
 <th align="right">　実行時間(時:分:秒)</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td align="left">ファイル　</td>
@@ -222,7 +200,6 @@
 <td align="right">2</td>
 <td align="right">07:55:22</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">自宅</td>
@@ -231,7 +208,6 @@
 <td align="right">2</td>
 <td align="right">10:22:30</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">自宅</td>
@@ -240,7 +216,6 @@
 <td align="right">2</td>
 <td align="right">12:46:37</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">オフィス</td>
@@ -249,7 +224,6 @@
 <td align="right">16</td>
 <td align="right">00:20:47</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">オフィス</td>
@@ -258,7 +232,6 @@
 <td align="right">16</td>
 <td align="right">00:45.11</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">オフィス</td>
@@ -267,7 +240,6 @@
 <td align="right">8</td>
 <td align="right">02:07.58</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">Azure 東日本</td>
@@ -276,7 +248,6 @@
 <td align="right">N/A</td>
 <td align="right">00:28:55</td>
 </tr>
-
 <tr>
 <td align="left">イメージ　</td>
 <td align="left">Azure 東日本</td>
@@ -285,7 +256,6 @@
 <td align="right">N/A</td>
 <td align="right">00:11:11</td>
 </tr>
-
 <tr>
 <td align="left">ファイル　</td>
 <td align="left">Azure 東日本</td>
@@ -294,7 +264,6 @@
 <td align="right">N/A</td>
 <td align="right">00.25:33</td>
 </tr>
-
 <tr>
 <td align="left">イメージ　</td>
 <td align="left">Azure 東日本</td>
@@ -305,57 +274,61 @@
 </tr>
 </tbody>
 </table>
-
-<h2 id="考察">考察</h2>
-
+<h2 id="heading-8">考察</h2>
 <ul>
-<li><p>アクセス回線の差が大きく影響</p>
-
+<li>
+<p>アクセス回線の差が大きく影響</p>
 <ul>
 <li>自宅パターンでプロバイダから帯域制限されていたかは不明 (自宅からAzure東日本まで16Mbpsくらいは出た)</li>
-<li>アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい</li>
+<li>アクセス回線が細い場合はユーザー拠点から「まとめて」送らないほうがいい
+<ul>
 <li>こまめに送る</li>
 <li>Azure内でデータを生成する</li>
+</ul>
+</li>
 <li>もしくはExpressRouteを引く (自宅で、とは言っていない)</li>
-</ul></li>
-
-<li><p>アクセス回線が細い場合、AzCopy Uploadの並列数を下げる</p>
-
+</ul>
+</li>
+<li>
+<p>アクセス回線が細い場合、AzCopy Uploadの並列数を下げる</p>
 <ul>
 <li>AzCopyのデフォルト並列数は実行環境のCPUコア数 *8だが、今回実施した端末での並列数(4コア * 8 = 32)ではかえって性能が劣化した</li>
 <li>アクセス回線に合わせて並列数は調整する</li>
-</ul></li>
-
-<li><p>Azureのリージョン間コピーは早い</p>
-
+</ul>
+</li>
+<li>
+<p>Azureのリージョン間コピーは早い</p>
 <ul>
 <li>Azureバックボーンを通るから</li>
 <li>端末よりAzureストレージのほうがリソース的に強いし負荷分散しているから</li>
-</ul></li>
-
-<li><p>地理的な距離感覚だけで考えてはダメ</p>
-
+</ul>
+</li>
+<li>
+<p>地理的な距離感覚だけで考えてはダメ</p>
 <ul>
 <li>地理的な近さではなく、ネットワーク的な近さと太さ</li>
 <li>Azureバックボーンを使うと日本とブラジルの間でもそれなりのスループット</li>
-</ul></li>
-
-<li><p>ファイル数が多いときはイメージで送るのも手</p>
-
+</ul>
+</li>
+<li>
+<p>ファイル数が多いときはイメージで送るのも手</p>
 <ul>
 <li>ファイル数がコピー時間に影響する (1 vs 6160)</li>
-<li>そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&hellip;</li>
+<li>そもそもアプリがBlobとして使うのか、ファイルシステムとして使うかにもよるが&hellip;
+<ul>
 <li>もしファイルシステムとして、であれば有効な手段</li>
 <li>エクスポートのひと手間は考慮</li>
-</ul></li>
-
-<li><p>Azureバックボーンを使うと、意外にブラジル近い</p>
-
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Azureバックボーンを使うと、意外にブラジル近い</p>
 <ul>
 <li>土管か(ない</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>Azureバックボーンの帯域にはSLAがありませんが、意識して仕組みを作ると得をします。</p>
 
       

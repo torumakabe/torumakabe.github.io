@@ -110,8 +110,8 @@
  Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。 仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。 プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。 リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。 プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。  公式ドキュメントはこちら。現時点の制約もまとまっているので、目を通しておきましょう。
 動きを見てみよう 公式ドキュメントには想定シナリオがあり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。
 事前に準備する環境 下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。
- VNet *2  vnet01 subnet01  subnet01-nsg (allow ssh)  vnet02 subnet01  subnet01-nsg (allow ssh)   Azure DNS Public Zone  example.com   Azure CLIへDNS拡張を導入 プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は公式ドキュメントで確認してください。
-$ az extension add --name dns  プライベートゾーンの作成 既存のゾーンを確認します。パブリックゾーンがあります。
+ VNet *2  vnet01  subnet01  subnet01-nsg (allow ssh)     vnet02  subnet01  subnet01-nsg (allow ssh)       Azure DNS Public Zone  example.com    Azure CLIへDNS拡張を導入 プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は公式ドキュメントで確認してください。
+$ az extension add --name dns プライベートゾーンの作成 既存のゾーンを確認します。パブリックゾーンがあります。
 $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordSets ------------ ---------------------- ------------ --------------- example.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_private_dns_preview/" style="height:28px">
@@ -147,7 +147,7 @@ $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordS
  AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
 DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
 [nginx-label.yaml]
-apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80  デプロイ。
+apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80 デプロイ。
 $ kubectl create -f nginx-label.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">

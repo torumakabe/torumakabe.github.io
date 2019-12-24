@@ -12,9 +12,9 @@
 Event GridがBlobに対応して何がうれしいか Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。
 イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。
 Event Gridに期待する理由はいくつかあります。
- フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます  信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます  スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう  ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます  Azureの外やサードパーティーとの連携  Webhookでシンプルにできます   前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
-az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid  以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。
-az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid  使い方 ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。'>
+ フィルタ  特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます   信頼性  リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます   スケールと高スループット  Azure Functions BlobトリガーのようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった 具体的な数値はプレビュー後に期待しましょう   ファンアウト  ひとつのイベントを複数のHandlerに紐づけられます   Azureの外やサードパーティーとの連携  Webhookでシンプルにできます    前提条件  Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません 現時点ではWest Central USリージョンのみで提供しています プライベートプレビューは申請が必要です  Azure CLIの下記コマンドでプレビューに申請できます。
+az provider register --namespace Microsoft.EventGrid az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid 以下のコマンドで確認し、statusが&quot;Registered&quot;であれば使えます。
+az feature show --name storageEventSubscriptions --namespace Microsoft.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_blobevent/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Blob'><meta property='article:tag' content='EventGrid'><meta property='article:tag' content='Functions'><meta property='article:published_time' content='2017-09-05T12:00:00&#43;09:00'/><meta property='article:modified_time' content='2017-09-05T12:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -115,117 +115,83 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
     <h1 class="title">Azure Event GridでBlobイベントを拾う</h1>
     
     <div class="content">
-      
-
-<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
-
+      <h2 id="event-gridblob">Event GridがBlobに対応</h2>
 <p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
-
 <p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-
-<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
-
+<h2 id="event-gridblob-1">Event GridがBlobに対応して何がうれしいか</h2>
 <p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
-
 <p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
-
-<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept" /></p>
-
+<p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept"></p>
 <p>Event Gridに期待する理由はいくつかあります。</p>
-
 <ul>
 <li>フィルタ
-
 <ul>
 <li>特定のBlobコンテナーにあるjpegファイルの作成イベントのみで発火させる、なんてことができます</li>
-</ul></li>
+</ul>
+</li>
 <li>信頼性
-
 <ul>
 <li>リトライ機能があるので、Handlerが一時的に黙ってしまっても対応できます</li>
-</ul></li>
+</ul>
+</li>
 <li>スケールと高スループット
-
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/azure-functions/functions-bindings-storage-blob#blob-storage-triggers-and-bindings">Azure Functions Blobトリガー</a>のようにHandler側で定期的にスキャンする必要がありません。これまではファイル数が多いとつらかった</li>
 <li>具体的な数値はプレビュー後に期待しましょう</li>
-</ul></li>
+</ul>
+</li>
 <li>ファンアウト
-
 <ul>
 <li>ひとつのイベントを複数のHandlerに紐づけられます</li>
-</ul></li>
+</ul>
+</li>
 <li>Azureの外やサードパーティーとの連携
-
 <ul>
 <li>Webhookでシンプルにできます</li>
-</ul></li>
 </ul>
-
-<h2 id="前提条件">前提条件</h2>
-
+</li>
+</ul>
+<h2 id="heading">前提条件</h2>
 <ul>
 <li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
 <li>現時点ではWest Central USリージョンのみで提供しています</li>
 <li>プライベートプレビューは申請が必要です</li>
 </ul>
-
 <p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-
 <pre><code>az provider register --namespace  Microsoft.EventGrid
 az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<p>以下のコマンドで確認し、statusが&rdquo;Registered&rdquo;であれば使えます。</p>
-
+</code></pre><p>以下のコマンドで確認し、statusが&quot;Registered&quot;であれば使えます。</p>
 <pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre>
-
-<h2 id="使い方">使い方</h2>
-
+</code></pre><h2 id="heading-1">使い方</h2>
 <p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
-
 <p>リソースグループを作ります。</p>
-
 <pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre>
-
-<p>Blobストレージアカウントを作ります。</p>
-
+</code></pre><p>Blobストレージアカウントを作ります。</p>
 <pre><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre>
-
-<p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-
+</code></pre><p>ではいよいよEvent GridのSubscriptionを作ります。</p>
 <pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
 ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
 -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre>
-
-<p>以下はパラメーターの補足です。</p>
-
+</code></pre><p>以下はパラメーターの補足です。</p>
 <ul>
 <li>&ndash;endpoint
-
 <ul>
 <li>Handlerのエンドポイントを指定します。ここではテストのために<a href="https://requestb.in/">RequestBin</a>に作ったエンドポイントを指定します</li>
-</ul></li>
+</ul>
+</li>
 <li>&ndash;included-event-types
-
 <ul>
 <li>イベントの種類をフィルタします。Blobの削除イベントは不要で、作成のみ拾いたいため、Microsoft.Storage.BlobCreatedを指定します</li>
-</ul></li>
+</ul>
+</li>
 <li>&ndash;subject-ends-with
-
 <ul>
 <li>対象ファイルをフィルタします。Blob名の末尾文字列がjpgであるBlobのみイベントの対象にしました</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
-
 <p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-
 <pre><code>[{
   &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
   &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
@@ -247,17 +213,11 @@ ider-namespace Microsoft.Storage --resource-type storageAccounts --included-even
     }
   }
 }]
-</code></pre>
-
-<p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-
+</code></pre><p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
 <pre><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
 vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
 g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre>
-
-<p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-
+</code></pre><p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
 <pre><code>[{
   &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
   &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
@@ -279,34 +239,19 @@ g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
     }
   }
 }]
-</code></pre>
-
-<h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
-
+</code></pre><h2 id="azure-functions">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
 <p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-
-<h3 id="概要">概要</h3>
-
+<h3 id="heading-2">概要</h3>
 <p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
-
-<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings" /></p>
-
+<p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings"></p>
 <p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>
-
-<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&rdquo;path&rdquo;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
-
+<p>その理由はEvent Grid Blobイベントのペイロードです。Blobファイル名がURLで渡されます。Azure FunctionsのBlob入出力バインド属性、&ldquo;path&quot;にURLは使えません。使えるのはコンテナー名+ファイル名です。</p>
 <p>入出力バインドを使わず、アプリのロジック内でStorage SDKを使って入出力してもいいのですが、Azure Functionsの魅力のひとつは宣言的にトリガーとバインドを定義し、アプリをシンプルに書けることなので、あまりやりたくないです。</p>
-
 <p>そこでイベントを受けてファイル名を取り出してQueueに入れるファンクションと、そのQueueをトリガーに画像をリサイズするファンクションに分けました。</p>
-
 <p>なお、この悩みはAzureの開発チームも認識しており、Functions側で対応する方針とのことです。</p>
-
 <h3 id="handler">Handler</h3>
-
 <p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
-
 <p>[run.csx]</p>
-
 <pre><code>#r &quot;Newtonsoft.json&quot;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 
@@ -315,12 +260,8 @@ public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem
     string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
     outputQueueItem = System.IO.Path.GetFileName(imageUrl);
 }
-</code></pre>
-
-<p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
-
+</code></pre><p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
 <p>[project.json]</p>
-
 <pre><code>{
 &quot;frameworks&quot;: {
   &quot;net46&quot;:{
@@ -330,12 +271,8 @@ public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem
   }
  }
 }
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。</p>
-
+</code></pre><p>トリガーとバインドは以下の通りです。</p>
 <p>[function.json]</p>
-
 <pre><code>{
   &quot;bindings&quot;: [
     {
@@ -353,14 +290,9 @@ public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem
   ],
   &quot;disabled&quot;: false
 }
-</code></pre>
-
-<h3 id="resizer">Resizer</h3>
-
+</code></pre><h3 id="resizer">Resizer</h3>
 <p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
-
 <p>[run.csx]</p>
-
 <pre><code>using ImageResizer;
 
 public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
@@ -382,12 +314,8 @@ private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimension
 {
   { ImageSize.Small, Tuple.Create(100, 100) }
 };
-</code></pre>
-
-<p>ImageResizerのパッケージを指定します。</p>
-
+</code></pre><p>ImageResizerのパッケージを指定します。</p>
 <p>[project.json]</p>
-
 <pre><code>{
 &quot;frameworks&quot;: {
   &quot;net46&quot;:{
@@ -397,14 +325,9 @@ private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimension
   }
  }
 }
-</code></pre>
-
-<p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
-
-<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&rdquo;images-s&rdquo;として別途作成しました。コンテナー&rdquo;images&rdquo;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
-
+</code></pre><p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
+<p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&ldquo;images-s&quot;として別途作成しました。コンテナー&quot;images&quot;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
 <p>[function.json]</p>
-
 <pre><code>{
   &quot;bindings&quot;: [
     {
@@ -431,15 +354,10 @@ private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimension
   ],
   &quot;disabled&quot;: false
 }
-</code></pre>
-
-<p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-
+</code></pre><p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
 <pre><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
 nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre>
-
-<p>これで、コンテナー&rdquo;images&rdquo;にjpgファイルがアップロードされると、コンテナー&rdquo;images-s&rdquo;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
+</code></pre><p>これで、コンテナー&quot;images&quot;にjpgファイルがアップロードされると、コンテナー&quot;images-s&quot;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
 
       
       <div class="related">

@@ -106,16 +106,16 @@
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/myazurecli201804/">俺のAzure CLI 2018春版</a></h1>
       <div class="content">
         春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。
-俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる  エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる  VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる   デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
+俺のおすすめ 3選  デフォルト設定  リソースグループやロケーション、出力形式などのデフォルト設定ができる   エイリアス  サブコマンドにエイリアスを付けられる 引数付きの込み入った表現もできる   VS Code プラグイン  Azure CLI Toolsプラグイン でazコマンドの編集をコードアシストしてくれる 編集画面上でコマンド選択して実行できる    デフォルト設定 $AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。
 Azure CLI 2.0 の構成
 まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。
-[core] output = table  そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
-[defaults] group = default-ejp-rg  他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
+[core] output = table そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。
+[defaults] group = default-ejp-rg 他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。
 ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。
 デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。
-az vm create -n yoursmplvm01 --image UbuntuLTS  エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
+az vm create -n yoursmplvm01 --image UbuntuLTS エイリアス $AZURE_CONFIG_DIR/aliasにエイリアスを書けます。
 Azure CLI 2.0 のエイリアス拡張機能
-前提はAzure CLI v2.
+前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/myazurecli201804/" style="height:28px">
           Read more
@@ -147,8 +147,8 @@ Azure CLI 2.0 のエイリアス拡張機能
 Terraformではイメージ名取得に正規表現とソートが可能 Terraformでは見出しの通り、捗る表現ができます。
 イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の文字列比較なので、末尾の番号の決めた桁は埋めること。
 ということで降順で最上位、つまり最新のイメージ名を取得できます。
-data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; }  あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
- storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; }  便利である。
+data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[0-9]*&quot; sort_descending = true resource_group_name = &quot;${var.managed_image_resource_group_name}&quot; } あとはVM/VMSSリソース定義内で、取得したイメージのidを渡します。
+ storage_profile_image_reference { id = &quot;${data.azurerm_image.poc.id}&quot; } 便利である。
         
       </div>
     </article>
@@ -189,7 +189,7 @@ Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraf
 Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
 手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
 MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_msi_terraform/" style="height:28px">
           Read more
@@ -220,8 +220,8 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
  Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。 仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。 プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。 リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。 プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。  公式ドキュメントはこちら。現時点の制約もまとまっているので、目を通しておきましょう。
 動きを見てみよう 公式ドキュメントには想定シナリオがあり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。
 事前に準備する環境 下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。
- VNet *2  vnet01 subnet01  subnet01-nsg (allow ssh)  vnet02 subnet01  subnet01-nsg (allow ssh)   Azure DNS Public Zone  example.com   Azure CLIへDNS拡張を導入 プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は公式ドキュメントで確認してください。
-$ az extension add --name dns  プライベートゾーンの作成 既存のゾーンを確認します。パブリックゾーンがあります。
+ VNet *2  vnet01  subnet01  subnet01-nsg (allow ssh)     vnet02  subnet01  subnet01-nsg (allow ssh)       Azure DNS Public Zone  example.com    Azure CLIへDNS拡張を導入 プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は公式ドキュメントで確認してください。
+$ az extension add --name dns プライベートゾーンの作成 既存のゾーンを確認します。パブリックゾーンがあります。
 $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordSets ------------ ---------------------- ------------ --------------- example.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_private_dns_preview/" style="height:28px">
@@ -252,8 +252,8 @@ $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordS
       <h2 class="subtitle is-6 date">March 26, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az_vmss_terraform/">AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</a></h1>
       <div class="content">
-        動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018&frasl;3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
-前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)   コード 以下のファイルを同じディレクトリに作成します。
+        動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
+前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)    コード 以下のファイルを同じディレクトリに作成します。
 Terraform メインコード VMSSと周辺リソースを作ります。
  最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。 クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。  [main.tf]
 resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var.resource_group_name}&quot; location = &quot;East US 2&quot; } resource &quot;azurerm_virtual_network&quot; &quot;poc&quot; { name = &quot;vnet01&quot; resource_group_name = &quot;${azurerm_resource_group.

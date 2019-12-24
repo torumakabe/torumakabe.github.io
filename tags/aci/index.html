@@ -106,7 +106,7 @@
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci_graceful_shutdown/">Azure Container InstancesのGraceful Shutdown事情</a></h1>
       <div class="content">
         何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
-ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&rdquo;Kubernetesである&rdquo;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
+ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&ldquo;Kubernetesである&quot;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
 Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
  Kubernetes: 詳解 Pods の終了
  書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。

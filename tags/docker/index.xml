@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker on re-imagine</title>
@@ -18,9 +18,9 @@
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
-      <description> 小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
-条件  Docker for Windows  Linuxモード ドライブ共有   PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
-docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux   golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
+      <description>小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &amp;ndash;mount で スタティックリンク  </description>
     </item>
     
     <item>
@@ -32,10 +32,10 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
 さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
 まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&amp;rdquo;appservice web config container&amp;rdquo;コマンドがあります。これでコンテナイメージを更新できます。
+Azure CLI 2.0 Azure CLI 2.0に&amp;quot;appservice web config container&amp;quot;コマンドがあります。これでコンテナイメージを更新できます。
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot; }  新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; }  これで更新されます。</description>
+$ az appservice web config container show -n yourcontainerapp -g YourRG { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
+$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; } これで更新されます。</description>
     </item>
     
     <item>
@@ -46,12 +46,10 @@ $ az appservice web config container update -n yourcontainerapp -g YourRG -c &am
       <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
 さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
-何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details  導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる   1がコンテナ的でいいですよね。実現イメージはこんな感じです。
+何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details   導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる    1がコンテナ的でいいですよね。実現イメージはこんな感じです。
 これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
 では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;rdquo;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです  OMSポータルのソリューションギャラリーから、&amp;rdquo;Containers&amp;rdquo;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください  OMSエージェントコンテナを導入
- 先ほど入手したOMSのワークスペースIDとKeyを入れてください
-sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&amp;quot;your workspace id&amp;quot; -e KEY=&amp;quot;your key&amp;quot; -h=`hostname` -p 127.</description>
+手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&amp;quot;Microsoft Azure を使用した迅速なサインアップ&amp;ldquo;から読むと、話が早いです   OMSポータルのソリューションギャラリーから、&amp;ldquo;Containers&amp;quot;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください   OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください    sudo docker run --privileged -d -v /var/run/docker.</description>
     </item>
     
     <item>
@@ -66,7 +64,7 @@ sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e 
  Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
  Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
 サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*- # vi: set ft=ruby : # Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing! VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot; $bootstrap=&amp;lt;&amp;lt;SCRIPT #Common tools sudo apt-get update sudo apt-get -y install wget unzip jq #Docker Engine sudo apt-get -y install apt-transport-https ca-certificates sudo apt-get -y install linux-image-extra-$(uname -r) sudo apt-key adv --keyserver hkp://p80.</description>
+# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!VAGRANTFILE_API_VERSION = &amp;quot;2&amp;quot;$bootstrap=&amp;lt;&amp;lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.</description>
     </item>
     
     <item>
@@ -97,10 +95,10 @@ sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e 
       <guid>https://ToruMakabe.github.io/post/azure_docker_cntk/</guid>
       <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
 試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
-方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース  CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで  Docker Hub上のリポジトリは torumakabe/cntk-cpu  ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull  VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
+方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース   CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで   Docker Hub上のリポジトリは torumakabe/cntk-cpu   ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull   VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
 リソースグループを作ります。
 C:\Work&amp;gt; azure group create CNTK -l &amp;quot;Japan West&amp;quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
- azuredeploy.json  編集不要です  azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.parameters.&amp;ldquo;sample&amp;rdquo;.jsonなので、以降の手順では&amp;rdquo;sample&amp;rdquo;を外して読み替えてください    うし、デプロイ。</description>
+ azuredeploy.json  編集不要です   azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.</description>
     </item>
     
     <item>
@@ -119,13 +117,13 @@ OpenStackの最前線から離れて3か月がたちました。OpenStackつな�
 そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&amp;ldquo;このは&amp;rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
 では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
 今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
-ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1   ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
+ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1    ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
 いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
 Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
-$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge $ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem  Conoha向けにOpenStack関連の環境変数をセットします。
-$ export OS_USERNAME=yourname $ export OS_TENANT_NAME=yourtenantname $ export OS_PASSWORD=yourpass $ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0  次はローカルコンテナ環境を整えます。
+$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem Conoha向けにOpenStack関連の環境変数をセットします。
+$ export OS_USERNAME=yourname$ export OS_TENANT_NAME=yourtenantname$ export OS_PASSWORD=yourpass$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0 次はローカルコンテナ環境を整えます。
 Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
-$ docker-machine create -d virtualbox local $ eval &amp;quot;$(docker-machine env local)&amp;quot; $ docker run swarm create Status: Downloaded newer image for swarm:latest tokentokentokentoken  このトークンは控えておきましょう。</description>
+$ docker-machine create -d virtualbox local$ eval &amp;quot;$(docker-machine env local)&amp;quot;$ docker run swarm create Status: Downloaded newer image for swarm:latesttokentokentokentoken このトークンは控えておきましょう。</description>
     </item>
     
     <item>
@@ -141,11 +139,11 @@ AzureはMicrosoftテクノロジーとオープンソースの交差点です。
 Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
 このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
 ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
- Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)  ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
+ Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)   ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
 Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
 ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
 Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
-なお、このDocker拡張、ARM属性で言うpublisherは&amp;rdquo;Microsoft.Azure.Extensions&amp;rdquo;ですが、古い&amp;rdquo;MSOpenTech.Extensions&amp;rdquo;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</description>
+なお、このDocker拡張、ARM属性で言うpublisherは&amp;quot;Microsoft.Azure.Extensions&amp;quot;ですが、古い&amp;quot;MSOpenTech.Extensions&amp;quot;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。</description>
     </item>
     
   </channel>

@@ -114,7 +114,7 @@
 なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
 環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
 環境は以下の通り。
- Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)  Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan  Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています  Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい  対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7  転送ファイル  Ubuntu 15.
+ Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)   Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan   Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています   Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい   対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7   転送ファイル  Ubuntu 15.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobupload_perf/" style="height:28px">
           Read more
@@ -153,8 +153,8 @@
 &ldquo;Linux で Azure File Storage を使用する方法&rdquo;
 もうちょっと情報欲しいですね。補足のためにわたしも流します。
 Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
-local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc  ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
-local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: Executing command storage account connectionstring show + Getting storage account keys data: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm== info: storage account connectionstring show command OK  shareを作成します。share名はfspocshareとしました。
+local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
+local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: Executing command storage account connectionstring show+ Getting storage account keysdata: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==info: storage account connectionstring show command OK shareを作成します。share名はfspocshareとしました。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/fileshare_linuxonazure/" style="height:28px">
           Read more
@@ -184,10 +184,10 @@ local$ azure storage account connectionstring show tomakabefspoc -g fspoc info: 
       <h2 class="subtitle is-6 date">January 27, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/striping_linuxonazure/">Linux on AzureでDisk IO性能を確保する方法</a></h1>
       <div class="content">
-        &ldquo;俺の鉄板&rdquo;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
+        &ldquo;俺の鉄板&quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
 クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
 ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
- 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い  ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる  ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある  コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく  動かす  やっぱり動かしてみないと  提案する  リスクがあれば明示します  問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
+ 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い   ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる   ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある   コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく   動かす  やっぱり動かしてみないと   提案する  リスクがあれば明示します   問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
 Linux on AzureでDisk IO性能を確保する方法 さて今回の主題です。
 結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。
 Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。
@@ -195,7 +195,6 @@ Linux on AzureでDisk IO性能を必要とする案件がありました。検�
 Linuxで使える代表的なストライプ実装は、LVMとMD。
 ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。
 前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。
-&ldquo;Configure Software RAID on Linux&rdquo;
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/striping_linuxonazure/" style="height:28px">
           Read more
@@ -236,7 +235,7 @@ Linuxで使える代表的なストライプ実装は、LVMとMD。
 &ldquo;仮想マシンのサイズ&rdquo;
 ざっくりA、D、Gシリーズに分けられます。Aは初期からあるタイプ。ＤはSSDを採用した現行の主力。Gは昨年後半からUSリージョンで導入がはじまった、大物です。ガンダムだと後半、宇宙に出てから登場するモビルアーマー的な存在。現在、GシリーズがもっともVMあたり多くのリソースを提供できます。
 企業システムではOLTPやIOバウンドなバッチ処理が多いと仮定します。では、Gシリーズ最大サイズ、Standard_GS5の主な仕様から、OLTPやバッチ処理性能の支配要素となるCPU、メモリ、IOPSを見てみましょう。
- Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS   メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
+ Standard_GS5の主な仕様  32仮想CPUコア 448GBメモリ 80,000IOPS    メモリはクラウドだからといって特記事項はありません。クラウドの特徴が出るCPUとIOPSについて深掘りしていきます。
 なお、現時点でまだ日本リージョンにはGシリーズが投入されていません。必要に応じ、公開スペックと後述のACUなどを使ってA、Dシリーズと相対評価してください。
 32仮想CPUコアの規模感 クラウドのCPU性能表記は、なかなか悩ましいです。仮想化していますし、CPUは世代交代していきます。ちなみにAzureでは、ACU(Azure Compute Unit)という単位を使っています。
 &ldquo;パフォーマンスに関する考慮事項&rdquo;
@@ -247,7 +246,7 @@ ACUはAzure内で相対評価をする場合にはいいのですが、「じゃ
 &ldquo;SAP Standard Application Benchmarks&rdquo;
 SAPSという値が出てきます。販売管理アプリケーションがその基盤上でどれだけ仕事ができるかという指標です。
 比較のため、3年ほど前の2ソケットマシン、現行2ソケットマシン、現行4ソケットマシンを選びました。単体サーバ性能をみるため、APとDBを1台のサーバにまとめた、2-Tierの値をとります。
-    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012&frasl;4 2015&frasl;9 2015&frasl;7 2015&frasl;7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
+    DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012/4 2015/9 2015/7 2015/7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" style="height:28px">
           Read more
@@ -295,6 +294,7 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
 マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
 また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
 ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。
+よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" style="height:28px">
           Read more
