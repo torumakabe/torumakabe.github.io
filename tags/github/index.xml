@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Sun, 22 Dec 2019 23:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 21 May 2020 13:05:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/github/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版</title>
+      <link>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</link>
+      <pubDate>Thu, 21 May 2020 13:05:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</guid>
+      <description>何の話か マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
+ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。
+ BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、aksに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
+data &amp;#34;azurerm_log_analytics_workspace&amp;#34; &amp;#34;aks&amp;#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &amp;#34;azurerm_kubernetes_cluster&amp;#34; &amp;#34;aks&amp;#34; { name = var.aks_cluster_name kubernetes_version = &amp;#34;1.18.2&amp;#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &amp;#34;default&amp;#34; type = &amp;#34;VirtualMachineScaleSets&amp;#34; enable_auto_scaling = true vnet_subnet_id = var.</description>
+    </item>
     
     <item>
       <title>GitHub Actionsでオンデマンドに環境を再現する</title>

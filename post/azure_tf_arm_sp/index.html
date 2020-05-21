@@ -116,11 +116,11 @@ client_id/client_secret って何よ 以下がARM向けのProvider設定です�
     <h1 class="title">TerraformをAzure ARMで使う時の認証</h1>
     
     <div class="content">
-      <h2 id="heading">高まってまいりました</h2>
+      <h2 id="高まってまいりました">高まってまいりました</h2>
 <p>全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。</p>
 <p>Terraformのマイナーバージョンアップのたびに、<a href="https://www.terraform.io/docs/providers/azurerm/index.html">Azure Resource Manager Providerのリソース</a>が追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。</p>
 <p>そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。</p>
-<h2 id="client-idclient-secret-">client_id/client_secret って何よ</h2>
+<h2 id="client_idclient_secret-って何よ">client_id/client_secret って何よ</h2>
 <p>以下がARM向けのProvider設定です。</p>
 <pre><code># Configure the Azure Resource Manager Provider
 provider &quot;azurerm&quot; {
@@ -134,7 +134,7 @@ provider &quot;azurerm&quot; {
 <pre><code>&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;
 </code></pre>
 <p>おっとそういうことか。OAuth。</p>
-<h2 id="heading-1">サービスプリンシパルを使おう</h2>
+<h2 id="サービスプリンシパルを使おう">サービスプリンシパルを使おう</h2>
 <p>Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。</p>
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/active-directory-application-objects/">&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;</a></p>
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/resource-group-authenticate-service-principal/">&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;</a></p>

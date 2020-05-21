@@ -112,7 +112,7 @@
     <h1 class="title">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</h1>
     
     <div class="content">
-      <h2 id="heading">動機</h2>
+      <h2 id="動機">動機</h2>
 <p><a href="https://kogelog.com/">焦げlogさん</a>で、とても興味深いエントリを拝見しました。</p>
 <ul>
 <li><a href="https://kogelog.com/2017/10/06/20171006-01/">Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました</a></li>
@@ -128,7 +128,7 @@
 <li>リージョン間通信に関するサムシング</li>
 </ul>
 <p>を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。</p>
-<h2 id="heading-1">検証方針</h2>
+<h2 id="検証方針">検証方針</h2>
 <ul>
 <li>同一リージョン(東日本)に、2つのVNETを作る</li>
 <li>それぞれのVNETにVPN Gatewayを配置し、接続する</li>
@@ -144,7 +144,7 @@
 <li>送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る</li>
 <li>スループットのポテンシャルを引き出す検証はしない</li>
 </ul>
-<h2 id="heading-2">結果</h2>
+<h2 id="結果">結果</h2>
 <h3 id="vpngw1650mbps">VpnGW1(650Mbps)</h3>
 <table>
 <thead>
@@ -274,7 +274,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="sku-1actstb-to-actstb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
+<h3 id="sku視点-パターン1actstb-to-actstb">SKU視点 パターン1(Act/Stb to Act/Stb)</h3>
 <table>
 <thead>
 <tr>
@@ -301,7 +301,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="sku-2actstb-to-actact">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
+<h3 id="sku視点-パターン2actstb-to-actact">SKU視点 パターン2(Act/Stb to Act/Act)</h3>
 <table>
 <thead>
 <tr>
@@ -328,7 +328,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="sku-3actact-to-actact">SKU視点 パターン3(Act/Act to Act/Act)</h3>
+<h3 id="sku視点-パターン3actact-to-actact">SKU視点 パターン3(Act/Act to Act/Act)</h3>
 <table>
 <thead>
 <tr>
@@ -355,7 +355,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="heading-3">考察と推奨</h2>
+<h2 id="考察と推奨">考察と推奨</h2>
 <ul>
 <li>リージョン間の遅延やサムシングを除くと、SKUによるGatewayのスループット差は測定できる
 <ul>

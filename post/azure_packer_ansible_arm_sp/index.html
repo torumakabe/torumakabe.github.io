@@ -110,12 +110,12 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
     <h1 class="title">PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</h1>
     
     <div class="content">
-      <h2 id="heading">いつの間に</h2>
+      <h2 id="いつの間に">いつの間に</h2>
 <p>ナイスな感じにイメージを作ってくれるPackerですが、いつの間にか<a href="https://www.packer.io/docs/builders/azure.html">Azure ARM対応のBuilder</a>が出ておりました。0.10からかな。早く言ってください。</p>
-<h2 id="ansible-local">ansible_localと組み合わせたサンプル</h2>
+<h2 id="ansible_localと組み合わせたサンプル">ansible_localと組み合わせたサンプル</h2>
 <p>さっそく試してそつなく動くことを確認しました。サンプルを<a href="https://github.com/ToruMakabe/Packer_Azure_Sample">Githubにあげておきます</a>。</p>
 <p>手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。</p>
-<h3 id="heading-1">前準備</h3>
+<h3 id="前準備">前準備</h3>
 <ul>
 <li>リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。</li>
 <li>認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。</li>
@@ -126,7 +126,7 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
 </li>
 <li>ansibleはapache2をインストール、サービスEnableするサンプルにしました。</li>
 </ul>
-<h3 id="heading-2">サンプル</h3>
+<h3 id="サンプル">サンプル</h3>
 <p>ubuntu.jsonはこんな感じです。</p>
 <pre><code>{
   &quot;variables&quot;: {

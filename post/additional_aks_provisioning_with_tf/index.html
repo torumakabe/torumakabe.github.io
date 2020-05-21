@@ -120,9 +120,9 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
     <h1 class="title">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      <h2 id="何の話か">何の話か</h2>
 <p>CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、それには触れません。インフラ担当者向け。</p>
-<h2 id="heading-1">動機</h2>
+<h2 id="動機">動機</h2>
 <p>Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。</p>
 <p>ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に、後追いでこんなものを入れています。</p>
 <ul>
@@ -152,7 +152,7 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
 </ol>
 <p>インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。</p>
 <p>ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。</p>
-<h2 id="-terraform-data-source">意外に知られていない Terraform Data Source</h2>
+<h2 id="意外に知られていない-terraform-data-source">意外に知られていない Terraform Data Source</h2>
 <p>Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。</p>
 <p>Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
 <p>CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。</p>
@@ -201,7 +201,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
 }
 </code></pre><p>なお、Terraform実行ホスト上のKubernetes configファイルを使って対象のクラスターを<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">指定、認証する</a>こともできます。要件に合わせて選択しましょう。</p>
 <p>ここまでを、まとめます。Azure CLIやポータルを使って作ったAKSクラスターに対し、TerraformのData SourceやKubenetesのconfigファイルを使って属性、認証情報を取得し、追加プロビジョニングを一括で、楽にできる、という話でした。</p>
-<h2 id="heading-2">サンプル</h2>
+<h2 id="サンプル">サンプル</h2>
 <p>ではどんなことができるのか、サンプルをGistに置いておきました。</p>
 <p><a href="https://gist.github.com/ToruMakabe/46ac0b31f7f8a07fa9a1254f862bc15c">サンプルコード</a></p>
 <p>冒頭で挙げた、以下リソースの導入や設定ができます。</p>
@@ -213,7 +213,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
 <li>リアルタイムコンテナーログ表示設定</li>
 </ul>
 <p>HelmとIstioは開発の流れが速いので、ワークアラウンド多めです。詳細はソース上のコメントを参考にしてください。</p>
-<h3 id="heading-3">使い方</h3>
+<h3 id="使い方">使い方</h3>
 <ul>
 <li>Gist上の3ファイルを同じディレクトリに置く</li>
 <li>variables.tf.sampleの変数を設定し、ファイルをリネーム(.sampleを消し、.tfにする)</li>

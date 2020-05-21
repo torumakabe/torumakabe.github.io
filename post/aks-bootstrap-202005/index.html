@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 | re-imagine</title>
+
+<meta property='og:title' content='Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 - re-imagine'>
+<meta property='og:description' content='何の話か マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
+ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。
+ BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、aksに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
+data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; { name = var.aks_cluster_name kubernetes_version = &#34;1.18.2&#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &#34;default&#34; type = &#34;VirtualMachineScaleSets&#34; enable_auto_scaling = true vnet_subnet_id = var.'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/aks-bootstrap-202005/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2020-05-21T13:05:00&#43;09:00'/><meta property='article:modified_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="canonical" href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav id="nav-main" class="nav">
+      <div id="nav-name" class="nav-left">
+        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+  <script src="/js/navicon-shift.js"></script>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/github">#GitHub</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+      
+    </div>
+    <h2 class="subtitle is-6">May 21, 2020</h2>
+    <h1 class="title">Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版</h1>
+    
+    <div class="content">
+      <h2 id="何の話か">何の話か</h2>
+<p>マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。</p>
+<p>ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。</p>
+<ul>
+<li>BootstrapとConfigurationを分割する
+<ul>
+<li>環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています</li>
+<li>前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します
+<ul>
+<li>FluxとHelm-Operatorは<a href="https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/">Azure Arc</a>でも採用されており、注目しています</li>
+</ul>
+</li>
+<li>分割した理由はライフサイクルと責務に応じたリソースとツールの分離です</li>
+<li>前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので</li>
+<li>どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます
+<ul>
+<li>わたしの場合はPrometheusとか</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>GitHubのプルリクを前提としたワークフロー
+<ul>
+<li>Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク</li>
+<li>プルリクによってCIのGitHub Actionsワークフローが走ります</li>
+<li>terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます</li>
+<li>レビュワーはそれを見てmasterへのマージを判断します</li>
+</ul>
+</li>
+</ul>
+<h2 id="メインとなるhclの概説">メインとなるHCLの概説</h2>
+<p>ちょっと長いのですが、aksに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
+  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
+  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34;</span> {
+  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
+  kubernetes_version  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.18.2&#34;</span>
+  location            <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_location</span>
+  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_rg</span>
+  dns_prefix          <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
+
+  <span style="color:#66d9ef">default_node_pool</span> {
+    name                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;default&#34;</span>
+    type                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;VirtualMachineScaleSets&#34;</span>
+    enable_auto_scaling <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+    vnet_subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
+    availability_zones  <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
+    node_count          <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+    min_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+    max_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
+    vm_size             <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_D2s_v3&#34;</span>
+  }
+
+  <span style="color:#66d9ef">identity</span> {
+    type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SystemAssigned&#34;</span>
+  }
+
+  <span style="color:#66d9ef">role_based_access_control</span> {
+    enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+  }
+
+  <span style="color:#66d9ef">network_profile</span> {
+    network_plugin    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
+    network_policy    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
+    load_balancer_sku <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;standard&#34;</span>
+    <span style="color:#66d9ef">load_balancer_profile</span> {
+      managed_outbound_ip_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+    }
+  }
+
+  <span style="color:#66d9ef">addon_profile</span> {
+    <span style="color:#66d9ef">oms_agent</span> {
+      enabled                    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+      log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+    }
+    <span style="color:#66d9ef">azure_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+    }
+  }
+
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster_node_pool&#34; &#34;system&#34;</span> {
+  name                  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;system&#34;</span>
+  kubernetes_cluster_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+  vnet_subnet_id        <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
+  availability_zones    <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
+  node_count            <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+  vm_size               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_F2s_v2&#34;</span>
+  node_taints           <span style="color:#f92672">=</span> [&#34;CriticalAddonsOnly<span style="color:#f92672">=</span><span style="color:#66d9ef">true</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#66d9ef">NoSchedule</span><span style="color:#960050;background-color:#1e0010">&#34;</span>]
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_monitor_diagnostic_setting&#34; &#34;aks&#34;</span> {
+  name                       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;aks-diag&#34;</span>
+  target_resource_id         <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+  log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+
+  <span style="color:#66d9ef">log</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-apiserver&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+
+  <span style="color:#66d9ef">log</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-controller-manager&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+
+  <span style="color:#66d9ef">log</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-scheduler&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+
+  <span style="color:#66d9ef">log</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-audit&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+
+  <span style="color:#66d9ef">log</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cluster-autoscaler&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+
+  <span style="color:#66d9ef">metric</span> {
+    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AllMetrics&#34;</span>
+    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+
+    <span style="color:#66d9ef">retention_policy</span> {
+      days    <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    }
+  }
+}
+
+<span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;kubernetes&#34;</span> {
+  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.11&#34;</span>
+
+  load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+  host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
+  client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
+  client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
+  cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_storage_class&#34; &#34;managed_premium_bind_wait&#34;</span> {
+  <span style="color:#66d9ef">metadata</span> {
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;managed-premium-bind-wait&#34;</span>
+  }
+  storage_provisioner <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kubernetes.io/azure-disk&#34;</span>
+  volume_binding_mode <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;WaitForFirstConsumer&#34;</span>
+  parameters <span style="color:#f92672">=</span> {
+    storageaccounttype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Premium_LRS&#34;</span>
+    kind               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Managed&#34;</span>
+  }
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role&#34; &#34;log_reader&#34;</span> {
+  <span style="color:#66d9ef">metadata</span> {
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
+  }
+
+  <span style="color:#66d9ef">rule</span> {
+    api_groups <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;&#34;</span>]
+    resources  <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;pods/log&#34;, &#34;events&#34;</span>]
+    verbs      <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;get&#34;, &#34;list&#34;</span>]
+  }
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role_binding&#34; &#34;log_reader&#34;</span> {
+  <span style="color:#66d9ef">metadata</span> {
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-read-logs-global&#34;</span>
+  }
+
+  <span style="color:#66d9ef">role_ref</span> {
+    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ClusterRole&#34;</span>
+    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
+    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
+  }
+
+  <span style="color:#66d9ef">subject</span> {
+    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;User&#34;</span>
+    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;clusterUser&#34;</span>
+    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
+  }
+}
+
+<span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;helm&#34;</span> {
+  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.2&#34;</span>
+
+  <span style="color:#66d9ef">kubernetes</span> {
+    load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+    host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
+    client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
+    client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
+    cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
+  }
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_namespace&#34; &#34;flux&#34;</span> {
+  count <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+  <span style="color:#66d9ef">metadata</span> {
+    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+  }
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;flux&#34;</span> {
+  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
+  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.3.0&#34;</span>
+
+  <span style="color:#66d9ef">set</span> {
+    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
+    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
+  }
+
+  <span style="color:#66d9ef">set</span> {
+    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.url&#34;</span>
+    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git@github.com:${var.git_authuser}/${var.git_fluxrepo}&#34;</span>
+  }
+
+}
+
+<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;helm_operator&#34;</span> {
+  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
+  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
+  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
+  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0.2&#34;</span>
+
+  <span style="color:#66d9ef">set</span> {
+    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
+    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
+  }
+
+  <span style="color:#66d9ef">set</span> {
+    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.ssh.secretName&#34;</span>
+    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux-git-deploy&#34;</span>
+  }
+
+}
+</code></pre></div><p>以下は特記すべきリソースと設定、その背景などです。</p>
+<ul>
+<li>(data).azurerm_log_analytics_workspace.aks
+<ul>
+<li>Azure Monitorのワークスペースを指定します</li>
+<li>ログはクラスター削除後も残しておきたいケースが多いので、AKSクラスターに合わせた動的な作成削除はしない方針です</li>
+</ul>
+</li>
+<li>azurerm_kubernetes_cluster.aks.kubernetes_version
+<ul>
+<li>目的に応じ、お好みのバージョンを</li>
+</ul>
+</li>
+<li>azurerm_kubernetes_cluster.aks.default_node_pool
+<ul>
+<li>既定のノードプールで、オートスケールを有効にしています</li>
+</ul>
+</li>
+<li>azurerm_kubernetes_cluster.aks.identity
+<ul>
+<li>typeをSystemAssignedにしているため、別途サービスプリンシパルを作成、指定する必要はありません</li>
+<li>以前はサービスプリンシパルの作成と指定、管理が煩雑、グローバル同期の考慮など悩ましかったのですが、楽になりました</li>
+<li>ただしAKS関連リソースが入るリソースグループ(MC_*)の外にあるリソースには、SystemAssigned指定で作られるManaged Identityから<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-managed-identity">操作する権限がない</a>ため、必要な場合はSystemAssignedではなくサービスプリンシパルを指定しましょう</li>
+</ul>
+</li>
+<li>azurerm_kubernetes_cluster.aks.addon_profile.azure_policy
+<ul>
+<li>OPAを利用したポリシー適用を有効化しています</li>
+<li>現時点でプレビュー機能なので、<a href="https://docs.microsoft.com/ja-jp/azure/governance/policy/concepts/policy-for-kubernetes?toc=%2Fazure%2Faks%2Ftoc.json">リソースプロバイダーの有効化</a>も行ってください</li>
+</ul>
+</li>
+<li>azurerm_kubernetes_cluster_node_pool.system
+<ul>
+<li>CoreDNSなどCritical Addonを分離するためにノードプールを分けています</li>
+<li>安定稼働が優先なのでオートスケール設定はしません</li>
+<li>コストと<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-system-pools#system-and-user-node-pools">要件</a>のバランスから、VMはStandard_F2s_v2にしています</li>
+<li>CriticalAddonsOnlyでtolerationしているPodだけがこのプールで動けるようにtaintします</li>
+<li>ただしCritical Addonがdefaultノードプールにスケジューリングされる可能性は残るので、厳密にしたい場合は合わせて<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools.sh">ノードプールのモード指定</a>、Critical Addonたちへ<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-nodeselecter-system-deployments.sh">nodeSelectorの指定</a>、<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/restart-system-deployments.sh">リスタート</a>が必要です</li>
+<li>なお、この追加したノードプールのモードをsystem、defaultプールのモードをuserにすると、destroy時に先に追加したノードプールを削除しに行ってしまい「systemモードのプールが最低1つは要るぞ」と怒られますので、destroy前にモードを<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools-on-deletion.sh">再設定</a>しましょう</li>
+<li>いずれこの流れはAKS APIとHCLで吸収されると期待しています</li>
+</ul>
+</li>
+<li>azurerm_monitor_diagnostic_setting.aks
+<ul>
+<li>マスターコンポーネントのログをAzure Monitorに送るよう設定します</li>
+</ul>
+</li>
+<li>kubernetes_storage_class.managed_premium_bind_wait
+<ul>
+<li>AZにクラスターノードを分散した場合、別のAZにあるPodとボリュームは関連付けできません</li>
+<li>Podより先にボリュームが作られてしまうとPodのスケジューリングができなくなる恐れがあるので、Podのスケジューリングを待つStorageClassを作ります</li>
+</ul>
+</li>
+<li>kubernetes_cluster_role.log_reader &amp; kubernetes_cluster_role_binding.log_reader
+<ul>
+<li>Azure Monitorの<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-livedata-overview?toc=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Faks%2Ftoc.json&amp;bc=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fbread%2Ftoc.json">リアルタイムビュー機能</a>を使えるようにしています</li>
+</ul>
+</li>
+<li>kubernetes_namespace.flux &amp; helm_release.flux &amp; helm_release.helm_operator
+<ul>
+<li>GitOpsのためにFluxとHelm-Operatorを導入しています</li>
+<li>variable enable_fluxをfalseにすれば導入されません</li>
+<li>ブートストラップ後に<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">Fluxの設定</a>を行ってください</li>
+</ul>
+</li>
+</ul>
+<h2 id="その他ワークフローに関する説明など">その他、ワークフローに関する説明など</h2>
+<p>長くなってしまったので、GitHubのリポジトリ<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">README</a>をご確認ください。えんじょい。</p>
+
+      
+      <div class="related">
+
+<h3>Similar articles:</h3>
+<ul>
+	
+	<li><a href="/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></li>
+	
+	<li><a href="/post/gh-actions-trigger-label/">GitHub Actionsでオンデマンドに環境を再現する</a></li>
+	
+	<li><a href="/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></li>
+	
+	<li><a href="/post/aks_how_to_keep_secret/">Azure Kubernetes Serviceでシークレットを管理する6つの方法</a></li>
+	
+	<li><a href="/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></li>
+	
+</ul>
+</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+

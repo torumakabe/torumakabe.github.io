@@ -117,25 +117,25 @@ Gistに置いたHCLで、以下のような環境を作れます。
     <h1 class="title">Azure Kubernetes ServiceのObservabilityお試しキットを作った</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      <h2 id="何の話か">何の話か</h2>
 <p>Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多くなってきたので、まるっと試せるTerraform HCLとサンプルアプリを作りました。</p>
 <p><a href="https://gist.github.com/ToruMakabe/916d4329f6e92c3fda1c8d6440afd47b#file-main-tf">Gistに置いたHCL</a>で、以下のような環境を作れます。</p>
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-observability-overview.png?raw=true" alt="Overview" title="Overview"></p>
-<h2 id="heading-1">動機</h2>
+<h2 id="動機">動機</h2>
 <p>監視とは、ビジネスとそれを支える仕組みがどのような状態かを把握し、判断や行動につなげるものです。そして何を監視し、何をもって健全、危険と判断するかは、人や組織によります。安易にベストプラクティスを求めるものではないでしょう。</p>
 <p>とはいえ、コンテナー技術が本格的に普及し始めたのは最近ですし、手を動かしていない段階では、議論が発散しがちです。そこでお試しキットを作りました。AKSクラスターとサンプルアプリケーション、それらを監視するサービスとツールをまるっと試せます。</p>
 <p>このお試しキットは、Azureの提供するサービスとオープンソースのツールのみでまとめました。ですが、世にはいい感じのKubernetes対応ツールやサービスが多くあります。このキットであたりをつけてから、他も探ってみてください。</p>
-<h2 id="heading-2">視点</h2>
+<h2 id="視点">視点</h2>
 <p>クラウド、コンテナー、サーバーレスの監視という文脈で、可観測性(Observability)という言葉を目にすることが多くなりました。オブザーバビブベボ、いまだに口が回りません。</p>
 <p>制御理論用語である可観測性がITの世界で使われるようになった理由は、諸説あるようです。監視を行為とすると、可観測性は性質です。「監視対象側に、状態を把握しやすくする仕組みを備えよう」というニュアンスを感じませんか。後付けではなく、監視をあらかじめ考慮したうえでアプリや基盤を作ろう、ということだと捉えています。いわゆるバズワードかもしれませんが、監視を考え直すいいきっかけになりそうで、わたしは好意的です。</p>
 <p>お試しキットは、3つの要素と2つの配置を意識して作りました。</p>
-<h3 id="heading-3">メトリクス、ロギング、トレーシング</h3>
+<h3 id="メトリクスロギングトレーシング">メトリクス、ロギング、トレーシング</h3>
 <p>可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。</p>
-<h3 id="heading-4">外からか、内からか</h3>
+<h3 id="外からか内からか">外からか、内からか</h3>
 <p>Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。</p>
 <p>いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。</p>
-<h2 id="heading-5">お試しキットの使い方</h2>
-<h3 id="heading-6">前提条件</h3>
+<h2 id="お試しキットの使い方">お試しキットの使い方</h2>
+<h3 id="前提条件">前提条件</h3>
 <ul>
 <li>Terraform 0.12</li>
 <li>Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています)</li>
@@ -149,10 +149,10 @@ Gistに置いたHCLで、以下のような環境を作れます。
 </ul>
 </li>
 </ul>
-<h3 id="heading-7">実行手順</h3>
+<h3 id="実行手順">実行手順</h3>
 <p>Gistに置いた<a href="https://gist.github.com/ToruMakabe/916d4329f6e92c3fda1c8d6440afd47b#file-variables-tf">variables.tf</a>を好みの値で編集し、<a href="https://gist.github.com/ToruMakabe/916d4329f6e92c3fda1c8d6440afd47b#file-main-tf">main.tf</a>を同じディレクトリに置いて実行(init、plan、apply)してください。</p>
 <p>セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。</p>
-<h3 id="heading-8">補足</h3>
+<h3 id="補足">補足</h3>
 <ul>
 <li>AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに<a href="https://www.terraform.io/docs/providers/azurerm/r/kubernetes_cluster.html#type">変更してください</a></li>
 <li>AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です
@@ -186,15 +186,15 @@ Gistに置いたHCLで、以下のような環境を作れます。
 </ul>
 </li>
 </ul>
-<h2 id="heading-9">触ってみよう</h2>
-<h3 id="heading-10">メトリクス</h3>
+<h2 id="触ってみよう">触ってみよう</h2>
+<h3 id="メトリクス">メトリクス</h3>
 <p>まずはメトリクスから。メトリクスとは「状態を数値で表せるもの」です。単数系はメトリック。CPUやメモリの使用率、Kubernetes固有ではNotReady状態のノード数やPendingのポッド数などがそれにあたります。</p>
 <p>Kubernetesでどのようなメトリクスに注目すべきかについては、議論が活発です。探せば参考になる情報が数多くあります。&ldquo;Golden signals&rdquo;、&ldquo;RED Method&rdquo;、&ldquo;USE Method&quot;で検索すると、いろいろ見つかるでしょう。</p>
 <p>お試しキットで作った環境では、Azure Monitorを主役に、Prometheusを組み合わせています。Azure Monitorのコンテナー向け機能は次のページをトップにしたツリーに情報がまとまっていますので、まずざっと読んでおくと理解しやすいです。</p>
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-overview">コンテナーに対する Azure Monitor の概要</a></p>
 </blockquote>
-<h4 id="azure-monitor-">Azure Monitor メトリック</h4>
+<h4 id="azure-monitor-メトリック">Azure Monitor メトリック</h4>
 <p>Azure MonitorはAzureの監視サービス群です。以前は従来からある監視サービスとAzure生まれのサービスがいくつか独立して提供されていたのですが、現在はAzure Monitorの傘の下で機能統合が進んでいます。</p>
 <p>Azure Monitorのメトリックは収集、可視化、アラート機能を持ちます。AKSに限らず、様々なAzureサービスのメトリックがサポートされています。</p>
 <blockquote>
@@ -243,8 +243,8 @@ annotations:
 <pre><code>kubectl port-forward -n monitoring svc/prometheus-operator-alertmanager 9093:9093
 </code></pre><p>AzureはVMからのメール送信を<a href="https://docs.microsoft.com/ja-jp/azure/virtual-network/troubleshoot-outbound-smtp-connectivity">制限している</a>ため、お試しキットではPrometheusからの通知設定をしていません。もしWebhook通知などを試してみたい場合は、<a href="https://prometheus.io/docs/alerting/overview/">こちら</a>を参考にConfigを書いてみてください。Configの投入は環境作成時に使ったTerraforrm HCLに追記してapplyすると楽です。</p>
 <p>PrometheusはKubernetesと同じCNCFプロジェクトということもあり、親和性は大きな利点です。エコシステムも魅力で、試す価値はあります。いっぽうでKubernetesクラスター上に導入する場合は、監視主体と対象が同居するため独立性、客観性が懸念です。これは利点とのトレードオフなので、Azure Monitorなど外部からの監視をうまく組み合わせましょう。</p>
-<h3 id="heading-11">ロギング</h3>
-<h4 id="azure-monitor-for-containers-">Azure Monitor for Containers (コンテナー分析)</h4>
+<h3 id="ロギング">ロギング</h3>
+<h4 id="azure-monitor-for-containers-コンテナー分析">Azure Monitor for Containers (コンテナー分析)</h4>
 <p>Azure Monitorのログ分析サービスであるLog Analyticsを活用したソリューションです。KubernetesのDaemonSetとして動くLog Analytics Agentが、アプリケーションコンテナーのログ、Kubernetesのインベントリ情報、性能情報を取得しLog Analyticsワークスペースへ送信します。ワークスペースに蓄積されたデータを使って、様々な可視化や分析を行えます。</p>
 <p>機能については、公式ドキュメントが詳しいのでそちらを。</p>
 <blockquote>
@@ -262,7 +262,7 @@ annotations:
 <p><a href="https://docs.microsoft.com/ja-jp/azure/aks/view-master-logs">Azure Kubernetes Service (AKS) での Kubernetes マスター ノード ログの有効化とレビュー</a></p>
 </blockquote>
 <p>Kubernetesのログ分析にはELKスタックが使われることが多いですが、AzureではAzure Monitor for Containersが楽に使えるので、ぜひ一度お試しを。</p>
-<h5 id="azure-monitor-for-containers">メトリックアラートエンジンとしてのAzure Monitor for Containers</h5>
+<h5 id="メトリックアラートエンジンとしてのazure-monitor-for-containers">メトリックアラートエンジンとしてのAzure Monitor for Containers</h5>
 <p>Azure MonitorのLog Analyticsワークスペースに蓄積されたログには、クエリーを書けます。そして定期的にクエリーを実行し、結果が条件にマッチした場合にAzure Moniterのアラート通知機能を呼び出すことができます。Scheduled Queryと呼ばれます。</p>
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-alerts">コンテナー用 Azure Monitor でパフォーマンスの問題に関するアラートを設定する方法</a></p>
@@ -270,7 +270,7 @@ annotations:
 <p>つまり、ログから特定の文字列を検索し、アラートにするという使い方の他に、メトリックアラート的な使い方もできます。ログからメトリックを動的に作り出すというアイデアです。ログの柔軟性を活かしたやり方と言えます。</p>
 <p>ですが、短サイクルで数値を取得、評価する目的で作られているメトリックと異なり、Log Analyticsワークスペースはあくまでログ志向の作りです。向き不向きを考えると、頻繁に測定、評価したい値はメトリックを使うべきでしょう。また、Scheduled Queryは比較的新しい機能であるため、現時点ではまだAzure CLIやTerraformで設定できず、<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/platform/alerts-log">ポータルやARMテンプレートでの設定が必要</a>という制約もあります。AKSクラスターをインプレースアップグレードせず、毎回新しいクラスターを作って切り替えるという運用では、監視設定を含めて構築を自動化したくなるため、考慮すべき制約です。</p>
 <p>メトリックアラート用途では、まずAzure MonitorメトリックアラートかPrometheusアラートを検討し、それでも満たせない場合はScheduled Queryを使う、というのがわたしのスタンスです。</p>
-<h3 id="heading-12">トレーシング</h3>
+<h3 id="トレーシング">トレーシング</h3>
 <p>コンテナーのアプリケーションは変更や更新、スケールの柔軟性を高めるため、ひとつのコンテナーにいくつも機能を詰め込まず、シンプルなコンテナーを組み合わせる設計が好まれます。となると「アプリケーションを構成する一連のコンテナーの、どこが期待通りに動き、どこが遅い/おかしいかを調べたい」というニーズが生まれます。これを実現するコンセプトが分散トレーシングです。</p>
 <h4 id="azure-monitor-application-insights">Azure Monitor Application Insights</h4>
 <p>AzureMonitorにはにはApplication Insightsという分散トレーシングを実現するサービスがあり、コンテナーやKubernetesに関係なく使えます。ASP.NET CoreやJava、Nodeなどのフレームワーク、言語むけの<a href="https://github.com/microsoft/ApplicationInsights-Home">SDK</a>があり、テレメトリをApplication Insightsに送るコードを埋め込みます。</p>
@@ -284,13 +284,13 @@ annotations:
 <p>また、エンドツーエンドの性能、依存関係も「パフォーマンス」メニューで可視化できます。</p>
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-observability-dependency.png?raw=true" alt="Dependency" title="Dependency"></p>
 <p>ところでOpenCensusは、別のトレーシング仕様であるOpenTracingとマージされ、今後<a href="https://opentelemetry.io/">OpenTelemetry</a>が存続プロジェクトになりました。マイクロソフトからも、OpenCensusに引き続き<a href="https://cloudblogs.microsoft.com/opensource/2019/05/23/announcing-opentelemetry-cncf-merged-opencensus-opentracing/">支持する</a>とアナウンスが出ています。当面はApplication Insights SDKを使いつつ、OpenTelemetryの本格化を横目でチェックする感じがいいのでは、と思います。</p>
-<h5 id="application-insights-">Application Insights 可用性テスト</h5>
+<h5 id="application-insights-可用性テスト">Application Insights 可用性テスト</h5>
 <p>分散トレーシングというよりはメトリックアラートなのですが、Application InsightsにはWeb可用性テスト、という機能もあります。いわゆる外形監視機能です。お試しキットでは設定していませんが、ポータルから試してみてください。</p>
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/app/monitor-web-app-availability">Web サイトの可用性と応答性の監視</a></p>
 </blockquote>
 <p>Terraformでの環境構築中、KubernetesのサービスにIPを割り当てたあと、Webテストを自動設定することもできます。ですがTerraformのWebテストリソースからはまだアラートの設定ができないため、お試しキットでは設定していません。(Terraformの対応後に参考となるよう、アラート設定なしのHCLはコメントとして残しておきました)</p>
-<h4 id="heading-13">サービスメッシュは?</h4>
+<h4 id="サービスメッシュは">サービスメッシュは?</h4>
 <p>Kubernetesを追っている人であれば、分散トレーシング機能はIstioなどのサービスメッシュ側が持つようになる、と考えているかもしれません。実際、Appication InsightsでもIstio向けアダプターが開発されています。</p>
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/app/kubernetes">Kubernetes でホストされるアプリケーションに対するゼロ インストルメンテーション アプリケーション監視</a></p>
@@ -300,7 +300,7 @@ annotations:
 <p><a href="https://smi-spec.io/">Service Mesh Interface: A standard interface for service meshes on Kubernetes</a></p>
 </blockquote>
 <p>もしサービスメッシュへの期待が分散トレーシング中心であれば、現時点では無理してサービスメッシュに取り組むよりも、アプリケーションにトレーシングのコードを埋め込む方がいいのではないかと考えます。</p>
-<h2 id="-">最後に: お試しキットを超えて</h2>
+<h2 id="最後に-お試しキットを超えて">最後に: お試しキットを超えて</h2>
 <p>冒頭でも書きましたが、このお試しキットはあくまでひとつの実装例です。Kubernetesの可観測性を高めるサービスやツールは数多いです。DatadogやNew Relicなど、監視に特化したサービスの機能は見るべきものがあります。ぜひ調べてみてください。</p>
 <p>特にアラート通知はPagerDutyなど特化したサービスがあるとうれしいと思います。たとえばAzure MonitorとPrometheusから別々のフォーマットや受諾機能を持つシステムからアラートを受け、それぞれ対応するのは若干つらい。アラートをいい感じにまとめてくれる仕組みは、検討する価値があるのではないでしょうか。</p>
 <p>ではでは Enjoy Observability</p>

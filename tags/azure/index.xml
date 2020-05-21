@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Sun, 22 Dec 2019 23:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 21 May 2020 13:05:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ToruMakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版</title>
+      <link>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</link>
+      <pubDate>Thu, 21 May 2020 13:05:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</guid>
+      <description>何の話か マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
+ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。
+ BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、aksに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
+data &amp;#34;azurerm_log_analytics_workspace&amp;#34; &amp;#34;aks&amp;#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &amp;#34;azurerm_kubernetes_cluster&amp;#34; &amp;#34;aks&amp;#34; { name = var.aks_cluster_name kubernetes_version = &amp;#34;1.18.2&amp;#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &amp;#34;default&amp;#34; type = &amp;#34;VirtualMachineScaleSets&amp;#34; enable_auto_scaling = true vnet_subnet_id = var.</description>
+    </item>
     
     <item>
       <title>GitHub Actionsでオンデマンドに環境を再現する</title>
@@ -40,7 +52,7 @@ name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: A
 Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
 MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
  Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-  What&#39;s so hard about vulnerability scanning?
+  What&amp;rsquo;s so hard about vulnerability scanning?
   Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
  トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
 $ docker run --rm -it aquasec/microscanner --register &amp;lt;email address&amp;gt; コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
@@ -308,7 +320,7 @@ $ kubectl create -f nginx-label.</description>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
 さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
 そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
- TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&#39;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待    なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
+ TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&amp;rsquo;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待    なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
 使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
  Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。この記事も参考に。
 $ helm install stable/nginx-ingress --name my-nginx サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。

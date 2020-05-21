@@ -12,7 +12,7 @@
 Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
 MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
  Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-  What&#39;s so hard about vulnerability scanning?
+  What&rsquo;s so hard about vulnerability scanning?
   Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
  トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
 $ docker run --rm -it aquasec/microscanner --register &lt;email address&gt; コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
@@ -117,25 +117,25 @@ FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.'>
     <h1 class="title">Azure Container Registry TasksでAqua MicroScannerを自動実行する</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      <h2 id="何の話か">何の話か</h2>
 <p>コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。</p>
 <p>@ehotinger の<a href="https://ehotinger.github.io/blog/acr-tasks-image-scanning/">ブログ</a>を読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!</p>
-<h2 id="aqua-microscanner">Aqua MicroScannerとは</h2>
+<h2 id="aqua-microscannerとは">Aqua MicroScannerとは</h2>
 <p>Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差は<a href="https://github.com/aquasecurity/microscanner#aqua-security-edition-comparison">こちら</a>を。</p>
 <p>MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。</p>
 <blockquote>
 <p><a href="https://blog.aquasec.com/microscanner-free-image-vulnerability-scanner-for-developers">Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers</a></p>
 </blockquote>
 <blockquote>
-<p><a href="https://speakerdeck.com/lizrice/whats-so-hard-about-vulnerability-scanning">What's so hard about vulnerability scanning?</a></p>
+<p><a href="https://speakerdeck.com/lizrice/whats-so-hard-about-vulnerability-scanning">What&rsquo;s so hard about vulnerability scanning?</a></p>
 </blockquote>
 <blockquote>
 <p><a href="https://github.com/aquasecurity/microscanner">Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub</a></p>
 </blockquote>
-<h2 id="heading-1">トークンの取得</h2>
+<h2 id="トークンの取得">トークンの取得</h2>
 <p>MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。</p>
 <pre><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
-</code></pre><h2 id="heading-2">コンテナービルド時に実行してみる</h2>
+</code></pre><h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
 <p>以降、<a href="https://github.com/ToruMakabe/aqua-sample/tree/master">ここ</a>にサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。</p>
 <p>ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。</p>
 <p>まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。</p>
@@ -280,7 +280,7 @@ Removing intermediate container 33b0f554bb3f
  ---&gt; a4f61c940dce
 Successfully built a4f61c940dce
 </code></pre><p>脆弱性は検出されず、ビルドが正常終了しました。これがMicroScannerの基本的な動きです。ちなみに&ndash;continue-on-failureオプションで、脆弱性highのブツが見つかっても処理を継続することはできます。</p>
-<h2 id="acr-tasks">ACR Tasksでのビルドに組み込む</h2>
+<h2 id="acr-tasksでのビルドに組み込む">ACR Tasksでのビルドに組み込む</h2>
 <p>ではACR Tasksに組み込みましょう。ポイントはMicroScannerに渡すトークンをいかに秘匿し、ACR Tasksに渡すかです。GitHubとかでご開帳しないように気を付けましょう。</p>
 <ul>
 <li>Key Vaultにトークンを保管</li>

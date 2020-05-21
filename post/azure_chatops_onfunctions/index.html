@@ -124,21 +124,21 @@ AZChatOpsSample
     <h1 class="title">SlackとAzure FunctionsでChatOpsする</h1>
     
     <div class="content">
-      <h2 id="azure-functions">Azure Functionsでやってみよう</h2>
+      <h2 id="azure-functionsでやってみよう">Azure Functionsでやってみよう</h2>
 <p>Azure上でChatOpsしたい、と相談をいただきました。</p>
 <p>AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵な<a href="http://fabriccontroller.net/chatops-deploy-and-manage-complete-environments-on-azure-using-slack/">サンプル</a>があります。</p>
 <p><img src="http://fabriccontroller.net/static/chatops-how-this-works.png.pagespeed.ce.lN444drUKd.png" alt="Azure Runスラッシュ" title="from fabriccontroller.net"></p>
 <p>素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。</p>
-<h2 id="slackrunbook">SlackからRunbookを実行できて、何がうれしいか</h2>
+<h2 id="slackからrunbookを実行できて何がうれしいか">SlackからRunbookを実行できて、何がうれしいか</h2>
 <ul>
 <li>誰がいつ、どんな文脈でRunbookを実行したかを可視化する</li>
 <li>CLIやAPIをRunbookで隠蔽し、おぼえることを減らす</li>
 <li>CLIやAPIをRunbookで隠蔽し、できることを制限する</li>
 </ul>
-<h2 id="heading">ブツ</h2>
+<h2 id="ブツ">ブツ</h2>
 <p>Githubに上げておきました。</p>
 <p><a href="https://github.com/ToruMakabe/AZChatOpsSample">AZChatOpsSample</a></p>
-<h2 id="heading-1">おおまかな流れ</h2>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
 <p>手順書つらいのでポイントだけ。</p>
 <ul>
 <li>
@@ -203,7 +203,7 @@ AZChatOpsSample
 </ul>
 </li>
 </ul>
-<h2 id="heading-2">よもやま話</h2>
+<h2 id="よもやま話">よもやま話</h2>
 <ul>
 <li>
 <p>SlackのSlash Commandは、3秒以内に返事を返さないとタイムアウトします。なのでいくつか工夫しています。</p>

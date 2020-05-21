@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.62.0" />
+	<meta name="generator" content="Hugo 0.71.0" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,44 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/paintschainer">#PaintsChainer</a>
+  
+  | <a class="subtitle is-6" href="/tags/nvidia">#NVIDIA</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 3, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/paintschainer_on_azure/">Azure N-SeriesでPaintsChainerを動かす</a></h1>
+      <div class="content">
+        PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;が、とても面白いです。
+畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。
+せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。
+試した環境  米国中南部リージョン Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80) Ubuntu 16.04 NSGはSSH(22)の他にHTTP(80)を受信許可  導入手順 NVIDIA Tesla driversのインストール マイクロソフト公式ドキュメントの通りに導入します。
+Set up GPU drivers for N-series VMs
+Dockerのインストール Docker公式ドキュメントの通りに導入します。
+Get Docker for Ubuntu
+NVIDIA Dockerのインストール GitHub上のNVIDIAのドキュメント通りに導入します。
+NVIDIA Docker
+ここまでの作業に問題がないか、確認します。
+$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest latest: Pulling from nvidia/cuda 8aec416115fd: Pull complete [...] Status: Downloaded newer image for nvidia/cuda:latest Fri Feb 3 06:43:18 2017 +-----------------------------------------------------------------------------+ | NVIDIA-SMI 367.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/paintschainer_on_azure/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -222,39 +260,6 @@ cd /mnt/c/your_work_directory node ./index.js なんて感じで、書いたコ�
  運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&quot;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App アプリ名は.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/docker">#Docker</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/oms">#OMS</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">August 25, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/oms_container_linux/">OMSでLinuxコンテナのログを分析する</a></h1>
-      <div class="content">
-        OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、利用者も多いのではないでしょうか。
-さて、このたびプレビュー開始したLinuxコンテナのログ分析機能、サクッと使えるので紹介します。まだプレビューなので、仕様が変わったらごめんなさい。
-何ができるか、とその特徴  Dockerコンテナに関わるログの収集と分析、ダッシュボード表示  収集データの詳細 - Containers data collection details   導入が楽ちん  OMSエージェントコンテナを導入し、コンテナホスト上のすべてのコンテナのログ分析ができる コンテナホストに直接OMS Agentを導入することもできる    1がコンテナ的でいいですよね。実現イメージはこんな感じです。
-これであれば、CoreOSのような「コンテナホストはあれこれいじらない」というポリシーのディストリビューションにも対応できます。
-では試しに、1のやり口でUbuntuへ導入してみましょう。
-手順  OMSのログ分析機能を有効化しワークスペースを作成、IDとKeyを入手 (参考)  Azureのサブスクリプションを持っている場合、&quot;Microsoft Azure を使用した迅速なサインアップ&ldquo;から読むと、話が早いです   OMSポータルのソリューションギャラリーから、&ldquo;Containers&quot;を追加 UbuntuにDockerを導入  参考 現在、OMSエージェントが対応するDockerバージョンは 1.11.2までなので、たとえばUbuntu 16.04の場合は sudo apt-get install docker-engine=1.11.2-0~xenial とするなど、バージョン指定してください   OMSエージェントコンテナを導入  先ほど入手したOMSのワークスペースIDとKeyを入れてください    sudo docker run --privileged -d -v /var/run/docker.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/oms_container_linux/" style="height:28px">
           Read more
         </a>
         

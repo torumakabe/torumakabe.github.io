@@ -116,12 +116,12 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
     <h1 class="title">GitHub ActionsでAzure CLIとkubectlを動かす</h1>
     
     <div class="content">
-      <h2 id="-2019819">(注: 2019/8/19追記)</h2>
+      <h2 id="注-2019819追記">(注: 2019/8/19追記)</h2>
 <p>GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。</p>
 <blockquote>
 <p><a href="https://help.github.com/en/articles/migrating-github-actions-from-hcl-syntax-to-yaml-syntax">Migrating GitHub Actions from HCL syntax to YAML syntax</a></p>
 </blockquote>
-<h2 id="github-actions">GitHub Actionsのプレビュー招待がきた</h2>
+<h2 id="github-actionsのプレビュー招待がきた">GitHub Actionsのプレビュー招待がきた</h2>
 <p>ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。</p>
 <p><a href="https://developer.github.com/actions/">GitHub Actions</a></p>
 <p>数時間、触った印象。</p>
@@ -132,7 +132,7 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
 <li>Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)</li>
 </ul>
 <p>Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。</p>
-<h2 id="azure-clikubernetesaks-kubectl">Azure CLI/Kubernetes(AKS) kubectlサンプル</h2>
+<h2 id="azure-clikubernetesaks-kubectlサンプル">Azure CLI/Kubernetes(AKS) kubectlサンプル</h2>
 <p>こんなことを試してみました。</p>
 <ul>
 <li>KubernetesのマニフェストをGitHubリポジトリへPush</li>
@@ -212,7 +212,7 @@ action &quot;Deploy to AKS&quot; {
 <p>アプリのパスは /dispvar です。curlしてみると。</p>
 <pre><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
 Hello. You set &quot;Ale&quot;
-</code></pre><h2 id="heading">まとめ</h2>
+</code></pre><h2 id="まとめ">まとめ</h2>
 <p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
 
       

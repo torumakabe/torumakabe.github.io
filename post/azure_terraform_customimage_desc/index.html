@@ -111,7 +111,7 @@ data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[
     <h1 class="title">TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</h1>
     
     <div class="content">
-      <h2 id="latest">カスタムイメージではlatest指定できない</h2>
+      <h2 id="カスタムイメージではlatest指定できない">カスタムイメージではlatest指定できない</h2>
 <p>Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新のイメージを取得できます。いっぽうでカスタムイメージの場合、同様の属性を管理していないので、できません。</p>
 <p>ではVM/VMSSを作成するとき、どうやって最新のカスタムイメージ名を指定すればいいでしょうか。</p>
 <ol>
@@ -119,7 +119,7 @@ data &quot;azurerm_image&quot; &quot;poc&quot; { name_regex = &quot;ubuntu1604-[
 <li>自動化パイプラインで、イメージ作成とVM/VMSS作成ステップでイメージ名を共有する</li>
 </ol>
 <p>2のケースは、JenkinsでPackerとTerraformを同じジョブで流すケースがわかりやすい。変数BUILD_NUMBERを共有すればいいですね。でもイメージに変更がなく、Terraformだけ流したい時、パイプラインを頭から流してイメージ作成をやり直すのは、無駄なわけです。</p>
-<h2 id="terraform">Terraformではイメージ名取得に正規表現とソートが可能</h2>
+<h2 id="terraformではイメージ名取得に正規表現とソートが可能">Terraformではイメージ名取得に正規表現とソートが可能</h2>
 <p>Terraformでは見出しの通り、捗る表現ができます。</p>
 <p>イメージを取得するとき、name_regexでイメージ名を引っ張り、sort_descendingを指定すればOK。以下の例は、イメージ名をubuntu1604-xxxxというルールで作ると決めた場合の例です。イメージを作るたびに末尾をインクリメントしてください。ソートはイメージ名全体の<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/data_source_image.go#L164">文字列比較</a>なので、末尾の番号の決めた桁は埋めること。</p>
 <p>ということで降順で最上位、つまり最新のイメージ名を取得できます。</p>

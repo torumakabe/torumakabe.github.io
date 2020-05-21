@@ -112,9 +112,9 @@
     <h1 class="title">VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</h1>
     
     <div class="content">
-      <h2 id="heading">端末だってコード化されたい</h2>
+      <h2 id="端末だってコード化されたい">端末だってコード化されたい</h2>
 <p>Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。</p>
-<h2 id="heading-1">解決したい課題</h2>
+<h2 id="解決したい課題">解決したい課題</h2>
 <p>こんな悩みを解決します。</p>
 <ul>
 <li>WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい</li>
@@ -129,7 +129,7 @@
 <li>不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変</li>
 <li>毎度作業のどこかが抜ける、漏れる、間違う 人間だもの</li>
 </ul>
-<h2 id="heading-2">やり口</h2>
+<h2 id="やり口">やり口</h2>
 <p>VagrantとDockerで解決します。</p>
 <ul>
 <li>Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る</li>
@@ -139,7 +139,7 @@
 <li>公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る</li>
 <li>Windows/MacのいまどきなIDEなりエディタを使えるようにする</li>
 </ul>
-<h2 id="heading-3">セットアップ概要</h2>
+<h2 id="セットアップ概要">セットアップ概要</h2>
 <p>簡単す。</p>
 <ol>
 <li>Virtualboxを<a href="https://www.virtualbox.org/">インストール</a></li>
@@ -148,7 +148,7 @@
 <li>作業フォルダを作り、Vagrant ファイルを書く</li>
 </ol>
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
-<h2 id="heading-4">サンプル解説</h2>
+<h2 id="サンプル解説">サンプル解説</h2>
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
 <pre><code># -*- mode: ruby -*-
 # vi: set ft=ruby :
@@ -234,7 +234,7 @@ end
 <p>Ubuntu 14.04では標準がPython2なので別途入れてます。Azure Batch向け開発でPython3使いたいので。</p>
 <p>みなさん他にもいろいろあるでしょう。シェルなのでお好みで。</p>
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&quot;Vagrant.configure～&quot;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
-<h2 id="heading-5">どれだけ楽か</h2>
+<h2 id="どれだけ楽か">どれだけ楽か</h2>
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
 <pre><code>vagrant up
 </code></pre><p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
@@ -256,7 +256,7 @@ end
 </ul>
 </li>
 </ul>
-<h2 id="bash-on-windows">Bash on Windowsまで待つとか言わない</h2>
+<h2 id="bash-on-windowsまで待つとか言わない">Bash on Windowsまで待つとか言わない</h2>
 <p>「WindowsではOSSの開発や管理がしにくい。Bash on Windowsが出てくるまで待ち」という人は、待たないで今すぐGoです。思い立ったが吉日です。繰り返しますがVagrantとDocker、超絶便利です。</p>
 <p>インフラのコード化なんか信用ならん！という人も、まず今回紹介したように端末からはじめてみたらいかがでしょう。激しく生産性上がると思います。</p>
 <p>夏近し、楽して早く帰ってビール呑みましょう。</p>

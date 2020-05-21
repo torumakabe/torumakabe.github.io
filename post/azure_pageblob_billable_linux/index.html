@@ -112,7 +112,7 @@ $Blob = Get-AzureStorageBlob yourDataDisk.'>
     <h1 class="title">Azure Linux VMのディスク利用料節約Tips</h1>
     
     <div class="content">
-      <h2 id="heading">定義領域全てが課金されるわけではありません</h2>
+      <h2 id="定義領域全てが課金されるわけではありません">定義領域全てが課金されるわけではありません</h2>
 <p>AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを使います。Page Blobは作成時に容量を定義しますが、課金対象となるのは、実際に書き込んだ領域分のみです。たとえば10GBytesのVHD Page Blobを作ったとしても、1GBytesしか書き込んでいなければ、課金対象は1GBytesです。</p>
 <p>なお、Premium Storageは例外です。<a href="https://azure.microsoft.com/ja-jp/pricing/details/storage/">FAQ</a>を確認してみましょう。</p>
 <pre><code>仮想マシンに空の 100 GB ディスクを接続した場合、100 GB 全体に対する料金が請求されますか? それとも使用したストレージ領域の分だけが請求されますか?
@@ -121,7 +121,7 @@ $Blob = Get-AzureStorageBlob yourDataDisk.'>
 </code></pre>
 <p>詳細な定義は、以下で。</p>
 <p><a href="https://blogs.msdn.microsoft.com/windowsazurestorage/2010/07/08/understanding-windows-azure-storage-billing-bandwidth-transactions-and-capacity/">Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Capacity</a></p>
-<h2 id="os">書き込み方はOSやファイルシステム次第</h2>
+<h2 id="書き込み方はosやファイルシステム次第">書き込み方はOSやファイルシステム次第</h2>
 <p>じゃあ、OSなりファイルシステムが、実際にどのタイミングでディスクに書き込むのか、気になりますね。実データの他に管理情報、メタデータがあるので、特徴があるはずです。Linuxで検証してみましょう。</p>
 <ul>
 <li>RHEL 7.2 on Azure</li>
@@ -157,7 +157,7 @@ $Blob.ICloudBlob.GetPageRanges() |
 return $blobSizeInBytes
 </code></pre>
 <p>ストレージコンテキストの作り方は<a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-powershell-guide-full/">ここ</a>を参考にしてください。</p>
-<h2 id="heading-1">結果</h2>
+<h2 id="結果">結果</h2>
 <h3 id="xfs">XFS</h3>
 <table>
 <thead>

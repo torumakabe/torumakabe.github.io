@@ -131,7 +131,7 @@ Monitoring as a Service 監視をサービスとして提供するって、ど�
 <p>ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。</p>
 <p>と思っていたら。</p>
 <p>なんと、<a href="https://github.com/stackforge/monasca-vagrant">Monasca-Vagrant</a>なんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。</p>
-<h3 id="heading">気をつけること</h3>
+<h3 id="気をつけること">気をつけること</h3>
 <ul>
 <li>動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。</li>
 <li>Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。</li>

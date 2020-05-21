@@ -115,10 +115,10 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.'>
     <h1 class="title">Azure Event GridでBlobイベントを拾う</h1>
     
     <div class="content">
-      <h2 id="event-gridblob">Event GridがBlobに対応</h2>
+      <h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
 <p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
 <p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
-<h2 id="event-gridblob-1">Event GridがBlobに対応して何がうれしいか</h2>
+<h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
 <p>Event Gridは、Azureで発生した様々なイベントを検知してWebhookで通知するサービスです。カスタムトピックも作成できます。</p>
 <p>イベントの発生元をPublisherと呼びますが、このたびPublisherとしてAzureのBlobがサポートされました。Blobの作成、削除イベントを検知し、Event GridがWebhookで通知します。通知先はHandlerと呼びます。Publisherとそこで拾うイベント、Handlerを紐づけるのがSubscriptionです。Subscriptionにはフィルタも定義できます。</p>
 <p><img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/ff3644c9-58ab-4729-8939-66a83ab0605d.png" alt="コンセプト" title="Concept"></p>
@@ -151,7 +151,7 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.'>
 </ul>
 </li>
 </ul>
-<h2 id="heading">前提条件</h2>
+<h2 id="前提条件">前提条件</h2>
 <ul>
 <li>Publisherに設定できるストレージアカウントはBlobストレージアカウントのみです。汎用ストレージアカウントは対応していません</li>
 <li>現時点ではWest Central USリージョンのみで提供しています</li>
@@ -162,7 +162,7 @@ az feature show --name storageEventSubscriptions --namespace Microsoft.'>
 az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
 </code></pre><p>以下のコマンドで確認し、statusが&quot;Registered&quot;であれば使えます。</p>
 <pre><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre><h2 id="heading-1">使い方</h2>
+</code></pre><h2 id="使い方">使い方</h2>
 <p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
 <p>リソースグループを作ります。</p>
 <pre><code>$ az group create -n blobeventpoc-rg -l westcentralus
@@ -239,9 +239,9 @@ g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
     }
   }
 }]
-</code></pre><h2 id="azure-functions">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
+</code></pre><h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
 <p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
-<h3 id="heading-2">概要</h3>
+<h3 id="概要">概要</h3>
 <p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/blobevent-function-bindings.png" alt="Bindings" title="Bindings"></p>
 <p>Using <a href="https://functions-visualizer.azurewebsites.net/">Azure Functions Bindings Visualizer</a></p>

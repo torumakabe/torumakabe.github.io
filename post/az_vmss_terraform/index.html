@@ -112,9 +112,9 @@ resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var
     <h1 class="title">AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</h1>
     
     <div class="content">
-      <h2 id="heading">動機</h2>
+      <h2 id="動機">動機</h2>
 <p>Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるように<a href="https://github.com/terraform-providers/terraform-provider-azurerm/pull/811">なりました</a>。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。</p>
-<h2 id="heading-1">前提条件</h2>
+<h2 id="前提条件">前提条件</h2>
 <ul>
 <li>Availability Zones対応リージョンを選びます。現在は<a href="https://docs.microsoft.com/en-us/azure/availability-zones/az-overview#regions-that-support-availability-zones">5リージョン</a>です。この記事ではEast US 2とします。</li>
 <li>Availability Zonesのプレビューに<a href="https://docs.microsoft.com/ja-jp/azure/availability-zones/az-overview">サインアップ</a>済みとします。</li>
@@ -128,9 +128,9 @@ resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var
 </ul>
 </li>
 </ul>
-<h2 id="heading-2">コード</h2>
+<h2 id="コード">コード</h2>
 <p>以下のファイルを同じディレクトリに作成します。</p>
-<h3 id="terraform-">Terraform メインコード</h3>
+<h3 id="terraform-メインコード">Terraform メインコード</h3>
 <p>VMSSと周辺リソースを作ります。</p>
 <ul>
 <li>最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。</li>
@@ -314,7 +314,7 @@ resource &quot;azurerm_virtual_machine_scale_set&quot; &quot;poc&quot; {
 
   zones = [1, 2, 3]
 }
-</code></pre><h3 id="cloud-init-config">cloud-init configファイル</h3>
+</code></pre><h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
 <p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
 <p>[cloud-config.yaml]</p>
 <pre><code>#cloud-config
@@ -328,7 +328,7 @@ runcmd:
 <li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer">Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法</a></li>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl">Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する</a></li>
 </ul>
-<h3 id="terraform--1">Terraform 変数ファイル</h3>
+<h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
 <p>変数は別ファイルへ。</p>
 <p>[variables.tf]</p>
 <pre><code>variable &quot;resource_group_name&quot; {
@@ -342,7 +342,7 @@ variable &quot;scaleset_name&quot; {
 variable &quot;admin_username&quot; {
   default = &quot;yourname&quot;
 }
-</code></pre><h2 id="heading-3">実行</h2>
+</code></pre><h2 id="実行">実行</h2>
 <p>では実行。</p>
 <pre><code>$ terraform init
 $ terraform plan

@@ -118,7 +118,7 @@ local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: 
     <h1 class="title">Linux on Azureでファイル共有する方法</h1>
     
     <div class="content">
-      <h2 id="heading">ファイル共有、あまりおすすめしないです</h2>
+      <h2 id="ファイル共有あまりおすすめしないです">ファイル共有、あまりおすすめしないです</h2>
 <p>いきなりタイトルを否定しました。ロック。</p>
 <p>さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。</p>
 <p>ですが<strong>個人的には</strong>あまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。</p>
@@ -129,7 +129,7 @@ local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: 
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-azure-cli/#create-and-manage-file-shares">&ldquo;Azure Storage での Azure CLI の使用&rdquo;</a></p>
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/storage-how-to-use-files-linux/">&ldquo;Linux で Azure File Storage を使用する方法&rdquo;</a></p>
 <p>もうちょっと情報欲しいですね。補足のためにわたしも流します。</p>
-<h2 id="azure-cli">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
+<h2 id="azure-cliでストレージアカウントを作成しファイル共有を設定">Azure CLIでストレージアカウントを作成し、ファイル共有を設定</h2>
 <p>ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。</p>
 <pre><code>local$ azure storage account create tomakabefspoc -l &quot;Japan East&quot; --type LRS -g fspoc
 </code></pre>
@@ -148,7 +148,7 @@ info:    storage account connectionstring show command OK
 [snip]
 data:    Primary Endpoints: file https://tomakabefspoc.file.core.windows.net/
 </code></pre>
-<h2 id="linux--2vm">Linux * 2VMで共有</h2>
+<h2 id="linux--2vmで共有">Linux * 2VMで共有</h2>
 <p>Ubuntuでやりますよ。SMBクライアントとしてcifs-utilsパッケージをインストールします。<a href="https://azure.microsoft.com/ja-jp/marketplace/partners/canonical/ubuntuserver1404lts/">Marketplace提供の14.04 LTS</a>であれば、すでに入ってるはずです。</p>
 <pre><code>fspocvm01:~$ sudo apt-get install cifs-utils
 </code></pre>
@@ -184,7 +184,7 @@ onemoretest
 test
 onemoretest
 </code></pre>
-<h2 id="heading-1">ご利用は計画的に</h2>
+<h2 id="ご利用は計画的に">ご利用は計画的に</h2>
 <p>2016年2月時点で、Azure File Storageには最大容量:5TB/share、1TB/file、ストレージアカウントあたりの帯域:60MBytes/sという制約があります。これを超えるガチ共有案件では、<a href="https://azure.microsoft.com/en-us/marketplace/partners/intel/lustre-cloud-edition-evaleval-lustre-2-7/">Lustre</a>など別の共有方法を検討してください。</p>
 <p>なおファイルサーバ用途であれば、Azure File Storageではなく、OneDriveなどオンラインストレージSaaSに移行した方が幸せになれると思います。企業向けが使いやすくなってきましたし。運用から解放されるだけじゃなく、便利ですよ。</p>
 

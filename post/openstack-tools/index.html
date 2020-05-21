@@ -117,11 +117,11 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
     <h1 class="title">OpenStackのツール環境をImmutableに整える</h1>
     
     <div class="content">
-      <h3 id="heading">タイトルは釣りです</h3>
+      <h3 id="タイトルは釣りです">タイトルは釣りです</h3>
 <p>すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。</p>
-<h3 id="heading-1">なぜ必要か?</h3>
+<h3 id="なぜ必要か">なぜ必要か?</h3>
 <p>いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。</p>
-<h3 id="heading-2">やりたいこと</h3>
+<h3 id="やりたいこと">やりたいこと</h3>
 <ul>
 <li>OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい</li>
 <li>Windows、Macどちらでも同様の環境にしたい</li>
@@ -130,21 +130,21 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
 <li>コマンド2、3発程度で、気軽に作って消せる</li>
 <li>VMできたらすぐログイン、即OpenStack CLIが使える</li>
 </ul>
-<h3 id="heading-3">方針</h3>
+<h3 id="方針">方針</h3>
 <ul>
 <li>OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る</li>
 <li>VagrantでWindows/Macの違いを吸収する</li>
 <li>VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う</li>
 <li>構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)</li>
 </ul>
-<h3 id="heading-4">前提条件</h3>
+<h3 id="前提条件">前提条件</h3>
 <ul>
 <li>Windows 8.1 &amp; VMware Worksation 10.0.3</li>
 <li>OSX 10.9.4 &amp; VirtualBox 4.3.16</li>
 <li>Vagrant 1.6.5  (VMware用ライセンス買いました)</li>
 <li>ひとまずOpenStack CLIを使えるところまで作る</li>
 </ul>
-<h3 id="vagrantfile">ではVagrantfileを見てみましょう</h3>
+<h3 id="ではvagrantfileを見てみましょう">ではVagrantfileを見てみましょう</h3>
 <script type="text/javascript" src="http://gist.github.com/a470e86a1477cd76d4f4.js"></script>
 <p>これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。</p>
 <ul>
@@ -166,10 +166,10 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
 127.0.0.1 ansible_connection=local</p>
 </li>
 </ul>
-<h4 id="provisionsh">provision.sh解説</h4>
+<h4 id="provisionsh解説">provision.sh解説</h4>
 <script type="text/javascript" src="http://gist.github.com/57ae9f8edbe6cf30cd16.js"></script>
 <p>ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。</p>
-<h4 id="playbooksiteyml">playbook(site.yml)解説</h4>
+<h4 id="playbooksiteyml解説">playbook(site.yml)解説</h4>
 <script type="text/javascript" src="http://gist.github.com/6c5d8ae296948b8d4070.js"></script>
 <ul>
 <li>
@@ -186,7 +186,7 @@ OS_USERNAME: your_username<br>
 <p>必要なパッケージ、pipの導入後、OpenStack CLI群をインストールします。</p>
 </li>
 </ul>
-<h3 id="windows">Windowsでの実行例</h3>
+<h3 id="windowsでの実行例">Windowsでの実行例</h3>
 <p>Vagrant &amp; AnsibleはMacの情報が多いので、ここではWindowsでの実行例を。PowerShellを管理者権限で起動し、Vagrantfileやprovision.sh、ansible関連ファイルが住むディレクトリでvagrant up。</p>
 <pre><code>PS C:\Users\hoge&gt; vagrant up
 Bringing machine 'default' up with 'vmware_workstation' provider...

@@ -114,9 +114,9 @@ Azure CLI 2.0 のエイリアス拡張機能
     <h1 class="title">俺のAzure CLI 2018春版</h1>
     
     <div class="content">
-      <h2 id="heading">春の環境リフレッシュ祭り</h2>
+      <h2 id="春の環境リフレッシュ祭り">春の環境リフレッシュ祭り</h2>
 <p>最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届く感じ。そこで、いい機会なのでAzure CLIまわりも最新の機能やツールで整えようか、というのが今回の動機。気づかないうちに、界隈が充実していた。</p>
-<h2 id="-3">俺のおすすめ 3選</h2>
+<h2 id="俺のおすすめ-3選">俺のおすすめ 3選</h2>
 <ul>
 <li>デフォルト設定
 <ul>
@@ -136,7 +136,7 @@ Azure CLI 2.0 のエイリアス拡張機能
 </ul>
 </li>
 </ul>
-<h2 id="heading-1">デフォルト設定</h2>
+<h2 id="デフォルト設定">デフォルト設定</h2>
 <p>$AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-configuration?view=azure-cli-latest">Azure CLI 2.0 の構成</a></p>
 <p>まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。</p>
@@ -150,13 +150,13 @@ group = default-ejp-rg
 <p>ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。</p>
 <p>デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。</p>
 <pre><code>az vm create -n yoursmplvm01 --image UbuntuLTS
-</code></pre><h2 id="heading-2">エイリアス</h2>
+</code></pre><h2 id="エイリアス">エイリアス</h2>
 <p>$AZURE_CONFIG_DIR/aliasにエイリアスを書けます。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest">Azure CLI 2.0 のエイリアス拡張機能</a></p>
 <p>前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</p>
 <pre><code>az extension add --name alias
 </code></pre><p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
-<h3 id="heading-3">頻繁に打つからできる限り短くしたい系</h3>
+<h3 id="頻繁に打つからできる限り短くしたい系">頻繁に打つからできる限り短くしたい系</h3>
 <pre><code>[ls]
 command = list
 
@@ -176,7 +176,7 @@ ProvisioningState
 -------------------
 yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
 Succeeded
-</code></pre><h3 id="heading-4">クエリー打つのがめんどくさい系</h3>
+</code></pre><h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
 <p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
 <pre><code>[get-vm-pip]
 command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddresses[].ipAddress
@@ -185,18 +185,18 @@ command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddress
 Result
 -------------
 52.185.133.68
-</code></pre><h3 id="heading-5">引数を確認するのがめんどくさい系</h3>
+</code></pre><h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
 <p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
 <pre><code>[empty-rg]
 command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
 </code></pre><p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
 <pre><code>$ az empty-rg
 </code></pre><p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
-<h2 id="vs-code--azure-cli-tools-">VS Code プラグイン (Azure CLI Tools )</h2>
+<h2 id="vs-code-プラグイン-azure-cli-tools-">VS Code プラグイン (Azure CLI Tools )</h2>
 <p>Azure CLIのVS Code向けプラグインがあります。コードアシストと編集画面からの実行が2大機能。紹介ページのGifアニメを見るのが分かりやすいです。</p>
 <p><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Tools</a></p>
 <p>プラグインを入れて、拡張子.azcliでファイルを作ればプラグインが効きます。長いコマンドを補完支援付きでコーディングしたい、スクリプトを各行実行して確認しながら作りたい、なんて場合におすすめです。</p>
-<h2 id="heading-6">注意点</h2>
+<h2 id="注意点">注意点</h2>
 <ul>
 <li>エイリアスには補完が効かない
 <ul>

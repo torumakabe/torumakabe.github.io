@@ -108,9 +108,9 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
     <h1 class="title">Windows上でLinux向けGoバイナリをDockerでビルドする</h1>
     
     <div class="content">
-      <h2 id="heading">小ネタです</h2>
+      <h2 id="小ネタです">小ネタです</h2>
 <p>Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。</p>
-<h2 id="heading-1">条件</h2>
+<h2 id="条件">条件</h2>
 <ul>
 <li>Docker for Windows
 <ul>
@@ -119,7 +119,7 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
 </ul>
 </li>
 </ul>
-<h2 id="powershell">PowerShell窓で実行</h2>
+<h2 id="powershell窓で実行">PowerShell窓で実行</h2>
 <p>ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。</p>
 <pre><code>docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux
 </code></pre><ul>

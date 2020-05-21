@@ -105,9 +105,9 @@
     <h1 class="title">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</h1>
     
     <div class="content">
-      <h2 id="azure-cli-20">Azure CLI 2.0版です</h2>
+      <h2 id="azure-cli-20版です">Azure CLI 2.0版です</h2>
 <p><a href="http://torumakabe.github.io/post/dockerforwin_azurecli/">Docker for WindowsでインストールレスAzure CLI環境を作る</a>、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。</p>
-<h2 id="heading">動機</h2>
+<h2 id="動機">動機</h2>
 <ul>
 <li>Docker for Windows、もっと活用しようぜ</li>
 <li>がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい</li>
@@ -115,14 +115,14 @@
 <li>WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう</li>
 <li>○○レスって言ってみたかった</li>
 </ul>
-<h2 id="heading-1">やり口</h2>
+<h2 id="やり口">やり口</h2>
 <ul>
 <li>もちろんDocker for Windows (on Client Hyper-V) を使う</li>
 <li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る</li>
 <li>&ldquo;az_cli&quot;入力にてAzure CLIコンテナを起動</li>
 <li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
 </ul>
-<h2 id="heading-2">作業の中身</h2>
+<h2 id="作業の中身">作業の中身</h2>
 <ul>
 <li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/install/">インストール</a>
 <ul>
@@ -139,7 +139,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="powershellfunction">PowerShellのfunctionを作る</h2>
+<h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
 <p>ここが作業のハイライト。</p>
 <p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
 <pre><code>PS C:\Workspace\ARM&gt; code $profile

@@ -114,7 +114,7 @@ $ kubectl create -f nginx-label.'>
     <h1 class="title">AKSのService作成時にホスト名を付ける</h1>
     
     <div class="content">
-      <h2 id="2">2つのやり口</h2>
+      <h2 id="2つのやり口">2つのやり口</h2>
 <p>Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。</p>
 <p>わたしの知る限り、2つの方法があります。</p>
 <ul>
@@ -122,7 +122,7 @@ $ kubectl create -f nginx-label.'>
 <li><a href="https://github.com/kubernetes-incubator/external-dns">Kubenetes ExternalDNS</a>を使ってAzure DNSへAレコードを追加する</li>
 </ul>
 <p>以下、AKS 1.9.2での実現手順です。</p>
-<h2 id="dns">DNSラベル名付与機能</h2>
+<h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
 <p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
 <p>[nginx-label.yaml]</p>
 <pre><code>apiVersion: apps/v1beta1

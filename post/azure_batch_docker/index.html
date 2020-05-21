@@ -117,13 +117,13 @@
     <h1 class="title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</h1>
     
     <div class="content">
-      <h2 id="heading">サーバレスって言いたいだけじゃないです</h2>
+      <h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 <p>クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
 節約」でしょう。</p>
 <p>ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。</p>
 <p>その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。</p>
-<h2 id="heading-1">コンセプト</h2>
+<h2 id="コンセプト">コンセプト</h2>
 <ul>
 <li>管理サーバを作らない</li>
 <li>Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される</li>
@@ -131,9 +131,9 @@
 <li>サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う</li>
 <li>セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納</li>
 </ul>
-<h2 id="heading-2">サンプル</h2>
+<h2 id="サンプル">サンプル</h2>
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/Azure_Batch_Sample">置いておきます</a>。</p>
-<h3 id="heading-3">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
+<h3 id="バッチアカウントとストレージアカウントコンテナの作成とアプリデータの配置">バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置</h3>
 <p><a href="https://azure.microsoft.com/ja-jp/documentation/articles/batch-technical-overview/">公式ドキュメント</a>で概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。</p>
 <p>ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。</p>
 <pre><code>.
@@ -246,7 +246,7 @@
 <pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
 </code></pre>
 <p>以上です。あとはAzureにお任せです。4時間に1回、アメリカ国歌の単語を数える刺身タンポポなジョブですが、コツコツいきましょう。</p>
-<h2 id="azure-automation">Azure Automationとの使い分け</h2>
+<h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 
       

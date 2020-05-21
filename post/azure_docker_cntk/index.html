@@ -113,10 +113,10 @@ C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレ�
     <h1 class="title">AzureとDockerでDeep Learning(CNTK)環境をサク作する</h1>
     
     <div class="content">
-      <h2 id="heading">気軽に作って壊せる環境を作る</h2>
+      <h2 id="気軽に作って壊せる環境を作る">気軽に作って壊せる環境を作る</h2>
 <p>Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。</p>
 <p>試行錯誤するでしょうから、萎えないようにデプロイは自動化します。</p>
-<h2 id="heading-1">方針</h2>
+<h2 id="方針">方針</h2>
 <ul>
 <li>インフラはAzure Resource Manager Templateでデプロイする
 <ul>
@@ -141,7 +141,7 @@ C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレ�
 </li>
 <li>VMにログインしたら即CNTKを使える、幸せ</li>
 </ul>
-<h2 id="heading-2">使い方</h2>
+<h2 id="使い方">使い方</h2>
 <p>Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。</p>
 <p>リソースグループを作ります。</p>
 <pre><code>C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;
@@ -180,7 +180,7 @@ yournamebe/cntk-cpu   latest              9abab8a76543        9 hours ago       
 root@a1234bc5d67d:/cntk#
 </code></pre>
 <p>CNTKの利用例は、<a href="https://github.com/Microsoft/CNTK/tree/master/Examples">Github</a>にあります。</p>
-<h2 id="heading-3">今後の展開</h2>
+<h2 id="今後の展開">今後の展開</h2>
 <p>インフラおじさんは、最近Linuxむけに<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">Previewがはじまった</a>Azure Batchと、このエントリで使った仕掛けを組み合わせて、大規模並列Deep Learning環境の自動化と使い捨て化を企んでいます。</p>
 <p>これだけ簡単に再現性ある環境を作れるなら、常時インフラ起動しておく必要ないですものね。使い捨てでいいです。</p>
 <p>もちろんdockerやGPUまわりの性能など別の課題にぶつかりそうですが、人間がどれだけ楽できるかとのトレードオフかと。</p>

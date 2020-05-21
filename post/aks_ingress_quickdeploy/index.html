@@ -114,11 +114,11 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 1
     <h1 class="title">AKSのNGINX Ingress Controllerのデプロイで悩んだら</h1>
     
     <div class="content">
-      <h2 id="helm">楽したいならhelmで入れましょう</h2>
+      <h2 id="楽したいならhelmで入れましょう">楽したいならhelmで入れましょう</h2>
 <p>AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。</p>
 <p>さて、そのNGINX Ingress Controllerのデプロイは<a href="https://github.com/kubernetes/ingress-nginx/blob/master/deploy/README.md">GitHubのドキュメント</a>通りに淡々とやればいいのですが、<a href="https://github.com/kubernetes/helm">helm</a>を使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。</p>
 <p>せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。</p>
-<h2 id="heading">使い方</h2>
+<h2 id="使い方">使い方</h2>
 <p>AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。</p>
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/aks/kubernetes-walkthrough">Azure Container Service (AKS) クラスターのデプロイ</a></li>
@@ -143,7 +143,7 @@ nginx                                    NodePort       10.0.191.16    &lt;none&
 </code></pre><p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
 <p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
 <pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
-</code></pre><p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet's Encryptで作っておきました。</p>
+</code></pre><p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
 <pre><code>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
 </code></pre><p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
 <pre><code>apiVersion: extensions/v1beta1

@@ -114,7 +114,7 @@ Azure Functionsは、
     <h1 class="title">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</h1>
     
     <div class="content">
-      <h2 id="heading">まだ好みなんて聞いてないぜ</h2>
+      <h2 id="まだ好みなんて聞いてないぜ">まだ好みなんて聞いてないぜ</h2>
 <p>Build 2016で、<a href="https://azure.microsoft.com/ja-jp/services/functions/">Azure Functions</a>が発表されました。</p>
 <p>Azure Functionsは、</p>
 <ol>
@@ -124,7 +124,7 @@ Azure Functionsは、
 </ol>
 <p>が特徴です。AWSのLambdaと似てるっちゃ似ています。</p>
 <p>何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。</p>
-<h3 id="heading-1">基本方針</h3>
+<h3 id="基本方針">基本方針</h3>
 <ul>
 <li>FunctionsはAzure内の様々な機能と<a href="https://azure.microsoft.com/ja-jp/documentation/articles/functions-reference/#bindings">イベント連動</a>できるが、あえてサンプルの少ないAzure外とつないでみる</li>
 <li>Facebook Messenger APIを使って、webhook連動する</li>
@@ -139,7 +139,7 @@ Azure Functionsは、
 <li>拡張性はひとまず目をつぶる  #<a href="http://qiita.com/yoichiro@github/items/6d4c7309210af20a5c8f">この辺の話</a></li>
 </ul>
 <p>ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。</p>
-<h2 id="heading-2">必要な作業</h2>
+<h2 id="必要な作業">必要な作業</h2>
 <p>以下が必要な作業の流れです。</p>
 <ul>
 <li>Azureで
@@ -181,7 +181,7 @@ Azure Functionsは、
 <li>FunctionsのサイトにDocumentDB Node SDKを導入する#12は、<a href="http://tech.guitarrapc.com/entry/2016/04/05/043723">こちら</a>を。コンソールからnpm installできます。</li>
 <li>Github連携設定、#13〜14は、<a href="http://tech.guitarrapc.com/entry/2016/04/03/051552">こちら</a>がとても参考になります。</li>
 </ul>
-<h2 id="function-app">Function Appのサンプル</h2>
+<h2 id="function-appのサンプル">Function Appのサンプル</h2>
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
 <p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
 <pre><code>D:\home\site\wwwroot

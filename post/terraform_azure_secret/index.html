@@ -107,7 +107,7 @@
     <h1 class="title">TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</h1>
     
     <div class="content">
-      <h2 id="heading">動機</h2>
+      <h2 id="動機">動機</h2>
 <p>システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した接続文字列をアプリ側で設定するのですが、ひとりでコピペするにせよ、チームメンバー間で受け渡すにせよ、めんどくさく、危険が危ないわけです。</p>
 <ul>
 <li>いちいちポータルやCLIで接続文字列を出力、コピーして、アプリの設定ファイルや環境変数にペーストしなければいけない
@@ -132,7 +132,7 @@
 </li>
 </ul>
 <p>つらいですね。シークレットなんて意識したくないのが人情。そこで、Terraformを使った解決法を。</p>
-<h2 id="heading-1">シナリオ</h2>
+<h2 id="シナリオ">シナリオ</h2>
 <p>Azureでコンテナーを使うシナリオを例に紹介します。ACI(Azure Container Instances)とAKS(Azure Container Service - k8s)の2パターンです。</p>
 <ul>
 <li>Nodeとデータストアを組み合わせた、<a href="https://github.com/ToruMakabe/ImpressAzureBookNode">Todoアプリケーション</a></li>
@@ -159,7 +159,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="heading-2">検証環境</h2>
+<h2 id="検証環境">検証環境</h2>
 <ul>
 <li>Azure Cloud Shell
 <ul>
@@ -171,7 +171,7 @@
 <li>Terraform kubernetes Provider v1.1</li>
 <li>AKS kubernetes 1.9.6</li>
 </ul>
-<h2 id="aci">ACIの場合</h2>
+<h2 id="aciの場合">ACIの場合</h2>
 <p>ざっと以下の流れです。</p>
 <ol>
 <li>リソースグループ作成</li>

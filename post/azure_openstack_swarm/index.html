@@ -122,11 +122,11 @@ $ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env lo
     <h1 class="title">OpenStackとAzureにDocker Swarmをかぶせてみた</h1>
     
     <div class="content">
-      <h2 id="heading">どこいってもいじられる</h2>
+      <h2 id="どこいってもいじられる">どこいってもいじられる</h2>
 <p><a href="http://www.adventar.org/calendars/968">OpenStack Advent Calendar 2015</a> 参加作品、19夜目のエントリです。</p>
 <p>OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。</p>
 <p>さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。</p>
-<h2 id="docker">乗るしかないこのDockerウェーブに</h2>
+<h2 id="乗るしかないこのdockerウェーブに">乗るしかないこのDockerウェーブに</h2>
 <p>どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。</p>
 <p>ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。</p>
 <p>条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。</p>
@@ -134,7 +134,7 @@ $ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env lo
 <p>そうすると、ほぼ一択。<a href="https://www.conoha.jp/">Conoha</a>です。かわいらしい座敷童の<a href="https://www.conoha.jp/conohadocs/?btn_id=top_footer_conotsu">&ldquo;このは&rdquo;</a>がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。</p>
 <p>では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。</p>
 <p>今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は<a href="http://www.slideshare.net/zembutsu/whats-new-aobut-docker-2015-network-and-orchestration">前佛さんの資料</a>を参考にしてください。</p>
-<h2 id="heading-1">ローカル環境</h2>
+<h2 id="ローカル環境">ローカル環境</h2>
 <ul>
 <li>Mac OS X (El Capitan)
 <ul>
@@ -144,7 +144,7 @@ $ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env lo
 </ul>
 <p>ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。
 また、Swarmのマスタはローカルに配置します。</p>
-<h2 id="heading-2">いざ実行</h2>
+<h2 id="いざ実行">いざ実行</h2>
 <p>まず、Docker Machineにクラウドの諸設定を食わせます。</p>
 <p>Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細は<a href="https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-docker-machine/">ここ</a>を。</p>
 <pre><code>$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge
@@ -218,7 +218,7 @@ b9d54d794a85        nginx               &quot;nginx -g 'daemon off&quot;   32 se
 </code></pre>
 <p>Nginxコンテナがきれいに散らばっているのが分かります。これは先ほど覚えた&quot;Strategy: spread&quot;が効いているからです。StrategyはSwarmのコンテナ配置ポリシーで、speradを指定すると散らしにいきます。Strategyをbinpackにしておけば、ノードを埋めようとします。埋まったら他、です。randomであれば、ランダムに。</p>
 <p>まだシンプルですが、今後このStrategyやリソース管理が賢くなると、「ローカルが埋まったら、リモートを使う」とか、使い道が広がりそうですね。最近Docker社が買収した<a href="https://www.tutum.co/">Tutum</a>との関係、今後どう進化していくのか、注目です。</p>
-<h2 id="heading-3">ツールから入るハイブリッドクラウドも、またよし</h2>
+<h2 id="ツールから入るハイブリッドクラウドもまたよし">ツールから入るハイブリッドクラウドも、またよし</h2>
 <p>ハイブリッドクラウドはまだ言葉先行です。まだクラウドを使ってない、使いこなしていない段階でツールの話だけが先行することも多いです。ナイフとフォークしか使ったことのない人が、お箸を使う和食や中華を選ぶ前に「どんなお箸がいいかねぇ」と議論している感じ。僕は、そうじゃなくて、その前に食べたいもの = クラウドを選びましょうよ、というスタンスでした。</p>
 <p>でも、コンテナ+Dockerって、お箸に弁当ついてきたような感じなんですよね。お箸が使える人であれば、弁当持ち込める場所さえ確保すればいい。インパクトでかいです。ちょっと考えを改めました。</p>
 <p>もちろん、だからクラウドは何でもいい、と言っているわけではありません。弁当持ち込みとしても、スペースが広い、個室で静か、お茶がうまい、お茶がタダ、揚げたてのから揚げを出してくれる、などなど、特徴は出てくるでしょう。APIを公開していないような「持ち込みやめて」のクラウドは、先々心配ですが。</p>

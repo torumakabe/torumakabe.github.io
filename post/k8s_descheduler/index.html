@@ -120,10 +120,10 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
     <h1 class="title">Kubernetes DeschedulerでPodを再配置する</h1>
     
     <div class="content">
-      <h2 id="heading">何の話か</h2>
+      <h2 id="何の話か">何の話か</h2>
 <p>KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。</p>
 <p>機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。</p>
-<h2 id="descheduler">Deschedulerとは</h2>
+<h2 id="deschedulerとは">Deschedulerとは</h2>
 <p><a href="https://twitter.com/ponde_m">@ponde_m</a> さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。</p>
 <blockquote>
 <p><a href="https://speakerdeck.com/daikurosawa/introduction-to-descheduler">図で理解する Descheduler</a></p>
@@ -136,7 +136,7 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
 <blockquote>
 <p><a href="https://docs.openshift.com/container-platform/3.11/admin_guide/scheduling/descheduler.html">Descheduling</a></p>
 </blockquote>
-<h2 id="heading-1">動きを見てみよう</h2>
+<h2 id="動きを見てみよう">動きを見てみよう</h2>
 <p>実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。</p>
 <p>Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。</p>
 <p>例えばこんなシナリオです。あるある。</p>
@@ -149,9 +149,9 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
 </ul>
 <p>Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。</p>
 <p>では、このシナリオで動きを追ってみましょう。</p>
-<h3 id="heading-2">事前準備</h3>
+<h3 id="事前準備">事前準備</h3>
 <p>DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、<a href="https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod">プロジェクトのREADME</a>を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。</p>
-<h3 id="nodepod">NodeにPodを寄せる</h3>
+<h3 id="nodeにpodを寄せる">NodeにPodを寄せる</h3>
 <p>はじめのNode数は2です。</p>
 <pre><code>$ kubectl get nodes
 NAME                            STATUS   ROLES   AGE   VERSION
@@ -188,7 +188,7 @@ NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE  
 nginx-6d4df4db7b-cqrkl   1/1     Running   0          12s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-dg267   1/1     Running   0          12s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-kxmml   1/1     Running   0          12s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-</code></pre><h3 id="node">Nodeを追加する</h3>
+</code></pre><h3 id="nodeを追加する">Nodeを追加する</h3>
 <p>Nodeを追加し、3Nodeにします。以下はマルチノードプール構成クラスター向けのコマンドです。シングルノードプール構成のクラスターでは、<a href="https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale">こちら</a>を参考に。</p>
 <pre><code>$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
 
@@ -205,7 +205,7 @@ nginx-6d4df4db7b-cqrkl   1/1     Running   0          5m39s   10.240.0.42   aks-
 nginx-6d4df4db7b-dg267   1/1     Running   0          5m39s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-kxmml   1/1     Running   0          5m39s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 </code></pre><p>Nodeを増やしたのに、寄りっぱなしですね。</p>
-<h3 id="descheduler-1">Descheduler用のリソースを作る</h3>
+<h3 id="descheduler用のリソースを作る">Descheduler用のリソースを作る</h3>
 <p>それではDeschedulerを作る準備を。手順は今後変化すると思うので、試す場合は都度<a href="https://github.com/kubernetes-incubator/descheduler/tree/master">プロジェクトのREADME</a>を確認してください。</p>
 <p>わたしはDescheduler動かすのに必要なリソースを、descheduler.yamlにまとめています。</p>
 <pre><code>kind: ClusterRole
@@ -271,7 +271,7 @@ metadata:
 </code></pre><p>Dechedulerのポリシーは、プロジェクトページのexamplesに<a href="https://github.com/kubernetes-incubator/descheduler/blob/master/examples/policy.yaml">あるもののまま</a>としました。先ほど用意したクラスターでは、aks-pool1-27450415-vmss000000にレプリカが2つ寄っているので、RemoveDuplicatesが適用されると期待できます。</p>
 <p>では作ります。</p>
 <pre><code>$ kubectl apply -f descheduler.yaml
-</code></pre><h3 id="descheduler-job">Descheduler Jobを実行</h3>
+</code></pre><h3 id="descheduler-jobを実行">Descheduler Jobを実行</h3>
 <p>descheduler-job.yamlとします。imageの確認をお忘れなく。</p>
 <pre><code>apiVersion: batch/v1
 kind: Job
@@ -312,7 +312,7 @@ nginx-6d4df4db7b-cqrkl   1/1     Running   0          15m     10.240.0.42   aks-
 nginx-6d4df4db7b-dg267   1/1     Running   0          15m     10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-w7mb6   1/1     Running   0          7m33s   10.240.0.87   aks-pool1-27450415-vmss000003   &lt;none&gt;           &lt;none&gt;
 </code></pre><p>aks-pool1-27450415-vmss000000にあった1つのPodが退出され、新たにaks-pool1-27450415-vmss000003で作成されたことがわかります。</p>
-<h2 id="descheduler-2">Deschedulerプロジェクトの現状</h2>
+<h2 id="deschedulerプロジェクトの現状">Deschedulerプロジェクトの現状</h2>
 <p>このようにDeschedulerは、特に少ないNode數で偏りが大きくなりがちなクラスターでとても有用です。ですが、アクティブなメンテナーの数が少なく、現時点では積極的にKubernetesのコア機能を目指す感じではなさそうです。</p>
 <blockquote>
 <p><a href="https://github.com/kubernetes-incubator/descheduler/issues/138">What is the current status of this project?</a></p>

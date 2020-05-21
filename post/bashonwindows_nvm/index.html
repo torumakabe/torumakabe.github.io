@@ -115,11 +115,11 @@ cd /mnt/c/your_work_directory node ./index.js なんて感じで、書いたコ�
     <h1 class="title">Bash on WindowsでNode開発環境を作る</h1>
     
     <div class="content">
-      <h2 id="bash-on-windows-">Bash on Windows 現時点での使いどころ</h2>
+      <h2 id="bash-on-windows-現時点での使いどころ">Bash on Windows 現時点での使いどころ</h2>
 <p>Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。</p>
 <p>たとえばNodeのバージョン管理。Windowsには<a href="https://github.com/marcelklehr/nodist">nodist</a>がありますが、Linux/Macでは動きません。Linux/Macで使ってる<a href="https://github.com/creationix/nvm">NVM</a>がWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。</p>
 <p>最近、Azure FunctionsでNode v6.4.0が<a href="https://blogs.msdn.microsoft.com/appserviceteam/2016/09/01/azure-functions-0-5-release-august-portal-update/">使えるようになった</a>ので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。</p>
-<h2 id="nvm">NVMのインストール</h2>
+<h2 id="nvmのインストール">NVMのインストール</h2>
 <ul>
 <li>Bash on Ubuntu on Windowsを入れます (<a href="http://www.atmarkit.co.jp/ait/articles/1608/08/news039.html">参考</a>)</li>
 <li>Bash on Ubuntu on Windowsを起動します</li>
@@ -133,7 +133,7 @@ sudo apt-get install libssl-dev
 <pre><code>curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
 </code></pre><p>バージョンアップを考慮し、インストールのつど<a href="https://github.com/creationix/nvm">公式ページ</a>を確認してください。</p>
 <p>以上。</p>
-<h2 id="nvm-1">NVMの使い方</h2>
+<h2 id="nvmの使い方">NVMの使い方</h2>
 <pre><code>nvm install 6.4.0
 </code></pre><p>指定のバージョンをインストールします。</p>
 <pre><code>nvm use 6.4.0

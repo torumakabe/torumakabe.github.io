@@ -106,9 +106,9 @@ PowerShellのプロファイルを編集します。ところでエディタは�
     <h1 class="title">Docker for WindowsでインストールレスAzure CLI環境を作る</h1>
     
     <div class="content">
-      <h2 id="heading">舌の根の乾かぬ内に</h2>
+      <h2 id="舌の根の乾かぬ内に">舌の根の乾かぬ内に</h2>
 <p><a href="http://torumakabe.github.io/post/azure_osstools_iac/">最近</a>、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。</p>
-<h2 id="heading-1">動機</h2>
+<h2 id="動機">動機</h2>
 <ul>
 <li>Docker for Windows(on Client Hyper-V)のベータが一般開放された</li>
 <li>Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい</li>
@@ -116,14 +116,14 @@ PowerShellのプロファイルを編集します。ところでエディタは�
 <li>開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい</li>
 <li>○○レスって言ってみたかった</li>
 </ul>
-<h2 id="heading-2">やり口</h2>
+<h2 id="やり口">やり口</h2>
 <ul>
 <li>もちろんDocker for Windows (on Client Hyper-V) を使う</li>
 <li>いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;azure_cli&rdquo; を作る</li>
 <li>&ldquo;azure_cli&quot;入力にてAzure CLIコンテナを起動</li>
 <li>コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする</li>
 </ul>
-<h2 id="heading-3">作業の中身</h2>
+<h2 id="作業の中身">作業の中身</h2>
 <ul>
 <li>Docker for Windowsを<a href="https://docs.docker.com/docker-for-windows/">インストール</a>
 <ul>
@@ -140,7 +140,7 @@ PowerShellのプロファイルを編集します。ところでエディタは�
 </ul>
 </li>
 </ul>
-<h2 id="powershellfunction">PowerShellのfunctionを作る</h2>
+<h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
 <p>ここが作業のハイライト。</p>
 <p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
 <pre><code>PS C:\Workspace\dockereval\arm&gt; code $profile

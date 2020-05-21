@@ -123,7 +123,7 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
     <h1 class="title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</h1>
     
     <div class="content">
-      <h2 id="terraformmarketplace">TerraformのプロビジョニングがMarketplaceから可能に</h2>
+      <h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
 <p>Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは<a href="https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code">この資料</a>も参考に。</p>
 <p>さて、先日Azure Marketplaceから<a href="https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform">Terraform入りの仮想マシン</a>をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。</p>
 <ul>
@@ -135,23 +135,23 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
 <li>apt-transport-https</li>
 </ul>
 <p>いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。</p>
-<h2 id="heading">シークレットをコードにベタ書きする問題</h2>
+<h2 id="シークレットをコードにベタ書きする問題">シークレットをコードにベタ書きする問題</h2>
 <p>MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/active-directory/managed-service-identity/overview">Azure リソースの管理対象サービス ID (MSI)</a></p>
 <p>詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると</p>
 <p><strong>アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ</strong></p>
 <p>です。</p>
 <p>GitHub上に疑わしいシークレットがないかスキャンする<a href="https://azure.microsoft.com/ja-jp/blog/managing-azure-secrets-on-github-repositories/">取り組み</a>もはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。</p>
-<h2 id="terraformmsi">TerraformはMSIに対応している</h2>
+<h2 id="terraformはmsiに対応している">TerraformはMSIに対応している</h2>
 <p>TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。</p>
 <p>ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。</p>
 <p><a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_msi.html">Authenticating to Azure Resource Manager using Managed Service Identity</a></p>
 <p>Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。</p>
-<h2 id="heading-1">試してみよう</h2>
+<h2 id="試してみよう">試してみよう</h2>
 <p>実は、すでに使い方を解説した公式ドキュメントがあります。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-vm-msi">Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する</a></p>
 <p>手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。</p>
-<h3 id="marketplaceterraform">MarketplaceからTerraform入り仮想マシンを作る</h3>
+<h3 id="marketplaceからterraform入り仮想マシンを作る">MarketplaceからTerraform入り仮想マシンを作る</h3>
 <p>まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。</p>
 <ul>
 <li>MSI VM拡張の導入</li>
@@ -217,7 +217,7 @@ MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceか
             ]
         }
 [snip]
-</code></pre><h3 id="vm">VMにログインし、環境を確認</h3>
+</code></pre><h3 id="vmにログインし環境を確認">VMにログインし、環境を確認</h3>
 <p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
 <pre><code>$ ssh your-vm-public-ip
 </code></pre><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
@@ -292,7 +292,7 @@ terraform {
   }
 }
 </code></pre><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
-<h3 id="heading-2">プロビジョニングしてみる</h3>
+<h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
 <p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
 <pre><code>$ mkdir sample
 $ cd sample/
@@ -344,7 +344,7 @@ $ curl 13.91.90.117
 &lt;head&gt;
 &lt;title&gt;Welcome to nginx!&lt;/title&gt;
 [snip]
-</code></pre><h2 id="heading-3">おまけ</h2>
+</code></pre><h2 id="おまけ">おまけ</h2>
 <p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
 <p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
 <pre><code>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
