@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-<title>Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 | re-imagine</title>
+<title>Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版 | re-imagine</title>
 
-<meta property='og:title' content='Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 - re-imagine'>
+<meta property='og:title' content='Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版 - re-imagine'>
 <meta property='og:description' content='何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
 ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。
  BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、AKSに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
@@ -106,7 +106,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
       
     </div>
     <h2 class="subtitle is-6">May 21, 2020</h2>
-    <h1 class="title">Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版</h1>
+    <h1 class="title">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</h1>
     
     <div class="content">
       <h2 id="何の話か">何の話か</h2>
