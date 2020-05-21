@@ -7,9 +7,9 @@
 <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 | re-imagine</title>
 
 <meta property='og:title' content='Azure Kubernetes Service インフラ ブートストラップ開発フロー 2020春版 - re-imagine'>
-<meta property='og:description' content='何の話か マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
-ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。
- BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、aksに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
+<meta property='og:description' content='何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
+ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。
+ BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、AKSに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
 data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; { name = var.aks_cluster_name kubernetes_version = &#34;1.18.2&#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &#34;default&#34; type = &#34;VirtualMachineScaleSets&#34; enable_auto_scaling = true vnet_subnet_id = var.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aks-bootstrap-202005/'>
 <meta property='og:site_name' content='re-imagine'>
@@ -110,8 +110,8 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
     
     <div class="content">
       <h2 id="何の話か">何の話か</h2>
-<p>マネージドサービスなどではKubernetesはコマンド1発でクラスターを作れるほど楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。</p>
-<p>ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のワークフローとサンプルを紹介します。以下がポイントです。</p>
+<p>マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。</p>
+<p>ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。</p>
 <ul>
 <li>BootstrapとConfigurationを分割する
 <ul>
@@ -140,7 +140,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 </li>
 </ul>
 <h2 id="メインとなるhclの概説">メインとなるHCLの概説</h2>
-<p>ちょっと長いのですが、aksに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
+<p>ちょっと長いのですが、AKSに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
   name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
   resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
@@ -411,10 +411,10 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 <li>CoreDNSなどCritical Addonを分離するためにノードプールを分けています</li>
 <li>安定稼働が優先なのでオートスケール設定はしません</li>
 <li>コストと<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-system-pools#system-and-user-node-pools">要件</a>のバランスから、VMはStandard_F2s_v2にしています</li>
-<li>CriticalAddonsOnlyでtolerationしているPodだけがこのプールで動けるようにtaintします</li>
+<li>CriticalAddonsOnlyでtolerationしているPodだけがこのプールで動けるようにtaintしています</li>
 <li>ただしCritical Addonがdefaultノードプールにスケジューリングされる可能性は残るので、厳密にしたい場合は合わせて<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools.sh">ノードプールのモード指定</a>、Critical Addonたちへ<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-nodeselecter-system-deployments.sh">nodeSelectorの指定</a>、<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/restart-system-deployments.sh">リスタート</a>が必要です</li>
-<li>なお、この追加したノードプールのモードをsystem、defaultプールのモードをuserにすると、destroy時に先に追加したノードプールを削除しに行ってしまい「systemモードのプールが最低1つは要るぞ」と怒られますので、destroy前にモードを<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools-on-deletion.sh">再設定</a>しましょう</li>
-<li>いずれこの流れはAKS APIとHCLで吸収されると期待しています</li>
+<li>なお、この追加したノードプールのモードをsystem、defaultプールのモードをuserにすると、destroy時に追加したsystemノードプールを先に削除しに行ってしまい「systemモードのプールが最低1つは要るぞ」と怒られますので、destroy前にモードを<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools-on-deletion.sh">再設定</a>しましょう</li>
+<li>いずれこの流れはAKS APIとHCLで吸収できると期待しています</li>
 </ul>
 </li>
 <li>azurerm_monitor_diagnostic_setting.aks
