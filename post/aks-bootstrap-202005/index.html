@@ -398,7 +398,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 <ul>
 <li>typeをSystemAssignedにしているため、別途サービスプリンシパルを作成、指定する必要はありません</li>
 <li>以前はサービスプリンシパルの作成と指定、管理が煩雑、グローバル同期の考慮など悩ましかったのですが、楽になりました</li>
-<li>ただしAKS関連リソースが入るリソースグループ(MC_*)の外にあるリソースには、SystemAssigned指定で作られるManaged Identityから<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-managed-identity">操作する権限がない</a>ため、必要な場合はSystemAssignedではなくサービスプリンシパルを指定しましょう
+<li>ただしAKS関連リソースが入るリソースグループ(MC_*)の外にあるリソースには、SystemAssigned指定で作られるManaged Identityから<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-managed-identity">操作する権限がない</a>ため、必要な場合はSystemAssignedではなく権限を持ったサービスプリンシパルを指定しましょう
 <ul>
 <li>もしくはSystemAssined指定で作成したManaged Identityに必要な権限を割り当てます</li>
 <li>例: AKSを既存の別リソースグループにあるVNetに参加させる場合に、オートスケール時にサブネット操作するための権限割当が必要(<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/assign_role_mi.sh">参考スクリプト</a>)</li>
