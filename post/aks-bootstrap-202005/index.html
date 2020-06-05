@@ -391,6 +391,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 <li>azurerm_kubernetes_cluster.aks.default_node_pool
 <ul>
 <li>既定のノードプールで、オートスケールを有効にしています</li>
+<li>Cluster AutoscalerによるオートスケールはPVとの組み合わせに<a href="https://github.com/kubernetes/autoscaler/issues/1658">課題がある</a>ため、解決するまではオートスケールを有効にしないノードプールを分けてPVを使うことをおすすめします</li>
 <li>このサンプルでは、加えて後述するManaged Identityへ権限割当を行います</li>
 </ul>
 </li>
