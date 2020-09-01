@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,33 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/docker-for-windows">#Docker for Windows</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure-cli">#Azure CLI</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 28, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/">Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</a></h1>
+      <div class="content">
+        Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。
+動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &ldquo;az_cli&rdquo; を作る &ldquo;az_cli&quot;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &gt; [Shared Drives]   PowerShell functionを作成  のちほど詳しく    PowerShellのfunctionを作る ここが作業のハイライト。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/dockerforwin_azurecli2/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -234,34 +261,6 @@ nvm use 6.4.0 使うバージョンを指定します。
 簡単ですね。
 cd /mnt/c/your_work_directory node ./index.js なんて感じで、書いたコードをテストしちゃってください。
 なお、Visual Studio Code使いの人は統合ターミナルをBashにしておくと、さらに幸せになれます。
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 13, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/">Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</a></h1>
-      <div class="content">
-        背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
-さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
- 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&quot;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App アプリ名は.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azurefunctions_getusagedata/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>

@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,45 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">June 26, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></h1>
+      <div class="content">
+        何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多くなってきたので、まるっと試せるTerraform HCLとサンプルアプリを作りました。
+Gistに置いたHCLで、以下のような環境を作れます。
+動機 監視とは、ビジネスとそれを支える仕組みがどのような状態かを把握し、判断や行動につなげるものです。そして何を監視し、何をもって健全、危険と判断するかは、人や組織によります。安易にベストプラクティスを求めるものではないでしょう。
+とはいえ、コンテナー技術が本格的に普及し始めたのは最近ですし、手を動かしていない段階では、議論が発散しがちです。そこでお試しキットを作りました。AKSクラスターとサンプルアプリケーション、それらを監視するサービスとツールをまるっと試せます。
+このお試しキットは、Azureの提供するサービスとオープンソースのツールのみでまとめました。ですが、世にはいい感じのKubernetes対応ツールやサービスが多くあります。このキットであたりをつけてから、他も探ってみてください。
+視点 クラウド、コンテナー、サーバーレスの監視という文脈で、可観測性(Observability)という言葉を目にすることが多くなりました。オブザーバビブベボ、いまだに口が回りません。
+制御理論用語である可観測性がITの世界で使われるようになった理由は、諸説あるようです。監視を行為とすると、可観測性は性質です。「監視対象側に、状態を把握しやすくする仕組みを備えよう」というニュアンスを感じませんか。後付けではなく、監視をあらかじめ考慮したうえでアプリや基盤を作ろう、ということだと捉えています。いわゆるバズワードかもしれませんが、監視を考え直すいいきっかけになりそうで、わたしは好意的です。
+お試しキットは、3つの要素と2つの配置を意識して作りました。
+メトリクス、ロギング、トレーシング 可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。
+外からか、内からか Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。
+いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。
+お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)    実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
+セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。
+補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです   環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など   以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる)  azurerm_role_assignment.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -241,39 +280,6 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
 . ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/wsl">#WSL</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/golang">#Golang</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">May 2, 2018</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/wslenv_golang/">WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</a></h1>
-      <div class="content">
-        見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支援系の機能、ツールも拡充されています。特に、WSL/Windowsの連携、相互運用まわりは着実に進化しています。そのうちのひとつが、このエントリーで紹介するWSLENVです。
-WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ単純に共有するだけでなく、ルールに従って変換も行います。これが地味に便利。でも地味だから、あまり話題になっていない。なので具体例で紹介しよう、というのがこのエントリーの目的です。
-TL;DR 英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。
-Share Environment Vars between WSL and Windows
-Go開発環境を例に 前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。
-想定開発者像、ペルソナ  Windows端末を使っている Go言語を使っている CLIはbash/WSL中心  スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽 アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮   とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心  前提条件  WSL、WindowsそれぞれにGoを導入  バージョン管理のためにも、パッケージマネージャーがおすすめ わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています   GOPATHは %USERPROFILE%go とする  ユーザー名を tomakabeとすると C:\Users\tomakabe\go setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定 WSLでもこのディレクトリをGOPATHとする   VS Code + Go拡張をWindowsに導入 WindowsのCLIはPowerShellを利用  そぞろ歩き その1(WindowsでのGo開発) では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。
-まず、Windowsで環境変数GOPATHを確認します。
-PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH C:\Users\tomakabe\go GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/wslenv_golang/" style="height:28px">
           Read more
         </a>
         

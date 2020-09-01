@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,40 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/webapp">#Webapp</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 1, 2020</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/webapp-outbound/">マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する</a></h1>
+      <div class="content">
+        何の話か ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。
+実現したいことは 「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」 です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。
+(注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください
+実現したいこと  マルチテナント型Web Appsに複数、ランダムに割り当てられるアウトバウンド通信用IPではなく、固定IPを割り当てたい  「連携する外部サービス/システムがIPアドレスでフィルタリングしている」というケースが多いです   ついでにインターネットに出ていくトラフィックのログを採っておきたい できればWeb AppsからAzureの他サービスにはプライベートネットワークで接続したい  DBとか    解決策  Web AppsのリージョンVNet統合機能を使い、アウトバウンドトラフィックをVNet上の統合用サブネットに転送します  WEBSITE_VNET_ROUTE_ALL を設定し、すべてのアウトバウンドトラフィックをVNetに向けます   統合用サブネットのデフォルトルートをAzure Firewallに向けます  Azure Firewallに割り当てたパブリックIPでインターネットに出ていきます   Azureの他サービスにはプライベートエンドポイント経由でアクセスさせます  名前解決でプライベートエンドポイントのIPが返ってくるよう、プライベートDNSゾーンを作ってリンクします    Linux Web AppにPython(Django)アプリを載せ、Azure Database for PostgreSQLに繋ぐサンプルを例にすると、こんな感じです。
+コードを見たほうがピンとくると思うので、Terraformの構成ファイルをGistに置いておきます。上記の環境が一発で作れます。
+Azure Web Appsからのアウトバウンド通信をAzure FirewallのパブリックIPに固定する
+では設定できているか、確認してみましょう。
+まずはAzure Firewallに割り当てたIPでインターネットに出ているかです。該当のパブリックIPアドレスを確認します。
+az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup Location Zones Address AddressVersion AllocationMethod IdleTimeoutInMinutes ProvisioningState ------------ --------------- ---------- ------- ----------- ---------------- ------------------ ---------------------- ------------------- pip-firewall rg-webapp-ob-fw japaneast 20.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/webapp-outbound/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">

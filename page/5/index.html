@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-05-21T13:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,41 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/rbac">#RBAC</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 22, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_rg_contributor/">Azureのリソースグループ限定 共同作成者をいい感じに作る</a></h1>
+      <div class="content">
+        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
+ユースケースのひとつに、&ldquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
+なのですが、このようなケースで、権限付与の落とし穴があります。
+ サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
+いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
+シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
+{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] } 組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
+では、カスタムロールを作成します。
+$ az role definition create --role-definition ./role.json 出力にカスタムロールのIDが入っていますので、控えておきます。
+&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot; カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる 次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_rg_contributor/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -218,40 +253,6 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
 # Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/intro_boxstarter/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/vpn-gateway">#VPN Gateway</a>
-  
-  | <a class="subtitle is-6" href="/tags/network">#Network</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">October 8, 2017</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</a></h1>
-      <div class="content">
-        動機 焦げlogさんで、とても興味深いエントリを拝見しました。
- Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました  確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは
- ※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…
- ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。
-そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる
- 遅延 リージョン間通信に関するサムシング  を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。
-検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*,-t 300   送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/" style="height:28px">
           Read more
         </a>
         
