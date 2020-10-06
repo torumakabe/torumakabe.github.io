@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2020-10-06T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,51 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/msi">#MSI</a>
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 30, 2018</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_msi_terraform/">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</a></h1>
+      <div class="content">
+        TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けはこの資料も参考に。
+さて、先日Azure MarketplaceからTerraform入りの仮想マシンをプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。
+ Terraform (latest) Azure CLI 2.0 Managed Service Identity (MSI) VM Extension Unzip JQ apt-transport-https  いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。
+シークレットをコードにベタ書きする問題 MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。
+Azure リソースの管理対象サービス ID (MSI)
+詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると
+アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ
+です。
+GitHub上に疑わしいシークレットがないかスキャンする取り組みもはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。
+TerraformはMSIに対応している TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。
+ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。
+Authenticating to Azure Resource Manager using Managed Service Identity
+Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。
+試してみよう 実は、すでに使い方を解説した公式ドキュメントがあります。
+Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
+手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
+MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
+ MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_msi_terraform/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -220,42 +265,6 @@ $ helm install stable/nginx-ingress --name my-nginx サービスの状況を確�
 $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.0.0.1 &lt;none&gt; 443/TCP 79d my-nginx-nginx-ingress-controller LoadBalancer 10.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">February 10, 2018</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></h1>
-      <div class="content">
-        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
-さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
-せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more
         </a>
         

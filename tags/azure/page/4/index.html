@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/azure/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2020-09-01T14:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2020-10-06T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,41 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">October 6, 2020</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/">Azure Kubernetes Serviceの推奨メトリックアラートをTerraoformで設定する</a></h1>
+      <div class="content">
+        何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート設定もよく使われているもので、検討の価値があります。
+ Azure Monitor for containers からの推奨メトリック アラート (プレビュー)
+ ドキュメントではAzure PortalとAzure Resource Managerテンプレートによる設定手順が紹介されているのですが、アラートを有効にする部分のみです。推奨メトリックアラートを既存環境で試すだけならこれでもいいのですが、いずれクラスター作成や再現時に合わせて設定したくなるはずです。そこで、Terraformでクラスター作成と同時にサクっと設定できるようにしてみましょう。
+(注)2020年10月時点のやり口です
+サンプルコードで出来ること Gistにサンプルコードを公開しました。お楽しみください。
+このサンプルコードで下記のリソース作成、設定ができます。せっかくなのでAKSとAzure Monitor for containersの組み合わせで取得、監視、分析できる他のメトリック、ログ関連の設定も入れておきました。
+ AKSクラスターの作成  マネージドIDの有効化 Azure Monitor for containersの有効化  Log Analyticsワークスペースは既存を指定     AKSカスタムメトリックの有効化 推奨メトリックアラートの設定  OOM Killed Containers Average container working set memory %   マスターノードログのLog Analytics Workspaceへの転送 ログ、イベント、メトリックのライブデータ表示設定  コード解説 ポイントだけ抜き出して解説します。
+OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行権限の付与 Azure Monitor for containersは各ノードにエージェント(OMS Agent)を配布し、ログやメトリックを収集します。メトリックとして扱うデータも、まずログ形式でLog Analyticsワークスペースに送信し、その上でメトリック化やアラート作成を行います。Kustoクエリによる柔軟な指定が可能です。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">

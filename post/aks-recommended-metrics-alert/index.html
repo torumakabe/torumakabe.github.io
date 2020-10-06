@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraoformで設定する | re-imagine</title>
+
+<meta property='og:title' content='Azure Kubernetes Serviceの推奨メトリックアラートをTerraoformで設定する - re-imagine'>
+<meta property='og:description' content='何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート設定もよく使われているもので、検討の価値があります。
+ Azure Monitor for containers からの推奨メトリック アラート (プレビュー)
+ ドキュメントではAzure PortalとAzure Resource Managerテンプレートによる設定手順が紹介されているのですが、アラートを有効にする部分のみです。推奨メトリックアラートを既存環境で試すだけならこれでもいいのですが、いずれクラスター作成や再現時に合わせて設定したくなるはずです。そこで、Terraformでクラスター作成と同時にサクっと設定できるようにしてみましょう。
+(注)2020年10月時点のやり口です
+サンプルコードで出来ること Gistにサンプルコードを公開しました。お楽しみください。
+このサンプルコードで下記のリソース作成、設定ができます。せっかくなのでAKSとAzure Monitor for containersの組み合わせで取得、監視、分析できる他のメトリック、ログ関連の設定も入れておきました。
+ AKSクラスターの作成  マネージドIDの有効化 Azure Monitor for containersの有効化  Log Analyticsワークスペースは既存を指定     AKSカスタムメトリックの有効化 推奨メトリックアラートの設定  OOM Killed Containers Average container working set memory %   マスターノードログのLog Analytics Workspaceへの転送 ログ、イベント、メトリックのライブデータ表示設定  コード解説 ポイントだけ抜き出して解説します。
+OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行権限の付与 Azure Monitor for containersは各ノードにエージェント(OMS Agent)を配布し、ログやメトリックを収集します。メトリックとして扱うデータも、まずログ形式でLog Analyticsワークスペースに送信し、その上でメトリック化やアラート作成を行います。Kustoクエリによる柔軟な指定が可能です。'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2020-10-06T16:00:00&#43;09:00'/><meta property='article:modified_time' content='2020-10-06T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="canonical" href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav id="nav-main" class="nav">
+      <div id="nav-name" class="nav-left">
+        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+  <script src="/js/navicon-shift.js"></script>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
+  
+
+      
+    </div>
+    <h2 class="subtitle is-6">October 6, 2020</h2>
+    <h1 class="title">Azure Kubernetes Serviceの推奨メトリックアラートをTerraoformで設定する</h1>
+    
+    <div class="content">
+      <h2 id="何の話か">何の話か</h2>
+<p>Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート設定もよく使われているもので、検討の価値があります。</p>
+<blockquote>
+<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts">Azure Monitor for containers からの推奨メトリック アラート (プレビュー)</a></p>
+</blockquote>
+<p>ドキュメントではAzure PortalとAzure Resource Managerテンプレートによる設定手順が紹介されているのですが、アラートを有効にする部分のみです。推奨メトリックアラートを既存環境で試すだけならこれでもいいのですが、いずれクラスター作成や再現時に合わせて設定したくなるはずです。そこで、Terraformでクラスター作成と同時にサクっと設定できるようにしてみましょう。</p>
+<p><em>(注)2020年10月時点のやり口です</em></p>
+<h2 id="サンプルコードで出来ること">サンプルコードで出来ること</h2>
+<p><a href="https://gist.github.com/ToruMakabe/e7787218eee07a003143849d0855ae59">Gist</a>にサンプルコードを公開しました。お楽しみください。</p>
+<p>このサンプルコードで下記のリソース作成、設定ができます。せっかくなのでAKSとAzure Monitor for containersの組み合わせで取得、監視、分析できる他のメトリック、ログ関連の設定も入れておきました。</p>
+<ul>
+<li>AKSクラスターの作成
+<ul>
+<li>マネージドIDの有効化</li>
+<li>Azure Monitor for containersの有効化
+<ul>
+<li>Log Analyticsワークスペースは既存を指定</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-update-metrics">AKSカスタムメトリックの有効化</a></li>
+<li>推奨メトリックアラートの設定
+<ul>
+<li>OOM Killed Containers</li>
+<li>Average container working set memory %</li>
+</ul>
+</li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/aks/view-master-logs">マスターノードログのLog Analytics Workspaceへの転送</a></li>
+<li><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-livedata-setup">ログ、イベント、メトリックのライブデータ表示設定</a></li>
+</ul>
+<h2 id="コード解説">コード解説</h2>
+<p>ポイントだけ抜き出して解説します。</p>
+<h3 id="oms-agent向けマネージドidに対するazure-monitorメトリック発行権限の付与">OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行権限の付与</h3>
+<p>Azure Monitor for containersは各ノードにエージェント(OMS Agent)を配布し、ログやメトリックを収集します。メトリックとして扱うデータも、まずログ形式でLog Analyticsワークスペースに送信し、その上でメトリック化やアラート作成を<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-log-alerts">行います</a>。Kustoクエリによる柔軟な指定が可能です。</p>
+<p>しかしLog Analyticsワークスペースでは、インデクシングなどデータを使えるようになるまでの前処理が必要で、アラートまでのタイムラグが大きくなりがちです。アラートや迅速な分析の用途ではLog Analyticsワークスペースではなく、多次元メトリック(MDM - Multi-Dimensional Metrics)データ構造で、時系列データストアをバックに持つAzure Monitorメトリックストアが適しているのは間違いありません。</p>
+<blockquote>
+<p><a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/platform/data-platform-metrics">Azure Monitor のメトリック</a></p>
+</blockquote>
+<p>このような背景があり、Azure Monitor for containerのOMS Agentから、メトリックデータをLog Analyticsワークスペースだけでなく、Azure MonitorメトリックストアへAKSカスタムメトリックとして送れるようになりました。</p>
+<p>そこで、アラート設定のためにまずカスタムメトリックを有効化しましょう。Azure Monitorのメトリックは各リソース単位で管理されており、書き込み権限の設定が必要です。つまりAKSクラスターリソースに対し、OMS Agentからメトリックを発行できるようにロールを付与しなければいけません。</p>
+<p>サンプルではAKSクラスターをマネージドIDを使うよう設定しているので、OMS Agetアドオン向けに作成されるマネージドIDに対し、Monitoring Metrics Publisherロールを付与しています。</p>
+<pre><code>resource &quot;azurerm_role_assignment&quot; &quot;aks_metrics&quot; {
+  scope                = azurerm_kubernetes_cluster.sample.id
+  role_definition_name = &quot;Monitoring Metrics Publisher&quot;
+  principal_id         = azurerm_kubernetes_cluster.sample.addon_profile.0.oms_agent.0.oms_agent_identity.0.object_id
+}
+</code></pre><p>なおAzure Monitor for containersのOMS Agentのコードは<a href="https://github.com/microsoft/Docker-Provider">公開</a>されています。お楽しみください。</p>
+<h3 id="メトリック発行閾値の設定">メトリック発行閾値の設定</h3>
+<p>Azure Monitor for containersで設定されるメトリックの中には、OMS Agentがメトリック送信の要否を閾値によって<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts#alert-rules-overview">判断するもの</a>があります。つまり閾値を超えない場合には、Azure Monitorへメトリックが送られません。</p>
+<p>よって、アラートだけでなく分析にもメトリックを使いたいケースでは、Azure Monitorで設定したアラート閾値よりも、OMS Agentの送信閾値を低くします。</p>
+<p>現在、コンテナーのcpuExceededPercentage、memoryRssExceededPercentage、memoryWorkingSetExceededPercentageの送信閾値を<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts#configure-alertable-metrics-in-configmaps">変更可能</a>です。OMS AgentはConfigMapを読み込み、既定値を上書きします。</p>
+<p>下記はmemoryWorkingSetExceededPercentageを既定値の95%から80%に変更する例です。</p>
+<pre><code>resource &quot;kubernetes_config_map&quot; &quot;oms_agent&quot; {
+  depends_on = [azurerm_role_assignment.aks_metrics]
+  metadata {
+    name      = &quot;container-azm-ms-agentconfig&quot;
+    namespace = &quot;kube-system&quot;
+  }
+
+  data = {
+    schema-version                           = &quot;v1&quot;
+    config-version                           = &quot;ver1&quot;
+    alertable-metrics-configuration-settings = &lt;&lt;EOT
+[alertable_metrics_configuration_settings.container_resource_utilization_thresholds]
+    container_memory_working_set_threshold_percentage = 80.0
+EOT
+  }
+
+  // Waiting for omsagent restart &amp; custom metrics preparation
+  provisioner &quot;local-exec&quot; {
+    command = &quot;sleep 180&quot;
+  }
+}
+</code></pre><p>サンプルコードではHCLのheredocに設定を埋め込みました。ComfigMapの元ネタは<a href="https://github.com/microsoft/Docker-Provider/blob/ci_prod/kubernetes/container-azm-ms-agentconfig.yaml">GitHub上</a>にあります。</p>
+<p>ちなみに、このComfigMapではログ収集の除外Namespaceを設定したり、Prometheusメトリックの<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-prometheus-integration">スクレーピング設定</a>などもできるので、合わせて活用しましょう。</p>
+<p>なおConfigMap作成後に、やや長めですが180秒スリープさせています。カスタムメトリックが有効になるのを待つためです。カスタムメトリックがまだ有効になっていない状態で後述のアラート設定を行うと、「カスタムメトリックが見つからない」とエラーになるため、それを回避します。</p>
+<h3 id="アラート設定">アラート設定</h3>
+<p>アラートのアクショングループはクラスター作成とライフサイクルが違うケースが多いと思いますので、既存のものを読み込みます。</p>
+<pre><code>data &quot;azurerm_monitor_action_group&quot; &quot;sample&quot; {
+  resource_group_name = var.alert_actiongroup_rg_name
+  name                = var.alert_actiongroup_name
+}
+</code></pre><p>そしてアラートの設定です。以下はOOM Killed Containersの数を頻度1分、ウインドウ5分の平均で評価し、0より大きければアラートアクションを呼び出すサンプルです。</p>
+<pre><code>resource &quot;azurerm_monitor_metric_alert&quot; &quot;aks_oom_killed_container_count&quot; {
+  depends_on          = [kubernetes_config_map.oms_agent]
+  name                = &quot;oomKilledContainerCount&quot;
+  resource_group_name = azurerm_resource_group.sample.name
+  scopes              = [azurerm_kubernetes_cluster.sample.id]
+  severity            = 3
+  frequency           = &quot;PT1M&quot;
+  window_size         = &quot;PT5M&quot;
+
+  criteria {
+    metric_namespace = &quot;Insights.Container/pods&quot;
+    metric_name      = &quot;oomKilledContainerCount&quot;
+    aggregation      = &quot;Average&quot;
+    operator         = &quot;GreaterThan&quot;
+    threshold        = 0
+
+
+    dimension {
+      name     = &quot;kubernetes namespace&quot;
+      operator = &quot;Include&quot;
+      values   = [&quot;*&quot;]
+    }
+
+    dimension {
+      name     = &quot;controllerName&quot;
+      operator = &quot;Include&quot;
+      values   = [&quot;*&quot;]
+    }
+
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.sample.id
+  }
+}
+</code></pre><p>コード化するにあたってアラート設定値の元ネタが欲しくなりますが、<a href="https://github.com/microsoft/Docker-Provider/tree/ci_prod/alerts/recommended_alerts_ARM">GitHub</a>上にあります。Azure Resource ManagerテンプレートのJSON形式ですので、そこから属性と値を拾ってHCLに書き換えましょう。閾値や頻度、評価ウインドウを好みに変えてもいいでしょう。</p>
+<p>サンプルコードには2つのみ書きましたが、他にも9つの推奨アラートがあります。ぜひ必要なものを加えてみて下さい。</p>
+
+      
+      <div class="related">
+
+<h3>Similar articles:</h3>
+<ul>
+	
+	<li><a href="/post/additional_aks_provisioning_with_tf/">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</a></li>
+	
+	<li><a href="/post/aks-bootstrap-202005/">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</a></li>
+	
+	<li><a href="/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></li>
+	
+	<li><a href="/post/aks_how_to_keep_secret/">Azure Kubernetes Serviceでシークレットを管理する6つの方法</a></li>
+	
+	<li><a href="/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></li>
+	
+</ul>
+</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+
