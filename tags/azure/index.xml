@@ -13,7 +13,7 @@
     
     
     <item>
-      <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraoformで設定する</title>
+      <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</title>
       <link>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</link>
       <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
       
