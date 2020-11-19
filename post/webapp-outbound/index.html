@@ -7,7 +7,8 @@
 <title>マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する | re-imagine</title>
 
 <meta property='og:title' content='マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する - re-imagine'>
-<meta property='og:description' content='何の話か ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。
+<meta property='og:description' content='(2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるようになりました
+何の話か ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。
 実現したいことは 「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」 です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。
 (注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください
 実現したいこと  マルチテナント型Web Appsに複数、ランダムに割り当てられるアウトバウンド通信用IPを使うのではなく、固定IPを割り当てたい  「連携する外部サービス/システムがIPアドレスでフィルタリングしている」というケースが多い   ついでにインターネットに出ていくトラフィックのログを採っておきたい できればWeb AppsからAzureの他サービスにはプライベートネットワークで接続したい  DBとか    解決策  Web AppsのリージョンVNet統合機能を使い、アウトバウンドトラフィックをVNet上の統合用サブネットに転送します  WEBSITE_VNET_ROUTE_ALL を設定し、すべてのアウトバウンドトラフィックをVNetに向けます   統合用サブネットのデフォルトルートをAzure Firewallに向けます  Azure Firewallに割り当てたパブリックIPでインターネットに出ていきます   Azureの他サービスにはプライベートエンドポイント経由でアクセスさせます  名前解決でプライベートエンドポイントのIPが返ってくるよう、プライベートDNSゾーンを作ってリンクします    Linux Web AppにPython(Django)アプリを載せ、Azure Database for PostgreSQLに繋ぐサンプルを例にすると、こんな感じです。
@@ -112,7 +113,9 @@ az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup 
     <h1 class="title">マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する</h1>
     
     <div class="content">
-      <h2 id="何の話か">何の話か</h2>
+      <h2 id="20201119更新">(2020/11/19更新)</h2>
+<p>この記事ではアウトバウンド通信をAzure Firewallに向けていますが、<a href="https://azure.github.io/AppService/2020/11/15/web-app-nat-gateway.html">NAT Gatewayにも向けられるようになりました</a></p>
+<h2 id="何の話か">何の話か</h2>
 <p>ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。</p>
 <p>実現したいことは <em>「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」</em> です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。</p>
 <p><em>(注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください</em></p>
