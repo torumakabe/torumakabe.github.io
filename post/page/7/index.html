@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2020-10-06T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-02-25T11:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,36 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/network">#Network</a>
+  
+  | <a class="subtitle is-6" href="/tags/latency">#Latency</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 9, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_latency/">Azureユーザー視点のLatency測定 2017/4版</a></h1>
+      <div class="content">
+        関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。
+せっかくなので、
+ 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ   自宅Wi-Fi環境  802.11ac(5GHz)   自宅加入インターネット接続サービス  OCN 光 マンション 100M   OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです   米国リージョン  US WEST (カリフォルニア)    測定結果 1.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_latency/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -219,52 +249,6 @@ Azure CLI 2.0 Azure CLI 2.0に&quot;appservice web config container&quot;コマ�
 すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
 $ az appservice web config container show -n yourcontainerapp -g YourRG { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.0&quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
 $ az appservice web config container update -n yourcontainerapp -g YourRG -c &quot;yourrepo/yourcontainer:1.0.1&quot; { &quot;DOCKER_CUSTOM_IMAGE_NAME&quot;: &quot;yourrepo/yourcontainer:1.0.1&quot; } これで更新されます。
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/chatops">#ChatOps</a>
-  
-  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
-  
-  | <a class="subtitle is-6" href="/tags/slack">#Slack</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">October 7, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/">SlackとAzure FunctionsでChatOpsする</a></h1>
-      <div class="content">
-        Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。
-AzureでChatOpsと言えば、Auth0のSandrino Di Mattia氏が作った素敵なサンプルがあります。
-素晴らしい。これで十分、という気もしますが、実装のバリエーションがあったほうが後々参考になる人も多いかなと思い、Web App/Web JobをAzure Functionsで置き換えてみました。
-SlackからRunbookを実行できて、何がうれしいか  誰がいつ、どんな文脈でRunbookを実行したかを可視化する CLIやAPIをRunbookで隠蔽し、おぼえることを減らす CLIやAPIをRunbookで隠蔽し、できることを制限する  ブツ Githubに上げておきました。
-AZChatOpsSample
-おおまかな流れ 手順書つらいのでポイントだけ。
-  SlackのSlash CommandとIncoming Webhookを作る
- 流れは氏の元ネタと同じ    ARM TemplateでFunction Appをデプロイ
-  Github上のDeployボタンからでもいいですが、パラメータファイルを作っておけばCLIで楽に繰り返せます
-  パラメータファイルのサンプルはsample.azuredeploy.parameters.jsonです。GUIでデプロイするにしても、パラメータの意味を理解するためにざっと読むと幸せになれると思います
-  Function AppのデプロイはGithubからのCIです。クローンしたリポジトリとブランチを指定してください
-  GithubからのCIは、はじめてのケースを考慮しARM Templateのリソースプロパティ&quot;IsManualIntegration&quot;をtrueにしています
-  Azure Automationのジョブ実行権限を持つサービスプリンシパルが必要です (パラメータ SUBSCRIPTION_ID、TENANT_ID、CLIENT_ID、CLIENT_SECRET で指定)
-  Azure Automationについて詳しく説明しませんが、Slackから呼び出すRunbookを準備しておいてください。そのAutomationアカウントと所属するリソースグループを指定します
-  作成済みのSlack関連パラメータを指定します
-    ARM Templateデプロイ後にkuduのデプロイメントスクリプトが走るので、しばし待つ(Function Appの設定-&gt;継続的インテグレーションの構成から進捗が見えます)
-  デプロイ後、Slash Commandで呼び出すhttptrigger function(postJob)のtokenを変更
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_chatops_onfunctions/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>
