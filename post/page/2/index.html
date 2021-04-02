@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-02-25T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-04-02T11:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,40 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/github">#GitHub</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 22, 2019</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/">GitHub Actionsでオンデマンドに環境を再現する</a></h1>
+      <div class="content">
+        何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフローに取り組むケースも増えてきました。
+ プルリクエストイベントをトリガーにコードの検証やテストを行い、マージの判断に使う マージされたら、ステージングや本番環境へデプロイする  こんなワークフローが一般的と思います。ですが一時的に「コードは変えてないけど、一時的に環境を再現したい」なんてこともあります。不具合対応とか。環境を作るコードはあるので、どこかにコードを持っていって実行すればいいのですが、せっかくGitHub Actionsで仕組みを作った手前、チョイっといじってできるなら、そうしたい。
+アイデア GitHub Actionsを使ってコードから環境をデプロイする環境はすでにある、という前提なので、論点は「どのトリガーを使うか」です。
+ ワークフローをトリガーするイベント
+ トリガーにできるイベントは多くありますが「コードは変えない」という条件だと、悩みます。プルリクやプッシュでの発火がわかりやすいからといって、そのためのフラグファイル的なものを作りたくもありません。
+GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
+そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
+ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: | az group create -n ${{ env.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -238,48 +272,6 @@ apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret 
 package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.Request) { secret := os.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">June 1, 2019</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></h1>
-      <div class="content">
-        何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
-機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
-Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
- 図で理解する Descheduler
- これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。
- Descheduler for Kubernetes
- OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
- Descheduling
- 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
-Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
-例えばこんなシナリオです。あるある。
- 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
-では、このシナリオで動きを追ってみましょう。
-事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
-NodeにPodを寄せる はじめのNode数は2です。
-$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5 レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
-apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m デプロイします。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
           Read more
         </a>
         

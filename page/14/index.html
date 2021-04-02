@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-02-25T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-02T11:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,39 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+
+
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 12, 2014</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/monasca/">君はOpenStack Monascaを知っているか</a></h1>
+      <div class="content">
+        このエントリーは、OpenStack (2枚目) Advent Calendar 2014の12夜目担当作品です。
+Monitoring as a Service 監視をサービスとして提供するって、どういうことでしょうか。
+[Monitoring]
+従来の監視。担当者が事前に監視項目を定義する。静的。
+[Monitoring as a Service] 監視機能をサービスとして提供する。不特定多数のユーザーが、自分の監視したい測定項目を定義し、自分の好きなタイミングでチェックする。GUIはもちろん、APIでデータ取得できる。動的。
+まあ、AWSのCloudWatchみたいなものです。先に言うべきでしたね、すいません。
+このMonitoring as a Service、技術的なハードルは結構高いんです。刻々と上がってくるイベントをさばき、蓄積し、APIをバシバシ叩くユーザーリクエストに応えなきゃいけない。監視というと裏方のイメージがありますが、これは、対価をいただくに値する、立派なサービスです。
+そこでOpenStackのMonitoring as a Service事情はどうでしょうか。一見、それを実現できそうなCeilometerがあります。ただ、もともとCeilomerは課金のための利用情報収集をする、という生まれなので、マルチテナントで、ユーザーが自らメトリックを定義し、チェックするという使い方に向いていません。ユーザー向けというより、管理者向けなんです。
+そこでMonascaの登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。
+では、アーキテクチャーを見てみましょう。
+ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。
+と思っていたら。
+なんと、Monasca-Vagrantなんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。
+気をつけること  動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。 Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。 git cloneしたディレクトリ直下にansibleのrequirementファイルが置かれるので、そこで作業 vagrant upで2つのVM、devstackとmini-monが作られる、ここは時間と帯域がいるので、スタバな人は要注意  気をつけるのはこれくらいです。レッツトライ。
+年末年始休暇のお楽しみが増えましたね。
+これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp; 良いお年を。
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -225,34 +258,6 @@ playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定
  フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&rdquo;:auto&quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
 スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
 $ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance is snapshoting! ==&gt; default: Snapshot is ok 
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-  
-  | <a class="subtitle is-6" href="/tags/icehouse">#Icehouse</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">May 6, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-icehouse/">いま最も楽にIcehouse環境を作る方法</a></h1>
-      <div class="content">
-        あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。
-では始めましょう。OpenStack Cloud Computing Cookbookの著者が提供しているツールを使います。使うのはVagrant、VirtualBox、Git。
-ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
-この環境だと30分でできた  Vagrant 1.5.4 VirtualBox 4.3.10 Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB  デモや新機能の試用くらいであればこれで十分ですね。
-著者に感謝。わたしは買いました。 &ndash; OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)
         
       </div>
     </article>

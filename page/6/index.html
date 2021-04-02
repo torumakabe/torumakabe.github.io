@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-02-25T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-02T11:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,32 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/windows">#Windows</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/golang">#Golang</a>
+  
+  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 4, 2017</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/">Windows上でLinux向けGoバイナリをDockerでビルドする</a></h1>
+      <div class="content">
+        小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
+条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
+docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -223,37 +249,6 @@ az provider register --namespace Microsoft.EventGrid az feature register --name 
 az feature show --name storageEventSubscriptions --namespace Microsoft.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_blobevent/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
-  
-  | <a class="subtitle is-6" href="/tags/copy">#Copy</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">June 13, 2017</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azureblobcopy_perf/">Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</a></h1>
-      <div class="content">
-        ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョン間でデータ複製してくれるサービスを使うのが、楽ですし、おすすめです。
-でも、ファイルコピーを無くせないもろもろの事情もあります。となると、「地球の裏側へのファイルコピーに、どんだけ時間かかるのよ」は、課題です。
-調べてみた ということで、いくつかのパターンで調べたので参考までに。測定環境は以下の通り。
-ツールと実行環境  AzCopy 6.1.0 Azure PowerShell 4.1.0 Windows 10 1703 ThinkPad X1 Carbon 2017, Core i7-7600U 2.8GHz, 16GB Memory  アクセス回線パターン  一般的な回線   自宅(川崎) OCN光 100M マンションタイプ 宅内は802.11ac(5GHz) 川崎でアクセス回線に入り、横浜(保土ヶ谷)の局舎からインターネットへ  ゲートウェイ名から推測    いい感じの回線   日本マイクロソフト 品川オフィス 1Gbps 有線 Azureデータセンターへ「ネットワーク的に近くて広帯域」  コピーするファイル  総容量: 約60GB  6160ファイル 1MB * 5000, 10MB * 1000, 100MB * 100, 500MB * 50, 1000MB * 10   Linux fallocateコマンドで作成  ファイル形式パターン  ファイル、Blobそのまま送る (6160ファイル) ディスクイメージで送る (1ファイル)   Managed Diskとしてアタッチした100GBの領域にファイルシステムを作成し、6160ファイルを配置 転送前にデタッチ、エクスポート(Blob SAS形式) AzCopyではなくAzure PowerShellでコピー指示 (AzCopyにBlob SAS指定オプションが見当たらなかった)  対象のAzureリージョン  東日本 (マスター、複製元と位置づける) 米国中南部 (太平洋越え + 米国内を見たい) ブラジル南部  転送パターン  ユーザー拠点の端末からAzureリージョン: AzCopy Upload Azureリージョン間 (Storage to Storage)  ファイル: AzCopy Copy イメージ: PowerShell Start-AzureStorageBlobCopy    結果    形式　 コピー元　 コピー先　 コマンド　 並列数 実行時間(時:分:秒)     ファイル　 自宅 Azure 東日本 AzCopy Upload 2 07:55:22   ファイル　 自宅 Azure 米国中南部 AzCopy Upload 2 10:22:30   ファイル　 自宅 Azure ブラジル南部 AzCopy Upload 2 12:46:37   ファイル　 オフィス Azure 東日本 AzCopy Upload 16 00:20:47   ファイル　 オフィス Azure 米国中南部 AzCopy Upload 16 00:45.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobcopy_perf/" style="height:28px">
           Read more
         </a>
         
