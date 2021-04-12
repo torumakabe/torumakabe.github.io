@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>App Service on re-imagine</title>
+    <link>https://ToruMakabe.github.io/tags/app-service/</link>
+    <description>Recent content in App Service on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
+    <lastBuildDate>Mon, 12 Apr 2021 13:30:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://ToruMakabe.github.io/tags/app-service/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</title>
+      <link>https://ToruMakabe.github.io/post/website-vnet-route-all/</link>
+      <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/website-vnet-route-all/</guid>
+      <description>何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&amp;ldquo;WEBSITE_VNET_ROUTE_ALL = 1&amp;rdquo;設定が可能です。すこぶる便利な反面、設定ひとつでルーティングがごそっと変わってしまう気持ち悪さは否めません。そこで、設定することでどのような効果があるのか、実際にインターフェースやルートの設定を見て、理解しておきましょう。ドキュメントを読めばだいたい想像できるのですが、トラブルシューティングの際に念のためルートを確認したいなんてこともあるでしょうから、知っておいて損はありません。
+確認環境と手法 App Service (Linux/.NET Core 3.1)のアプリコンテナーへsshし、インターフェースやルートを確認します。
+ VNet統合なし VNet統合あり VNet統合あり(WEBSITE_VNET_ROUTE_ALL = 1)  この流れで、設定の効果を見ていきましょう。
+VNet統合なし まずは、IPアドレスとインターフェースの設定を確認します。
+root@96d38124b1f4:~/site/wwwroot# ip a 1: lo: &amp;lt;LOOPBACK,UP,LOWER_UP&amp;gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 34: eth0@if35: &amp;lt;BROADCAST,MULTICAST,UP,LOWER_UP&amp;gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:10:02:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.16.2.2/24 brd 172.</description>
+    </item>
+    
+  </channel>
+</rss>

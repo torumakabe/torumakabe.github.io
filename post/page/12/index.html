@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-04-02T11:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,38 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/ddos">#DDoS</a>
+  
+  | <a class="subtitle is-6" href="/tags/securty">#Securty</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">February 15, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_ddosprotection/">Azure DDoS対策ことはじめ</a></h1>
+      <div class="content">
+        すこぶるFAQ 攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないので、DDoSに絞り、現時点で検討していただきたいことをシンプルにまとめます。
+公式ホワイトペーパー Microsoft Azure Network Security Whitepaper V3が、現時点でのMicrosoft公式見解です。DDoS以外にもセキュリティ関連で考慮すべきことがまとまっています。おすすめです。
+今回はここから、DDoSに言及している部分を抜き出し意訳します。必要に応じて補足も入れます。
+2016//3/4 追記 日本語訳がありました
+2.2 Security Management and Threat Defense - Protecting against DDoS &quot;To protect Azure platform services, Microsoft provides a distributed denial-of-service (DDoS) defense system that is part of Azure’s continuous monitoring process, and is continually improved through penetration-testing. Azure’s DDoS defense system is designed to not only withstand attacks from the outside, but also from other Azure tenants:&quot;  MicrosoftはDDoSを防ぐ仕組みを提供しています。Azure外部からの攻撃はもちろんのこと、Azure内部で別テナントから攻撃されることも考慮しています。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_ddosprotection/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -249,54 +281,6 @@ SAPSという値が出てきます。販売管理アプリケーションがそ�
     DELL R720 Azure VM GS5 NEC R120f-2M FUJITSU RX4770 M2     Date 2012/4 2015/9 2015/7 2015/7   CPU Type Intel Xeon Processor E5-2690 Intel Xeon Processor E5-2698B v3 Intel Xeon Processor E5-2699 v3 Intel Xeon Processor E7-8890 v3   CPU Sockets 2 2 2 4   CPU Cores 16 32 (Virtual) 36 72   SD Benchmark Users 6,500 7,600 14,440 29,750   SAPS 35,970 41,670 79,880 162,500    3年前の2ソケットマシンより性能はいい。現行2ソケットマシンの半分程度が期待値でしょうか。ざっくりE5-2699 v3の物理18コアくらい。4ソケットは無理め。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">January 11, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/">Azureでインフラデプロイツールを選ぶ時に考えていること</a></h1>
-      <div class="content">
-        ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進化が早いですし、選択肢も豊富。クラウド採用に合わせて自動化に挑戦するケースも増えてますので、自然なことと思います。
-特に話題になるのが「どのツールを選べばいいか」。ツールというのは課題を解決する手段なので、まず課題を掘るべきです。ですが、まだ成熟していない領域で変化が激しいですし、ツールひとつで課題を解決できるとも限らない。複数のツールを組み合わせることも多く、依存関係もありそう。となると、考えるきっかけが欲しいのは、ごもっとも。
-なので「ケースバイケース。以上」とは、言いにくい。
-私見であっても、たたき台となる考え方なりパターンがWebに転がっていれば、参考になるかもしれない。それがこのエントリを書く動機です。わたしは他のプラットフォームからAzureに主戦場を移していますので、新鮮な意見が書けるかも、という背景も、あります。
-書く前に前提など 対象はインフラレイヤのデプロイメントに絞ります。そして、インフラ = 物理/仮想ハードウェア(サーバ、ストレージ、ネットワーク) + OS + プラットフォームソフト(アプリじゃないもの、Webサーバ、ユーティリティ、etc）と定義します。
-レイヤリングや用語は、 @gosukenator さんの&ldquo;インフラ系技術の流れ&rdquo;が参考になるので、合わせて読むと幸せになれるでしょう。このエントリで言うBootstrapping/Configurationレイヤが今回の焦点です。
-では、わたしがツールを選ぶ時にどんなことを考えているのか、脳内をダンプしていきましょう。
-そもそもツールで自動化すべきかを考える いきなり萎えるそもそも論で恐縮ですが、重要です。たとえばあるソフトの試用目的で、同じ構成のサーバのデプロイは今後しなさそう、台数は1台、使うのは自分だけ、なんていう環境のデプロイまで、自動化する必要はないはずです。時短、工数削減、オペレーションミスリスクの軽減、そもそも自動化しないと運用がまわらない、など自動化によって得られる利益がその手間を上回るかを判断します。
-なお「知っている/できる」人でないとその価値、利益はわかりません。やらないという判断は、腕があってはじめてできることです。
-使い捨てられないかを考える 次は、ツールによって作った環境がどのように変化するか、変えられるかを検討します。ストレートに言うと、変化のタイミングで捨てられないか？新しいものに置き換えられないか？を考えます。もしこれができるのであれば、方式はとてもシンプルにできます。Immutable Infrastructure、Blue/Green Deploymentなどのやり口が注目されていますが、これらの根っこには「ちまちま変化を加えて複雑化するくらいなら、使い捨て/入れ替えてしまえ」という意識があります。
-ですが、とは言ってもそんな大胆にできない事情もあると思います。Blue/Green Deploymentでは、入れ替えのタイミングでBlue、Green分のリソースが必要になりますし、切り替えにともなうリスクもあります。それを許容できない場合、同じインフラに変化を積んでいくことになります。ChefなどConfigurationレイヤで冪等なオペーレーションができるツールが注目されたのは、この変化を維持しやすいからです。
-変化を積む場合にやるべきでないのは、中途半端に職人が真心こめて手作業してしまうことです。ツールでやると決めたら、少なくともそのカバー範囲はツールに任せましょう。でないといわゆる「手作業汚れ」「スノーフレークサーバ（雪の結晶のように、全部同じように見えて実はそれぞれ違う）」のダークサイドに堕ちます。
-変化を積まないのであれば、インフラデプロイメント用途ではConfigurationレイヤのツールを導入しないという割り切りもできるでしょう。
-優先事項や制約条件を洗い出す アーキテクトが真っ白なキャンバスに画を描けることはほぼありません。きっと、先になんらかの優先事項や制約条件があるはずです。そして、ほとんどのシステムにおいて、インフラのデプロイは主役ではありません。ツールに合わせてもらえることはまれでしょう。様々な条件を選定にあたって洗い出す必要があります。
- 社内/プロジェクト標準  　周知されていないだけで、推奨ツールが決まってたりします。あるある。そのツールの良し悪しは置いておいて、社内ノウハウの蓄積など、大きな目的がある場合には従うべきでしょう。
- 他レイヤでの優先ツール  　インフラのデプロイに影響がありそうなツールがアプリ開発側で決まっていたりします。最近華やかなのがDockerです。Docker社が出してるツール群は上から下までカバー範囲も広く、デプロイツールと重複しがちです。組み合わせを検討しなければいけません。また、Apache Mesosもインフラとアプリのグレーゾーンに鎮座します。なかなか悩ましいですが、優先せざるをえません。
- 規模  　いきなり1000台とか10000台規模を扱うユーザは多くないと思いますが、その規模になるとツールの性能限界にぶち当たったりします。念のため、意識はしましょう。ちなみに、1000台をひとつのツールの傘に入れずとも、たとえば10*100台にする設計ができないか、事前に考えておくと打ち手が増えます。
- チーム or ひとり  　本番環境のデプロイ自動化はチームプレイになるので、ツールの導入はサーバ上になるでしょうし、構成ファイルの共有、バージョンコントロールなど考慮点は多いです。一方で、開発者が開発、検証用途で端末に導入し実行する使い方では、手軽さが求められます。誤解を恐れず例をあげると、前者にはChefが、後者にはAnsibleやTerraformがフィットしやすいです。
- Windows or Linux  　Azure ARM Templateなど、はじめからマルチOS環境を前提に作られているツールはありますが、ほとんどのツールはその生まれがWindows、Linuxに寄っています。マルチOS対応が進んではいますが、活用にあたって、参考となる情報量には大きな差があります。たとえばマルチOS対応のツールであっても、DSCはWindowsの、ChefやAnsibleはLinuxの情報が圧倒的に多いです。これは意識せざるを得ません。使うOSでの十分な情報があるか確認します。
-マネージドサービス、機能を活用する マネージドサービス = プラットフォームが提供している機能です。Azureであれば、今回対象としているレイヤではARMがそれにあたります。デプロイツールは有用ですが、その導入や維持運用には本質的価値はありません。プラットフォームに任せられるのであれば、そうしたほうが楽です。
-また、Azureのインフラは進化が早いため、それに対応するスピードも、本家ツールのほうが期待できます。
-ですが、以前のエントリで触れたように、本家のツールであっても、すべてのレイヤをカバーできるほど万能ではありません。たとえばARM TemplateはインフラのBootstrappingには向いていますが冪等性が限定的であるため、ソフトウェアパッケージを足す/消す/入れ替えるを頻繁に繰り返す環境のConfiguration用途では、苦しいです。
-よってARM Templateは、Immutableな環境で使う、もしくは、ChefなどのConfigurationツールと組み合わせて使うことを念頭に設計をします。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_infradeployment_selection/" style="height:28px">
           Read more
         </a>
         

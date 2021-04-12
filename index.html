@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-02T11:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,38 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/app-service">#App Service</a>
+  
+  | <a class="subtitle is-6" href="/tags/network">#Network</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">April 12, 2021</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/website-vnet-route-all/">Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</a></h1>
+      <div class="content">
+        何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&ldquo;WEBSITE_VNET_ROUTE_ALL = 1&rdquo;設定が可能です。すこぶる便利な反面、設定ひとつでルーティングがごそっと変わってしまう気持ち悪さは否めません。そこで、設定することでどのような効果があるのか、実際にインターフェースやルートの設定を見て、理解しておきましょう。ドキュメントを読めばだいたい想像できるのですが、トラブルシューティングの際に念のためルートを確認したいなんてこともあるでしょうから、知っておいて損はありません。
+確認環境と手法 App Service (Linux/.NET Core 3.1)のアプリコンテナーへsshし、インターフェースやルートを確認します。
+ VNet統合なし VNet統合あり VNet統合あり(WEBSITE_VNET_ROUTE_ALL = 1)  この流れで、設定の効果を見ていきましょう。
+VNet統合なし まずは、IPアドレスとインターフェースの設定を確認します。
+root@96d38124b1f4:~/site/wwwroot# ip a 1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 34: eth0@if35: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:10:02:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.16.2.2/24 brd 172.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/website-vnet-route-all/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -220,37 +252,6 @@ Azure Web Appsからのアウトバウンド通信をAzure Firewallのパブリ�
 az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup Location Zones Address AddressVersion AllocationMethod IdleTimeoutInMinutes ProvisioningState ------------ --------------- ---------- ------- ----------- ---------------- ------------------ ---------------------- ------------------- pip-firewall rg-webapp-ob-fw japaneast 20.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/webapp-outbound/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/github">#GitHub</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">May 21, 2020</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</a></h1>
-      <div class="content">
-        何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
-ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。
- BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、AKSに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
-data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; { name = var.aks_cluster_name kubernetes_version = &#34;1.18.2&#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &#34;default&#34; type = &#34;VirtualMachineScaleSets&#34; enable_auto_scaling = true vnet_subnet_id = var.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/" style="height:28px">
           Read more
         </a>
         
