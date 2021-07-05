@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.71.0" />
+	<meta name="generator" content="Hugo 0.84.4" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-05T14:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -98,6 +98,52 @@
 
 
   
+  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
+  
+  | <a class="subtitle is-6" href="/tags/aci">#ACI</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">July 5, 2021</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci-runner-on-functions/">Azure Container Instancesの定期実行をAzure Functionsのタイマートリガーで行うパターン</a></h1>
+      <div class="content">
+        何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点があります。そこで、実装例とともにまとめておきます。
+ サンプルコードはGitHubに公開しているので、合わせて参照してください。Pythonで書きました。
+ ACI Runner on Azure Functions
+ 背景 以前、ACIの定期実行をGitHub Actionsで行う記事を書きました。
+ Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する
+ その後、同様のご相談をいくつかいただきました。ACIの定期実行は、ニーズがあるのでしょう。
+アプリの定期実行であればAzure Functionsのタイマートリガー関数という手もあります。それでもACIが選ばれる理由としてよく耳にするのは、「実行するアプリはコンテナー化したい」「Functionsでもコンテナーは動かせるが、コンテナーの実行環境としてはFunctionsよりシンプルなACIがいい」です。App Service/Functionsの習熟度も、判断に影響するでしょう。いずれにせよ、実現手段が選択できるのは、良いことだと思います。
+ところで、ACIを定期的に走らせるランナーの実装にははいくつかパターンがあります。前述の通りGitHub ActionsなどAzure外部のスケジューラを使う他に、Logic AppsなどAzureのサービスを使う手があります。
+ Azure Logic Apps で自動化された定期的なタスク、プロセス、ワークフローのスケジュールを設定して実行する
+  Azure Logic Apps を使用して Azure Container Instances をデプロイおよび管理する
+ 昨今、Logic Appsのようなローコード環境が注目されています。いっぽう、可能な限りコードで表現、維持したいというニーズも多いです。そこで、Azure Functionsのタイマートリガー関数でランナーを書くならどうする、というのが、この記事の背景です。
+考慮点 作るのは難しくありません。ですが、設計や実装にあたって、いくつかの考慮点があります。
+Functionsのホスティングオプションと言語ランタイム 1日1回、数十秒で終わるジョブなど、ランナーの実行回数が少なく、短時間で終了するケースもあるでしょう。その場合、コストを考えると、Functionsのプランは従量課金を使いたいものです。従量課金プランの適用可否の判断材料となりがちなVNet統合も、非データプレーンアプリであるACIランナーの用途では不要、と判断できる案件が多いのではないでしょうか。また、オフラインバッチならコールドスタートも問題にならないでしょう。
+ Azure Functions のホスティング オプション
+ 従量課金プランをターゲットにすると、次はOSと言語ラインタイムの選択です。従量課金プランを選択する場合、カスタムコンテナーは利用できないため、言語ランタイムは提供されているものの中から選択する必要があります。選択肢の中から、開発、運用主体の習熟度やチームの意志で決定してください。
+冒頭で紹介した、わたしの作ったサンプルはLinux/Pythonです。わたしの周辺、半径10mくらいの意見で決めました。
+Windowsの場合には、HTTPトリガーの例ではありますが、PowerShellでのチュートリアルが公開されています。参考にしてください。
+ チュートリアル:HTTP によってトリガーされる Azure Functions を使用してコンテナー グループを作成する
+ ロジックと構成、パラメータの分離 ACIのコンテナーグループを作成、実行するロジックはシンプルです。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/aci-runner-on-functions/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
   | <a class="subtitle is-6" href="/tags/app-service">#App Service</a>
   
   | <a class="subtitle is-6" href="/tags/network">#Network</a>
@@ -148,7 +194,7 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
 ああ残念、と思いきや、手はあります。Application Insightsは可用性テスト結果を受け取るAPIを公開しているので、そこにデータを送るカスタムプローブを作って、プライベートネットワークに配置すれば、実現できます。
 そんな背景があり、公開されているのが前述のサンプルです。C#とFunctions使いであればこれでOK。このエントリはGoなど他言語での実装に関心がある人向けです。
 作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
-   Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
+  Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    
         
       </div>
@@ -175,9 +221,9 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
       <div class="content">
         何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。
  運用系で定期実行したい作業、いわゆるハウスキーピング/レポーティング処理がある いずれその機能はサービスとして提供されそう/リクエストしているが、それまでの間をつなぐ仕組みを作りたい KubernetesやTerraformなど、利用しているOSSの習熟も兼ねて、Goで書きたい Azureのリソースを操作するので、権限割り当てやシークレット管理は気を付けたい、アプリのコードに書くなんてもってのほか ハウスキーピングアプリだけでなく環境全体をコード化し、ライフサイクル管理したい  いずれこの仕組みが不要になったらサクッと消す    作ったもの 例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。Service Tag Discovery APIを使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。
-   GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
-   必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
-   ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
+  GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
+  必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
+  ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
 考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  ハウスキーピングアプリの実行環境として、Azure FunctionsやLogic Appsもありです。それらを手の内に入れており、言語にこだわりがなければ、そのほうが楽かも FunctionsであればGoをカスタムハンドラーで動かす手もあります。ただ、ユースケースが定期実行、つまりタイマトリガだと、入出力バインディングなどFunctionsのおいしいところを活かせないので、あえてカスタムハンドラーを使って書くこともないかな、という気持ちに Rustで書いちゃおっかな、とも思ったのですが、Azure SDK for Rustが現状 &ldquo;very active development&rdquo;なので、この用途では深呼吸 GoはAzure SDKのファーストクラス言語ではありませんが、KubernetesやTerraformのAzure対応で活発に利用されており、実用的です。ただ、Azureリソースの管理系操作、つまりコントロールプレーンと、blobの操作などデータプレーン向けSDKが分離されているので注意が必要です  どちらかだけならいいのですが、このサンプルのようにどちらも使うケースで課題になる このサンプルではGiovanniやTerraform AzureRM Providerを参考に、クライアントビルダーをまとめた   リトライは大事です。コケても再実行できるようにしましょう  例えば、このサンプルではAzure Container InstancesのManaged Identityサポートが作成時点でプレビューということもあり、Managed Identityエンドポイントの準備が整う前にコンテナが起動するケースが報告されています このサンプルのように常時起動が不要なケースでは、Azure Container Instancesを&ndash;restart-policy OnFailureオプションで起動すれば、異常終了時に再実行されます。また、正常終了時にはコンテナが停止し課金も止まります   Actionsでの認証認可やAzure Container Instancesの実行パラメータ用途で、GitHubに登録するシークレットが多めです。Terraform実行時に.
         
@@ -217,41 +263,6 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
 OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行権限の付与 Azure Monitor for containersは各ノードにエージェント(OMS Agent)を配布し、ログやメトリックを収集します。メトリックとして扱うデータも、まずログ形式でLog Analyticsワークスペースに送信し、その上でメトリック化やアラート作成を行います。Kustoクエリによる柔軟な指定が可能です。
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/webapp">#Webapp</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 1, 2020</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/webapp-outbound/">マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する</a></h1>
-      <div class="content">
-        (2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるようになりました
-何の話か ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。
-実現したいことは 「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」 です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。
-(注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください
-実現したいこと  マルチテナント型Web Appsに複数、ランダムに割り当てられるアウトバウンド通信用IPを使うのではなく、固定IPを割り当てたい  「連携する外部サービス/システムがIPアドレスでフィルタリングしている」というケースが多い   ついでにインターネットに出ていくトラフィックのログを採っておきたい できればWeb AppsからAzureの他サービスにはプライベートネットワークで接続したい  DBとか    解決策  Web AppsのリージョンVNet統合機能を使い、アウトバウンドトラフィックをVNet上の統合用サブネットに転送します  WEBSITE_VNET_ROUTE_ALL を設定し、すべてのアウトバウンドトラフィックをVNetに向けます   統合用サブネットのデフォルトルートをAzure Firewallに向けます  Azure Firewallに割り当てたパブリックIPでインターネットに出ていきます   Azureの他サービスにはプライベートエンドポイント経由でアクセスさせます  名前解決でプライベートエンドポイントのIPが返ってくるよう、プライベートDNSゾーンを作ってリンクします    Linux Web AppにPython(Django)アプリを載せ、Azure Database for PostgreSQLに繋ぐサンプルを例にすると、こんな感じです。
-  コードを見たほうがピンとくると思うので、Terraformの構成ファイルをGistに置いておきます。上記の環境が一発で作れます。
-Azure Web Appsからのアウトバウンド通信をAzure FirewallのパブリックIPに固定する
-では設定できているか、確認してみましょう。
-まずはAzure Firewallに割り当てたIPでインターネットに出ているかです。該当のパブリックIPアドレスを確認します。
-az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup Location Zones Address AddressVersion AllocationMethod IdleTimeoutInMinutes ProvisioningState ------------ --------------- ---------- ------- ----------- ---------------- ------------------ ---------------------- ------------------- pip-firewall rg-webapp-ob-fw japaneast 20.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/webapp-outbound/" style="height:28px">
           Read more
         </a>
         

@@ -7,10 +7,33 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Mon, 12 Apr 2021 13:30:00 +0900</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jul 2021 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ACI</title>
+      <link>https://ToruMakabe.github.io/tags/aci/</link>
+      <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/aci/</guid>
+      <description></description>
+    </item>
     
-	<atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure</title>
+      <link>https://ToruMakabe.github.io/tags/azure/</link>
+      <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
+      <description></description>
+    </item>
     
+    <item>
+      <title>Functions</title>
+      <link>https://ToruMakabe.github.io/tags/functions/</link>
+      <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/functions/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>App Service</title>
@@ -18,24 +41,6 @@
       <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/app-service/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>AZ</title>
-      <link>https://ToruMakabe.github.io/tags/az/</link>
-      <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/az/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Azure</title>
-      <link>https://ToruMakabe.github.io/tags/azure/</link>
-      <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
       <description></description>
     </item>
     
@@ -112,15 +117,6 @@
     </item>
     
     <item>
-      <title>ACI</title>
-      <link>https://ToruMakabe.github.io/tags/aci/</link>
-      <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/aci/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Golang</title>
       <link>https://ToruMakabe.github.io/tags/golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
@@ -153,6 +149,15 @@
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/dns/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AZ</title>
+      <link>https://ToruMakabe.github.io/tags/az/</link>
+      <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/az/</guid>
       <description></description>
     </item>
     
@@ -256,15 +261,6 @@
     </item>
     
     <item>
-      <title>Functions</title>
-      <link>https://ToruMakabe.github.io/tags/functions/</link>
-      <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/functions/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Copy</title>
       <link>https://ToruMakabe.github.io/tags/copy/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
@@ -279,15 +275,6 @@
       <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/latency/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>ARM</title>
-      <link>https://ToruMakabe.github.io/tags/arm/</link>
-      <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/arm/</guid>
       <description></description>
     </item>
     
@@ -495,6 +482,15 @@
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/ops/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ARM</title>
+      <link>https://ToruMakabe.github.io/tags/arm/</link>
+      <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/arm/</guid>
       <description></description>
     </item>
     

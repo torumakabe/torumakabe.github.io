@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Mon, 22 Jan 2018 22:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 22 Jan 2018 22:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/rbac/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
       <link>https://ToruMakabe.github.io/post/azure_rg_contributor/</link>

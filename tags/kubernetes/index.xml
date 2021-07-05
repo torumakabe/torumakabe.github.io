@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Tue, 06 Oct 2020 16:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Tue, 06 Oct 2020 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</title>
       <link>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</link>

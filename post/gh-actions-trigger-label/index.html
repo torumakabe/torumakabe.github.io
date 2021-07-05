@@ -15,7 +15,7 @@
 GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
 そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
 ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: | az group create -n ${{ env.'>
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: |az group create -n ${{ env.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/gh-actions-trigger-label/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='Azure'><meta property='article:published_time' content='2019-12-22T23:30:00&#43;09:00'/><meta property='article:modified_time' content='2019-12-22T23:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -129,38 +129,38 @@ name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: A
 <p>そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。</p>
 <h2 id="ワークフロー例">ワークフロー例</h2>
 <p>以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">name</span>: gh-actions-trigger-labeled
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">name</span>: <span style="color:#ae81ff">gh-actions-trigger-labeled</span>
 
-<span style="color:#66d9ef">on</span>:
-  <span style="color:#66d9ef">issues</span>:
-    <span style="color:#66d9ef">types</span>:
-      - labeled
-      - unlabeled
-<span style="color:#66d9ef">env</span>:
-  <span style="color:#66d9ef">AZURE_GROUP_NAME</span>: rg-repro-gh-actions-trigger-label
-  <span style="color:#66d9ef">YOUR_PARAM</span>: hoge
+<span style="color:#f92672">on</span>:
+  <span style="color:#f92672">issues</span>:
+    <span style="color:#f92672">types</span>:
+      - <span style="color:#ae81ff">labeled</span>
+      - <span style="color:#ae81ff">unlabeled</span>
+<span style="color:#f92672">env</span>:
+  <span style="color:#f92672">AZURE_GROUP_NAME</span>: <span style="color:#ae81ff">rg-repro-gh-actions-trigger-label</span>
+  <span style="color:#f92672">YOUR_PARAM</span>: <span style="color:#ae81ff">hoge</span>
 
-<span style="color:#66d9ef">jobs</span>:
-  <span style="color:#66d9ef">deploy-or-delete</span>:
-    <span style="color:#66d9ef">runs-on</span>: ubuntu-latest
-    <span style="color:#66d9ef">steps</span>:
-      - <span style="color:#66d9ef">uses</span>: actions/checkout@master
+<span style="color:#f92672">jobs</span>:
+  <span style="color:#f92672">deploy-or-delete</span>:
+    <span style="color:#f92672">runs-on</span>: <span style="color:#ae81ff">ubuntu-latest</span>
+    <span style="color:#f92672">steps</span>:
+      - <span style="color:#f92672">uses</span>: <span style="color:#ae81ff">actions/checkout@master</span>
 
-      - <span style="color:#66d9ef">uses</span>: azure/login@v1
-        <span style="color:#66d9ef">with</span>:
-          <span style="color:#66d9ef">creds</span>: ${{ secrets.AZURE_CREDENTIALS }}
+      - <span style="color:#f92672">uses</span>: <span style="color:#ae81ff">azure/login@v1</span>
+        <span style="color:#f92672">with</span>:
+          <span style="color:#f92672">creds</span>: <span style="color:#ae81ff">${{ secrets.AZURE_CREDENTIALS }}</span>
 
-      - <span style="color:#66d9ef">if</span>: github.event.label.name == <span style="color:#e6db74">&#39;repro&#39;</span> <span style="color:#75715e">&amp;&amp;</span> github.event.action == <span style="color:#e6db74">&#39;labeled&#39;</span>
-        <span style="color:#66d9ef">run</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">          az group create -n ${{ env.AZURE_GROUP_NAME }} -l japaneast</span>
-          az group deployment create -n repro -g ${{ env.AZURE_GROUP_NAME }} --template-file deployment/azuredeploy.json --parameters name=${{ env.YOUR_PARAM }}
+      - <span style="color:#f92672">if</span>: <span style="color:#ae81ff">github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39;</span>
+        <span style="color:#f92672">run</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">          az group create -n ${{ env.AZURE_GROUP_NAME }} -l japaneast
+</span><span style="color:#e6db74">          az group deployment create -n repro -g ${{ env.AZURE_GROUP_NAME }} --template-file deployment/azuredeploy.json --parameters name=${{ env.YOUR_PARAM }}</span>          
 
-      - <span style="color:#66d9ef">if</span>: github.event.label.name == <span style="color:#e6db74">&#39;repro&#39;</span> <span style="color:#75715e">&amp;&amp;</span> github.event.action == <span style="color:#e6db74">&#39;unlabeled&#39;</span>
-        <span style="color:#66d9ef">run</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">          az group delete -n ${{ env.AZURE_GROUP_NAME }} -y</span>
+      - <span style="color:#f92672">if</span>: <span style="color:#ae81ff">github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;unlabeled&#39;</span>
+        <span style="color:#f92672">run</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">          </span>          <span style="color:#ae81ff">az group delete -n ${{ env.AZURE_GROUP_NAME }} -y</span>
 
-      - <span style="color:#66d9ef">run</span>: <span style="color:#e6db74">|
-</span><span style="color:#e6db74">          az logout</span>
+      - <span style="color:#f92672">run</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">          </span>          <span style="color:#ae81ff">az logout</span>
 </code></pre></div><p>ポイントは以下の通りです。</p>
 <ul>
 <li>ラベル「repro」を作っておく(環境を再現してるという意図が分かればなんでも)</li>

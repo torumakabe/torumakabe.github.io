@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.71.0" />
+	<meta name="generator" content="Hugo 0.84.4" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-05T14:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,25 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/hugo">#Hugo</a>
+
+
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">September 20, 2015</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/migrate-to-hugo/">Hugoへ移行</a></h1>
+      <div class="content">
+        JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。
+移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -219,45 +238,6 @@ Neutron。でもまあ、Neutronに罪はないか。取り巻きが良くなか
 Swiftで決まり。ほとばしる安定感。というかAWSに依存したS3互換製品とかやめてみんなオープンなSwift互換にするといいよ。
   じゃあ二枚目は? Troveです。若さと期待の大きさを込めてキャスティングしました。というかこれを見ても分かるとおり、当面PaaSと言えばDBaaSです。DBの構築とか運用面倒ですものね。Troveはレプリケーション機能が追加されたり、いよいよこれから本格化と思います。
 2枚目のカレンダーなので、ネタ感あふれる副音声モードでお届けしました。ではメリークリスマス。
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-  
-  | <a class="subtitle is-6" href="/tags/ansible">#Ansible</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">September 14, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/openstack-tools/">OpenStackのツール環境をImmutableに整える</a></h1>
-      <div class="content">
-        タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
-なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
-やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
-  VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。
-  実行ディレクトリにprovision.shを置きます。
-  provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。
-  実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。
-  hostsファイルには以下のようにlocalhostを定義します。
-[localhost]
-127.0.0.1 ansible_connection=local
-  provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
-playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定義したenv.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/openstack-tools/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>

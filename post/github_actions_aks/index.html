@@ -194,7 +194,7 @@ action &quot;Deploy to AKS&quot; {
   }
 }
 </code></pre><p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
-<p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&ldquo;Load AKS credential&quot;ブロックがその例です。&quot;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
+<p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&ldquo;Load AKS credential&quot;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
 <p>&ldquo;Deploy branch filter&quot;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&ldquo;Deploy to AKS&quot;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
 <p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&quot;Actions&quot;タブで実行結果を確認できます。</p>
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/ghaction_sc.png" alt="Workflow"></p>

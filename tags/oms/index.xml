@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
       <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>

@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/chatops/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 07 Oct 2016 17:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/chatops/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
       <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>

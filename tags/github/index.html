@@ -6,11 +6,11 @@
 
 <title>GitHub | re-imagine</title>
 
-<meta property='og:title' content='Tag: GitHub - re-imagine'>
+<meta property='og:title' content='GitHub - re-imagine'>
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/tags/github/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Tags'><meta property='og:updated_time' content='2021-07-05T14:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -115,7 +115,7 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
 ああ残念、と思いきや、手はあります。Application Insightsは可用性テスト結果を受け取るAPIを公開しているので、そこにデータを送るカスタムプローブを作って、プライベートネットワークに配置すれば、実現できます。
 そんな背景があり、公開されているのが前述のサンプルです。C#とFunctions使いであればこれでOK。このエントリはGoなど他言語での実装に関心がある人向けです。
 作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
-   Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
+  Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    
         
       </div>
@@ -142,9 +142,9 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
       <div class="content">
         何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。
  運用系で定期実行したい作業、いわゆるハウスキーピング/レポーティング処理がある いずれその機能はサービスとして提供されそう/リクエストしているが、それまでの間をつなぐ仕組みを作りたい KubernetesやTerraformなど、利用しているOSSの習熟も兼ねて、Goで書きたい Azureのリソースを操作するので、権限割り当てやシークレット管理は気を付けたい、アプリのコードに書くなんてもってのほか ハウスキーピングアプリだけでなく環境全体をコード化し、ライフサイクル管理したい  いずれこの仕組みが不要になったらサクッと消す    作ったもの 例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。Service Tag Discovery APIを使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。
-   GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
-   必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
-   ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
+  GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
+  必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
+  ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
 考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  ハウスキーピングアプリの実行環境として、Azure FunctionsやLogic Appsもありです。それらを手の内に入れており、言語にこだわりがなければ、そのほうが楽かも FunctionsであればGoをカスタムハンドラーで動かす手もあります。ただ、ユースケースが定期実行、つまりタイマトリガだと、入出力バインディングなどFunctionsのおいしいところを活かせないので、あえてカスタムハンドラーを使って書くこともないかな、という気持ちに Rustで書いちゃおっかな、とも思ったのですが、Azure SDK for Rustが現状 &ldquo;very active development&rdquo;なので、この用途では深呼吸 GoはAzure SDKのファーストクラス言語ではありませんが、KubernetesやTerraformのAzure対応で活発に利用されており、実用的です。ただ、Azureリソースの管理系操作、つまりコントロールプレーンと、blobの操作などデータプレーン向けSDKが分離されているので注意が必要です  どちらかだけならいいのですが、このサンプルのようにどちらも使うケースで課題になる このサンプルではGiovanniやTerraform AzureRM Providerを参考に、クライアントビルダーをまとめた   リトライは大事です。コケても再実行できるようにしましょう  例えば、このサンプルではAzure Container InstancesのManaged Identityサポートが作成時点でプレビューということもあり、Managed Identityエンドポイントの準備が整う前にコンテナが起動するケースが報告されています このサンプルのように常時起動が不要なケースでは、Azure Container Instancesを&ndash;restart-policy OnFailureオプションで起動すれば、異常終了時に再実行されます。また、正常終了時にはコンテナが停止し課金も止まります   Actionsでの認証認可やAzure Container Instancesの実行パラメータ用途で、GitHubに登録するシークレットが多めです。Terraform実行時に.
         
@@ -211,7 +211,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
 そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
 ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: | az group create -n ${{ env.
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: |az group create -n ${{ env.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/" style="height:28px">
           Read more

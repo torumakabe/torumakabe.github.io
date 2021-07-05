@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-04-12T13:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-07-05T14:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,47 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/book">#Book</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/ops">#Ops</a>
+  
+  | <a class="subtitle is-6" href="/tags/google">#Google</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">March 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/">書評: Site Reliability Engineering</a></h1>
+      <div class="content">
+        英語だけどぜひ読んでほしい Site Reliability Engineering: How Google Runs Production Systems
+参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本です。GoogleのSREについては断片的に知っていたのですが、まとめて読むと違いますね。背景やストーリーがあって、理解しやすいです。
+共感できるネタがどんどん繰り出されるので、一気読みしました。読み込みが浅いところもあったので、改めて読む予定。
+以下、印象に残ったこと。
+  Site Reliability Engineering teamは、インフラ/Ops担当であるが、Unix内部やネットワークなどインフラの知見を持つソフトウェアエンジニアの集団。自分たちのオペレーションを効率的に、迅速に、確実にするために、コードを書く。
+  インシデント対応、問い合わせ対応、手作業は仕事の50%に収まるように調整する。残りの時間は自分たちの仕事をより良く、楽にするために、コードを書く。
+  日々のリアクティブな活動に忙殺されるインフラ/Ops担当はどうしても減点評価になりがちだが、仕事の半分がプロアクティブな活動であり、成果を加点評価できる。昇格、昇給の根拠になりやすい。
+  アプリ/製品チームとSREチームは&quot;Error Budget&quot;を定義、共有する。これは四半期ごとに定義される、サービスレベル目標である。ユーザがサービスを使えなくなると、その時間が、このError Budgetから取り崩されていく。Budgetが残り少なくなると、リスクを伴うデプロイなどは控える。
+  インフラ/Ops担当は「サービスを少しでもダウンさせたら悪」となりがちだが、サービスごとにアプリ/製品チームとSREチームがError Budgetを共有することで、利害関係を一致できる。
+  Error Budgetの大きさはサービスごとに異なり、定義は製品チームの責任。当然Error Budgetが少ない = サービスレベルが高い = コストがかかる ので、製品チームはいたずらに高いサービスレベルを定義しない。Google Apps for WorkとYoutubeのError Budgetは異なる。Appsはサービスレベル重視であり、Youtubeは迅速で頻繁な機能追加を重視する。
+  SLA違反など、重大な障害では&quot;Postmortem(過激だが死体解剖の意)&ldquo;を作成し、失敗から学ぶ。客観的に、建設的に。誰かや何かを責めるためにやるわけではない。マサカリ投げない。
+  他の産業から学ぶ。製造業のビジネス継続プラン、国防のシミュレーションや演習、通信業の輻輳対策など。
+  もう一回読んだら、また違う発見があるんじゃないかと。
+自分ごととして読みたい 今後の働き方や所属組織に行き詰まりを感じているインフラ/Ops技術者に、参考になるネタが多いと思います。
+DevOpsムーブメントが来るか来ないかという今、Opsとしてのスタンスを考え直すのにも、いいかもしれません。
+もちろん、Googleの圧倒的物量、成長スピードゆえのミッションと働き方である事は否定しません。でも、自分とは無関係、と無視するにはもったいないです。
+なお、このSREチーム、できてから10年以上たっているそうです。それだけ持続できるということは、そこに何か本質的な価値があるのではないでしょうか。
+オススメです。
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -233,44 +274,6 @@ ansible_localと組み合わせたサンプル さっそく試してそつなく
   認証情報は変数指定し、設定ファイルから読み込む
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-  
-  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">February 27, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/">TerraformをAzure ARMで使う時の認証</a></h1>
-      <div class="content">
-        高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
-Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
-そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
-client_id/client_secret って何よ 以下がARM向けのProvider設定です。
-# Configure the Azure Resource Manager Provider provider &quot;azurerm&quot; { subscription_id = &quot;...&quot; client_id = &quot;...&quot; client_secret = &quot;...&quot; tenant_id = &quot;...&quot; }  subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、client_id/client_secret って何よ。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。
-&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;  おっとそういうことか。OAuth。
-サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
-&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
-&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
-以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
-まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_tf_arm_sp/" style="height:28px">
           Read more
         </a>
         

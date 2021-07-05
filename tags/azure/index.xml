@@ -7,10 +7,33 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Mon, 12 Apr 2021 13:30:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Mon, 05 Jul 2021 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/azure/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure Container Instancesの定期実行をAzure Functionsのタイマートリガーで行うパターン</title>
+      <link>https://ToruMakabe.github.io/post/aci-runner-on-functions/</link>
+      <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aci-runner-on-functions/</guid>
+      <description>何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点があります。そこで、実装例とともにまとめておきます。
+ サンプルコードはGitHubに公開しているので、合わせて参照してください。Pythonで書きました。
+ ACI Runner on Azure Functions
+ 背景 以前、ACIの定期実行をGitHub Actionsで行う記事を書きました。
+ Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する
+ その後、同様のご相談をいくつかいただきました。ACIの定期実行は、ニーズがあるのでしょう。
+アプリの定期実行であればAzure Functionsのタイマートリガー関数という手もあります。それでもACIが選ばれる理由としてよく耳にするのは、「実行するアプリはコンテナー化したい」「Functionsでもコンテナーは動かせるが、コンテナーの実行環境としてはFunctionsよりシンプルなACIがいい」です。App Service/Functionsの習熟度も、判断に影響するでしょう。いずれにせよ、実現手段が選択できるのは、良いことだと思います。
+ところで、ACIを定期的に走らせるランナーの実装にははいくつかパターンがあります。前述の通りGitHub ActionsなどAzure外部のスケジューラを使う他に、Logic AppsなどAzureのサービスを使う手があります。
+ Azure Logic Apps で自動化された定期的なタスク、プロセス、ワークフローのスケジュールを設定して実行する
+  Azure Logic Apps を使用して Azure Container Instances をデプロイおよび管理する
+ 昨今、Logic Appsのようなローコード環境が注目されています。いっぽう、可能な限りコードで表現、維持したいというニーズも多いです。そこで、Azure Functionsのタイマートリガー関数でランナーを書くならどうする、というのが、この記事の背景です。
+考慮点 作るのは難しくありません。ですが、設計や実装にあたって、いくつかの考慮点があります。
+Functionsのホスティングオプションと言語ランタイム 1日1回、数十秒で終わるジョブなど、ランナーの実行回数が少なく、短時間で終了するケースもあるでしょう。その場合、コストを考えると、Functionsのプランは従量課金を使いたいものです。従量課金プランの適用可否の判断材料となりがちなVNet統合も、非データプレーンアプリであるACIランナーの用途では不要、と判断できる案件が多いのではないでしょうか。また、オフラインバッチならコールドスタートも問題にならないでしょう。
+ Azure Functions のホスティング オプション
+ 従量課金プランをターゲットにすると、次はOSと言語ラインタイムの選択です。従量課金プランを選択する場合、カスタムコンテナーは利用できないため、言語ランタイムは提供されているものの中から選択する必要があります。選択肢の中から、開発、運用主体の習熟度やチームの意志で決定してください。
+冒頭で紹介した、わたしの作ったサンプルはLinux/Pythonです。わたしの周辺、半径10mくらいの意見で決めました。
+Windowsの場合には、HTTPトリガーの例ではありますが、PowerShellでのチュートリアルが公開されています。参考にしてください。
+ チュートリアル:HTTP によってトリガーされる Azure Functions を使用してコンテナー グループを作成する
+ ロジックと構成、パラメータの分離 ACIのコンテナーグループを作成、実行するロジックはシンプルです。</description>
+    </item>
     
     <item>
       <title>Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</title>
@@ -39,7 +62,7 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
 ああ残念、と思いきや、手はあります。Application Insightsは可用性テスト結果を受け取るAPIを公開しているので、そこにデータを送るカスタムプローブを作って、プライベートネットワークに配置すれば、実現できます。
 そんな背景があり、公開されているのが前述のサンプルです。C#とFunctions使いであればこれでOK。このエントリはGoなど他言語での実装に関心がある人向けです。
 作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
-   Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
+  Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    </description>
     </item>
     
@@ -51,9 +74,9 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
       <guid>https://ToruMakabe.github.io/post/servicetag-checker/</guid>
       <description>何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。
  運用系で定期実行したい作業、いわゆるハウスキーピング/レポーティング処理がある いずれその機能はサービスとして提供されそう/リクエストしているが、それまでの間をつなぐ仕組みを作りたい KubernetesやTerraformなど、利用しているOSSの習熟も兼ねて、Goで書きたい Azureのリソースを操作するので、権限割り当てやシークレット管理は気を付けたい、アプリのコードに書くなんてもってのほか ハウスキーピングアプリだけでなく環境全体をコード化し、ライフサイクル管理したい  いずれこの仕組みが不要になったらサクッと消す    作ったもの 例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。Service Tag Discovery APIを使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。
-   GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
-   必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
-   ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
+  GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
+  必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
+  ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
 考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  ハウスキーピングアプリの実行環境として、Azure FunctionsやLogic Appsもありです。それらを手の内に入れており、言語にこだわりがなければ、そのほうが楽かも FunctionsであればGoをカスタムハンドラーで動かす手もあります。ただ、ユースケースが定期実行、つまりタイマトリガだと、入出力バインディングなどFunctionsのおいしいところを活かせないので、あえてカスタムハンドラーを使って書くこともないかな、という気持ちに Rustで書いちゃおっかな、とも思ったのですが、Azure SDK for Rustが現状 &amp;ldquo;very active development&amp;rdquo;なので、この用途では深呼吸 GoはAzure SDKのファーストクラス言語ではありませんが、KubernetesやTerraformのAzure対応で活発に利用されており、実用的です。ただ、Azureリソースの管理系操作、つまりコントロールプレーンと、blobの操作などデータプレーン向けSDKが分離されているので注意が必要です  どちらかだけならいいのですが、このサンプルのようにどちらも使うケースで課題になる このサンプルではGiovanniやTerraform AzureRM Providerを参考に、クライアントビルダーをまとめた   リトライは大事です。コケても再実行できるようにしましょう  例えば、このサンプルではAzure Container InstancesのManaged Identityサポートが作成時点でプレビューということもあり、Managed Identityエンドポイントの準備が整う前にコンテナが起動するケースが報告されています このサンプルのように常時起動が不要なケースでは、Azure Container Instancesを&amp;ndash;restart-policy OnFailureオプションで起動すれば、異常終了時に再実行されます。また、正常終了時にはコンテナが停止し課金も止まります   Actionsでの認証認可やAzure Container Instancesの実行パラメータ用途で、GitHubに登録するシークレットが多めです。Terraform実行時に.</description>
     </item>
@@ -85,7 +108,7 @@ OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行�
 実現したいことは 「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」 です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。
 (注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください
 実現したいこと  マルチテナント型Web Appsに複数、ランダムに割り当てられるアウトバウンド通信用IPを使うのではなく、固定IPを割り当てたい  「連携する外部サービス/システムがIPアドレスでフィルタリングしている」というケースが多い   ついでにインターネットに出ていくトラフィックのログを採っておきたい できればWeb AppsからAzureの他サービスにはプライベートネットワークで接続したい  DBとか    解決策  Web AppsのリージョンVNet統合機能を使い、アウトバウンドトラフィックをVNet上の統合用サブネットに転送します  WEBSITE_VNET_ROUTE_ALL を設定し、すべてのアウトバウンドトラフィックをVNetに向けます   統合用サブネットのデフォルトルートをAzure Firewallに向けます  Azure Firewallに割り当てたパブリックIPでインターネットに出ていきます   Azureの他サービスにはプライベートエンドポイント経由でアクセスさせます  名前解決でプライベートエンドポイントのIPが返ってくるよう、プライベートDNSゾーンを作ってリンクします    Linux Web AppにPython(Django)アプリを載せ、Azure Database for PostgreSQLに繋ぐサンプルを例にすると、こんな感じです。
-  コードを見たほうがピンとくると思うので、Terraformの構成ファイルをGistに置いておきます。上記の環境が一発で作れます。
+ コードを見たほうがピンとくると思うので、Terraformの構成ファイルをGistに置いておきます。上記の環境が一発で作れます。
 Azure Web Appsからのアウトバウンド通信をAzure FirewallのパブリックIPに固定する
 では設定できているか、確認してみましょう。
 まずはAzure Firewallに割り当てたIPでインターネットに出ているかです。該当のパブリックIPアドレスを確認します。
@@ -118,7 +141,7 @@ data &amp;#34;azurerm_log_analytics_workspace&amp;#34; &amp;#34;aks&amp;#34; { n
 GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
 そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
 ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &amp;#39;repro&amp;#39; &amp;amp;&amp;amp; github.event.action == &amp;#39;labeled&amp;#39; run: | az group create -n ${{ env.</description>
+name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &amp;#39;repro&amp;#39; &amp;amp;&amp;amp; github.event.action == &amp;#39;labeled&amp;#39; run: |az group create -n ${{ env.</description>
     </item>
     
     <item>
@@ -617,7 +640,7 @@ AZChatOpsSample
       <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
 さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
- 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&amp;quot;+新規&amp;rdquo; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.</description>
+ 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&amp;quot;+新規&amp;quot; -&amp;gt; Web + モバイル -&amp;gt; Function App アプリ名は.</description>
     </item>
     
     <item>

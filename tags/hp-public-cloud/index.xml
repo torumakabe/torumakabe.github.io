@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
       <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
@@ -23,7 +19,7 @@
 さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
 前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
 ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;rdquo;:auto&amp;quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
+ フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;quot;:auto&amp;quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
 スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
 $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server instance is snapshoting! ==&amp;gt; default: Snapshot is ok </description>
     </item>

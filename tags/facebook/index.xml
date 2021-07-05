@@ -7,11 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Sun, 08 May 2016 14:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/tags/facebook/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 08 May 2016 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/facebook/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
       <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>

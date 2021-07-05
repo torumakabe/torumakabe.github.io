@@ -9,7 +9,7 @@
 <meta property='og:title' content='Azure Functionsで運用管理サーバレス生活(使用量データ取得編) - re-imagine'>
 <meta property='og:description' content='背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている気もしますが、システムのつくり方を変える可能性がある、潜在能力高めなヤツです。キャッチアップして損はないです。
 さて、Azure Functionsを使ってAzureの使用量データを取得、蓄積したいというリクエストを最近いくつかいただきました。いい機会なのでまとめておきます。以下、その背景。
- 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&quot;&#43;新規&rdquo; -&gt; Web &#43; モバイル -&gt; Function App アプリ名は.'>
+ 運用管理業務がビジネスの差別化要素であるユーザは少ない。可能な限り省力化したい。運用管理ソフトの導入維持はもちろん、その土台になるサーバの導入、維持は真っ先に無くしたいオーバヘッド。もうパッチ当てとか監視システムの監視とか、やりたくない。 Azure自身が持つ運用管理の機能が充実し、また、運用管理SaaS(MS OMS、New Relic、Datadogなど)が魅力的になっており、使い始めている。いつかは運用管理サーバを無くしたい。 でも、それら標準的なサービスでカバーされていない、ちょっとした機能が欲しいことがある。 Azureリソースの使用量データ取得が一例。Azureでは使用量データをポータルからダウンロードしたり、Power BIで分析できたりするが、元データは自分でコントロールできるようためておきたい。もちろん手作業なし、自動で。 ちょっとしたコードを気軽に動かせる仕組みがあるなら、使いたい。インフラエンジニアがさくっと書くレベルで。 それAzure Functionsで出来るよ。  方針  Azure FunctionsのTimer Triggerを使って、日次で実行 Azure Resource Usage APIを使って使用量を取得し、ファイルに書き込み Nodeで書く (C#のサンプルはたくさんあるので) 業務、チームでの運用を考慮して、ブラウザでコード書かずにソース管理ツールと繋げる (Githubを使う)  Quick Start 準備  ところでAzure Funtionsって何よ、って人はまずいい資料1といい資料2でざっと把握を AzureのAPIにプログラムからアクセスするため、サービスプリンシパルを作成 (こことかここを参考に)  後ほど環境変数に設定するので、Domain(Tenant ID)、Client ID(App ID)、Client Secret(Password)、Subscription IDを控えておいてください 権限はsubscriptionに対するreaderが妥当でしょう   Githubのリポジトリを作成 (VSTSやBitbucketも使えます) 使用量データを貯めるストレージアカウントを作成  後ほど環境変数に設定するので、接続文字列を控えておいてください    デプロイ  Function Appを作成  ポータル左上&quot;&#43;新規&quot; -&gt; Web &#43; モバイル -&gt; Function App アプリ名は.'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azurefunctions_getusagedata/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Functions'><meta property='article:published_time' content='2016-09-13T17:30:00&#43;09:00'/><meta property='article:modified_time' content='2016-09-13T17:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
@@ -145,7 +145,7 @@
 <ul>
 <li>Function Appを作成
 <ul>
-<li>ポータル左上&quot;+新規&rdquo; -&gt; Web + モバイル -&gt; Function App</li>
+<li>ポータル左上&quot;+新規&quot; -&gt; Web + モバイル -&gt; Function App</li>
 <li>アプリ名は.azurewebsites.net空間でユニークになるように</li>
 <li>App Seriviceプランは、占有型の&quot;クラシック&quot;か、共有で実行したぶん課金の&quot;動的&quot;かを選べます。今回の使い方だと動的がお得でしょう</li>
 <li>メモリは128MBあれば十分です</li>
@@ -174,7 +174,7 @@
 <ul>
 <li><del>Function Appへポータルからアクセス -&gt; Function Appの設定 -&gt; kuduに移動 -&gt; site/wwwroot/getUsageData へ移動</del></li>
 <li><del>このディレクトリが、実行する関数、functionの単位です</del></li>
-<li><del>&quot;npm install&rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&quot;へインストールされます)</del></li>
+<li><del>&ldquo;npm install&rdquo; を実行 (package.jsonの定義に従ってNodeのモジュールが”node_modules&quot;へインストールされます)</del></li>
 <li>deploy.cmd で自動的にインストールするよう変えました</li>
 </ul>
 </li>
