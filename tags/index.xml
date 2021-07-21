@@ -7,22 +7,31 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Mon, 05 Jul 2021 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 21 Jul 2021 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure</title>
+      <link>https://ToruMakabe.github.io/tags/azure/</link>
+      <pubDate>Wed, 21 Jul 2021 16:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Kubernetes</title>
+      <link>https://ToruMakabe.github.io/tags/kubernetes/</link>
+      <pubDate>Wed, 21 Jul 2021 16:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>ACI</title>
       <link>https://ToruMakabe.github.io/tags/aci/</link>
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/aci/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Azure</title>
-      <link>https://ToruMakabe.github.io/tags/azure/</link>
-      <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
       <description></description>
     </item>
     
@@ -68,15 +77,6 @@
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/go/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Kubernetes</title>
-      <link>https://ToruMakabe.github.io/tags/kubernetes/</link>
-      <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/kubernetes/</guid>
       <description></description>
     </item>
     

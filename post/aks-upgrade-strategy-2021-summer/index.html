@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Azure Kubernetes Service アップグレード戦略 2021夏版 | re-imagine</title>
+
+<meta property='og:title' content='Azure Kubernetes Service アップグレード戦略 2021夏版 - re-imagine'>
+<meta property='og:description' content='何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩和手段を整える重要性は従来から変わりませんが、負担を軽減するため、自動アップグレードの適用を意識する段階にあると考えています。
+なお、アップグレードのリスク、インパクト評価は使い手によります。「全てのアップグレードをクラスター新規作成で行う」という戦略もあれば、「インプレース中心。当たらなければどうということはない」というユーザーもいます。条件や方針、環境に合わせ、妥当な戦略を検討してください。
+背景 Kubernetesは2014年の初回コミットから7年経った2021年夏時点においても、活発に開発されているオープンソースソフトウェアです。バージョン1.22からリリースサイクルがおおよそ15週になり、若干落ち着きますが、それでも年間3回の大きな機能変更を意識する必要があります。たとえば、1.22ではIngressなど利用ユーザーが多いであろうAPIの廃止が予定されています。いま動いているシステム、アプリケーションが影響なくアップグレードできるか、変更が必要か、ユーザーは評価、対応しなければなりません。
+AKSは&ldquo;N-2&quot;サポートポリシーを採用しています。(N (最新リリース) - 2 (マイナー バージョン))がサポート対象なので、短期間で廃止するシステムでない限り、アップグレードは避けられません。
+AKSはアップグレード作業の負担軽減のため、クラスターのアップグレード機能を提供しています。ですが、その方式はインプレースであり、動いているクラスターに変更を加えます。ダウングレードは、できません。
+そこで、アップグレード作業のリスク緩和を目的とした
+ 新規クラスターを新バージョンで作成し アプリケーションの動作確認を行った後 トラフィックを新規クラスターに向け 安定後に旧クラスターを消す  という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。
+  Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy
+ IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。
+とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。
+AKSにおけるアップグレード、メンテナンスの現状整理 AKSでアップグレードやメンテナンスの対象となる要素は大きく分けて、マスターとノードです。それぞれ、Kubernetesのバージョンアップ有無で内容が異なります。
+ マスター(Kubernetesバージョンアップを伴わない) マスター(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴わない)  1は、マスターコンポーネントに対するセキュリティやバグの修正パッチ、Azure連携機能の追加が主です。おおむね週次で自動的に行われており、GitHubにチェンジログが公開されています。Kubernetesのバージョンを変えず、短時間で実施されるためインパクトが小さく、気づいていないユーザーも多い印象です。アップグレードというよりは、メンテナンスです。
+このメンテナンスは、実施時間を指定できるようになりました。現時点ではプレビュー機能で制限事項もありますが、可能な限り利用者の少ない夜間に実行したい、また逆に、何か起こっても担当者がすぐに対応できる平日昼間がいい、などのニーズに合います。
+そして2と3は、Kubernetesのバージョンアップを伴う、影響の大きな作業です。従来、ユーザーがポータルやCLIから手動で実施する作業でしたが、アップグレードチャネルを設定することで、自動化も可能になりました。チャネル指定機能は、現時点ではプレビューです。
+ 自動アップグレード チャネルを設定する
+ チャネルはアップグレードのアグレッシブさに応じ、none(既定)、patch、stable、rapid、node-imageから選択できます。たとえばpatchを指定すると、バージョン1.17.7を実行しているとき、1.17.9、1.18.4、1.18.6、1.19.1が利用できる場合、クラスターは 1.17.9 に自動でアップグレードされます。
+ノードのアップグレードは、既定ではノードプールを構成するVMSSに1ノードを追加し、既存ノードをdrainして行われます。1ノードずつ行うため、プールのノード数が多い場合にアップグレードにかかる時間が長くなるおそれがありますが、サージ値の指定によって短縮できます。サージ値の増加に応じ、複数ノードでdrainが同時に行われるため、アプリケーションへの影響は考慮してください。
+なお、この自動アップグレードは、1の計画メンテナンスで指定したスケジュールを加味して実行されます。
+ Using Planned Maintenance with Cluster Auto-Upgrade
+ 最後に4ですが、ノード(Linux/Ubuntu、Windows)のVMイメージの更新です。AKSではおおむね週次で新規ノードイメージの公開が行われ、Kubernetesのバージョンアップとは別に適用できます。内容はチェンジログで確認できます。セキュリティ関連更新が主目的です。ノードイメージの更新にはOSカーネル関連だけでなく、Kubernetes関連コンポーネントも含まれるため、定期的に行ったほうがよいでしょう。なお、OSの自動セキュリティアップデート機能やkuredと併用できます。'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2021-07-21T16:00:00&#43;09:00'/><meta property='article:modified_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="canonical" href="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav id="nav-main" class="nav">
+      <div id="nav-name" class="nav-left">
+        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+  <script src="/js/navicon-shift.js"></script>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
+  
+
+      
+    </div>
+    <h2 class="subtitle is-6">July 21, 2021</h2>
+    <h1 class="title">Azure Kubernetes Service アップグレード戦略 2021夏版</h1>
+    
+    <div class="content">
+      <h2 id="何の話か">何の話か</h2>
+<p>AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩和手段を整える重要性は従来から変わりませんが、負担を軽減するため、自動アップグレードの適用を意識する段階にあると考えています。</p>
+<p>なお、アップグレードのリスク、インパクト評価は使い手によります。「全てのアップグレードをクラスター新規作成で行う」という戦略もあれば、「インプレース中心。当たらなければどうということはない」というユーザーもいます。条件や方針、環境に合わせ、妥当な戦略を検討してください。</p>
+<h2 id="背景">背景</h2>
+<p>Kubernetesは2014年の<a href="https://github.com/kubernetes/kubernetes/commit/2c4b3a562ce34cddc3f8218a2c4d11c7310e6d56">初回コミット</a>から7年経った2021年夏時点においても、活発に開発されているオープンソースソフトウェアです。<a href="https://kubernetes.io/blog/2021/07/20/new-kubernetes-release-cadence/">バージョン1.22からリリースサイクルがおおよそ15週</a>になり、若干落ち着きますが、それでも年間3回の大きな機能変更を意識する必要があります。たとえば、1.22ではIngressなど利用ユーザーが多いであろうAPIの<a href="https://kubernetes.io/blog/2021/07/14/upcoming-changes-in-kubernetes-1-22/">廃止が予定されています</a>。いま動いているシステム、アプリケーションが影響なくアップグレードできるか、変更が必要か、ユーザーは評価、対応しなければなりません。</p>
+<p>AKSは<a href="https://docs.microsoft.com/ja-jp/azure/aks/supported-kubernetes-versions#kubernetes-version-support-policy">&ldquo;N-2&quot;サポートポリシー</a>を採用しています。(N (最新リリース) - 2 (マイナー バージョン))がサポート対象なので、短期間で廃止するシステムでない限り、アップグレードは避けられません。</p>
+<p>AKSはアップグレード作業の負担軽減のため、クラスターの<a href="https://docs.microsoft.com/ja-jp/azure/aks/upgrade-cluster">アップグレード機能</a>を提供しています。ですが、その方式はインプレースであり、動いているクラスターに変更を加えます。ダウングレードは、<a href="https://docs.microsoft.com/ja-jp/azure/aks/supported-kubernetes-versions#faq">できません</a>。</p>
+<p>そこで、アップグレード作業のリスク緩和を目的とした</p>
+<ul>
+<li>新規クラスターを新バージョンで作成し</li>
+<li>アプリケーションの動作確認を行った後</li>
+<li>トラフィックを新規クラスターに向け</li>
+<li>安定後に旧クラスターを消す</li>
+</ul>
+<p>という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。</p>
+<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-anti-dry.png?raw=true" width="800"/>
+</figure>
+
+<blockquote>
+<p><a href="https://github.com/ToruMakabe/aks-anti-dry-iac">Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy</a></p>
+</blockquote>
+<p>IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。</p>
+<p>とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。</p>
+<h2 id="aksにおけるアップグレードメンテナンスの現状整理">AKSにおけるアップグレード、メンテナンスの現状整理</h2>
+<p>AKSでアップグレードやメンテナンスの対象となる要素は大きく分けて、マスターとノードです。それぞれ、Kubernetesのバージョンアップ有無で内容が異なります。</p>
+<ol>
+<li>マスター(Kubernetesバージョンアップを伴わない)</li>
+<li>マスター(Kubernetesバージョンアップを伴う)</li>
+<li>ノード(Kubernetesバージョンアップを伴う)</li>
+<li>ノード(Kubernetesバージョンアップを伴わない)</li>
+</ol>
+<p>1は、マスターコンポーネントに対するセキュリティやバグの修正パッチ、Azure連携機能の追加が主です。おおむね週次で自動的に行われており、GitHubに<a href="https://github.com/Azure/AKS/blob/master/CHANGELOG.md">チェンジログ</a>が公開されています。Kubernetesのバージョンを変えず、短時間で実施されるためインパクトが小さく、気づいていないユーザーも多い印象です。アップグレードというよりは、メンテナンスです。</p>
+<p>このメンテナンスは、<a href="https://docs.microsoft.com/ja-jp/azure/aks/planned-maintenance">実施時間を指定できるようになりました</a>。現時点ではプレビュー機能で制限事項もありますが、可能な限り利用者の少ない夜間に実行したい、また逆に、何か起こっても担当者がすぐに対応できる平日昼間がいい、などのニーズに合います。</p>
+<p>そして2と3は、Kubernetesのバージョンアップを伴う、影響の大きな作業です。従来、ユーザーがポータルやCLIから手動で実施する作業でしたが、アップグレードチャネルを設定することで、自動化も可能になりました。チャネル指定機能は、現時点ではプレビューです。</p>
+<blockquote>
+<p><a href="https://docs.microsoft.com/ja-jp/azure/aks/upgrade-cluster#set-auto-upgrade-channel">自動アップグレード チャネルを設定する</a></p>
+</blockquote>
+<p>チャネルはアップグレードのアグレッシブさに応じ、none(既定)、patch、stable、rapid、node-imageから選択できます。たとえばpatchを指定すると、バージョン1.17.7を実行しているとき、1.17.9、1.18.4、1.18.6、1.19.1が利用できる場合、クラスターは 1.17.9 に自動でアップグレードされます。</p>
+<p>ノードのアップグレードは、既定ではノードプールを構成するVMSSに1ノードを追加し、既存ノードをdrainして行われます。1ノードずつ行うため、プールのノード数が多い場合にアップグレードにかかる時間が長くなるおそれがありますが、<a href="https://docs.microsoft.com/ja-jp/azure/aks/upgrade-cluster#customize-node-surge-upgrade">サージ値の指定</a>によって短縮できます。サージ値の増加に応じ、複数ノードでdrainが同時に行われるため、アプリケーションへの影響は考慮してください。</p>
+<p>なお、この自動アップグレードは、1の計画メンテナンスで指定したスケジュールを加味して実行されます。</p>
+<blockquote>
+<p><a href="https://docs.microsoft.com/en-us/azure/aks/planned-maintenance#using-planned-maintenance-with-cluster-auto-upgrade">Using Planned Maintenance with Cluster Auto-Upgrade</a></p>
+</blockquote>
+<p>最後に4ですが、ノード(Linux/Ubuntu、Windows)のVMイメージの更新です。AKSではおおむね週次で新規ノードイメージの公開が行われ、Kubernetesのバージョンアップとは別に適用できます。内容は<a href="https://github.com/Azure/AKS/blob/master/CHANGELOG.md">チェンジログ</a>で確認できます。セキュリティ関連更新が主目的です。ノードイメージの更新にはOSカーネル関連だけでなく、Kubernetes関連コンポーネントも含まれるため、定期的に行ったほうがよいでしょう。なお、OSの自動セキュリティアップデート機能や<a href="https://github.com/weaveworks/kured">kured</a>と併用できます。</p>
+<p>ノードイメージのアップグレードは、パッチをあてるのではなく、ノードを新しいイメージで再作成します。3と同様の方式で行われ、<a href="https://docs.microsoft.com/ja-jp/azure/aks/node-image-upgrade#upgrade-node-images-with-node-surge">サージ値を指定</a>できます。</p>
+<h2 id="自動アップグレードをいかに活用するか">自動アップグレードをいかに活用するか</h2>
+<p>プレビュー段階ではありますが、アップグレードの自動適用、スケジュール指定機能は運用負担の軽減の観点から、検討したいところです。論点は、自動化するリスクと得られる価値とのバランスをどう考え、方針を作るか。以下は、わたしの個人的な方針です。</p>
+<h3 id="iacによる環境再現リカバリ方式の確立が前提">IaCによる環境再現、リカバリ方式の確立が前提</h3>
+<p>備えがあれば、リスクはとりやすくなります。また、自動化された作業のリカバリは、自身が確認しながら行ったそれと比較して難しくなりがちです。よって、いざというときには迅速にクラスターを再作成できる仕組みを整備しておきましょう。実際問題、何らかIaCを実現する手段は必要と考えます。以下のポイントを考慮しておくと、作り直しが容易です。</p>
+<ul>
+<li>クラスター内でデータ、ステート、構成情報を永続化せず、クラスター外部で行う
+<ul>
+<li>データベース、ストレージ、シークレットストア、ソースコード管理など、各種マネージドサービスを活用する</li>
+</ul>
+</li>
+<li>関連チームの作業省力化も意識する
+<ul>
+<li>たとえば、有事にアプリケーション開発チームに再セットアップをお願いするのは心苦しいもの</li>
+<li>クラスター、基盤関連リソースだけでなく、アプリケーションの再セットアップも手段を確立しておく (GitOpsなど)</li>
+</ul>
+</li>
+<li>監視や監査の継続性も意識する
+<ul>
+<li>メトリックやログがクラスター再作成によって失われないようにする</li>
+<li>各種マネージドサービスを活用する</li>
+<li>監視など運用周りの設定もコード化しておく
+<ul>
+<li>例外として手作業でいいや、と妥協してしまうと、この作業の面倒さが後々足を引っ張ります</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>実装は先ほど紹介した<a href="https://github.com/ToruMakabe/aks-anti-dry-iac">サンプル</a>などを参考にしてください。</p>
+<h3 id="パッチバージョンノードイメージのアップグレードから自動化する">パッチバージョン、ノードイメージのアップグレードから自動化する</h3>
+<p>1.22の変更内容からも実感できるように、現状、マイナーバージョンアップには破壊的な変更が含まれます。となると、マイナーバージョンアップをAzureに任せて放置、という方針はまだ高リスクでしょう。そこで小さく実績、成功体験を積み重ねる意味でも、パッチバージョン、ノードイメージのアップグレードから自動化するのがよいのでは、と考えます。パッチバージョンやノードイメージの更新には緊急性の高いセキュリティ対応が含まれがちなので、ここを自動化するだけでも負担は大きく軽減されるはずです。</p>
+<h3 id="ノード更新時のアプリケーションへの影響を把握対処する">ノード更新時のアプリケーションへの影響を把握、対処する</h3>
+<p>先述の通り、AKSのアップグレード機能において、Kubernetes、ノードイメージのアップグレード実行中はノード追加とdrain、ノード削除が行われます。この際の影響を把握することが重要です。</p>
+<ul>
+<li><a href="https://www.slideshare.net/ToruMakabe/ingress-on-azure-kubernetes-service">セッションアフィニティに依存しない</a>など、Pod上のアプリケーションがステートレスであること</li>
+<li>Pod削除時に、受け付けたリクエストへのレスポンスが終わるまで待つ仕組みがあること</li>
+<li>アップグレード中に要求が失敗したり接続が切れても、要求元がリトライすること</li>
+</ul>
+<p>が、影響を回避する設計の基本です。ですが、それを意識して設計したとしても、実際に動かしてみないと挙動が分からないケースもあるでしょう。</p>
+<p>たとえば、</p>
+<ul>
+<li>ステートレスな作り</li>
+<li>Podのレプリカ数、PodDisruptionBudgetも十分</li>
+<li>シグナルハンドリング、terminationGracePeriodSeconds設定など、graceful shutdownも考慮されている</li>
+</ul>
+<p>という場合でも、アップグレード中に新規リクエストが一時的に失敗するケースがあります。以下はGCPでのIssueですが、AKSでも起こりえます。アップグレード中に新規リクエストがタイムアウトしてしまう、という問題です。(既存リクエストへのレスポンスには影響ありません)</p>
+<blockquote>
+<p><a href="https://github.com/kubernetes/ingress-nginx/issues/6281">Terminating pod causes network timeouts with GCP L4 LB and externalTrafficPolicy: Local</a></p>
+</blockquote>
+<p>service.type: LoadBalancerで公開しているServiceは、トラフィックの送り先であるノードの死活確認をロードバランサーのプローブに依存しています。そして、アップグレードの際のノード削除がプローブ間隔、判断の隙間に入ってしまうと、ロードバランサが停止、削除されたノードへトラフィックを送り、タイムアウトまで待ってしまう可能性があります。IssueではexternalTrafficPolicy: Localのケースが議論されていますが、LocalではなくClusterに変えても、現時点で<a href="https://github.com/kubernetes/ingress-nginx/issues/7175#issuecomment-851058419">ノード削除時はこの問題を回避できません</a>。GCPにおいて、ロードバランサのプローブ、判断間隔を短くする<a href="https://github.com/kubernetes/ingress-nginx/issues/6281#issuecomment-705415770">ワークアラウンド</a>が提案されていますが、行ったり来たりの副作用が懸念されます。なお、AKSの場合は、ロードバランサのプローブに関する設定を<a href="https://docs.microsoft.com/ja-jp/azure/aks/load-balancer-standard#additional-customizations-via-kubernetes-annotations">カスタマイズできない</a>ので、このアイデアは適用できません。クライアントやApplication Gatewayで副作用の起きない範囲でタイムアウトを早めに検出、早めのリトライを行うといいでしょう。</p>
+<p>このように、実際にアップグレード中の挙動を確認しないと気づけないことは往々にしてあるので、テストをおすすめします。</p>
+<p>Kubernetesの進化のサイクルへの追従、アップグレードは、企業における活用において大きな課題でした。AKSの支援機能が、その問題の解決に寄与することを願っています。プレビュー段階の機能が多いですが、来るGAに備え、開発、検証環境などで知見を得ておくのも、よいのではないでしょうか。</p>
+
+      
+      <div class="related">
+
+<h3>Similar articles:</h3>
+<ul>
+	
+	<li><a href="/post/aks-recommended-metrics-alert/">Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</a></li>
+	
+	<li><a href="/post/aks-bootstrap-202005/">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</a></li>
+	
+	<li><a href="/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></li>
+	
+	<li><a href="/post/aks_how_to_keep_secret/">Azure Kubernetes Serviceでシークレットを管理する6つの方法</a></li>
+	
+	<li><a href="/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></li>
+	
+</ul>
+</div>
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2019 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+

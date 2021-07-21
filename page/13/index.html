@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-05T14:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,46 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/linux">#Linux</a>
+  
+  | <a class="subtitle is-6" href="/tags/disk">#Disk</a>
+  
+  | <a class="subtitle is-6" href="/tags/performance">#Performance</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 27, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/striping_linuxonazure/">Linux on AzureでDisk IO性能を確保する方法</a></h1>
+      <div class="content">
+        &ldquo;俺の鉄板&quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk IO性能についてと思いますが、それは後半に書きます。
+クラウド、Azureに関わらず、技術や製品の組み合わせは頭の痛い問題です。「これとこれ、組み合わせて動くの？サポートされるの？性能出るの？」という、あれです。技術や製品はどんどん進化しますので、同じ組み合わせが使えることは珍しくなってきています。
+ちなみにお客様のシステムを設計する機会が多いわたしは、こんな流れで検討します。
+ 構成要素全体を俯瞰したうえで、調査が必要な技術や製品、ポイントを整理する  やみくもに調べものしないように 経験あるアーキテクトは実績ある組み合わせや落とし穴を多くストックしているので、ここが早い   ベンダの公式資料を確認する  「この使い方を推奨/サポートしています」と明記されていれば安心 でも星の数ほどある技術や製品との組み合わせがすべて網羅されているわけではない 不明確なら早めに問い合わせる   ベンダが運営しているコミュニティ上の情報を確認する  ベンダの正式見解ではない場合もあるが、その製品を担当する社員が書いている情報には信ぴょう性がある   コミュニティや有識者の情報を確認する  OSSでは特に 専門性を感じるサイト、人はリストしておく   動かす  やっぱり動かしてみないと   提案する  リスクがあれば明示します   問題なければ実績になる、問題があればリカバリする  提案しっぱなしにせずフォローすることで、自信とパターンが増える 次の案件で活きる    いまのわたしの課題は4、5です。特にOSS案件。AzureはOSSとの組み合わせを推進していて、ここ半年でぐっと情報増えたのですが、まだ物足りません。断片的な情報を集め、仮説を立て、動かす機会が多い。なので、5を増やして、4の提供者側にならんとなぁ、と。
+Linux on AzureでDisk IO性能を確保する方法 さて今回の主題です。
+結論: Linux on AzureでDisk IOを最大化するには、MDによるストライピングがおすすめ。いくつかパラメータを意識する。
+Linux on AzureでDisk IO性能を必要とする案件がありました。検討したアイデアは、SSDを採用したPremium Storageを複数束ねてのストライピングです。Premium Storageはディスクあたり5,000IOPSを期待できます。でも、それで足りない恐れがありました。なので複数並べて平行アクセスし、性能を稼ぐ作戦です。
+サーバ側でのソフトウェアストライピングは古くからあるテクニックで、ハードの能力でブン殴れそうなハイエンドUnixサーバとハイエンドディスクアレイを組み合わせた案件でも、匠の技として使われています。キャッシュやアレイコントローラ頼りではなく、明示的にアクセスを分散することで性能を確保することができます。
+Linuxで使える代表的なストライプ実装は、LVMとMD。
+ではAzure上でどちらがを選択すべきでしょう。この案件では性能が優先事項です。わたしはその時点で判断材料を持っていませんでした。要調査。この絞り込みまでが前半ポエムの1です。
+前半ポエムの2、3はググ、もといBing力が試される段階です。わたしは以下の情報にたどり着きました。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/striping_linuxonazure/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -277,39 +317,6 @@ $ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env lo
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_openstack_swarm/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">November 5, 2015</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_extension/">Azure Docker VM Extensionを使う3つの理由</a></h1>
-      <div class="content">
-        まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
-もちろん、技術者個人として、中立的に、公開できるネタを書きます。
-AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。
-なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。
-Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
-このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
-ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
- Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)   ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
-Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
-ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
-Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
-なお、このDocker拡張、ARM属性で言うpublisherは&quot;Microsoft.Azure.Extensions&quot;ですが、古い&quot;MSOpenTech.Extensions&quot;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
         
       </div>
     </article>
