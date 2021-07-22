@@ -214,12 +214,12 @@ AKSにおけるアップグレード、メンテナンスの現状整理 AKSで�
 <li>Podのレプリカ数、PodDisruptionBudgetも十分</li>
 <li>シグナルハンドリング、terminationGracePeriodSeconds設定など、graceful shutdownも考慮されている</li>
 </ul>
-<p>という場合でも、アップグレード中に新規リクエストが一時的に失敗するケースがあります。以下はGCPでのIssueですが、AKSでも起こりえます。アップグレード中に新規リクエストがタイムアウトしてしまう、という問題です。(既存リクエストへのレスポンスには影響ありません)</p>
+<p>という場合でも、アップグレード中に新規リクエストが一時的に失敗するケースがあります。以下はGCPでのIssueですが、AKSでも起こりえます。アップグレード中に新規リクエストがタイムアウトしてしまう、という問題です。既存リクエストへのレスポンスには影響ありません。</p>
 <blockquote>
 <p><a href="https://github.com/kubernetes/ingress-nginx/issues/6281">Terminating pod causes network timeouts with GCP L4 LB and externalTrafficPolicy: Local</a></p>
 </blockquote>
-<p>service.type: LoadBalancerで公開しているServiceは、トラフィックの送り先であるノードの死活確認をロードバランサーのプローブに依存しています。そして、アップグレードの際のノード削除がプローブ間隔、判断の隙間に入ってしまうと、ロードバランサが停止、削除されたノードへトラフィックを送り、タイムアウトまで待ってしまう可能性があります。IssueではexternalTrafficPolicy: Localのケースが議論されていますが、LocalではなくClusterに変えても、現時点で<a href="https://github.com/kubernetes/ingress-nginx/issues/7175#issuecomment-851058419">ノード削除時はこの問題を回避できません</a>。GCPにおいて、ロードバランサのプローブ、判断間隔を短くする<a href="https://github.com/kubernetes/ingress-nginx/issues/6281#issuecomment-705415770">ワークアラウンド</a>が提案されていますが、行ったり来たりの副作用が懸念されます。なお、AKSの場合は、ロードバランサのプローブに関する設定を<a href="https://docs.microsoft.com/ja-jp/azure/aks/load-balancer-standard#additional-customizations-via-kubernetes-annotations">カスタマイズできない</a>ので、このアイデアは適用できません。クライアントやApplication Gatewayで副作用の起きない範囲でタイムアウトを早めに検出、早めのリトライを行うといいでしょう。</p>
-<p>このように、実際にアップグレード中の挙動を確認しないと気づけないことは往々にしてあるので、テストをおすすめします。</p>
+<p>service.type: LoadBalancerで公開しているServiceは、トラフィックの送り先であるノードの死活確認をロードバランサーのプローブに依存しています。そして、アップグレードの際のノード削除がプローブ間隔、判断の隙間に入ってしまうと、ロードバランサが停止、削除されたノードへトラフィックを送り、タイムアウトまで待ってしまう可能性があります。IssueではexternalTrafficPolicy: Localのケースが議論されていますが、LocalではなくClusterに変えても、現時点で<a href="https://github.com/kubernetes/ingress-nginx/issues/7175#issuecomment-851058419">ノード削除時はこの問題を回避できません</a>。GCPにおいて、ロードバランサーのプローブ、判断間隔を短くする<a href="https://github.com/kubernetes/ingress-nginx/issues/6281#issuecomment-705415770">ワークアラウンド</a>が提案されていますが、行ったり来たりの副作用が懸念されます。なお、AKSの場合は、ロードバランサのプローブに関する設定を<a href="https://docs.microsoft.com/ja-jp/azure/aks/load-balancer-standard#additional-customizations-via-kubernetes-annotations">カスタマイズできない</a>ので、このアイデアは適用できません。クライアントやApplication Gatewayで副作用の起きない範囲で早めにタイムアウト、リトライを行うといいでしょう。</p>
+<p>このように、実際にアップグレード中の挙動を確認しないと気づきにくいこともあり、テストをおすすめします。</p>
 <p>Kubernetesの進化のサイクルへの追従、アップグレードは、企業における活用において大きな課題でした。AKSの支援機能が、その問題の解決に寄与することを願っています。プレビュー段階の機能が多いですが、いずれ来るGAに備え、開発、検証環境などで知見を得ておくのも、よいのではないでしょうか。</p>
 
       
