@@ -13,8 +13,8 @@
 今回はIngress編です。
 Azure Container Apps Ingressとは EnvoyをベースとしたProxyです。
  Azure Container Apps プレビューでの HTTPS イングレスの設定
- Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットも提供します。Container Appsの使いこなしのカギのひとつです。
-以下の3つは、わたしがIngress初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
+ Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットもできます。Container Appsの使いこなしのカギのひとつです。
+以下の3つは、わたしが初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
  gRPC使える？ 名前解決やサービスディスカバリってどうなってる？ 同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？  gRPC使える？ 使えます。
 では試してみましょう。grpc/grpc-go のhelloworldサンプルをベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。
 package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#34; &#34;net&#34; &#34;os&#34; &#34;google.golang.org/grpc&#34; pb &#34;google.golang.org/grpc/examples/helloworld/helloworld&#34; &#34;google.golang.org/grpc/reflection&#34; ) var ( port = flag.Int(&#34;port&#34;, 50051, &#34;The server port&#34;) ) type server struct { pb.UnimplementedGreeterServer } func (s *server) SayHello(ctx context.'>
@@ -124,8 +124,8 @@ package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#3
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/container-apps/ingress?tabs=bash">Azure Container Apps プレビューでの HTTPS イングレスの設定</a></p>
 </blockquote>
-<p>Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/revisions">複数リビジョンへのトラフィックスプリット</a>も提供します。Container Appsの使いこなしのカギのひとつです。</p>
-<p>以下の3つは、わたしがIngress初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。</p>
+<p>Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/revisions">複数リビジョンへのトラフィックスプリット</a>もできます。Container Appsの使いこなしのカギのひとつです。</p>
+<p>以下の3つは、わたしが初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。</p>
 <ul>
 <li>gRPC使える？</li>
 <li>名前解決やサービスディスカバリってどうなってる？</li>
@@ -193,16 +193,16 @@ $ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#
 <span style="color:#f92672">}</span>
 </code></pre></div><p>呼び出せました。また、複数回呼び出すと、応答のホスト名が変わり、負荷分散できていることがわかります。</p>
 <h2 id="名前解決やサービスディスカバリってどうなってる">名前解決やサービスディスカバリってどうなってる？</h2>
-<p>Ingressには、fqdnが付与されます。</p>
+<p>Ingressには、FQDNが付与されます。</p>
 <blockquote>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/container-apps/connect-apps?tabs=bash">Azure Container Apps プレビューでアプリケーションを接続する</a></p>
 </blockquote>
 <p><strong>[Container app name].[Environment unique identifier].[Region name].azurecontainerapps.io</strong></p>
 <p>がルールです。たとえば、以下のように。</p>
 <p><strong><code>myapp.happyhill-70162bb9.canadacentral.azurecontainerapps.io</code></strong></p>
-<p>このfqdnを引くと、IngressのIPアドレスが得られます。</p>
+<p>このFQDNを引くと、IngressのIPアドレスが得られます。</p>
 <p>ポイントは、externalとinternalで扱いが変わることです。</p>
-<p>試しに3つ、アプリケーションを作ってみましょう。すべてNGINXです。external向けを1つ、internalを2つです。</p>
+<p>試しに3つ、Ingress付きアプリケーションを作ってみましょう。すべてNGINXです。external向けを1つ、internalを2つ。</p>
 <ul>
 <li><code>nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io</code></li>
 <li><code>nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io</code></li>
@@ -215,7 +215,7 @@ $ dig +noall +answer nginx-internal.makabecchi-123456.canadacentral.azurecontain
 nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
 $ dig +noall +answer nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io
 nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
-</code></pre></div><p>すべて同じアドレス(20.151.223.25)が返ってきました。</p>
+</code></pre></div><p>すべて同じパブリックIPアドレス(20.151.223.25)が返ってきました。</p>
 <p>external向けには、意図通りインターネット経由でアクセスできます。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ curl -sv https://nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io
 *   Trying 20.151.223.25:443...
@@ -237,7 +237,7 @@ nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span st
 ...
 &lt; HTTP/2 <span style="color:#ae81ff">404</span>
 ...
-</code></pre></div><p>以上から、同じ環境にあるIngressのエンドポイントは、アプリケーション間で共有されることがわかります。ただし、internal Ingressは、環境外部からのトラフィックを転送しません。</p>
+</code></pre></div><p>以上から、同じ環境にあるIngressのエンドポイントは、アプリケーション間で共有されることがわかります。そして、internal Ingressは、環境外部からのトラフィックを転送しません。</p>
 <p>では、Container Apps環境内部からの名前解決は、どうでしょうか。確認用のコンテナを作って確かめましょう。digやcurlが含まれるコンテナイメージ <a href="https://github.com/giantswarm/tiny-tools">giantswarm/tiny-tools</a> を使います。ところでデバッグコンテナ的な何かがほしいですね。のびしろです。</p>
 <p>digで名前解決を確認します。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az containerapp create -n tiny-tools -g rg-containerapp-poc --environment containerapps-env --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span> --revisions-mode single --cpu 0.25 --memory 0.5Gi
@@ -247,7 +247,7 @@ nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span st
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az containerapp update -n tiny-tools -g rg-containerapp-poc --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal-2.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span>
 </code></pre></div><pre><code class="language-log" data-lang="log">k8se-envoy-internal.k8se-system.svc.cluster.local. 5 IN	A 10.0.183.11
 </code></pre><p>同じIPアドレスが返ってきました。internal Ingressではプライベートな共有エンドポイントが作られ、環境内部からはそのIPで解決されることがわかります。ホスト名からも、想像ができますね。</p>
-<p>ここでKubernetes経験者は、同じNamespaceのServiceであればサービス名的な何かだけで解決できるのでは、と思うでしょう。わたしもそうでした。ただし、現在のContainer AppsはNamespaceとServiceが非可視、またIngressがfqdnでフィルタ処理をしているため、現状ではできません。</p>
+<p>ここでKubernetes経験者は、同じNamespaceのServiceであればサービス名的な何かだけで解決できるのでは、と思うでしょう。わたしもそうでした。ただし、現在のContainer AppsはNamespaceとServiceが非可視、またIngressがFQDNでフィルタ処理をしているため、現状ではできません。</p>
 <p>なお、Ingressを使わず、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/connect-apps?tabs=bash#dapr-location">Daprを使ってもアプリケーション、サービス呼び出しができます</a>。こちらの指定はシンプルです。環境識別子やリージョン名を指定せずにサービスディスカバリできます。例えば以下のように。</p>
 <p><strong><code>http://localhost:3500/v1.0/invoke/myapp</code></strong></p>
 <h2 id="同じ環境内のingress経由トラフィックをプライベートネットワークに閉じ込められる">同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？</h2>
