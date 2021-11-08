@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,42 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/container">#Container</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">November 8, 2021</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - Ingress編</a></h1>
+      <div class="content">
+        何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロジェクトの成果物をマネージドサービスとして提供するサービスです。ここ数年、マイクロソフトがCNCFで取り組んできたことをまとめてドン、という感じで、なかなか熱いものがあります。
+ですが、プレビュー初期ということもあり、公式ドキュメントが充実しているとは言いにくい状況です。そこで、ドキュメントが整備されるまで、試す前に知っておくといいかな、ということをいくつか紹介します。
+なお、プレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
+今回はIngress編です。
+Azure Container Apps Ingressとは EnvoyをベースとしたProxyです。
+ Azure Container Apps プレビューでの HTTPS イングレスの設定
+ Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットも提供します。Container Appsの使いこなしのカギのひとつです。
+以下の3つは、わたしがIngress初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
+ gRPC使える？ 名前解決やサービスディスカバリってどうなってる？ 同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？  gRPC使える？ 使えます。
+では試してみましょう。grpc/grpc-go のhelloworldサンプルをベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。
+package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#34; &#34;net&#34; &#34;os&#34; &#34;google.golang.org/grpc&#34; pb &#34;google.golang.org/grpc/examples/helloworld/helloworld&#34; &#34;google.golang.org/grpc/reflection&#34; ) var ( port = flag.Int(&#34;port&#34;, 50051, &#34;The server port&#34;) ) type server struct { pb.UnimplementedGreeterServer } func (s *server) SayHello(ctx context.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -241,40 +277,6 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
 作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
   Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
  Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/github">#Github</a>
-  
-  | <a class="subtitle is-6" href="/tags/go">#Go</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">February 25, 2021</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/servicetag-checker/">Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する</a></h1>
-      <div class="content">
-        何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。
- 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーティング処理がある いずれその機能はサービスとして提供されそう/リクエストしているが、それまでの間をつなぐ仕組みを作りたい KubernetesやTerraformなど、利用しているOSSの習熟も兼ねて、Goで書きたい Azureのリソースを操作するので、権限割り当てやシークレット管理は気を付けたい、アプリのコードに書くなんてもってのほか ハウスキーピングアプリだけでなく環境全体をコード化し、ライフサイクル管理したい  いずれこの仕組みが不要になったらサクッと消す    作ったもの 例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。Service Tag Discovery APIを使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。
-  GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
-  必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
-  ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
-考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
- ハウスキーピングアプリの実行環境として、Azure FunctionsやLogic Appsもありです。それらを手の内に入れており、言語にこだわりがなければ、そのほうが楽かも FunctionsであればGoをカスタムハンドラーで動かす手もあります。ただ、ユースケースが定期実行、つまりタイマトリガだと、入出力バインディングなどFunctionsのおいしいところを活かせないので、あえてカスタムハンドラーを使って書くこともないかな、という気持ちに Rustで書いちゃおっかな、とも思ったのですが、Azure SDK for Rustが現状 &ldquo;very active development&rdquo;なので、この用途では深呼吸 GoはAzure SDKのファーストクラス言語ではありませんが、KubernetesやTerraformのAzure対応で活発に利用されており、実用的です。ただ、Azureリソースの管理系操作、つまりコントロールプレーンと、blobの操作などデータプレーン向けSDKが分離されているので注意が必要です  どちらかだけならいいのですが、このサンプルのようにどちらも使うケースで課題になる このサンプルではGiovanniやTerraform AzureRM Providerを参考に、クライアントビルダーをまとめた   リトライは大事です。コケても再実行できるようにしましょう  例えば、このサンプルではAzure Container InstancesのManaged Identityサポートが作成時点でプレビューということもあり、Managed Identityエンドポイントの準備が整う前にコンテナが起動するケースが報告されています このサンプルのように常時起動が不要なケースでは、Azure Container Instancesを&ndash;restart-policy OnFailureオプションで起動すれば、異常終了時に再実行されます。また、正常終了時にはコンテナが停止し課金も止まります   Actionsでの認証認可やAzure Container Instancesの実行パラメータ用途で、GitHubに登録するシークレットが多めです。Terraform実行時に.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/servicetag-checker/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>

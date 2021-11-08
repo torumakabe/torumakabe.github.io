@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,48 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/cli">#CLI</a>
+  
+  | <a class="subtitle is-6" href="/tags/resource-policy">#Resource Policy</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">May 21, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/">Azure X-Plat CLIでResource Policyを設定する</a></h1>
+      <div class="content">
+        Azure X-Plat CLIのリリースサイクル OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ月次です。改善と機能追加を定期的にまわしていくことには意味があるのですが、いっぽう、Azureの機能追加へタイムリーに追随できないことがあります。短期間とはいえ、次のリリースまで空白期間ができてしまうのです。
+たとえば、今回のテーマであるResource Policy。GA直後に公開されたドキュメントに、X-Plat CLIでの使い方が2016/5/21現在書かれていません。おやCLIではできないのかい、と思ってしまいますね。でもその後のアップデートで、できるようになりました。
+機能リリース時点ではCLIでできなかった、でもCLIの月次アップデートで追加された、いまはできる、ドキュメントの更新待ち。こんなパターンは多いので、あきらめずに探ってみてください。
+ポリシーによるアクセス管理 さて本題。リソースの特性に合わせて、きめ細かいアクセス管理をしたいことがあります。
+ VMやストレージのリソースタグに組織コードを入れること強制し、費用負担の計算に使いたい 日本国外リージョンのデータセンタを使えないようにしたい Linuxのディストリビューションを標準化し、その他のディストリビューションは使えなくしたい 開発環境リソースグループでは、大きなサイズのインスタンスを使えないようにしたい  などなど。こういう課題にポリシーが効きます。
+従来からあるRBACは「役割と人」目線です。「この役割を持つ人は、このリソースを読み取り/書き込み/アクションできる」という表現をします。組み込みロールの一覧を眺めると、理解しやすいでしょう。
+ですが、RBACは役割と人を切り口にしているので、各リソースの多様な特性にあわせた統一表現が難しいです。たとえばストレージにはディストリビューションという属性はありません。無理してカスタム属性なんかで表現すると破綻しそうです。
+リソース目線でのアクセス管理もあったほうがいい、ということで、ポリシーの出番です。もちろんRBACと、組み合わせできます。
+X-Plat CLIでの定義方法 2016/4リリースのv0.9.20から、X-Plat CLIでもResource Policyを定義できます。
+ポリシーの定義、構文はPowerShellと同じなので、公式ドキュメントに任せます。ご一読を。
+ポリシーを使用したリソース管理とアクセス制御
+X-Plat CLI固有部分に絞って紹介します。
+ポリシー定義ファイルを作る CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。
+例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。
+{ &quot;if&quot;: { &quot;allOf&quot;: [ { &quot;field&quot;: &quot;type&quot;, &quot;equals&quot;: &quot;Microsoft.Compute/virtualMachines&quot; }, { &quot;not&quot;: { &quot;field&quot;: &quot;Microsoft.Compute/virtualMachines/sku.name&quot;, &quot;in&quot;: [ &quot;Standard_D1_v2&quot;, &quot;Standard_D2_v2&quot;,&quot;Standard_D3_v2&quot;, &quot;Standard_D4_v2&quot;, &quot;Standard_D5_v2&quot; ] } } ] }, &quot;then&quot;: { &quot;effect&quot;: &quot;deny&quot; } } policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -226,41 +268,6 @@ Understanding Windows Azure Storage Billing – Bandwidth, Transactions, and Cap
 $Blob = Get-AzureStorageBlob yourDataDisk.
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/" style="height:28px">
-          Read more
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
-  
-  | <a class="subtitle is-6" href="/tags/deep-learning">#Deep Learning</a>
-  
-  | <a class="subtitle is-6" href="/tags/cntk">#CNTK</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 17, 2016</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_cntk/">AzureとDockerでDeep Learning(CNTK)環境をサク作する</a></h1>
-      <div class="content">
-        気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこれする主役ではないのですが、ちょっとは中身を理解しておきたいなと思い、環境作ってます。
-試行錯誤するでしょうから、萎えないようにデプロイは自動化します。
-方針  インフラはAzure Resource Manager Templateでデプロイする  Linux (Ubuntu 14.04) VM, 仮想ネットワーク/ストレージ関連リソース   CNTKをビルド済みのdockerリポジトリをDocker Hubに置いておく  Dockerfileの元ネタはここ  GPUむけもあるけどグッと我慢、今回はCPUで   Docker Hub上のリポジトリは torumakabe/cntk-cpu   ARM TemplateデプロイでVM Extensionを仕込んで、上物のセットアップもやっつける  docker extensionでdocker engineを導入 custom script extensionでdockerリポジトリ(torumakabe/cntk-cpu)をpull   VMにログインしたら即CNTKを使える、幸せ  使い方 Azure CLIでARM Templateデプロイします。WindowsでもMacでもLinuxでもOK。
-リソースグループを作ります。
-C:\Work&gt; azure group create CNTK -l &quot;Japan West&quot;  ARMテンプレートの準備をします。テンプレートはGithubに置いておきました。
- azuredeploy.json  編集不要です   azuredeploy.parameters.json  テンプレートに直で書かきたくないパラメータです fileUris、commandToExecute以外は、各々で fileUris、commandToExecuteもGist読んでdocker pullしているだけなので、お好みで変えてください ファイル名がazuredeploy.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_cntk/" style="height:28px">
           Read more
         </a>
         

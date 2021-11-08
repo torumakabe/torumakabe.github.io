@@ -11,7 +11,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content=''><meta property='og:updated_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -88,6 +88,37 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
+
+
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">December 9, 2014</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/longtermsupport/">OpenStackと長期バージョン固定</a></h1>
+      <div class="content">
+        このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。
+ソフトウェア、バージョン、サポート たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。
+進化著しいソフト、OpenStackでは OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして公式サイトを見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。
+でも、長期バージョン固定するとどうなるか では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。
+[とあるクラウド その1]
+ (Dev) 今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。 (Ops) あー、うちの環境Jよ。 (Dev) そうすか。じゃあ他のにするわ。  使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。
+[とあるクラウド その2]
+ (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!! (Dev) おーいいね。決定。3年のんびりするわ。
+〜3年後〜 (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!! (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。  リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。
+アップデートの仕組みに投資したほうが建設的と思う もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。
+それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。
+最後に、最新のOpenStack User Surveyを紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。
+OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&ldquo;Ability to innovate&quot;なんですよね。 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。
+メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -222,36 +253,6 @@ $ vagrant openstack snapshot -n lab01_snap ==&gt; default: This server instance 
 ほんと、これだけ  Vagrant、VirtualBox、Gitが入ってること、バージョンと大まかな手順をこのページで確認 $ vagrant plugin install vagrant-cachier $ git clone https://github.com/OpenStackCookbook/OpenStackCookbook.git $ cd OpenStackCookbook $ git checkout icehouse $ vagrant up 何度か管理者パスワードを入力 $ vagrant ssh controller $ . /vagrant/openrc $/vagrant/demo.sh  以上。Horizonコンソールは http://172.16.0.200/ から。
 この環境だと30分でできた  Vagrant 1.5.4 VirtualBox 4.3.10 Macbook Pro 2.3GHz クアッドコアIntel Core i7/メモリ16GB/SSD512GB  デモや新機能の試用くらいであればこれで十分ですね。
 著者に感謝。わたしは買いました。 &ndash; OpenStack Cloud Computing Cookbook Second Edition(Amazon.co.jp)
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/vagrant">#Vagrant</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/hp-public-cloud">#HP Public Cloud</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">May 5, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/vagrant-hpcloud/">Vagrant HP Public Cloud Pluginを試す</a></h1>
-      <div class="content">
-        みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作はVagrantでしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。
-VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。
-前提条件  Vagrant 1.5.4 vagrant-hp 0.1.4 HP Public Cloud (2014/5/5)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
-ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、Githubの説明には若干のトラップがありますのでご注意を。
- イメージにUbuntu 14.04 LTSを使う例です。 Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。 Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。 Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。 ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。  それではさっそくvagrant up $ vagrant up --provider=hp Bringing machine 'default' up with 'hp' provider... WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1 ==&gt; default: Warning! The HP provider doesn't support any of the Vagrant ==&gt; default: high-level network configurations (`config.
-        
-        <a class="button is-link" href="https://ToruMakabe.github.io/post/vagrant-hpcloud/" style="height:28px">
-          Read more
-        </a>
         
       </div>
     </article>
