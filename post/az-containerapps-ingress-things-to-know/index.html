@@ -228,7 +228,7 @@ nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span st
 &lt; server: nginx/1.21.3
 ...
 </code></pre></div><p>internal向けには、できません。internal向けに2つ作りましたが、結果は同様です。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">curl -sv https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ curl -sv https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io
 *   Trying 20.151.223.25:443...
 * TCP_NODELAY set
 * Connected to nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io <span style="color:#f92672">(</span>20.151.223.25<span style="color:#f92672">)</span> port <span style="color:#ae81ff">443</span> <span style="color:#f92672">(</span><span style="color:#75715e">#0)</span>
