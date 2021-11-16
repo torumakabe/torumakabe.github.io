@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-11-16T15:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,44 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/container">#Container</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">November 16, 2021</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</a></h1>
+      <div class="content">
+        何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。
+前回はIngress編、今回は定期実行とgraceful shutdownについて、です。
+Container Appsはプレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
+背景 システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。
+Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。
+選択肢 アプリへの定期実行ロジック組み込みや外部からの起動を含めると、選択肢は多くあります。その中で、Container Appsの特徴を活かす、「らしい」やり方は、以下の2つです。
+ Dapr Cronバインディングを使い、定期的にハンドラを呼び出す 加えて、KEDA Cronスケーラを使い、ジョブが動かない時間はレプリカ数をゼロにする  考慮点 レプリカ数をゼロにするのであれば、そのタイミングでアプリを安全に停止したいことでしょう。仮にCronに指定する想定実行時間を、余裕をもって長めにとるとしても、データの整合性など確認した上で停止したいものです。万が一のオーバーランなど、あるかもしれませんし。いわゆるgraceful shutdownを考慮すべきです。
+Azure FunctionsなどApp Serviceシリーズでコンテナを使う場合、graceful shutdownの実装は課題でした。いっぽう、Container AppsはベースとしているKubernetesと同じように、シグナルハンドラの実装で対応できます。
+ Azure Container Apps プレビューでのアプリケーション ライフサイクル管理
+  コンテナアプリのスケールイン時 コンテナアプリが削除された時 リビジョンが非アクティブ化された時  上記タイミングでコンテナにシグナル(SIGTERM)が送られます。
+なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。
+Dapr Cronバインディング 実装例 では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。
+package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;syscall&#34; &#34;time&#34; &#34;net/http&#34; &#34;os&#34; &#34;github.
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -243,39 +281,6 @@ root@96d38124b1f4:~/site/wwwroot# ip a 1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 6
         <a class="button is-link" href="https://ToruMakabe.github.io/post/website-vnet-route-all/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/github">#Github</a>
-  
-  | <a class="subtitle is-6" href="/tags/go">#Go</a>
-  
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">April 2, 2021</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-healthprobe/">Azure Application Insightsのカスタム可用性テストを使って プライベートネットワーク対応の可用性テストプローブをGoで書く</a></h1>
-      <div class="content">
-        何の話か 以下のサンプル(C# &amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。
- Azure Functions を使用してカスタム可用性テストを作成して実行する
- 背景 ユーザ視点でサービス、サイトの可用性を客観的に把握できている、外形監視しているケースは、意外に少なかったりします。明らかにしてしまうといろいろ問題が、という裏事情はさておき、サービスレベル維持、改善のためには客観的な根拠があったほうがいいでしょう。
-Azure Application Insightsには可用性テストやSLAレポート機能があり、視覚化や分析、レポート作成をサクッと実現できます。
-なのですが、この可用性テストのプローブがインターネット上に配置されているため、監視対象もインターネットに口を開いている必要があります。Azureの仮想ネットワークなど、プライベートネットワークにあるサイト向けには使えません。
-ああ残念、と思いきや、手はあります。Application Insightsは可用性テスト結果を受け取るAPIを公開しているので、そこにデータを送るカスタムプローブを作って、プライベートネットワークに配置すれば、実現できます。
-そんな背景があり、公開されているのが前述のサンプルです。C#とFunctions使いであればこれでOK。このエントリはGoなど他言語での実装に関心がある人向けです。
-作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
-  Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
- Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    
         
       </div>
     </article>

@@ -7,7 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
-    <lastBuildDate>Mon, 08 Nov 2021 19:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 16 Nov 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</title>
+      <link>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</link>
+      <pubDate>Tue, 16 Nov 2021 15:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</guid>
+      <description>何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。
+前回はIngress編、今回は定期実行とgraceful shutdownについて、です。
+Container Appsはプレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
+背景 システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。
+Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。
+選択肢 アプリへの定期実行ロジック組み込みや外部からの起動を含めると、選択肢は多くあります。その中で、Container Appsの特徴を活かす、「らしい」やり方は、以下の2つです。
+ Dapr Cronバインディングを使い、定期的にハンドラを呼び出す 加えて、KEDA Cronスケーラを使い、ジョブが動かない時間はレプリカ数をゼロにする  考慮点 レプリカ数をゼロにするのであれば、そのタイミングでアプリを安全に停止したいことでしょう。仮にCronに指定する想定実行時間を、余裕をもって長めにとるとしても、データの整合性など確認した上で停止したいものです。万が一のオーバーランなど、あるかもしれませんし。いわゆるgraceful shutdownを考慮すべきです。
+Azure FunctionsなどApp Serviceシリーズでコンテナを使う場合、graceful shutdownの実装は課題でした。いっぽう、Container AppsはベースとしているKubernetesと同じように、シグナルハンドラの実装で対応できます。
+ Azure Container Apps プレビューでのアプリケーション ライフサイクル管理
+  コンテナアプリのスケールイン時 コンテナアプリが削除された時 リビジョンが非アクティブ化された時  上記タイミングでコンテナにシグナル(SIGTERM)が送られます。
+なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。
+Dapr Cronバインディング 実装例 では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。
+package main import ( &amp;#34;context&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os/signal&amp;#34; &amp;#34;syscall&amp;#34; &amp;#34;time&amp;#34; &amp;#34;net/http&amp;#34; &amp;#34;os&amp;#34; &amp;#34;github.</description>
+    </item>
+    
     <item>
       <title>Azure Container Appsを試す前に知っておきたいこと - Ingress編</title>
       <link>https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/</link>

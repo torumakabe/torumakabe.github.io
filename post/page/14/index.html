@@ -10,7 +10,7 @@
 <meta property='og:description' content=''>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/'>
 <meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+<meta property='og:type' content='website'><meta property='article:section' content='Post'><meta property='og:updated_time' content='2021-11-16T15:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
 
 
 <link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
@@ -87,6 +87,54 @@
 </section>
 <section class="section">
   <div class="container">
+    
+    <article>
+      <div class="subtitle tags is-6 is-pulled-right">
+        
+        
+<a class="subtitle is-6" href="/tags/azure">#Azure</a>
+
+
+
+  
+  | <a class="subtitle is-6" href="/tags/arm">#ARM</a>
+  
+
+        
+      </div>
+      <h2 class="subtitle is-6 date">January 6, 2016</h2>
+      <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_idempotent/">Azure ARM Templateによるデプロイと冪等性</a></h1>
+      <div class="content">
+        宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
+さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
+Azure リソース マネージャーの概要  &ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;
+  &ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
+ 冪等と言い切ってはいませんが、目的は似ています。
+なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
+残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
+増分デプロイと完全デプロイ まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使えるクロスプラットフォームCLIもあります。
+PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。
+今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途ドキュメントで確認してください。
+さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
+コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
+いっぽうで、完全モードです。
+ ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
+  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
+  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
+ 2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
+動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
+パラメータファイル(azuredeploy.parameters.json)は以下とします。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_idempotent/" style="height:28px">
+          Read more
+        </a>
+        
+      </div>
+    </article>
     
     <article>
       <div class="subtitle tags is-6 is-pulled-right">
@@ -211,39 +259,6 @@ $ terraform plan Refreshing Terraform state prior to plan... The Terraform execu
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/" style="height:28px">
           Read more
         </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <div class="subtitle tags is-6 is-pulled-right">
-        
-        
-<a class="subtitle is-6" href="/tags/openstack">#OpenStack</a>
-
-
-
-        
-      </div>
-      <h2 class="subtitle is-6 date">December 12, 2014</h2>
-      <h1 class="title"><a href="https://ToruMakabe.github.io/post/monasca/">君はOpenStack Monascaを知っているか</a></h1>
-      <div class="content">
-        このエントリーは、OpenStack (2枚目) Advent Calendar 2014の12夜目担当作品です。
-Monitoring as a Service 監視をサービスとして提供するって、どういうことでしょうか。
-[Monitoring]
-従来の監視。担当者が事前に監視項目を定義する。静的。
-[Monitoring as a Service] 監視機能をサービスとして提供する。不特定多数のユーザーが、自分の監視したい測定項目を定義し、自分の好きなタイミングでチェックする。GUIはもちろん、APIでデータ取得できる。動的。
-まあ、AWSのCloudWatchみたいなものです。先に言うべきでしたね、すいません。
-このMonitoring as a Service、技術的なハードルは結構高いんです。刻々と上がってくるイベントをさばき、蓄積し、APIをバシバシ叩くユーザーリクエストに応えなきゃいけない。監視というと裏方のイメージがありますが、これは、対価をいただくに値する、立派なサービスです。
-そこでOpenStackのMonitoring as a Service事情はどうでしょうか。一見、それを実現できそうなCeilometerがあります。ただ、もともとCeilomerは課金のための利用情報収集をする、という生まれなので、マルチテナントで、ユーザーが自らメトリックを定義し、チェックするという使い方に向いていません。ユーザー向けというより、管理者向けなんです。
-そこでMonascaの登場です。まだ正式機能ではありませんが、いずれ昇格するのでは、と個人的に期待しています。
-では、アーキテクチャーを見てみましょう。
-ひゃー、ワクワクしますがちょっと重いですね。特にイベントを処理するメッセージキュー、イベントを貯めるDBは工夫が要りそうです。現時点で、キューにはApache Kafka、DBにはカラムナーDBのVerticaや、時系列DBのInflux DBがサポートされています。正直、無理目のスタックです。
-と思っていたら。
-なんと、Monasca-Vagrantなんてものができているじゃありませんか。VagrantとAnsibleでサクっと環境を作れるとな。まじか。本当か。本当だった。1時間くらいでできた。
-気をつけること  動作実績のあるわたしの環境は、MacBook Pro Late 2013 / 2.3 GHz Intel Core i7、メモリ16GB、Yosemite。 Vagrantfileを見る限り、メモリ7GBと6GBのVMを作る。ここいじって動くかは要検証。 git cloneしたディレクトリ直下にansibleのrequirementファイルが置かれるので、そこで作業 vagrant upで2つのVM、devstackとmini-monが作られる、ここは時間と帯域がいるので、スタバな人は要注意  気をつけるのはこれくらいです。レッツトライ。
-年末年始休暇のお楽しみが増えましたね。
-これでわたしの2014年Advent Calendarシリーズは完了です。メリークリスマス &amp; 良いお年を。
         
       </div>
     </article>
