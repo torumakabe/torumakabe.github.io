@@ -9,7 +9,7 @@
 <meta property='og:title' content='Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編 - re-imagine'>
 <meta property='og:description' content='何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。
 前回はIngress編、今回は定期実行とgraceful shutdownについて、です。
-Container Appsはプレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
+Container Appsはプレビュー中ということもあり、これから説明する内容は変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
 背景 システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。
 Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。
 選択肢 アプリへの定期実行ロジック組み込みや外部からの起動を含めると、選択肢は多くあります。その中で、Container Appsの特徴を活かす、「らしい」やり方は、以下の2つです。
@@ -119,7 +119,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
       <h2 id="何の話か">何の話か</h2>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/container-apps/?ocid=AID3042118">Azure Container Apps</a>を試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。</p>
 <p>前回は<a href="https://torumakabe.github.io/post/az-containerapps-ingress-things-to-know/">Ingress編</a>、今回は定期実行とgraceful shutdownについて、です。</p>
-<p>Container Appsはプレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。</p>
+<p>Container Appsはプレビュー中ということもあり、これから説明する内容は変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。</p>
 <h2 id="背景">背景</h2>
 <p>システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。</p>
 <p>Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。</p>
