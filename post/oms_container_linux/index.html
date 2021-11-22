@@ -152,7 +152,7 @@
 </ul>
 </li>
 </ul>
-<pre><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
+<pre tabindex="0"><code>sudo docker run --privileged -d -v /var/run/docker.sock:/var/run/docker.sock -e WSID=&quot;your workspace id&quot; -e KEY=&quot;your key&quot; -h=`hostname` -p 127.0.0.1:25224:25224/udp -p 127.0.0.1:25225:25225 --name=&quot;omsagent&quot; --log-driver=none --restart=always microsoft/oms
 </code></pre><p>以上。これでOMSポータルからログ分析ができます。こんな感じで。</p>
 <p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash01.png" alt="Dashboard1" title="from microsoft.com"></p>
 <p><img src="https://acom.azurecomcdn.net/80C57D/cdn/mediahandler/docarticles/dpsmedia-prod/azure.microsoft.com/en-us/documentation/articles/log-analytics-containers/20160824105310/containers-dash02.png" alt="Dashboard2" title="from microsoft.com"></p>

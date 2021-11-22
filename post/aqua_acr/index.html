@@ -134,12 +134,12 @@ FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.'>
 </blockquote>
 <h2 id="トークンの取得">トークンの取得</h2>
 <p>MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。</p>
-<pre><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
+<pre tabindex="0"><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
 </code></pre><h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
 <p>以降、<a href="https://github.com/ToruMakabe/aqua-sample/tree/master">ここ</a>にサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。</p>
 <p>ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。</p>
 <p>まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。</p>
-<pre><code>FROM alpine:3.3
+<pre tabindex="0"><code>FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
 ADD https://get.aquasec.com/microscanner /
 RUN chmod +x /microscanner
@@ -148,7 +148,7 @@ RUN /microscanner ${token} &amp;&amp; rm /microscanner
 RUN echo &quot;No vulnerabilities!&quot;
 CMD [&quot;echo&quot;, &quot;Hello&quot;]
 </code></pre><p>Apline Linuxをベースに、実行したらHelloとechoするだけのコンテナーです。ビルド時にイメージ作成環境内でMicroScannerをダウンロードし、実行します。Alpineのバージョンは3.3で、ちょっと古いものを指定しています。さあ何が起こるでしょう。</p>
-<pre><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
+<pre tabindex="0"><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.3
  ---&gt; a6fc1dbfa81a
@@ -244,7 +244,7 @@ Step 6/8 : RUN /microscanner ${token} &amp;&amp; rm /microscanner
 The command '/bin/sh -c /microscanner ${token} &amp;&amp; rm /microscanner' returned a non-zero code: 4
 </code></pre><p>スペースの都合で省きましたが、いっぱいひっかかりましたね。そして深刻度highの脆弱性が検出されたので、そこで終了しています。</p>
 <p>では、alpineのバージョンを現時点で最新の3.10にしてみましょう。</p>
-<pre><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
+<pre tabindex="0"><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.10
  ---&gt; b7b28af77ffe
@@ -289,22 +289,22 @@ Successfully built a4f61c940dce
 </ul>
 <p>この方針とします。これであればトークンをDockerfileやタスク定義ファイルに書く必要がなく、ご開帳のリスクを減らせます。</p>
 <p>リソースグループ、Key Vaultとシークレットを作成します。</p>
-<pre><code>$ az group create -n rg-aqua-sample -l japaneast
+<pre tabindex="0"><code>$ az group create -n rg-aqua-sample -l japaneast
 $ az keyvault create -g rg-aqua-sample -n your-aqua-sample
 $ az keyvault secret set --vault-name your-aqua-sample -n aqua-key --value &quot;&lt;your token&gt;&quot;
 </code></pre><p>ユーザー割り当てManaged Identityを作り、IDを取得して変数へ入れておきます。</p>
-<pre><code>$ az identity create -g rg-aqua-sample -n aqua-identity
+<pre tabindex="0"><code>$ az identity create -g rg-aqua-sample -n aqua-identity
 $ resourceID=$(az identity show -g rg-aqua-sample -n aqua-identity --query id -o tsv)
 $ principalID=$(az identity show -g rg-aqua-sample -n aqua-identity --query principalId -o tsv)
 </code></pre><p>Key Vaultシークレットの読み取り権限を、先ほど作ったManaged Identityに付与します。</p>
-<pre><code>$ az keyvault set-policy -g rg-aqua-sample -n your-aqua-sample --object-id $principalID --secret-permissions get
+<pre tabindex="0"><code>$ az keyvault set-policy -g rg-aqua-sample -n your-aqua-sample --object-id $principalID --secret-permissions get
 </code></pre><p>これで準備はOKです。次はACR Tasksでのビルド定義をします。</p>
 <p>まずはDockerfileです。先ほどはビルド時にコンテナー作成環境内でMicroScannerを実行しましたが、ACR Tasksはマルチステップ定義ができるので、コンテナーイメージのビルドとスキャンをステップ分離します。なのでDockerfileはシンプルです。脆弱性検出時の動きを見たいので、Alpineのバージョンは3.3としました。</p>
-<pre><code>FROM alpine:3.3
+<pre tabindex="0"><code>FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
 CMD [&quot;echo&quot;, &quot;Hello&quot;]
 </code></pre><p>そしてACR Tasksのタスク定義をします。ファイルはaqua-scan.yamlです。コンテナーイメージビルドのステップと、脆弱性スキャンのステップを分離しています。脆弱性スキャンのステップが失敗したらそこでタスクは終了し、レジストリへpushしません。</p>
-<pre><code>version: v1.0.0
+<pre tabindex="0"><code>version: v1.0.0
 
 secrets:
   - id: key
@@ -326,9 +326,9 @@ steps:
   # Only push the image if the scan was successful.
   - push: [&quot;{{.Run.Registry}}/alpine-hello:{{.Run.ID}}&quot;]
 </code></pre><p>MicroScannerのトークンをKey Vaultシークレットから渡していますね。それではタスクを作成してみましょう。</p>
-<pre><code>$ az acr task create -r your-acr -n aqua-scan -c https://github.com/your-repo/aqua-sample.git -f aqua-scan.yaml --commit-trigger-enabled false --pull-request-trigger-enabled false --assign-identity $resourceID
+<pre tabindex="0"><code>$ az acr task create -r your-acr -n aqua-scan -c https://github.com/your-repo/aqua-sample.git -f aqua-scan.yaml --commit-trigger-enabled false --pull-request-trigger-enabled false --assign-identity $resourceID
 </code></pre><p>タスクを実行します。</p>
-<pre><code>$ az acr task run -r your-acr -n aqua-scan                                                                           
+<pre tabindex="0"><code>$ az acr task run -r your-acr -n aqua-scan                                                                           
 Queued a run with ID: ce9                                                                                               
 Waiting for an agent...                                                                                                 
 2019/08/05 05:20:21 Downloading source code...
@@ -395,7 +395,7 @@ failed to run step ID: acb_step_2: exit status 4
 
 Run ID: ce9 failed after 34s. Error: failed during run, err: exit status 1
 </code></pre><p>コンテナーイメージに脆弱性のあるパッケージが含まれているため、レジストリへpushをせずに終了しました。ではDockerfileのベースイメージバージョンをAlpine 3.10に変えてタスクを再実行してみます。</p>
-<pre><code>$ az acr task run -r your-acr -n aqua-scan
+<pre tabindex="0"><code>$ az acr task run -r your-acr -n aqua-scan
 Queued a run with ID: cea                                                                                               
 Waiting for an agent...                                                                                                 
 2019/08/05 05:22:25 Downloading source code...

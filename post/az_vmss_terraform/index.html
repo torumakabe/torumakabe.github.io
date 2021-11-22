@@ -137,7 +137,7 @@ resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var
 <li>クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。</li>
 </ul>
 <p>[main.tf]</p>
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;poc&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_resource_group&quot; &quot;poc&quot; {
   name     = &quot;${var.resource_group_name}&quot;
   location = &quot;East US 2&quot;
 }
@@ -317,7 +317,7 @@ resource &quot;azurerm_virtual_machine_scale_set&quot; &quot;poc&quot; {
 </code></pre><h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
 <p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
 <p>[cloud-config.yaml]</p>
-<pre><code>#cloud-config
+<pre tabindex="0"><code>#cloud-config
 package_upgrade: true
 packages:
   - nginx
@@ -331,7 +331,7 @@ runcmd:
 <h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
 <p>変数は別ファイルへ。</p>
 <p>[variables.tf]</p>
-<pre><code>variable &quot;resource_group_name&quot; {
+<pre tabindex="0"><code>variable &quot;resource_group_name&quot; {
   default = &quot;your-rg&quot;
 }
 
@@ -344,23 +344,23 @@ variable &quot;admin_username&quot; {
 }
 </code></pre><h2 id="実行">実行</h2>
 <p>では実行。</p>
-<pre><code>$ terraform init
+<pre tabindex="0"><code>$ terraform init
 $ terraform plan
 $ terraform apply
 </code></pre><p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
 <p>インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。</p>
-<pre><code>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
+<pre tabindex="0"><code>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
 $ tail -f /var/log/cloud-init-output.log
 Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
 </code></pre><p>ではWebサーバーにアクセスしてみましょう。</p>
-<pre><code>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
+<pre tabindex="0"><code>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
 [Instance Name]: yourvmss01_2    [Zone]: 3
 [Instance Name]: yourvmss01_0    [Zone]: 1
 [Instance Name]: yourvmss01_2    [Zone]: 3
 [Instance Name]: yourvmss01_1    [Zone]: 2
 </code></pre><p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
 <p>では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。</p>
-<pre><code>[Instance Name]: yourvmss01_1    [Zone]: 2
+<pre tabindex="0"><code>[Instance Name]: yourvmss01_1    [Zone]: 2
 [Instance Name]: yourvmss01_3    [Zone]: 1
 [Instance Name]: yourvmss01_3    [Zone]: 1
 [Instance Name]: yourvmss01_1    [Zone]: 2

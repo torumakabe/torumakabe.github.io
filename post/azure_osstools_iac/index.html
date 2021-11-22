@@ -150,7 +150,7 @@
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
 <h2 id="サンプル解説">サンプル解説</h2>
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
-<pre><code># -*- mode: ruby -*-
+<pre tabindex="0"><code># -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -236,13 +236,13 @@ end
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&quot;Vagrant.configure～&quot;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
 <h2 id="どれだけ楽か">どれだけ楽か</h2>
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
-<pre><code>vagrant up
+<pre tabindex="0"><code>vagrant up
 </code></pre><p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
 <p>できましたか。できたら、</p>
-<pre><code>vagrant putty
+<pre tabindex="0"><code>vagrant putty
 </code></pre><p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
 <p>あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら</p>
-<pre><code>vagrant destroy
+<pre tabindex="0"><code>vagrant destroy
 </code></pre><p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
 <p>なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。</p>
 <p>わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。</p>

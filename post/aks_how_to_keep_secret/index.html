@@ -138,7 +138,7 @@ package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;
 <p>よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。</p>
 <h2 id="マニフェストに書く">マニフェストに書く</h2>
 <p>Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 [snip]
     spec:
@@ -150,7 +150,7 @@ kind: Deployment
           value: &quot;Selfish sell fish.&quot;
 </code></pre><p>これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。</p>
 <p>この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
 	&quot;fmt&quot;
@@ -174,7 +174,7 @@ func main() {
 <p>マニフェストを置くリポジトリのアクセス制御は、マニフェストを誰が作り、デプロイするかによります。深いテーマなので踏み込みませんが、少なくともマニフェストにシークレットの値を平文で書くなら、マニフェストにアクセスできる人を限定すべきでしょう。これは開発、運用の大きな制約条件になり得ます。</p>
 <p>なお、シークレットだけを暗号化してソースコードを管理し、デプロイ時に復号化する、という方法もあります。Helmのラッパーで、Helmの実行時に暗号化されたシークレットファイルを復号化する<a href="https://github.com/futuresimple/helm-secrets">helm-secrets</a>がその例です。<a href="https://github.com/mozilla/sops">SOPS</a>を活用しています。</p>
 <p>ただしKubernetesには復号化されて単なる環境変数として送られますので、Podの参照権限があれば値は読めてしまいます。</p>
-<pre><code>$ kubectl get po getsecret-hoge -o yaml
+<pre tabindex="0"><code>$ kubectl get po getsecret-hoge -o yaml
 [snip]
 spec:
   containers:
@@ -186,7 +186,7 @@ spec:
 <p>KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは <a href="https://github.com/Azure/kubernetes-kms">&ldquo;AKS does encrypt secrets-at-rest&rdquo; つまり暗号化されています</a>。</p>
 <p>Secretはそれを受け取るPodの実行サーバー上では永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。</p>
 <p>Secretは以下のようなマニフェストで作成します。</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 kind: Secret
 metadata:
   name: joke
@@ -195,7 +195,7 @@ data:
   joke: U2VsZmlzaCBzZWxsIGZpc2gu
 </code></pre><p>値はBase64符号化した結果を書きます。当然ながらBase64デコードできるので、マニフェストの管理はご注意を。</p>
 <p>このSecretをアプリケーションに環境変数として渡すマニフェストの書き方は、先ほどの環境変数を直接書く方法とあまり変わりません。envのvalueFrom以下でSecretを指定します。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 [snip]
     spec:
@@ -210,7 +210,7 @@ kind: Deployment
               key: joke
 </code></pre><p>これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、Secretは符号化されていますが、アプリケーションはデコードされた結果を受け取ります。</p>
 <p>もちろんPodの参照権限だけでは、中身をKubernetes API経由で見ることはできません。</p>
-<pre><code>$ kubectl get po getsecret-fuga -o yaml
+<pre tabindex="0"><code>$ kubectl get po getsecret-fuga -o yaml
 [snip]
 spec:
   containers:
@@ -235,7 +235,7 @@ spec:
 <h2 id="key-vaultで管理しその認証情報をkubernetesのsecretにする">Key Vaultで管理し、その認証情報をKubernetesのSecretにする</h2>
 <p>Key VaultはシークレットをHSMで保護し、かつきめ細かいアクセスポリシー制御ができる、シークレット管理に特化したサービスです。暗号化キーや証明書の管理もできます。ここへKuberentesで動くアプリケーションのシークレットを入れてみましょう。</p>
 <p>まずはアプリケーションのサンプルです。先ほどのGoで書いたWebアプリを、Azure SDK for Goを使って、Key Vaultからシークレットが読めるように書き換えます。</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
 	&quot;context&quot;
@@ -291,7 +291,7 @@ func main() {
 <p>これは見ての通りですね。シークレットが格納されているKey Vaultを指定するため、 AZURE_KEYVAULT_NAME などを環境変数から読み込みます。</p>
 <p>他の言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。</p>
 <p>では、マニフェストを見てみましょう。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 [snip]
     spec:
@@ -331,7 +331,7 @@ kind: Deployment
 </blockquote>
 <p>でも、これだけだとピンとこないと思います。導入して何が嬉しいかを理解してから、再度読んでみて下さい。理解が深まると思います。</p>
 <p>Pod Identitiyを導入した環境では、マニフェストはこうなります。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -370,7 +370,7 @@ metadata:
 </blockquote>
 <p>これも使い方から理解したほうがいいでしょう。FlexVolumeはKey Vaultのシークレット、暗号化キー、証明書をPodへVolumeとしてマウントできる仕組みです。つまりアプリケーションがシークレットを、あたかもファイルシステム上のファイルであるかのように読むことができます。</p>
 <p>これまでのサンプルアプリケーションを、こう変えられます。</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
 	&quot;fmt&quot;
@@ -395,7 +395,7 @@ func main() {
 	http.ListenAndServe(&quot;:8080&quot;, nil)
 }
 </code></pre><p>シークレットはKey Vaultにあるのですが、アプリ的にはファイルを読んでるだけです。ではマニフェストはどうでしょう。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:

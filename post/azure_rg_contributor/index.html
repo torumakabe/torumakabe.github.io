@@ -130,7 +130,7 @@ $ az role definition create --role-definition ./role.json 出力にカスタム�
 <h2 id="いい感じのカスタムロールを作る">いい感じのカスタムロールを作る</h2>
 <p>Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。</p>
 <p>シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。</p>
-<pre><code>{
+<pre tabindex="0"><code>{
     &quot;Name&quot;: &quot;Resource Group Contributor&quot;,
     &quot;IsCustom&quot;: true,
     &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;,
@@ -149,39 +149,39 @@ $ az role definition create --role-definition ./role.json 出力にカスタム�
 }
 </code></pre><p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
 <p>では、カスタムロールを作成します。</p>
-<pre><code>$ az role definition create --role-definition ./role.json
+<pre tabindex="0"><code>$ az role definition create --role-definition ./role.json
 </code></pre><p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
-<pre><code>&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot;
+<pre tabindex="0"><code>&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot;
 </code></pre><h2 id="カスタムロールをユーザーグループサービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
 <p>次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。</p>
-<pre><code>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
+<pre tabindex="0"><code>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
 </code></pre><p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
-<pre><code>$ az ad sp create-for-rbac -n &quot;rgcontributor&quot; -p &quot;your-password&quot; --role your-customrole-id --scopes &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
+<pre tabindex="0"><code>$ az ad sp create-for-rbac -n &quot;rgcontributor&quot; -p &quot;your-password&quot; --role your-customrole-id --scopes &quot;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&quot;
 </code></pre><p>余談ですが、&ldquo;az ad sp create-for-rbac&quot;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
 <h2 id="試してみる">試してみる</h2>
 <p>ログインして試してみましょう。サービスプリンシパルの例です。</p>
-<pre><code>$ az login --service-principal -u &quot;http://rgcontributor&quot; -p &quot;your-password&quot; -t &quot;your-tenant-id&quot;
+<pre tabindex="0"><code>$ az login --service-principal -u &quot;http://rgcontributor&quot; -p &quot;your-password&quot; -t &quot;your-tenant-id&quot;
 </code></pre><p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
-<pre><code>$ az group list -o table
+<pre tabindex="0"><code>$ az group list -o table
 Name              Location    Status
 ----------------  ----------  ---------
 sample-dev-rg  japaneast   Succeeded
 </code></pre><p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
-<pre><code>$ az vm list -o table
+<pre tabindex="0"><code>$ az vm list -o table
 Name              ResourceGroup     Location
 ----------------  ----------------  ----------
 sampledevvm01     sample-dev-rg  japaneast
 </code></pre><p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
-<pre><code>$ az group create -n rgc-poc-rg -l japaneast
+<pre tabindex="0"><code>$ az group create -n rgc-poc-rg -l japaneast
 The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/write' over scope '/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg'.
 </code></pre><p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
-<pre><code>$ az group delete -n sample-dev-rg
+<pre tabindex="0"><code>$ az group delete -n sample-dev-rg
 Are you sure you want to perform this operation? (y/n): y
 The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddddd-eeeee' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/delete' over scope '/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg'.
 </code></pre><h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
 <p>でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。</p>
 <p>空テンプレートを、empty.jsonとしましょう。</p>
-<pre><code>{
+<pre tabindex="0"><code>{
     &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
     &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
     &quot;parameters&quot;: {},
@@ -190,14 +190,14 @@ The client 'aaaaa-bbbbb-ccccc-ddddd-eeeee' with object id 'aaaaa-bbbbb-ccccc-ddd
     &quot;outputs&quot;: {}
 }
 </code></pre><p>破壊的空砲を打ちます。</p>
-<pre><code>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+<pre tabindex="0"><code>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
 </code></pre><p>リソースグループは残ります。</p>
-<pre><code>$ az group list -o table
+<pre tabindex="0"><code>$ az group list -o table
 Name              Location    Status
 ----------------  ----------  ---------
 sample-dev-rg  japaneast   Succeeded
 </code></pre><p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
-<pre><code>$ az vm list -o table
+<pre tabindex="0"><code>$ az vm list -o table
 
 </code></pre>
       

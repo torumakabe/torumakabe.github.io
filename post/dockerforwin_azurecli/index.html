@@ -143,9 +143,9 @@ PowerShellのプロファイルを編集します。ところでエディタは�
 <h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
 <p>ここが作業のハイライト。</p>
 <p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
-<pre><code>PS C:\Workspace\dockereval\arm&gt; code $profile
+<pre tabindex="0"><code>PS C:\Workspace\dockereval\arm&gt; code $profile
 </code></pre><p>こんなfunctionを作ります。</p>
-<pre><code>function azure_cli {
+<pre tabindex="0"><code>function azure_cli {
    C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data microsoft/azure-cli:latest
 }
 </code></pre><ul>
@@ -156,7 +156,7 @@ PowerShellのプロファイルを編集します。ところでエディタは�
 <li>コンテナはdocker hubのMicrosoft公式イメージ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
 </ul>
 <p>ではテスト。まずはホスト側のファイルを確認。</p>
-<pre><code>PS C:\Workspace\dockereval\arm&gt; ls
+<pre tabindex="0"><code>PS C:\Workspace\dockereval\arm&gt; ls
 
 
     ディレクトリ: C:\Workspace\dockereval\arm
@@ -169,15 +169,15 @@ d-----       2016/06/22     11:21                subd
 -a----       2016/06/22     11:28            690 azuredeploy.parameters.json
 </code></pre><p>いくつかのファイルとサブディレクトリがあります。</p>
 <p>コンテナを起動してみましょう。azure_cli functionを呼びます。</p>
-<pre><code>PS C:\Workspace\dockereval\arm&gt; azure_cli
+<pre tabindex="0"><code>PS C:\Workspace\dockereval\arm&gt; azure_cli
 root@be41d3389a21:/data#
 </code></pre><p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。公式Azure CLIコンテナは<a href="https://hub.docker.com/r/microsoft/azure-cli/~/dockerfile/">debianベース</a>です。</p>
 <p>ファイル共有できているか確認。</p>
-<pre><code>root@be41d3389a21:/data# ls
+<pre tabindex="0"><code>root@be41d3389a21:/data# ls
 azuredeploy.json  azuredeploy.parameters.json  subd
 </code></pre><p>できてますね。</p>
 <p>azureコマンドが打てるか確認。</p>
-<pre><code>root@be41d3389a21:/data# azure -v
+<pre tabindex="0"><code>root@be41d3389a21:/data# azure -v
 0.10.1
 </code></pre><p>しあわせ。</p>
 

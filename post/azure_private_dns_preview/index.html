@@ -157,24 +157,24 @@ $ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordS
 </ul>
 <h3 id="azure-cliへdns拡張を導入">Azure CLIへDNS拡張を導入</h3>
 <p>プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-getstarted-cli#to-installuse-azure-dns-private-zones-feature-public-preview">公式ドキュメント</a>で確認してください。</p>
-<pre><code>$ az extension add --name dns
+<pre tabindex="0"><code>$ az extension add --name dns
 </code></pre><h3 id="プライベートゾーンの作成">プライベートゾーンの作成</h3>
 <p>既存のゾーンを確認します。パブリックゾーンがあります。</p>
-<pre><code>$ az network dns zone list -o table
+<pre tabindex="0"><code>$ az network dns zone list -o table
 ZoneName      ResourceGroup             RecordSets    MaxRecordSets
 ------------  ----------------------  ------------  ---------------
 example.com   common-global-rg                   2             5000
 </code></pre><p>プライベートゾーンを作成します。Registration VNetとしてvnet01をリンクします。<a href="https://docs.microsoft.com/en-us/azure/dns/private-dns-overview#limitations">現時点の制約</a>で、リンク時にはVNet上にVMが無い状態にする必要があります。</p>
-<pre><code>$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
+<pre tabindex="0"><code>$ az network dns zone create -g private-dns-poc-ejp-rg -n example.com --zone-type Private --registration-vnets vnet01
 </code></pre><p>同じ名前のゾーンが2つになりました。</p>
-<pre><code>$ az network dns zone list -o table
+<pre tabindex="0"><code>$ az network dns zone list -o table
 ZoneName      ResourceGroup             RecordSets    MaxRecordSets
 ------------  ----------------------  ------------  ---------------
 example.com   common-global-rg                   2             5000
 example.com   private-dns-poc-ejp-rg             1             5000
 </code></pre><h3 id="registration-vnetへvmを作成">Registration VNetへVMを作成</h3>
 <p>VMを2つ作ります。1つにはインターネット経由でsshするので、パブリックIPを割り当てます。</p>
-<pre><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
+<pre tabindex="0"><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
 $ az network public-ip create -n vm01-pip -g ${BASE_NAME}-rg
 $ az network nic create -g ${BASE_NAME}-rg -n vm01-nic --public-ip-address vm01-pip --vnet vnet01 --subnet subnet01
 $ az vm create -g ${BASE_NAME}-rg -n vm01 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm01-nic
@@ -182,11 +182,11 @@ $ az network nic create -g ${BASE_NAME}-rg -n vm02-nic --vnet vnet01 --subnet su
 $ az vm create -g ${BASE_NAME}-rg -n vm02 --image Canonical:UbuntuServer:16.04.0-LTS:latest --size Standard_B1s --nics vm02-nic
 </code></pre><h3 id="パブリックipをパブリックゾーンへ登録">パブリックIPをパブリックゾーンへ登録</h3>
 <p>Split-Horizonの動きを確認したいので、パブリックIPをパブリックゾーンへ登録します。</p>
-<pre><code>$ az network public-ip show -g private-dns-poc-ejp-rg -n vm01-pip --query ipAddress
+<pre tabindex="0"><code>$ az network public-ip show -g private-dns-poc-ejp-rg -n vm01-pip --query ipAddress
 &quot;13.78.84.84&quot;
 $ az network dns record-set a add-record -g common-global-rg -z example.com -n vm01 -a 13.78.84.84
 </code></pre><p>パブリックゾーンで名前解決できることを確認します。</p>
-<pre><code>$ nslookup vm01.example.com
+<pre tabindex="0"><code>$ nslookup vm01.example.com
 Server:         103.5.140.1
 Address:        103.5.140.1#53
 
@@ -195,9 +195,9 @@ Name:   vm01.example.com
 Address: 13.78.84.84
 </code></pre><h3 id="registration-vnetの動きを確認">Registration VNetの動きを確認</h3>
 <p>vnet01のvm01へ、パブリックIP経由でsshします。</p>
-<pre><code>$ ssh vm01.example.com
+<pre tabindex="0"><code>$ ssh vm01.example.com
 </code></pre><p>同じRegistration VNet上のvm02を正引きします。ドメイン名無し、ホスト名だけでnslookupすると、VNetの内部ドメイン名がSuffixになります。</p>
-<pre><code>vm01:~$ nslookup vm02
+<pre tabindex="0"><code>vm01:~$ nslookup vm02
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
@@ -205,7 +205,7 @@ Non-authoritative answer:
 Name:   vm02.aioh0amlfdze5drhlpb1ktqwxd.lx.internal.cloudapp.net
 Address: 10.0.0.5
 </code></pre><p>ドメイン名をつけてみましょう。Nameはvnet01にリンクしたプライベートゾーンのドメイン名になりました。</p>
-<pre><code>vm01:~$ nslookup vm02.example.com
+<pre tabindex="0"><code>vm01:~$ nslookup vm02.example.com
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
@@ -213,7 +213,7 @@ Non-authoritative answer:
 Name:   vm02.example.com
 Address: 10.0.0.5
 </code></pre><p>逆引きもできます。</p>
-<pre><code>vm01:~$ nslookup 10.0.0.5
+<pre tabindex="0"><code>vm01:~$ nslookup 10.0.0.5
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
@@ -223,7 +223,7 @@ Non-authoritative answer:
 Authoritative answers can be found from:
 </code></pre><h3 id="split-horizonの動きを確認">Split-Horizonの動きを確認</h3>
 <p>さて、いま作業をしているvm01には、インターネット経由でパブリックゾーンで名前解決してsshしたわけですが、プライベートなVNet内でnslookupするとどうなるでしょう。</p>
-<pre><code>vm01:~$ nslookup vm01.example.com
+<pre tabindex="0"><code>vm01:~$ nslookup vm01.example.com
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
@@ -234,7 +234,7 @@ Address: 10.0.0.4
 <p>あ、どうでもいいことですが、Split-Horizonって戦隊モノの必殺技みたいなネーミングですね。叫びながら地面に拳を叩きつけたい感じ。</p>
 <h3 id="resolution-vnetの動きを確認">Resolution VNetの動きを確認</h3>
 <p>vnet02を作成し、Resolution VNetとしてプライベートゾーンとリンクします。そして、vnet02にvm03を作ります。vm03へのsshまで一気に進めます。</p>
-<pre><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
+<pre tabindex="0"><code>$ BASE_NAME=&quot;private-dns-poc-ejp&quot;
 $ az network vnet create -g ${BASE_NAME}-rg -n vnet02 --address-prefix 10.1.0.0/16 --subnet-name subnet01
 $ az network vnet subnet update -g ${BASE_NAME}-rg -n subnet01 --vnet-name vnet02 --network-security-group subnet01-nsg
 $ az network public-ip create -n vm03-pip -g ${BASE_NAME}-rg
@@ -246,13 +246,13 @@ $ az network public-ip show -g private-dns-poc-ejp-rg -n vm03-pip --query ipAddr
 $ ssh 13.78.54.133
 </code></pre><p>名前解決の確認が目的なので、vnet01/02間はPeeringしません。</p>
 <p>では、vnet01上のvm01を正引きします。ドメイン名を指定しないと、解決できません。vnet02上にvm01がある、と指定されたと判断するからです。</p>
-<pre><code>vm03:~$ nslookup vm01
+<pre tabindex="0"><code>vm03:~$ nslookup vm01
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
 ** server can't find vm01: SERVFAIL
 </code></pre><p>ではプライベートゾーンのドメイン名をつけてみます。解決できました。</p>
-<pre><code>vm03:~$ nslookup vm01.example.com
+<pre tabindex="0"><code>vm03:~$ nslookup vm01.example.com
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
@@ -260,13 +260,13 @@ Non-authoritative answer:
 Name:   vm01.example.com
 Address: 10.0.0.4
 </code></pre><p>Resolution VNetからは、逆引きできません。</p>
-<pre><code>vm03:~$ nslookup 10.0.0.4
+<pre tabindex="0"><code>vm03:~$ nslookup 10.0.0.4
 Server:         168.63.129.16
 Address:        168.63.129.16#53
 
 ** server can't find 4.0.0.10.in-addr.arpa: NXDOMAIN
 </code></pre><p>ところでRegistration VNetからResolution VNetのホスト名をnslookupするとどうなるでしょう。</p>
-<pre><code>$ ssh vm01.example.com
+<pre tabindex="0"><code>$ ssh vm01.example.com
 vm01:~$ nslookup vm03
 Server:         168.63.129.16
 Address:        168.63.129.16#53

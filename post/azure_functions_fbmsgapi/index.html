@@ -184,7 +184,7 @@ Azure Functionsは、
 <h2 id="function-appのサンプル">Function Appのサンプル</h2>
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
 <p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
-<pre><code>D:\home\site\wwwroot
+<pre tabindex="0"><code>D:\home\site\wwwroot
 ├── fb-message-callback
 │   ├── TestOutput.json
 │   ├── function.json
@@ -194,7 +194,7 @@ Azure Functionsは、
 ├── README.md
 </code></pre><p>なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。</p>
 <p>ではFunction Appの実体、index.jsを見てみましょう。</p>
-<pre><code>var https = require('https');
+<pre tabindex="0"><code>var https = require('https');
 var documentClient = require(&quot;documentdb&quot;).DocumentClient;
 const databaseUrl = &quot;dbs/&quot; + process.env.APPSETTING_DOCDB_DB_ID;
 
@@ -298,12 +298,12 @@ module.exports = function (context, req) {
 </ul>
 </li>
 </ul>
-<pre><code>{
+<pre tabindex="0"><code>{
   &quot;url&quot;: &quot;http://beertaster.org/beerstyle/web/001A.html#japanese&quot;,
   &quot;beer&quot;: &quot;酵母なし、ライトアメリカン・ウィートビール&quot;,
   &quot;id&quot;: &quot;bf3636c5-4284-4e7a-b587-9002a771f214&quot;
 }
-</code></pre><pre><code>{
+</code></pre><pre tabindex="0"><code>{
   &quot;msg&quot;: &quot;はウマい&quot;,
   &quot;id&quot;: &quot;acd63222-2138-4e19-894e-dc85a950be64&quot;
 }

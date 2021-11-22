@@ -152,13 +152,13 @@ PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH Name Value ---- ----- GOPATH
 <h3 id="そぞろ歩き-その1windowsでのgo開発">そぞろ歩き その1(WindowsでのGo開発)</h3>
 <p>では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。</p>
 <p>まず、Windowsで環境変数GOPATHを確認します。</p>
-<pre><code>PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
+<pre tabindex="0"><code>PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
 
 Name                           Value
 ----                           -----
 GOPATH                         C:\Users\tomakabe\go
 </code></pre><p>GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</p>
-<pre><code>PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
+<pre tabindex="0"><code>PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
 PS C:\Users\tomakabe\go&gt; ls
 
 
@@ -185,7 +185,7 @@ Mode                LastWriteTime         Length Name
 -a----       2018/05/02     11:09        5708288 godef.exe
 [snip]
 </code></pre><p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
-<pre><code>PS C:\Users\tomakabe\go&gt; cd .\src\github.com\ToruMakabe\work\
+<pre tabindex="0"><code>PS C:\Users\tomakabe\go&gt; cd .\src\github.com\ToruMakabe\work\
 PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; cat .\hello.go
 package main
 
@@ -195,7 +195,7 @@ func main() {
         fmt.Println(&quot;Hello Go on the new WSL&quot;)
 }
 </code></pre><p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
+<pre tabindex="0"><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
 PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
 
 
@@ -214,17 +214,17 @@ Hello Go on the new WSL
 <h3 id="そぞろ歩き-その2wslでのgo開発">そぞろ歩き その2(WSLでのGo開発)</h3>
 <p>WSLにつなぎます。ターミナルは任意ですが、わたしはVS Codeの統合ターミナルが好きです。コードを書きながら操作できるので。</p>
 <p>GOPATHを確認します。空っぽです。WSLは既定でWindowsから環境変数PATHを受け取ります。PATHは特別扱いです。ですが、他の環境変数は、指定しないと渡されません。よってWindowsで設定していても、WSLから見るとGOPATHは空っぽです。</p>
-<pre><code>~ $ echo $GOPATH
+<pre tabindex="0"><code>~ $ echo $GOPATH
 
 </code></pre><p>$HOMEもきれいな状態です。</p>
-<pre><code>~ $ ls
+<pre tabindex="0"><code>~ $ ls
 ~ $
 </code></pre><p>ではGOPATHに指定したい、先ほどWindowsで確認したディレクトリへ移動します。ちなみにWindowsのCドライブはWSLで/mnt/c/に変換されます。先ほど確認したbin、srcが見えています。</p>
-<pre><code>~ $ cd /mnt/c/Users/tomakabe/go/
+<pre tabindex="0"><code>~ $ cd /mnt/c/Users/tomakabe/go/
 /mnt/c/Users/tomakabe/go $ ls
 bin  src
 </code></pre><p>ではここで実験。試しにパッケージをインポートしてみましょう。定番の<a href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>をインポートしてみます。わざとらしいですが、なんだか嫌な予感がします。</p>
-<pre><code>/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
+<pre tabindex="0"><code>/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
 Fetching https://golang.org/x/tools/cmd/goimports?go-get=1
 Parsing meta tags from https://golang.org/x/tools/cmd/goimports?go-get=1 (status code 200)
 get &quot;golang.org/x/tools/cmd/goimports&quot;: found meta tag get.metaImport{Prefix:&quot;golang.org/x/tools&quot;, VCS:&quot;git&quot;, RepoRoot:&quot;https://go.googlesource.com/tools&quot;} at https://golang.org/x/tools/cmd/goimports?go-get=1
@@ -234,26 +234,26 @@ Parsing meta tags from https://golang.org/x/tools?go-get=1 (status code 200)
 golang.org/x/tools (download)
 created GOPATH=/home/tomakabe/go; see 'go help gopath'
 </code></pre><p>嫌な予感は予定調和で的中します。GOPATHがいらっしゃらないので、/home/tomakabe/go とみなしてしまいました。先ほど確認した際、$HOMEはきれいな状態でした、が。新たにお作りになられたようです。</p>
-<pre><code>/mnt/c/Users/tomakabe/go $ ls ~/
+<pre tabindex="0"><code>/mnt/c/Users/tomakabe/go $ ls ~/
 go
 /mnt/c/Users/tomakabe/go $ ls ~/go
 bin  src
 </code></pre><p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
 <h3 id="そぞろ歩き-その3解決編">そぞろ歩き その3(解決編)</h3>
 <p>そこで登場するのが、WSLENVです。Windowsで作業します。Windowsの環境変数GOPATHを、環境変数WSLENVへスイッチとともに設定します。/pスイッチは、「この環境変数はパスを格納しているから、いい感じにして」という指定です。</p>
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &quot;$env:WSLENV`:GOPATH/p&quot;
+<pre tabindex="0"><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &quot;$env:WSLENV`:GOPATH/p&quot;
 
 成功: 指定した値は保存されました。
 </code></pre><p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
-<pre><code>/mnt/c/Users/tomakabe/go $ echo $GOPATH
+<pre tabindex="0"><code>/mnt/c/Users/tomakabe/go $ echo $GOPATH
 /mnt/c/Users/tomakabe/go
 </code></pre><p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
 <p>ではWSLでサンプルコードを触ってみましょう。ソースのあるディレクトリへ移動します。ソースと先ほどビルドしたexeがあります。</p>
-<pre><code>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
+<pre tabindex="0"><code>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
 /mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
 hello.exe  hello.go
 </code></pre><p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
-<pre><code>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
+<pre tabindex="0"><code>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
 /mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
 hello  hello.exe  hello.go
 /mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello

@@ -134,7 +134,7 @@ Azureのストレージサービスは、多数のサーバーで構成された
 <h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
 <p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
 <p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
-<pre><code>&quot;osDisk&quot;: {
+<pre tabindex="0"><code>&quot;osDisk&quot;: {
   &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;,
   &quot;createOption&quot;: &quot;FromImage&quot;,
   &quot;managedDisk&quot;: {
@@ -151,7 +151,7 @@ Azureのストレージサービスは、多数のサーバーで構成された
 <p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed"></p>
 <p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
 <p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
-<pre><code>{
+<pre tabindex="0"><code>{
   &quot;type&quot;: &quot;Microsoft.Compute/availabilitySets&quot;,
   &quot;name&quot;: &quot;AvSet01&quot;,
   &quot;apiVersion&quot;: &quot;2016-04-30-preview&quot;,
@@ -166,7 +166,7 @@ Azureのストレージサービスは、多数のサーバーで構成された
 <p>そしてポイントです。合わせて&quot;platformFaultDomainCount&quot;を指定してください。managedにする場合は必須パラメータです。</p>
 <p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
-<pre><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+<pre tabindex="0"><code>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
 
 Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
 </code></pre>

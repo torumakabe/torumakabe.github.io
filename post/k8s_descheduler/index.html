@@ -153,12 +153,12 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
 <p>DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、<a href="https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod">プロジェクトのREADME</a>を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。</p>
 <h3 id="nodeにpodを寄せる">NodeにPodを寄せる</h3>
 <p>はじめのNode数は2です。</p>
-<pre><code>$ kubectl get nodes
+<pre tabindex="0"><code>$ kubectl get nodes
 NAME                            STATUS   ROLES   AGE   VERSION
 aks-pool1-27450415-vmss000000   Ready    agent   34m   v1.13.5
 aks-pool1-27450415-vmss000001   Ready    agent   34m   v1.13.5
 </code></pre><p>レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
@@ -181,16 +181,16 @@ spec:
           requests:
             cpu: 500m
 </code></pre><p>デプロイします。</p>
-<pre><code>$ kubectl apply -f nginx.yaml
+<pre tabindex="0"><code>$ kubectl apply -f nginx.yaml
 </code></pre><p>aks-pool1-27450415-vmss000000に寄ってますね。</p>
-<pre><code>$ kubectl get po -o wide
+<pre tabindex="0"><code>$ kubectl get po -o wide
 NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                            NOMINATED NODE   READINESS GATES
 nginx-6d4df4db7b-cqrkl   1/1     Running   0          12s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-dg267   1/1     Running   0          12s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-kxmml   1/1     Running   0          12s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
 </code></pre><h3 id="nodeを追加する">Nodeを追加する</h3>
 <p>Nodeを追加し、3Nodeにします。以下はマルチノードプール構成クラスター向けのコマンドです。シングルノードプール構成のクラスターでは、<a href="https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale">こちら</a>を参考に。</p>
-<pre><code>$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
+<pre tabindex="0"><code>$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
 
 $ kubectl get nodes
 NAME                            STATUS   ROLES   AGE   VERSION
@@ -199,7 +199,7 @@ aks-pool1-27450415-vmss000001   Ready    agent   38m   v1.13.5
 aks-pool1-27450415-vmss000003   Ready    agent   68s   v1.13.5
 </code></pre><p>aks-pool1-27450415-vmss000003が追加されました。余談ですが、この検証の前にNodeを増やしたり減らしたりしてるので000002が飛んで採番されています。気にせず。</p>
 <p>ではPodの様子を見てみましょう。</p>
-<pre><code>$ kubectl get po -o wide
+<pre tabindex="0"><code>$ kubectl get po -o wide
 NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
 nginx-6d4df4db7b-cqrkl   1/1     Running   0          5m39s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-dg267   1/1     Running   0          5m39s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
@@ -208,7 +208,7 @@ nginx-6d4df4db7b-kxmml   1/1     Running   0          5m39s   10.240.0.11   aks-
 <h3 id="descheduler用のリソースを作る">Descheduler用のリソースを作る</h3>
 <p>それではDeschedulerを作る準備を。手順は今後変化すると思うので、試す場合は都度<a href="https://github.com/kubernetes-incubator/descheduler/tree/master">プロジェクトのREADME</a>を確認してください。</p>
 <p>わたしはDescheduler動かすのに必要なリソースを、descheduler.yamlにまとめています。</p>
-<pre><code>kind: ClusterRole
+<pre tabindex="0"><code>kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: descheduler-cluster-role
@@ -270,10 +270,10 @@ metadata:
   namespace: kube-system
 </code></pre><p>Dechedulerのポリシーは、プロジェクトページのexamplesに<a href="https://github.com/kubernetes-incubator/descheduler/blob/master/examples/policy.yaml">あるもののまま</a>としました。先ほど用意したクラスターでは、aks-pool1-27450415-vmss000000にレプリカが2つ寄っているので、RemoveDuplicatesが適用されると期待できます。</p>
 <p>では作ります。</p>
-<pre><code>$ kubectl apply -f descheduler.yaml
+<pre tabindex="0"><code>$ kubectl apply -f descheduler.yaml
 </code></pre><h3 id="descheduler-jobを実行">Descheduler Jobを実行</h3>
 <p>descheduler-job.yamlとします。imageの確認をお忘れなく。</p>
-<pre><code>apiVersion: batch/v1
+<pre tabindex="0"><code>apiVersion: batch/v1
 kind: Job
 metadata:
   name: descheduler-job
@@ -301,12 +301,12 @@ spec:
           configMap:
             name: descheduler-policy-configmap
 </code></pre><p>いざ実行。</p>
-<pre><code>$ kubectl apply -f descheduler-job.yaml
+<pre tabindex="0"><code>$ kubectl apply -f descheduler-job.yaml
 $ kubectl get jobs.batch -n kube-system
 NAME              COMPLETIONS   DURATION   AGE
 descheduler-job   1/1           9s         11s
 </code></pre><p>さて、偏りは解消したでしょうか。</p>
-<pre><code>$ kubectl get po -o wide
+<pre tabindex="0"><code>$ kubectl get po -o wide
 NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
 nginx-6d4df4db7b-cqrkl   1/1     Running   0          15m     10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
 nginx-6d4df4db7b-dg267   1/1     Running   0          15m     10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;

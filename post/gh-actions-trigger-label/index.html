@@ -129,7 +129,7 @@ name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: A
 <p>そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。</p>
 <h2 id="ワークフロー例">ワークフロー例</h2>
 <p>以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">name</span>: <span style="color:#ae81ff">gh-actions-trigger-labeled</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">name</span>: <span style="color:#ae81ff">gh-actions-trigger-labeled</span>
 
 <span style="color:#f92672">on</span>:
   <span style="color:#f92672">issues</span>:

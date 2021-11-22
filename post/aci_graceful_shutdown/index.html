@@ -158,7 +158,7 @@ package main import ( &quot;log&quot; &quot;os&quot; &quot;os/signal&quot; &quot
 <p>Docker APIを触れる環境であれば、docker run時に<a href="https://docs.docker.com/engine/reference/run/#specify-an-init-process">&ndash;initオプション</a>をつければ擬似init(<a href="https://github.com/krallin/tini">tini</a>)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。</p>
 <h2 id="それぞれのやり方と動き">それぞれのやり方と動き</h2>
 <p>ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
 	&quot;log&quot;
@@ -186,9 +186,9 @@ func main() {
 </code></pre><p>SIGTERMかSIGQUITを受け取ったら、受け取ったシグナルの種類をログに書いて終了します。</p>
 <h3 id="sigtermを意識できていない場合">SIGTERMを意識できていない場合</h3>
 <p>まずは何もしなかった時の動きを見るため、SIGTERMを無視するようにアプリを書き換えます。</p>
-<pre><code>signal.Notify(sigs, syscall.SIGQUIT)
+<pre tabindex="0"><code>signal.Notify(sigs, syscall.SIGQUIT)
 </code></pre><p>以下のDockerfileでコンテナーをビルドします。終わったらレジストリにpushしておきます。</p>
-<pre><code>ARG GO_VERSION=1.12.6
+<pre tabindex="0"><code>ARG GO_VERSION=1.12.6
 FROM golang:${GO_VERSION}-alpine AS build-stage
 RUN apk add --no-cache git
 WORKDIR /src
@@ -201,55 +201,55 @@ FROM alpine:3.9
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
 </code></pre><p>ではACIにデプロイしましょう。コンテナー停止後もログを見たいので、Azure Monitorへログを送るオプションも指定します。</p>
-<pre><code>$ az container create -g YOUR-RG -n YOUR-CONTAINER-GROUP --image YOUR-REGISTRY/handle-signal:1.0.0 --log-analytics-workspace YOUR-WORKSPACE-ID --log-analytics-workspace-key YOUR-WORKSPACE-KEY
+<pre tabindex="0"><code>$ az container create -g YOUR-RG -n YOUR-CONTAINER-GROUP --image YOUR-REGISTRY/handle-signal:1.0.0 --log-analytics-workspace YOUR-WORKSPACE-ID --log-analytics-workspace-key YOUR-WORKSPACE-KEY
 </code></pre><p>できあがったら、PIDを確認します。</p>
-<pre><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
+<pre tabindex="0"><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
 PID   USER     TIME  COMMAND
     1 root      0:00 /goapp
    10 root      0:00 ps
 </code></pre><p>アプリがPID 1です。ではコンテナーを止めます。</p>
-<pre><code>$ az container stop -g YOUR-RG -n YOUR-CONTAINER-GROUP
+<pre tabindex="0"><code>$ az container stop -g YOUR-RG -n YOUR-CONTAINER-GROUP
 </code></pre><p>Azure Monitorに送られたログを見てみます。</p>
-<pre><code>2019/07/03 00:49:52 awaiting signal
+<pre tabindex="0"><code>2019/07/03 00:49:52 awaiting signal
 </code></pre><p>コンテナーが停止した後、待てど暮らせどこのままです。つまり送られたSIGTERMを受け取らず、SIGKILLで強制終了したと考えられます。そう書いたのですから、期待通りの動きです。</p>
 <h3 id="sigtermを処理する">SIGTERMを処理する</h3>
 <p>ではアプリをSIGTERMを受け取るように変更します。</p>
-<pre><code>	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGQUIT)
+<pre tabindex="0"><code>	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGQUIT)
 </code></pre><p>ひとつ前と同じDockerfileでビルドし、レジストリにpushします。そして、コンテナーを実行、停止します。ログはどう出力されたでしょうか。</p>
-<pre><code>2019/07/03 00:57:42 awaiting signal
+<pre tabindex="0"><code>2019/07/03 00:57:42 awaiting signal
 2019/07/03 00:59:17 terminated
 2019/07/03 00:59:17 exiting
 </code></pre><p>うまくSIGTERMを受け取れたようです。</p>
 <h3 id="擬似initを挟む">擬似initを挟む</h3>
 <p>擬似initとして、Yelpの開発した<a href="https://github.com/Yelp/dumb-init">dumb-init</a>を使ってみましょう。あとで触れますが、シグナルを変換できる優れものです。</p>
 <p>dumb-initを仕込むよう、Dockerfileを変更します。build-stageは同じです。</p>
-<pre><code>FROM alpine:3.9
+<pre tabindex="0"><code>FROM alpine:3.9
 RUN apk add --no-cache dumb-init
 ENTRYPOINT [&quot;/usr/bin/dumb-init&quot;, &quot;--&quot;]
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
 </code></pre><p>このイメージを動かすと、PIDはこのように割り当てられます。</p>
-<pre><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
+<pre tabindex="0"><code>$ az container exec -g YOUR-RG -n YOUR-CONTAINER-GROUP --exec-command ps
 PID   USER     TIME  COMMAND
     1 root      0:00 /usr/bin/dumb-init -- /goapp
     5 root      0:00 /goapp
    11 root      0:00 /bin/sh
    15 root      0:00 ps
 </code></pre><p>PID 1はdumb-initに割り当てられました。このコンテナーを停止すると、SIGTERMはdumb-initに送られます。</p>
-<pre><code>2019/07/03 01:13:36 awaiting signal
+<pre tabindex="0"><code>2019/07/03 01:13:36 awaiting signal
 2019/07/03 01:18:46 terminated
 2019/07/03 01:18:46 exiting
 </code></pre><p>そして、SIGTERMがdumb-initからアプリに伝搬されたことがわかります。</p>
 <h3 id="擬似initを挟む-シグナル変換">擬似initを挟む (シグナル変換)</h3>
 <p>自分が作るアプリであればSIGTERMを適切に扱うよう書けばいいのですが、製品やコミュニティで配布されているソフトウェアをコンテナーに入れる場合は注意が必要です。ソフトウェアによってはSIGTERMをGraceful Shutdownの合図としないものもあります。たとえば、<a href="http://nginx.org/en/docs/control.html">NGINX</a>はSIGTERMを強制終了(Fast Shutdown)のシグナルとして扱います。SIGQUITがGraceful Shutdown向けです。</p>
 <p>そのような場合は、dumb-initのシグナル変換機能が役立ちます。コンテナーのビルド時にオプションを指定します。</p>
-<pre><code>FROM alpine:3.9
+<pre tabindex="0"><code>FROM alpine:3.9
 RUN apk add --no-cache dumb-init
 ENTRYPOINT [&quot;/usr/bin/dumb-init&quot;, &quot;--rewrite&quot;, &quot;15:3&quot;, &quot;--&quot;]
 COPY --from=build-stage /goapp /
 CMD [&quot;/goapp&quot;]
 </code></pre><p>これで、docker stop時に送られるSIGTERM(15)を、SIGQUIT(3)に変換できます。ではコンテナーを動かし、止めます。</p>
-<pre><code>2019/07/03 01:19:40 awaiting signal
+<pre tabindex="0"><code>2019/07/03 01:19:40 awaiting signal
 2019/07/03 01:21:04 quit
 2019/07/03 01:21:04 exiting
 </code></pre><p>アプリは変換後のSIGQUITを受け取っています。</p>

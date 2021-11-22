@@ -155,7 +155,7 @@ OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行�
 <p>このような背景があり、Azure Monitor for containerのOMS Agentから、メトリックデータをLog Analyticsワークスペースだけでなく、Azure MonitorメトリックストアへAKSカスタムメトリックとして送れるようになりました。</p>
 <p>そこで、アラート設定のためにまずカスタムメトリックを有効化しましょう。Azure Monitorのメトリックは各リソース単位で管理されており、書き込み権限の設定が必要です。つまりAKSクラスターリソースに対し、OMS Agentからメトリックを発行できるようにロールを付与しなければいけません。</p>
 <p>サンプルではAKSクラスターをマネージドIDを使うよう設定しているので、OMS Agetアドオン向けに作成されるマネージドIDに対し、Monitoring Metrics Publisherロールを付与しています。</p>
-<pre><code>resource &quot;azurerm_role_assignment&quot; &quot;aks_metrics&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_role_assignment&quot; &quot;aks_metrics&quot; {
   scope                = azurerm_kubernetes_cluster.sample.id
   role_definition_name = &quot;Monitoring Metrics Publisher&quot;
   principal_id         = azurerm_kubernetes_cluster.sample.addon_profile.0.oms_agent.0.oms_agent_identity.0.object_id
@@ -166,7 +166,7 @@ OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行�
 <p>よって、アラートだけでなく分析にもメトリックを使いたいケースでは、Azure Monitorで設定したアラート閾値よりも、OMS Agentの送信閾値を低くします。</p>
 <p>現在、コンテナーのcpuExceededPercentage、memoryRssExceededPercentage、memoryWorkingSetExceededPercentageの送信閾値を<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts#configure-alertable-metrics-in-configmaps">変更可能</a>です。OMS AgentはConfigMapを読み込み、既定値を上書きします。</p>
 <p>下記はmemoryWorkingSetExceededPercentageを既定値の95%から80%に変更する例です。</p>
-<pre><code>resource &quot;kubernetes_config_map&quot; &quot;oms_agent&quot; {
+<pre tabindex="0"><code>resource &quot;kubernetes_config_map&quot; &quot;oms_agent&quot; {
   depends_on = [azurerm_role_assignment.aks_metrics]
   metadata {
     name      = &quot;container-azm-ms-agentconfig&quot;
@@ -192,12 +192,12 @@ EOT
 <p>なおConfigMap作成後に、やや長めですが180秒スリープさせています。カスタムメトリックが有効になるのを待つためです。カスタムメトリックがまだ有効になっていない状態で後述のアラート設定を行うと、「カスタムメトリックが見つからない」とエラーになるため、それを回避します。</p>
 <h3 id="アラート設定">アラート設定</h3>
 <p>アラートのアクショングループはクラスター作成とライフサイクルが違うケースが多いと思いますので、既存のものを読み込みます。</p>
-<pre><code>data &quot;azurerm_monitor_action_group&quot; &quot;sample&quot; {
+<pre tabindex="0"><code>data &quot;azurerm_monitor_action_group&quot; &quot;sample&quot; {
   resource_group_name = var.alert_actiongroup_rg_name
   name                = var.alert_actiongroup_name
 }
 </code></pre><p>そしてアラートの設定です。以下はOOM Killed Containersの数を頻度1分、ウインドウ5分の平均で評価し、0より大きければアラートアクションを呼び出すサンプルです。</p>
-<pre><code>resource &quot;azurerm_monitor_metric_alert&quot; &quot;aks_oom_killed_container_count&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_monitor_metric_alert&quot; &quot;aks_oom_killed_container_count&quot; {
   depends_on          = [kubernetes_config_map.oms_agent]
   name                = &quot;oomKilledContainerCount&quot;
   resource_group_name = azurerm_resource_group.sample.name

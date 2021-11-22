@@ -144,7 +144,7 @@ X-Plat CLI固有部分に絞って紹介します。
 <h3 id="ポリシー定義ファイルを作る">ポリシー定義ファイルを作る</h3>
 <p>CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。</p>
 <p>例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。</p>
-<pre><code>{
+<pre tabindex="0"><code>{
   &quot;if&quot;: {
     &quot;allOf&quot;: [
       {
@@ -164,8 +164,8 @@ X-Plat CLI固有部分に絞って紹介します。
   }
 }
 </code></pre><p>policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</p>
-<pre><code>$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
-</code></pre><pre><code>info:    Executing command policy definition create
+<pre tabindex="0"><code>$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
+</code></pre><pre tabindex="0"><code>info:    Executing command policy definition create
 + Creating policy definition deny_vmsize
 data:    PolicyName:             deny_vmsize
 data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
@@ -177,8 +177,8 @@ info:    policy definition create command OK
 </code></pre><p>できたみたいです。</p>
 <h3 id="ポリシーをアサインする">ポリシーをアサインする</h3>
 <p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
-<pre><code>$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
-</code></pre><pre><code>info:    Executing command policy assignment create
+<pre tabindex="0"><code>$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+</code></pre><pre tabindex="0"><code>info:    Executing command policy assignment create
 + Creating policy assignment deny_vmsize_assignment
 data:    PolicyAssignmentName:     deny_vmsize_assignment
 data:    Type:                     Microsoft.Authorization/policyAssignments
@@ -187,7 +187,7 @@ data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Micro
 data:    Scope:                    /subscriptions/mysubscription
 info:    policy assignment create command OK
 </code></pre><p>割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。</p>
-<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_G5
+<pre tabindex="0"><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_G5
 info:    Executing command vm quick-create
 [...snip]
 + Creating VM &quot;rppocvm&quot;
@@ -196,7 +196,7 @@ info:    Error information has been recorded to /root/.azure/azure.err
 error:   vm quick-create command failed
 </code></pre><p>拒否られました。</p>
 <p>許可されているVMサイズだと。</p>
-<pre><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_D1_v2
+<pre tabindex="0"><code>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &quot;canonical:ubuntuserver:14.04.4-LTS:latest&quot; -u &quot;adminname&quot; -p &quot;adminpass&quot; -z Standard_D1_v2
 info:    Executing command vm quick-create
 [...snip]
 info:    vm quick-create command OK

@@ -141,7 +141,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
 </ul>
 <h2 id="メインとなるhclの概説">メインとなるHCLの概説</h2>
 <p>ちょっと長いのですが、AKSに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
   name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
   resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
 }

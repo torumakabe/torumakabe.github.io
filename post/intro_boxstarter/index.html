@@ -144,17 +144,17 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
 <li>Boxstarterを導入する</li>
 </ul>
 <p>PowerShell 3以降であれば</p>
-<pre><code>. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+<pre tabindex="0"><code>. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
 </code></pre><ul>
 <li>Gist上のスクリプトを指定して実行する</li>
 </ul>
 <p>なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)</p>
-<pre><code>Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots
+<pre tabindex="0"><code>Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots
 </code></pre><p>以上。</p>
 <h2 id="サンプルスクリプト">サンプルスクリプト</h2>
 <p>スクリプトは<a href="https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac">こんな感じ</a>に書きます。</p>
 <p>ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。</p>
-<pre><code># Learn more: http://boxstarter.org/Learn/WebLauncher
+<pre tabindex="0"><code># Learn more: http://boxstarter.org/Learn/WebLauncher
 
 # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)

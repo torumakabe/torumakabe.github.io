@@ -144,7 +144,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
 <p>なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。</p>
 <h2 id="dapr-cronバインディング-実装例">Dapr Cronバインディング 実装例</h2>
 <p>では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
 <span style="color:#f92672">import</span> (
 	<span style="color:#e6db74">&#34;context&#34;</span>
@@ -212,7 +212,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
 </code></pre></div><p>では、このアプリをコンテナアプリとしてデプロイします。</p>
 <p>なお余談ですが、現状、Container AppsのデプロイはAzure CLIではなくARMテンプレートをおすすめします。CLIのcontainerapp拡張は、開発が<a href="https://github.com/MicrosoftDocs/azure-docs/issues/83785">サービスに追いついていない</a>印象です。Terraformなどサードパーティーツールのサポート状況は<a href="https://github.com/hashicorp/terraform-provider-azurerm/issues/14122">適宜確認</a>してください。</p>
 <p>ポイントだけ抜き出したARMテンプレートを以下に説明します。全体は<a href="https://gist.github.com/ToruMakabe/f08a5a1c45d40290aca8350b824cdd3d#file-dapr-json">Gist</a>を参照してください。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
 <span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
     {
         <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
@@ -254,7 +254,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
 </code></pre></div><p>おおよそ、定義は読めばわかりますね。<a href="https://docs.dapr.io/reference/components-reference/supported-bindings/cron/">Dapr Cronバインディングのcronフォーマット</a>は秒指定できる6フィールド型です。@dailyなどのマクロも使えます。この検証では、毎時0分0秒に実行するよう指定しています。</p>
 <p>なお、SIGTERMのシグナルハンドリングに3秒かかるよう設定しました。</p>
 <p>では、デプロイ後に数時間放置し、コンテナアプリを削除した後、ログを見てみましょう。</p>
-<pre><code class="language-log" data-lang="log">11/15/2021, 11:19:49.486 PM	Starting...
+<pre tabindex="0"><code class="language-log" data-lang="log">11/15/2021, 11:19:49.486 PM	Starting...
 11/15/2021, 11:19:49.827 PM	2021/11/15 23:19:33 http: superfluous response.WriteHeader call from github.com/dapr/go-sdk/service/http.(*Server).registerBaseHandler.func3 (topic.go:60)
 11/16/2021, 12:00:01.483 AM	Got cron event.
 11/16/2021, 1:00:01.335 AM	Got cron event.
@@ -267,7 +267,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
 <p>1秒ほどのオーバーヘッドはありますが、毎時0分0秒にDapr Cronバインディングから呼び出されている(Got cron event)ことがわかります。また、コンテナアプリの削除時にSIGTERMをハンドリングし、3秒待った後に正常終了(Exit)できています。</p>
 <h2 id="keda-cronスケーラを組み合わせる">KEDA Cronスケーラを組み合わせる</h2>
 <p>では次に、KEDA Cronスケーラを組み合わせた場合も見てみましょう。Daprの定義は同じです。これもポイントのみ抜き出し、全体は<a href="https://gist.github.com/ToruMakabe/f08a5a1c45d40290aca8350b824cdd3d#file-both-json">Gist</a>に置いておきます。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
 <span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
     {
         <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
@@ -305,7 +305,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
 </code></pre></div><p>scaleのminReplicasを0にし、ルールに合致しない時間にはレプリカ数をゼロにします。そして、0分0秒のDapr Cronバインディングからの呼び出しに間に合うよう、余裕をもって毎時50分にレプリカ数をdesiredReplicasで指定した1にスケールします。そして、アプリケーションの実行は10分以内に終わる、という想定で、毎時10分にスケールインします。なお、<a href="https://keda.sh/docs/2.0/scalers/cron/">KEDA Cronスケーラのcronフォーマット</a>は5フィールドです。</p>
 <p>また、SIGTERM受信後の待ち時間を長めに、60秒としました。<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/application-lifecycle-management#shutdown">SIGTERMからSIGKILLまでの猶予時間</a>がどれだけあるかを確認したいからです。Kubernetesの<a href="https://kubernetes.io/ja/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination">既定値は30秒</a>ですが、さて同じでしょうか。</p>
 <p>こちらは、デプロイ後に1時間ほど放置し、ログを見てみましょう。</p>
-<pre><code class="language-log" data-lang="log">11/15/2021, 11:21:08.265 PM	Starting...
+<pre tabindex="0"><code class="language-log" data-lang="log">11/15/2021, 11:21:08.265 PM	Starting...
 11/15/2021, 11:25:35.590 PM	Got signal. shutting down...
 11/15/2021, 11:25:36.360 PM	Waited for 1 seconds...
 11/15/2021, 11:25:37.558 PM	Waited for 2 seconds...

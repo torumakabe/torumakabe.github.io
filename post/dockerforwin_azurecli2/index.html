@@ -142,9 +142,9 @@
 <h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
 <p>ここが作業のハイライト。</p>
 <p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
-<pre><code>PS C:\Workspace\ARM&gt; code $profile
+<pre tabindex="0"><code>PS C:\Workspace\ARM&gt; code $profile
 </code></pre><p>こんなfunctionを作ります。</p>
-<pre><code>function az_cli {
+<pre tabindex="0"><code>function az_cli {
    C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
 }
 </code></pre><ul>
@@ -155,7 +155,7 @@
 <li>コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
 </ul>
 <p>ではテスト。まずはホスト側のファイルを確認。</p>
-<pre><code>PS C:\Workspace\ARM&gt; ls
+<pre tabindex="0"><code>PS C:\Workspace\ARM&gt; ls
 
 
     ディレクトリ: C:\Workspace\ARM
@@ -167,18 +167,18 @@ Mode                LastWriteTime         Length Name
 -a----       2017/02/28      8:30            374 azuredeploy.parameters.json
 </code></pre><p>いくつかのファイルがあります。</p>
 <p>コンテナを起動してみましょう。az_cli functionを呼びます。</p>
-<pre><code>PS C:\Workspace\ARM&gt; az_cli
+<pre tabindex="0"><code>PS C:\Workspace\ARM&gt; az_cli
 bash-4.3#
 </code></pre><p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
 <p>カレントディレクトリを確認。</p>
-<pre><code>bash-4.3# pwd
+<pre tabindex="0"><code>bash-4.3# pwd
 /data
 </code></pre><p>ファイル共有できているか確認。</p>
-<pre><code>bash-4.3# ls
+<pre tabindex="0"><code>bash-4.3# ls
 azuredeploy.json             azuredeploy.parameters.json
 </code></pre><p>できてますね。</p>
 <p>azコマンドが打てるか確認。</p>
-<pre><code>bash-4.3# az --version
+<pre tabindex="0"><code>bash-4.3# az --version
 azure-cli (2.0.0+dev)
 
 acr (0.1.1b4+dev)
@@ -208,7 +208,7 @@ vm (2.0.0+dev)
 Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
 [GCC 5.3.0]
 </code></pre><p>タブで補完も効きます。</p>
-<pre><code>bash-4.3# az a
+<pre tabindex="0"><code>bash-4.3# az a
 account     acr         acs         ad          appservice
 </code></pre><p>しあわせ。</p>
 

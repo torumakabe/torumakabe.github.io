@@ -157,10 +157,10 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
 <p>Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
 <p>CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。</p>
 <p>たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、</p>
-<pre><code>/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
+<pre tabindex="0"><code>/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
 </code></pre><p>とかいうやつです。いちいち調べるの、めんどくさい。</p>
 <p>そこで、AKSクラスターとLog AnalyticsのWorkspaceをdataとして定義します。</p>
-<pre><code>data &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
+<pre tabindex="0"><code>data &quot;azurerm_kubernetes_cluster&quot; &quot;aks&quot; {
   name                = &quot;${var.aks_cluster_name}&quot;
   resource_group_name = &quot;${var.aks_cluster_rg}&quot;
 }
@@ -170,7 +170,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
   resource_group_name = &quot;${var.la_workspace_rg_for_aks}&quot;
 }
 </code></pre><p>それを次のように、resource作成時に参照できます。</p>
-<pre><code>resource &quot;azurerm_monitor_diagnostic_setting&quot; &quot;aks&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_monitor_diagnostic_setting&quot; &quot;aks&quot; {
   name                       = &quot;diag_aks&quot;
   target_resource_id         = &quot;${data.azurerm_kubernetes_cluster.aks.id}&quot;
   log_analytics_workspace_id = &quot;${data.azurerm_log_analytics_workspace.aks.id}&quot;
@@ -185,7 +185,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
   }
 }
 </code></pre><p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
-<pre><code>provider &quot;kubernetes&quot; {
+<pre tabindex="0"><code>provider &quot;kubernetes&quot; {
   load_config_file       = false
   host                   = &quot;${data.azurerm_kubernetes_cluster.aks.kube_config.0.host}&quot;
   client_certificate     = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&quot;
@@ -193,7 +193,7 @@ data &quot;azurerm_log_analytics_workspace&quot; &quot;aks&quot; {
   cluster_ca_certificate = &quot;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&quot;
 }
 </code></pre><p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
-<pre><code>resource &quot;kubernetes_service_account&quot; &quot;kured&quot; {
+<pre tabindex="0"><code>resource &quot;kubernetes_service_account&quot; &quot;kured&quot; {
   metadata {
     name      = &quot;kured&quot;
     namespace = &quot;kube-system&quot;

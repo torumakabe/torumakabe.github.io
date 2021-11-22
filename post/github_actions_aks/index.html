@@ -144,7 +144,7 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
 <p>kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
 <p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
 <p>ディレクトリ構造は、こうです。</p>
-<pre><code>.
+<pre tabindex="0"><code>.
 ├── .git
 │   └── (省略)
 ├── .github
@@ -162,7 +162,7 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
 </ul>
 <h3 id="workflow">Workflow</h3>
 <p>まず、 .github/main.workflow を見てみましょう</p>
-<pre><code>workflow &quot;Deploy app to AKS&quot; {
+<pre tabindex="0"><code>workflow &quot;Deploy app to AKS&quot; {
   on = &quot;push&quot;
   resolves = [&quot;Deploy to AKS&quot;]
 }
@@ -210,7 +210,7 @@ action &quot;Deploy to AKS&quot; {
 <p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
 <p>このactionが実行されると、envの&quot;YOUR_VALUE&quot;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&ldquo;YOUR_DNS_LABEL_NAME&quot;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
 <p>アプリのパスは /dispvar です。curlしてみると。</p>
-<pre><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
+<pre tabindex="0"><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
 Hello. You set &quot;Ale&quot;
 </code></pre><h2 id="まとめ">まとめ</h2>
 <p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>

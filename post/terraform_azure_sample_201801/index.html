@@ -141,7 +141,7 @@ terraform workspace select prod みなまで言わなくても分かりますね
 <p>AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。</p>
 <p>TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。</p>
 <p>ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。</p>
-<pre><code>terraform workspace select prod
+<pre tabindex="0"><code>terraform workspace select prod
 </code></pre><p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
 <h2 id="サンプル解説">サンプル解説</h2>
 <p>サンプルは<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801">GitHub</a>に置きました。合わせてご確認ください。</p>
@@ -154,7 +154,7 @@ terraform workspace select prod みなまで言わなくても分かりますね
 </ul>
 <h3 id="リポジトリ構造">リポジトリ構造</h3>
 <p>サンプルのリポジトリ構造です。</p>
-<pre><code>├── modules
+<pre tabindex="0"><code>├── modules
 │   ├── computegroup
 │   │   ├── main.tf
 │   │   ├── os
@@ -199,36 +199,36 @@ terraform workspace select prod みなまで言わなくても分かりますね
 <h3 id="管理者向けのサービスプリンシパルを用意する">管理者向けのサービスプリンシパルを用意する</h3>
 <p>インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。</p>
 <p>もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。<a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html">Terraformのドキュメント</a>も参考に。</p>
-<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/SUBSCRIPTION_ID&quot;
+<pre tabindex="0"><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/SUBSCRIPTION_ID&quot;
 </code></pre><p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
 <p>なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go">使う</a>からです。</p>
 <p>そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが<a href="https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go">使われません</a>。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。</p>
 <p>サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも<a href="https://www.terraform.io/docs/backends/types/azurerm.html">対応できます</a>。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。</p>
 <h3 id="管理者の環境変数を設定する">管理者の環境変数を設定する</h3>
 <p>Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。</p>
-<pre><code>export ARM_SUBSCRIPTION_ID=&quot;&lt;your subscription id&gt;&quot;
+<pre tabindex="0"><code>export ARM_SUBSCRIPTION_ID=&quot;&lt;your subscription id&gt;&quot;
 export ARM_CLIENT_ID=&quot;&lt;your servicce principal appid&gt;&quot;
 export ARM_CLIENT_SECRET=&quot;&lt;your service principal password&gt;&quot;
 export ARM_TENANT_ID=&quot;&lt;your service principal tenant&gt;&quot;
 </code></pre><h3 id="workspaceを作る">Workspaceを作る</h3>
 <p>開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。</p>
-<pre><code>terraform workspace new dev
+<pre tabindex="0"><code>terraform workspace new dev
 terraform workspace new stage
 terraform workspace new prod
 </code></pre><h3 id="リソースグループを作る">リソースグループを作る</h3>
 <p>まずWorkspace別にリソースグループを作ります。</p>
-<pre><code>az group create -n tf-sample-dev-rg -l japaneast
+<pre tabindex="0"><code>az group create -n tf-sample-dev-rg -l japaneast
 az group create -n tf-sample-stage-rg -l japaneast
 az group create -n tf-sample-prod-rg -l japaneast
 </code></pre><p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
-<pre><code>data &quot;azurerm_resource_group&quot; &quot;resource_group&quot; {
+<pre tabindex="0"><code>data &quot;azurerm_resource_group&quot; &quot;resource_group&quot; {
   name = &quot;${var.resource_group_name}-${terraform.workspace}-rg&quot;
 }
 </code></pre><p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&quot;tf-sample&quot;と指定しています。</p>
 <p>次にBackend、state共有向けリソースグループを作ります。</p>
-<pre><code>az group create -n tf-sample-state-rg -l japaneast
+<pre tabindex="0"><code>az group create -n tf-sample-state-rg -l japaneast
 </code></pre><p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
-<pre><code>terraform {
+<pre tabindex="0"><code>terraform {
   backend &quot;azurerm&quot; {
     resource_group_name  = &quot;tf-sample-state-rg&quot;
     storage_account_name = &quot;&lt;your storage account name&gt;&quot;
@@ -237,7 +237,7 @@ az group create -n tf-sample-prod-rg -l japaneast
   }
 }
 </code></pre><p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
-<pre><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&quot; &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&quot;
+<pre tabindex="0"><code>az ad sp create-for-rbac --role=&quot;Contributor&quot; --scopes &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&quot; &quot;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&quot;
 </code></pre><p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
 <h3 id="backendを準備する">Backendを準備する</h3>
 <p>project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに</p>
@@ -247,7 +247,7 @@ az group create -n tf-sample-prod-rg -l japaneast
 </ul>
 <p>を作ってください。GUIでもCLIでも、お好きなやり方で。</p>
 <p>その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。</p>
-<pre><code>terraform {
+<pre tabindex="0"><code>terraform {
   backend &quot;azurerm&quot; {
     resource_group_name  = &quot;tf-sample-state-rg&quot;
     storage_account_name = &quot;&lt;your storage account name&gt;&quot;
@@ -269,20 +269,20 @@ data &quot;terraform_remote_state&quot; &quot;shared&quot; {
 </code></pre><p>これで準備完了です。</p>
 <h3 id="実行">実行</h3>
 <p>Workspaceをdevに切り替えます。</p>
-<pre><code>terraform workspace select dev
+<pre tabindex="0"><code>terraform workspace select dev
 </code></pre><p>まずは土台となるリソースを作成するsharedから。</p>
-<pre><code>cd shared
+<pre tabindex="0"><code>cd shared
 terraform init
 terraform plan
 terraform apply
 </code></pre><p>土台となるリソースが作成されたら、次はproject_aを。</p>
-<pre><code>cd ../project_a
+<pre tabindex="0"><code>cd ../project_a
 terraform init
 terraform plan
 terraform apply
 </code></pre><p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
 <p>dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。</p>
-<pre><code>terraform workspace select stage
+<pre tabindex="0"><code>terraform workspace select stage
 [以下devと同様の操作]
 </code></pre><p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
 <h2 id="参考情報">参考情報</h2>

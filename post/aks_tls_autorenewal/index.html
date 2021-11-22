@@ -135,21 +135,21 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
 <li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
 </ul>
 <p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
-<pre><code>$ helm install stable/nginx-ingress --name my-nginx
+<pre tabindex="0"><code>$ helm install stable/nginx-ingress --name my-nginx
 </code></pre><p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
-<pre><code>$ kubectl get svc
+<pre tabindex="0"><code>$ kubectl get svc
 NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
 kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
 my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
 my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
 </code></pre><p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
-<pre><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
+<pre tabindex="0"><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
 </code></pre><p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&quot;&ndash;set rbac.create=false&quot;オプションを指定しています。</p>
-<pre><code>$ git clone https://github.com/jetstack/cert-manager
+<pre tabindex="0"><code>$ git clone https://github.com/jetstack/cert-manager
 $ cd cert-manager/
 $ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
 </code></pre><p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
   name: letsencrypt-staging
@@ -168,9 +168,9 @@ spec:
 </code></pre><p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
 <p>なお、Let&rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも<a href="https://github.com/jetstack/cert-manager/pull/246">いずれ対応する見込み</a>です。</p>
 <p>では、Issuerを登録します。</p>
-<pre><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
+<pre tabindex="0"><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
 </code></pre><p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: example-com
@@ -189,9 +189,9 @@ spec:
       domains:
       - www.example.com
 </code></pre><p>証明書設定をデプロイします。</p>
-<pre><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
+<pre tabindex="0"><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
 </code></pre><p>証明書の発行状況を確認します。</p>
-<pre><code>$ kubectl describe certificate example-com
+<pre tabindex="0"><code>$ kubectl describe certificate example-com
 Name:         example-com
 Namespace:    default
 [snip]
@@ -208,7 +208,7 @@ Events:
   Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
 </code></pre><p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
 <p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
   name: letsencrypt-prod
@@ -225,9 +225,9 @@ spec:
     # Enable the HTTP-01 challenge provider
     http01: {}
 </code></pre><p>デプロイします。</p>
-<pre><code>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
+<pre tabindex="0"><code>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
 </code></pre><p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
-<pre><code>apiVersion: certmanager.k8s.io/v1alpha1
+<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: prod-example-com
@@ -246,9 +246,9 @@ spec:
       domains:
       - www.example.com
 </code></pre><p>デプロイします。</p>
-<pre><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
+<pre tabindex="0"><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
 </code></pre><p>発行状況を確認します。</p>
-<pre><code>$ kubectl describe certificate prod-example-com
+<pre tabindex="0"><code>$ kubectl describe certificate prod-example-com
 Name:         prod-example-com
 Namespace:    default
 [snip]
@@ -265,10 +265,10 @@ Events:
   Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
 </code></pre><p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
 <p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
-<pre><code>$ kubectl run nginx --image nginx --port 80
+<pre tabindex="0"><code>$ kubectl run nginx --image nginx --port 80
 $ kubectl expose deployment nginx --type NodePort
 </code></pre><p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
-<pre><code>apiVersion: extensions/v1beta1
+<pre tabindex="0"><code>apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -289,9 +289,9 @@ spec:
       - www.example.com
       secretName: prod-example-com-tls
 </code></pre><p>デプロイします。</p>
-<pre><code>$ kubectl apply -f ingress-nginx-sample.yaml
+<pre tabindex="0"><code>$ kubectl apply -f ingress-nginx-sample.yaml
 </code></pre><p>いざ確認。</p>
-<pre><code>$ curl https://www.example.com/
+<pre tabindex="0"><code>$ curl https://www.example.com/
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;

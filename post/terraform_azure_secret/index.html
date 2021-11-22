@@ -180,7 +180,7 @@
 </ol>
 <p>var.で参照している変数は、別ファイルに書いています。</p>
 <p>[main.tf]</p>
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
   name     = &quot;${var.resource_group_name}&quot;
   location = &quot;${var.resource_group_location}&quot;
 }
@@ -247,7 +247,7 @@ resource &quot;azurerm_container_group&quot; &quot;aci-todo&quot; {
 <li>k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</li>
 </ol>
 <p>[main.tf]</p>
-<pre><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
+<pre tabindex="0"><code>resource &quot;azurerm_resource_group&quot; &quot;rg&quot; {
   name     = &quot;${var.resource_group_name}&quot;
   location = &quot;${var.resource_group_location}&quot;
 }
@@ -332,7 +332,7 @@ resource &quot;kubernetes_secret&quot; &quot;cosmosdb_secret&quot; {
 </code></pre><p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
 <p>そしてアプリのデプロイ時に、登録したSecretを指定します。ここからはkubernetesワールドなので、kubectlなどを使います。マニフェストは以下のように。</p>
 <p>[todo.yaml]</p>
-<pre><code>apiVersion: apps/v1beta1
+<pre tabindex="0"><code>apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: todoapp

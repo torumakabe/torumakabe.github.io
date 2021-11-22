@@ -159,17 +159,17 @@ az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup 
 <p><a href="https://gist.github.com/ToruMakabe/e5a41dd51bc998a975a91aba148f55d9">Azure Web Appsからのアウトバウンド通信をAzure FirewallのパブリックIPに固定する</a></p>
 <p>では設定できているか、確認してみましょう。</p>
 <p>まずはAzure Firewallに割り当てたIPでインターネットに出ているかです。該当のパブリックIPアドレスを確認します。</p>
-<pre><code>az network public-ip show -g rg-webapp-ob-fw -n pip-firewall
+<pre tabindex="0"><code>az network public-ip show -g rg-webapp-ob-fw -n pip-firewall
 Name          ResourceGroup    Location    Zones    Address      AddressVersion    AllocationMethod    IdleTimeoutInMinutes    ProvisioningState
 ------------  ---------------  ----------  -------  -----------  ----------------  ------------------  ----------------------  -------------------
 pip-firewall  rg-webapp-ob-fw  japaneast            20.48.76.82  IPv4              Static              4                       Succeeded
 </code></pre><p>20.48.76.82 がAzure Firewallに割り当てたパブリックIPです。</p>
 <p>ではWeb AppsにSSHし、そこから、送信元IPアドレスを返すWebサイト <a href="http://ifconfig.io/">ifconfig.io</a> にcurlしてみます。</p>
-<pre><code>root@b48941bac7f4:/home# curl ifconfig.io
+<pre tabindex="0"><code>root@b48941bac7f4:/home# curl ifconfig.io
 20.48.76.82
 </code></pre><p>Azure Firewallに割り当てたパブリックIPでアクセスしていることが分かります。</p>
 <p>合わせて、PostgreSQLへの接続がプライベートになっているか、名前解決を確認します。</p>
-<pre><code>root@b48941bac7f4:/home# dig psql-server-tomakabe.postgres.database.azure.com
+<pre tabindex="0"><code>root@b48941bac7f4:/home# dig psql-server-tomakabe.postgres.database.azure.com
 
 ; &lt;&lt;&gt;&gt; DiG 9.10.3-P4-Debian &lt;&lt;&gt;&gt; psql-server-tomakabe.postgres.database.azure.com
 ;; global options: +cmd
