@@ -6,7 +6,7 @@
     <description>Recent content in VMSS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
+    <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
     <lastBuildDate>Mon, 26 Mar 2018 00:08:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/vmss/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>

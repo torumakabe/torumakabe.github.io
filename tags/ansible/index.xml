@@ -6,7 +6,7 @@
     <description>Recent content in Ansible on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
+    <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
     <lastBuildDate>Sun, 14 Sep 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/ansible/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>

@@ -6,7 +6,7 @@
     <description>Recent content in Storage on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; Copyright 2019 Toru Makabe</copyright>
+    <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
     <lastBuildDate>Tue, 28 Nov 2017 08:45:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/storage/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
