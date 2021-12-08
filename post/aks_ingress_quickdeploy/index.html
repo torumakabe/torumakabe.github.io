@@ -7,15 +7,7 @@
 <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら | re-imagine</title>
 
 <meta property='og:title' content='AKSのNGINX Ingress Controllerのデプロイで悩んだら - re-imagine'>
-<meta property='og:description' content='楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
-さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
-せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.'>
+<meta property='og:description' content='楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='AKS'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2018-02-10T11:00:00&#43;09:00'/><meta property='article:modified_time' content='2018-02-10T11:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

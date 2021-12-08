@@ -106,10 +106,7 @@
       <h2 class="subtitle is-6 date">March 23, 2014</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/swift-upload/">OpenStack Swiftへのファイル分割アップロード</a></h1>
       <div class="content">
-        Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら世の関心が高い話題かもしれないので、まとめておきます。
-アップロード形式は大きく3つ &ndash; そのまま、DLO、SLO  そのまま、ファイルに手を加えずにアップロードします。この場合、ファイルサイズの上限は5GBです。5GBを超えるファイルをアップロードする場合、後述のDLO、SLOどちらかの形式でファイルを分割する必要があります。 DLO(Dynamic Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。「指定のコンテナ/疑似フォルダ下にあるファイルを結合する」というルールなのでアップロード手順がシンプルです。また、後からのセグメント追加/削除が容易です。 SLO(Static Large Object)形式。ファイルを任意のサイズに分割し、Swift上で1つのファイルに見せかけます。分割セグメントファイルのハッシュ値をリストした、マニフェストファイルの作成が必要です。Swift上でハッシュのチェックが行われるため、データの完全性がDLOより高いです。また、セグメントを任意のコンテナに分散できるため、負荷分散の手段が増えます。  動きを見てみよう 環境は以下の通り。
- HP Public Cloud US-West Region Swift Clientを動かすCompute Node &ndash; standard.large / ubuntu 12.04 Swift CLI &ndash; 2.0.3 約900MBあるubuntu desktopのisoファイルをアップロード  そのままアップロード $time swift -v upload mak-cont ./ubuntu-13.10-desktop-amd64.iso --object-name non-seg.iso No handlers could be found for logger &quot;keystoneclient.httpclient&quot; non-seg.iso real	0m24.557s user	0m12.617s sys	0m11.197s  ハンドラーが無いとか怒られましたが、別事案なので気にせずにいきましょう。そのまま送ると、25秒くらい。
-$curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpcloudsvc.com/v1/fuga/mak-cont/non-seg.iso HTTP/1.1 200 OK Content-Length: 925892608 Content-Type: application/x-iso9660-image Accept-Ranges: bytes Last-Modified: Sun, 23 Mar 2014 01:16:53 GMT Etag: 21ec41563ff34da27d4a0b56f2680c4f X-Timestamp: 1395537413.
+        Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/swift-upload/" style="height:28px">
           Read more
@@ -131,17 +128,11 @@ $curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpclou
       <h2 class="subtitle is-6 date">March 16, 2014</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/cloud-and-power/">クラウド = 発電所?</a></h1>
       <div class="content">
-        思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるようになるよ、と。ふーん、そうかもなぁ。
-でも本当にそうなんでしょうか。雰囲気だけで、ちゃんと考えてない、思考停止している気がしています。
-本当に発電は大規模発電所任せ? 最近CMでよく見ますが、エネファームってご存じですか。これ、ざっくり言うと戸別の発電所じゃないでしょうか。エネルギーは、使うところの近くで作った方が効率的なので、こういう仕組みが出てきたんでしょうね。
-戸別の発電は、将来的には燃料電池など新しい技術も使われて、さらに普及するんじゃないでしょうか。使う人の近くで、その使い方に合わせて発電した方が、合理的ですものね。
-オンプレIT基盤は無くなる? で、クラウドの話です。オンプレミスのIT基盤は無くなって、全部クラウドに移ってしまうのでしょうか。でも、もしその考えが「発電所のように」という根拠であれば、「従来の」という前提が要ります。なぜなら、発電の仕組みも進化しているので。エネファームのように。
-ネットワーク遅延を考えれば、処理する場所の近くにデータがあったほうがいいですよね。利用者みんなが、クラウドが動くデータセンターの近くにいるわけではないので。
-また、発電所は、ピークに合わせて設備投資をしています。いっぽうで、いざというとき、あなたの契約しているクラウドは、契約者全員が使えるだけの能力を供給できるでしょうか。ピークに合わせて設備投資しているでしょうか。そもそもピークをどう定義しているでしょうか。災害時にそれを期待した利用者の需要で、パンクしないでしょうか。
-そのインフラ知識は捨てないほうがいい 発電の世界で燃料電池が期待されているように、ITの世界でも不揮発性メモリなど、その使い方が大きく変わるイノベーションの種が研究開発されています。普段は電源を切っておいて、処理するときだけ瞬時に起動、処理、また停止するようなコンピュータ。家とかオフィスに置きたくないですか。性能的にも経済的にもリスク管理的にも、合理的かもしれませんよ。
-そして、その設備ではリソースが足りない、読めない、あまり使わないものはクラウドに置き、動かせばいいのではないかと思います。あと、クラウドのほうが、いいものをすぐに使える場合。SaaSとか。
-「未来はどっちだ」という白か黒かの議論をして、どちらかと心中する必要はありません。どっちも使えばいいです。かっこいい言い方をすると、ハイブリッドです。
-なので、「クラウド時代に自分で基盤作ることなんてなくなるから、インフラの知識はもう要らないよね」とか言って、せっかく身につけたハードウェア、ITインフラの知識は、捨てるどころか磨いた方がいいですよ。知識は荷物になりません、あなたを守る懐刀。
+        思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるように
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/cloud-and-power/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>
@@ -163,11 +154,11 @@ $curl -H &quot;X-Auth-Token: hoge&quot; -I https://region-a.geo-1.objects.hpclou
       <h2 class="subtitle is-6 date">February 2, 2014</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/transparency-is-noisy/">Transparency is Noisy</a></h1>
       <div class="content">
-        雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。
-いっぽうで、みなで仕様を議論し、期限を定めて開発する。その過程を公開。こっちは有言実行。
-有言実行は、叩かれやすいんです。雑音も多く生まれます。でもそれは、オープンである裏返し。
-答えを出すのは、ユーザーとデベロッパーです。安全地帯にいる、外野ではありません。
-元記事は、ここ。
+        雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。 いっぽうで、みなで仕様を議論し、期限を定めて開発する。
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/transparency-is-noisy/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>

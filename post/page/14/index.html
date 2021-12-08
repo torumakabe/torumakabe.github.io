@@ -105,29 +105,7 @@
       <h2 class="subtitle is-6 date">January 6, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_idempotent/">Azure ARM Templateによるデプロイと冪等性</a></h1>
       <div class="content">
-        宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です。これまで可読性や再利用性を犠牲にしたシェル芸になりがちだったデプロイの世界。それがいま、あるべき姿を定義しその状態に収束させるように、また、何度ツールを実行しても同じ結果が得られるように変わってきています。
-さて、そんな時流に飛び込んできたデプロイ手法があります。AzureのARM(Azure Resource Manager) Templateによるデプロイです。ARMはAzureのリソース管理の仕組みですが、そのARMに対し、構成を宣言的に書いたJSONを食わせて環境を構築する手法です。Azureの標準機能として、提供されています。
-Azure リソース マネージャーの概要  &ldquo;ソリューションを開発のライフサイクル全体で繰り返しデプロイできます。また、常にリソースが一貫した状態でデプロイされます&rdquo;
-  &ldquo;宣言型のテンプレートを利用し、デプロイメントを定義できます&rdquo;
- 冪等と言い切ってはいませんが、目的は似ています。
-なるほど、期待十分。ではあるのですが、冪等性の実現は簡単ではありません。たとえばChefやAnsibleも、冪等性はリソースやモジュール側で考慮する必要があります。多様なリソースの違いを吸収しなければいけないので、仕方ありません。魔法じゃないです。その辺を理解して使わないと、ハマります。
-残念ながらARMは成長が著しく、情報が多くありません。そこで、今回は実行結果を元に、冪等さ加減を理解していきましょう。
-増分デプロイと完全デプロイ まず、デプロイのコマンド例を見ていきましょう。今回はPowerShellを使いますが、Mac/Linux/Winで使えるクロスプラットフォームCLIもあります。
-PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -TemplateFile .\azuredeploy.json -TemplateParameterFile .\azuredeploy.parameters.json  ワンライナーです。これだけで環境ができあがります。-TemplateFileでリソース定義を記述したJSONファイルを指定します。また、-TemplateParameterFileにパラメータを外だしできます。
-今回は冪等さがテーマであるため詳細は省きます。関心のあるかたは、別途ドキュメントで確認してください。
-さて、ワンライナーで環境ができあがるわけですが、その後が重要です。環境変更の際にJSONで定義を変更し、同じコマンドを再投入したとしても、破たんなく使えなければ冪等とは言えません。
-コマンド投入には2つのモードがあります。増分(Incremental)と完全(Complete)です。まずは増分から見ていきましょう。
- ・リソース グループに存在するが、テンプレートに指定されていないリソースを変更せず、そのまま残します
-  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
- すでに存在するリソースには手を入れず、JSONへ新たに追加されたリソースのみを追加します。
-いっぽうで、完全モードです。
- ・リソース グループに存在するが、テンプレートに指定されていないリソースを削除します
-  ・テンプレートに指定されているが、リソース グループに存在しないリソースを追加します
-  ・テンプレートに定義されている同じ条件でリソース グループに存在するリソースを再プロビジョニングしません
- 2、3番目は増分と同じです。1番目が違います。JSONから定義を消されたリソースを削除するかどうかが、ポイントです。完全モードはスッキリするけどリスクも高そう、そんな印象を受けるのはわたしだけではないでしょう。
-動きをつかむ では動きを見ていきましょう。テンプレートはGithubに公開されているVery simple deployment of an Linux VMを使います。詳細は説明しませんので、読み進める前にリソース定義テンプレートファイル(azuredeploy.json)をリンク先でざっと確認してください。
-パラメータファイル(azuredeploy.parameters.json)は以下とします。
+        宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_idempotent/" style="height:28px">
           Read more
@@ -155,23 +133,7 @@ PS C:\&gt; New-AzureRmResourceGroupDeployment -ResourceGroupName YourRGName -Tem
       <h2 class="subtitle is-6 date">December 19, 2015</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_openstack_swarm/">OpenStackとAzureにDocker Swarmをかぶせてみた</a></h1>
       <div class="content">
-        どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
-OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
-さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
-乗るしかないこのDockerウェーブに どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。
-ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。
-条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。
-あと、当然ですが個人で気軽にオンラインで契約できることも条件です。
-そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&ldquo;このは&rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
-では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
-今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
-ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1    ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
-いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
-Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
-$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem Conoha向けにOpenStack関連の環境変数をセットします。
-$ export OS_USERNAME=yourname$ export OS_TENANT_NAME=yourtenantname$ export OS_PASSWORD=yourpass$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0 次はローカルコンテナ環境を整えます。
-Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
-$ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env local)&quot;$ docker run swarm create Status: Downloaded newer image for swarm:latesttokentokentokentoken このトークンは控えておきましょう。
+        どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。 OpenStackの最前線から離れて3か月がたちました。OpenStackつ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_openstack_swarm/" style="height:28px">
           Read more
@@ -197,18 +159,11 @@ $ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env lo
       <h2 class="subtitle is-6 date">November 5, 2015</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_docker_extension/">Azure Docker VM Extensionを使う3つの理由</a></h1>
       <div class="content">
-        まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると思いますが、ひとつよろしくお願いします。Microsoftテクノロジーとオープンソースの間あたりを、積極的にこすっていく所存です。
-もちろん、技術者個人として、中立的に、公開できるネタを書きます。
-AzureはMicrosoftテクノロジーとオープンソースの交差点です。できないと思っていたことが、実はできたりします。いまだに「AzureでLinux動くのね、知らなかった」と言われたり。また、その逆もしかり。SDKが色々あるからできると思っていたら、制約があった、とか。
-なので、小ネタであっても、実践的な情報には価値があります。今後、公式ドキュメントでカバーされなかったり、細かすぎて伝わりづらいなことを、書いていこうかと。
-Azure Docker VM Extension を使う3つの理由 さて、今回は話題沸騰のDocker関連のネタ、Azure Docker VM Extensionについて。名前通り、Azure上でDockerをのせたVMを動かすときに便利な拡張機能です。
-このDocker VM Extension、AzureのARMテンプレートによく登場します。なんとなくおすすめっぽいです。ですが「自分でDockerをインストールするのと何が違うのよ」という疑問も、あるかと思います。実際、よく聞かれます。
-ずばり、答えはGithubのREADMEにまとまっています。この拡張機能のうれしさは、
- Docker EngineのStable最新版をインストールしてくれる Docker デーモンの起動オプションや認証まわりを設定できる (オプション)   ポートマッピング、認証まわり、Docker Registoryサーバの定義など  Docker Composeのパラメータを渡すことができる (オプション)  以上です。2と3はJSONで記述できます。要するに、毎度山ほどオプションつけてdockerコマンド打つよりは、宣言的にDockerを楽に使えますよ、ということです。必須ではありません。また、山ほどあるDockerのオプションを隅々まで網羅しているわけではありません。カバー範囲は基本的なところです。
-Dockerの環境構築、はじめはコマンドを打つことをおすすめします。オプションがいろいろあるので、その中身を理解することには意味があります。
-ですが、一度理解したあとは、かったるいことこの上ないので、この手のツールはあったほうがいいですね。
-Dockerは本家のみならずエコシステムも急激に変化しているので、まだ環境構築ツールのファイナルアンサーはないでしょう。どれを学ぶか悩ましいところです。ですが、この拡張は気軽に使えますし、依存性も低いので、おすすめです。
-なお、このDocker拡張、ARM属性で言うpublisherは&quot;Microsoft.Azure.Extensions&quot;ですが、古い&quot;MSOpenTech.Extensions&quot;を指定しているARMテンプレートがまだあったりします。拡張のインストール時に「そんなのねぇよ」と怒られたら、疑ってみてください。伝統を重んじるUSのリージョンでは動いて、Japanで動かないテンプレートでは、MSOpenTechが指定されているかもしれません。
+        まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_docker_extension/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>
@@ -226,8 +181,11 @@ Dockerは本家のみならずエコシステムも急激に変化している�
       <h2 class="subtitle is-6 date">September 20, 2015</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/migrate-to-hugo/">Hugoへ移行</a></h1>
       <div class="content">
-        JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。
-移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。
+        JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソ
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/migrate-to-hugo/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>
@@ -249,12 +207,7 @@ Dockerは本家のみならずエコシステムも急激に変化している�
       <h2 class="subtitle is-6 date">April 4, 2015</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/">いきなり Terraform OpenStack Provider</a></h1>
       <div class="content">
-        Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされました。
-小さくはじめましょう この手のツールを試すときは、はじめから欲張ると苦労します。最小限の設定でひとまず動かすとクイックに幸せが訪れます。目標は10分。
-テストした環境  Terraform 0.4 Mac OS 10.10.2 HP Helion Public Cloud  OpenStackerのみだしなみ、環境変数 下記、環境変数はセットされてますよね。要確認。
- OS_AUTH_URL OS_USERNAME OS_PASSWORD OS_REGION_NAME OS_TENANT_NAME  最小限の構成ファイル  これだけ。Providerの設定は書かなくていいです。Terraformは環境変数を見に行きます。Resource部は、最小限ということで、まずはインスタンスを起動し、Floating IPをつけるとこまで持っていきましょう。
-さあ実行 まずはterraform planコマンドで、実行計画を確認します。
-$ terraform plan Refreshing Terraform state prior to plan... The Terraform execution plan has been generated and is shown below. Resources are shown in alphabetical order for quick scanning. Green resources will be created (or destroyed and then created if an existing resource exists), yellow resources are being changed in-place, and red resources will be destroyed.
+        Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされま
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform-openstack-minimum/" style="height:28px">
           Read more

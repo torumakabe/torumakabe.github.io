@@ -107,24 +107,7 @@
       <h2 class="subtitle is-6 date">March 30, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_msi_terraform/">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</a></h1>
       <div class="content">
-        TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けはこの資料も参考に。
-さて、先日Azure MarketplaceからTerraform入りの仮想マシンをプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。
- Terraform (latest) Azure CLI 2.0 Managed Service Identity (MSI) VM Extension Unzip JQ apt-transport-https  いろいろセットアップしてくれるのでしみじみ便利なのですが、ポイントはManaged Service Identity (MSI)です。
-シークレットをコードにベタ書きする問題 MSIの何がうれしいいのでしょう。分かりやすい例を挙げると「GitHubにシークレットを書いたコードをpushする、お漏らし事案」を避ける仕組みです。もちそんそれだけではありませんが。
-Azure リソースの管理対象サービス ID (MSI)
-詳細の説明は公式ドキュメントに譲りますが、ざっくり説明すると
-アプリに認証・認可用のシークレットを書かなくても、アプリの動く仮想マシン上にあるローカルエンドポイントにアクセスすると、Azureのサービスを使うためのトークンが得られるよ
-です。
-GitHub上に疑わしいシークレットがないかスキャンする取り組みもはじまっているのですが、できればお世話になりなくない。MSIを活用しましょう。
-TerraformはMSIに対応している TerraformでAzureのリソースをプロビジョニングするには、もちろん認証・認可が必要です。従来はサービスプリンシパルを作成し、そのIDやシークレットをTerraformの実行環境に配布していました。でも、できれば配布したくないですよね。実行環境を特定の仮想マシンに限定し、MSIを使えば、解決できます。
-ところでMSIを使うには、ローカルエンドポイントにトークンを取りに行くよう、アプリを作らなければいけません。
-Authenticating to Azure Resource Manager using Managed Service Identity
-Terraformは対応済みです。環境変数 ARM_USE_MSI をtrueにしてTerraformを実行すればOK。
-試してみよう 実は、すでに使い方を解説した公式ドキュメントがあります。
-Azure Marketplace イメージを使用して管理対象サービス ID を使用する Terraform Linux 仮想マシンを作成する
-手順は十分なのですが、理解を深めるための補足情報が、もうちょっと欲しいところです。なので補ってみましょう。
-MarketplaceからTerraform入り仮想マシンを作る まず、Marketplaceからのデプロイでどんな仮想マシンが作られたのか、気になります。デプロイに利用されたテンプレートをのぞいてみましょう。注目は以下3つのリソースです。抜き出します。
- MSI VM拡張の導入 VMに対してリソースグループスコープでContributorロールを割り当て スクリプト実行 VM拡張でTerraform関連のプロビジョニング  [snip] { &quot;type&quot;: &quot;Microsoft.
+        TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_msi_terraform/" style="height:28px">
           Read more

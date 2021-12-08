@@ -14,8 +14,7 @@
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli2/</guid>
-      <description>Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始に合わせて書いています。
-動機  Docker for Windows、もっと活用しようぜ がんがんアップデートされるAzure CLI2.0をいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい WindowsでPythonのバージョン管理するのつらくないですか? コンテナで解決しましょう ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;az_cli&amp;rdquo; を作る &amp;ldquo;az_cli&amp;quot;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです モードをLinuxにします。タスクトレイのdockerアイコンを右クリック [Switch to Linux containers] ドライブ共有をお忘れなく。 タスクトレイのdockerアイコンを右クリック [settings] &amp;gt; [Shared Drives]   PowerShell functionを作成  のちほど詳しく    PowerShellのfunctionを作る ここが作業のハイライト。</description>
+      <description>Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始</description>
     </item>
     
     <item>
@@ -24,9 +23,7 @@
       <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli/</guid>
-      <description>舌の根の乾かぬ内に 最近、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い。
-動機  Docker for Windows(on Client Hyper-V)のベータが一般開放された Dockerもそうだが、Hyper-V前提のツールが今後増えそう、となると、それとぶつかるVirtualBoxをぼちぼちやめたい 月一ペースでアップデートされるAzure CLIをいちいちインストールしたくない、コンテナ引っ張って以上、にしたい 開発端末の環境を汚したくない、いつでもきれいに作り直せるようにしたい ○○レスって言ってみたかった  やり口  もちろんDocker for Windows (on Client Hyper-V) を使う いちいちdocker run&amp;hellip;と打たなくていいよう、エイリアス的にPowerShellのfunction &amp;ldquo;azure_cli&amp;rdquo; を作る &amp;ldquo;azure_cli&amp;quot;入力にてAzure CLIコンテナを起動 コンテナとホスト(Windows)間でファイル共有、ホスト側のIDEなりエディタを使えるようにする  作業の中身  Docker for Windowsをインストール  64bit Windows 10 Pro/Enterprise/Education 1511以降に対応 Hyper-Vの有効化を忘れずに Hyper-VとぶつかるVirtualBoxとはお別れです Docker for Windowsの起動時にIPをとれないケースがありますが、その場合はsettings -&amp;gt; Network から、設定変えずにApplyしてみてください。いまのところこれで対処できています。この辺はベータなので今後の調整を期待しましょう。 共有ドライブも共有が外れていることが。settings -&amp;gt; Shared Drives で共有しなおしてください。   PowerShell functionを作成  のちほど詳しく    PowerShellのfunctionを作る ここが作業のハイライト。
-PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。Azure Resource Manager TemplateやDockerむけextensionがあります。</description>
+      <description>舌の根の乾かぬ内に 最近、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い</description>
     </item>
     
   </channel>

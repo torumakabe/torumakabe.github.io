@@ -7,10 +7,7 @@
 <title>Azure Blob アップローダーをGoで書いた、そしてその理由 | re-imagine</title>
 
 <meta property='og:title' content='Azure Blob アップローダーをGoで書いた、そしてその理由 - re-imagine'>
-<meta property='og:description' content='Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。
-ひとつめの理由: SDKが新しくなったから 最近公式ブログで紹介された通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。
-ということで、新しいSDKで書いてみたかった、というのがひとつめの理由です。ローカルにあるファイルを読んでBlobにアップロードするコードは、こんな感じ。
-(2018/6/17) 更新  SDKバージョンを 2017-07-29 へ変更 関数 UploadStreamToBlockBlob を UploadFileToBlockBlob に変更 Parallelism オプションを追加 ヘルパー関数 handleErrors を追加  package main import ( &quot;context&quot; &quot;flag&quot; &quot;fmt&quot; &quot;log&quot; &quot;net/url&quot; &quot;os&quot; &quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot; ) var ( accountName string accountKey string containerName string fileName string blockSize int64 blockSizeBytes int64 parallelism int64 ) func init() { flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;) flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;) flag.'>
+<meta property='og:description' content='Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azblob_golang/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Golang'><meta property='article:tag' content='Storage'><meta property='article:published_time' content='2017-11-28T08:45:00&#43;09:00'/><meta property='article:modified_time' content='2017-11-28T08:45:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

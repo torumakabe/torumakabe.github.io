@@ -7,21 +7,7 @@
 <title>TerraformでAzure サンプル 2018/1版 | re-imagine</title>
 
 <meta property='og:title' content='TerraformでAzure サンプル 2018/1版 - re-imagine'>
-<meta property='og:description' content='サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
-インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
- BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
-チーム、複数端末での運用 BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。
-Workspaceの導入 従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。
-要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。
-Module、Terraform Module Registryの活用 TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。
-リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
-TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
-ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
-terraform workspace select prod みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
-サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
-このコードをapplyすると、以下のリソースが出来上がります。
- NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
-├── modules │ ├── computegroup │ │ ├── main.'>
+<meta property='og:description' content='サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいと'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/terraform_azure_sample_201801/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-01-08T16:30:00&#43;09:00'/><meta property='article:modified_time' content='2018-01-08T16:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

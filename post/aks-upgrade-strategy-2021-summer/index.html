@@ -7,26 +7,7 @@
 <title>Azure Kubernetes Service アップグレード戦略 2021夏版 | re-imagine</title>
 
 <meta property='og:title' content='Azure Kubernetes Service アップグレード戦略 2021夏版 - re-imagine'>
-<meta property='og:description' content='何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩和手段を整える重要性は従来から変わりませんが、負担を軽減するため、自動アップグレードの適用を意識する段階にあると考えています。
-なお、アップグレードのリスク、インパクト評価は使い手によります。「全てのアップグレードをクラスター新規作成で行う」という戦略もあれば、「インプレース中心。当たらなければどうということはない」というユーザーもいらっしゃいます。条件や方針、環境に合わせ、妥当な戦略を検討してください。
-背景 Kubernetesは2014年の初回コミットから7年経った2021年夏時点においても、活発に開発されているオープンソースソフトウェアです。バージョン1.22からリリースサイクルがおおよそ15週になり、若干落ち着きますが、それでも年間3回の大きな機能変更を意識する必要があります。たとえば、1.22ではIngressなど利用ユーザーが多いであろうAPIの廃止が予定されています。いま動いているシステム、アプリケーションが影響なくアップグレードできるか、変更が必要か、ユーザーは評価、対応しなければなりません。
-AKSは&ldquo;N-2&quot;サポートポリシーを採用しています。(N (最新リリース) - 2 (マイナー バージョン))がサポート対象なので、短期間で廃止するシステムでない限り、アップグレードは避けられません。
-AKSはアップグレード作業の負担軽減のため、クラスターのアップグレード機能を提供しています。ですが、その方式はインプレースであり、動いているクラスターに変更を加えます。ダウングレードは、できません。
-そこで、アップグレード作業のリスク緩和を目的とした
- 新規クラスターを新バージョンで作成し アプリケーションの動作確認を行った後 トラフィックを新規クラスターに向け 安定後に旧クラスターを消す  という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。
-  Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy
- IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。
-とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。
-AKSにおけるアップグレード、メンテナンスの現状整理 AKSでアップグレードやメンテナンスの対象となる要素は大きく分けて、マスターとノードです。それぞれ、Kubernetesのバージョンアップ有無で内容が異なります。
- マスター(Kubernetesバージョンアップを伴わない) マスター(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴わない)  1は、マスターコンポーネントに対するセキュリティやバグの修正パッチ、Azure連携機能の追加が主です。おおむね週次で自動的に行われており、GitHubにチェンジログが公開されています。Kubernetesのバージョンを変えず、短時間で実施されるためインパクトが小さく、気づいていないユーザーも多い印象です。アップグレードというよりは、メンテナンスです。
-このメンテナンスは、実施時間を指定できるようになりました。現時点ではプレビュー機能で制限事項もありますが、可能な限り利用者の少ない夜間に実行したい、また逆に、何か起こっても担当者がすぐに対応できる平日昼間を指定したい、などのニーズに合います。
-そして2と3は、Kubernetesのバージョンアップを伴う、影響の大きな作業です。従来、ユーザーがポータルやCLIから手動で実施する作業でしたが、アップグレードチャネルを設定することで、自動化も可能になりました。チャネル指定機能は、現時点ではプレビューです。
- 自動アップグレード チャネルを設定する
- チャネルはアップグレードのアグレッシブさに応じ、none(既定)、patch、stable、rapid、node-imageから選択できます。たとえばpatchを指定すると、バージョン1.17.7を実行しているとき、1.17.9、1.18.4、1.18.6、1.19.1が利用できる場合、クラスターは 1.17.9 に自動でアップグレードされます。
-ノードのアップグレードは、既定ではノードプールを構成するVMSSに1ノードを追加し、既存ノードをdrainして行われます。1ノードずつ行うため、プールのノード数が多い場合にアップグレードにかかる時間が長くなるおそれがありますが、サージ値の指定によって短縮できます。サージ値の増加に応じ、複数ノードでdrainが同時に行われるため、アプリケーションへの影響は考慮してください。
-なお、この自動アップグレードは、1の計画メンテナンスで指定したスケジュールを加味して実行されます。
- Using Planned Maintenance with Cluster Auto-Upgrade
- 最後に4ですが、ノード(Linux/Ubuntu、Windows)のVMイメージの更新です。AKSではおおむね週次で新規ノードイメージの公開が行われ、Kubernetesのバージョンアップとは別に適用できます。内容はチェンジログで確認できます。セキュリティ関連更新が主目的です。ノードイメージの更新にはOSカーネル関連だけでなく、Kubernetes関連コンポーネントも含まれるため、定期的に行ったほうがよいでしょう。なお、OSの自動セキュリティアップデート機能やkuredと併用できます。'>
+<meta property='og:description' content='何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2021-07-21T16:00:00&#43;09:00'/><meta property='article:modified_time' content='2021-07-21T16:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

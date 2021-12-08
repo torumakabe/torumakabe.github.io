@@ -105,26 +105,7 @@
       <h2 class="subtitle is-6 date">July 21, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/">Azure Kubernetes Service アップグレード戦略 2021夏版</a></h1>
       <div class="content">
-        何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩和手段を整える重要性は従来から変わりませんが、負担を軽減するため、自動アップグレードの適用を意識する段階にあると考えています。
-なお、アップグレードのリスク、インパクト評価は使い手によります。「全てのアップグレードをクラスター新規作成で行う」という戦略もあれば、「インプレース中心。当たらなければどうということはない」というユーザーもいらっしゃいます。条件や方針、環境に合わせ、妥当な戦略を検討してください。
-背景 Kubernetesは2014年の初回コミットから7年経った2021年夏時点においても、活発に開発されているオープンソースソフトウェアです。バージョン1.22からリリースサイクルがおおよそ15週になり、若干落ち着きますが、それでも年間3回の大きな機能変更を意識する必要があります。たとえば、1.22ではIngressなど利用ユーザーが多いであろうAPIの廃止が予定されています。いま動いているシステム、アプリケーションが影響なくアップグレードできるか、変更が必要か、ユーザーは評価、対応しなければなりません。
-AKSは&ldquo;N-2&quot;サポートポリシーを採用しています。(N (最新リリース) - 2 (マイナー バージョン))がサポート対象なので、短期間で廃止するシステムでない限り、アップグレードは避けられません。
-AKSはアップグレード作業の負担軽減のため、クラスターのアップグレード機能を提供しています。ですが、その方式はインプレースであり、動いているクラスターに変更を加えます。ダウングレードは、できません。
-そこで、アップグレード作業のリスク緩和を目的とした
- 新規クラスターを新バージョンで作成し アプリケーションの動作確認を行った後 トラフィックを新規クラスターに向け 安定後に旧クラスターを消す  という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。
-  Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy
- IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。
-とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。
-AKSにおけるアップグレード、メンテナンスの現状整理 AKSでアップグレードやメンテナンスの対象となる要素は大きく分けて、マスターとノードです。それぞれ、Kubernetesのバージョンアップ有無で内容が異なります。
- マスター(Kubernetesバージョンアップを伴わない) マスター(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴わない)  1は、マスターコンポーネントに対するセキュリティやバグの修正パッチ、Azure連携機能の追加が主です。おおむね週次で自動的に行われており、GitHubにチェンジログが公開されています。Kubernetesのバージョンを変えず、短時間で実施されるためインパクトが小さく、気づいていないユーザーも多い印象です。アップグレードというよりは、メンテナンスです。
-このメンテナンスは、実施時間を指定できるようになりました。現時点ではプレビュー機能で制限事項もありますが、可能な限り利用者の少ない夜間に実行したい、また逆に、何か起こっても担当者がすぐに対応できる平日昼間を指定したい、などのニーズに合います。
-そして2と3は、Kubernetesのバージョンアップを伴う、影響の大きな作業です。従来、ユーザーがポータルやCLIから手動で実施する作業でしたが、アップグレードチャネルを設定することで、自動化も可能になりました。チャネル指定機能は、現時点ではプレビューです。
- 自動アップグレード チャネルを設定する
- チャネルはアップグレードのアグレッシブさに応じ、none(既定)、patch、stable、rapid、node-imageから選択できます。たとえばpatchを指定すると、バージョン1.17.7を実行しているとき、1.17.9、1.18.4、1.18.6、1.19.1が利用できる場合、クラスターは 1.17.9 に自動でアップグレードされます。
-ノードのアップグレードは、既定ではノードプールを構成するVMSSに1ノードを追加し、既存ノードをdrainして行われます。1ノードずつ行うため、プールのノード数が多い場合にアップグレードにかかる時間が長くなるおそれがありますが、サージ値の指定によって短縮できます。サージ値の増加に応じ、複数ノードでdrainが同時に行われるため、アプリケーションへの影響は考慮してください。
-なお、この自動アップグレードは、1の計画メンテナンスで指定したスケジュールを加味して実行されます。
- Using Planned Maintenance with Cluster Auto-Upgrade
- 最後に4ですが、ノード(Linux/Ubuntu、Windows)のVMイメージの更新です。AKSではおおむね週次で新規ノードイメージの公開が行われ、Kubernetesのバージョンアップとは別に適用できます。内容はチェンジログで確認できます。セキュリティ関連更新が主目的です。ノードイメージの更新にはOSカーネル関連だけでなく、Kubernetes関連コンポーネントも含まれるため、定期的に行ったほうがよいでしょう。なお、OSの自動セキュリティアップデート機能やkuredと併用できます。
+        何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/" style="height:28px">
           Read more
@@ -152,14 +133,7 @@ AKSにおけるアップグレード、メンテナンスの現状整理 AKSで�
       <h2 class="subtitle is-6 date">October 6, 2020</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/">Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</a></h1>
       <div class="content">
-        何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート設定もよく使われているもので、検討の価値があります。
- Azure Monitor for containers からの推奨メトリック アラート (プレビュー)
- ドキュメントではAzure PortalとAzure Resource Managerテンプレートによる設定手順が紹介されているのですが、アラートを有効にする部分のみです。推奨メトリックアラートを既存環境で試すだけならこれでもいいのですが、いずれクラスター作成や再現時に合わせて設定したくなるはずです。そこで、Terraformでクラスター作成と同時にサクっと設定できるようにしてみましょう。
-(注)2020年10月時点のやり口です
-サンプルコードで出来ること Gistにサンプルコードを公開しました。お楽しみください。
-このサンプルコードで下記のリソース作成、設定ができます。せっかくなのでAKSとAzure Monitor for containersの組み合わせで取得、監視、分析できる他のメトリック、ログ関連の設定も入れておきました。
- AKSクラスターの作成  マネージドIDの有効化 Azure Monitor for containersの有効化  Log Analyticsワークスペースは既存を指定     AKSカスタムメトリックの有効化 推奨メトリックアラートの設定  OOM Killed Containers Average container working set memory %   マスターノードログのLog Analytics Workspaceへの転送 ログ、イベント、メトリックのライブデータ表示設定  コード解説 ポイントだけ抜き出して解説します。
-OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行権限の付与 Azure Monitor for containersは各ノードにエージェント(OMS Agent)を配布し、ログやメトリックを収集します。メトリックとして扱うデータも、まずログ形式でLog Analyticsワークスペースに送信し、その上でメトリック化やアラート作成を行います。Kustoクエリによる柔軟な指定が可能です。
+        何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/" style="height:28px">
           Read more
@@ -187,10 +161,7 @@ OMS Agent向けマネージドIDに対するAzure Monitorメトリック発行�
       <h2 class="subtitle is-6 date">May 21, 2020</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</a></h1>
       <div class="content">
-        何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
-ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。
- BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、AKSに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
-data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; { name = var.aks_cluster_name kubernetes_version = &#34;1.18.2&#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &#34;default&#34; type = &#34;VirtualMachineScaleSets&#34; enable_auto_scaling = true vnet_subnet_id = var.
+        何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/" style="height:28px">
           Read more
@@ -216,20 +187,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
       <h2 class="subtitle is-6 date">June 26, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/">Azure Kubernetes ServiceのObservabilityお試しキットを作った</a></h1>
       <div class="content">
-        何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多くなってきたので、まるっと試せるTerraform HCLとサンプルアプリを作りました。
-Gistに置いたHCLで、以下のような環境を作れます。
-動機 監視とは、ビジネスとそれを支える仕組みがどのような状態かを把握し、判断や行動につなげるものです。そして何を監視し、何をもって健全、危険と判断するかは、人や組織によります。安易にベストプラクティスを求めるものではないでしょう。
-とはいえ、コンテナー技術が本格的に普及し始めたのは最近ですし、手を動かしていない段階では、議論が発散しがちです。そこでお試しキットを作りました。AKSクラスターとサンプルアプリケーション、それらを監視するサービスとツールをまるっと試せます。
-このお試しキットは、Azureの提供するサービスとオープンソースのツールのみでまとめました。ですが、世にはいい感じのKubernetes対応ツールやサービスが多くあります。このキットであたりをつけてから、他も探ってみてください。
-視点 クラウド、コンテナー、サーバーレスの監視という文脈で、可観測性(Observability)という言葉を目にすることが多くなりました。オブザーバビブベボ、いまだに口が回りません。
-制御理論用語である可観測性がITの世界で使われるようになった理由は、諸説あるようです。監視を行為とすると、可観測性は性質です。「監視対象側に、状態を把握しやすくする仕組みを備えよう」というニュアンスを感じませんか。後付けではなく、監視をあらかじめ考慮したうえでアプリや基盤を作ろう、ということだと捉えています。いわゆるバズワードかもしれませんが、監視を考え直すいいきっかけになりそうで、わたしは好意的です。
-お試しキットは、3つの要素と2つの配置を意識して作りました。
-メトリクス、ロギング、トレーシング 可観測性の3大要素はメトリクス、ロギング、トレーシングです。お試しキットのサービスやツールがどれにあたるかは、つど説明します。
-外からか、内からか Kubernetesに限りませんが「監視主体」と「監視対象」の分離は重要な検討ポイントです。監視するものと監視されるものを同じ基盤にのせると、不具合があった時、どちらがおかしくなっているかを判断できない場合があります。できれば分離して、独立性を持たせたい。
-いっぽう、監視対象の内側に仕組みを入れることで、外からは取りづらい情報を取得できたりします。外からの監視と内からの監視は排他ではないので、組み合わせるのがいいでしょう。
-お試しキットの使い方 前提条件  Terraform 0.12 Bash (WSL Ubuntu 18.04とmacOS 10.14.5で検証しています) Azure CLI kubectl Helm 2.13.1 (2.14はこの問題にて保留中) AKS診断ログ機能の有効化  「注意」に記載された az feature register コマンドで機能フラグを有効する作業のみでOK Log Analyticsへの送信設定は不要です (Terraformで行います)    実行手順 Gistに置いたvariables.tfを好みの値で編集し、main.tfを同じディレクトリに置いて実行(init、plan、apply)してください。
-セットアップが完了するとサンプルアプリの公開IP(front_service_ip)とGrafanaの管理者パスワード(grafana_password)が出力されるので、控えておきましょう。
-補足  AKSクラスターのノードはVMSSとしていますが、VMSSを有効化していない場合はmain.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.typeをAvailabilitySetに変更してください AKSクラスターのノード構成は Standard_D2s_v3(2vCPU、8GBメモリ) * 3 です  main.tfのazurerm_kubernetes_cluster.aks.agent_pool_profile.vm_sizeで定義してますので、必要に応じて変更してください メモリはPrometheusが頑張ると足りなくなりがちなので、ノードあたり8GBは欲しいところです   環境を一括作成、削除する作りなので、本番で活用したい場合はライフサイクルを意識してください  Log Analyticsのワークスペース作成処理はログ保管用に分ける、など   以下の理由でTerraformがコケたら、シンプルに再実行してください  Azure ADのレプリケーションに時間がかかった場合 (サービスプリンシパルがない、不正と言われる)  azurerm_role_assignment.
+        何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多く
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_observability_trial_kit/" style="height:28px">
           Read more
@@ -255,17 +213,7 @@ Gistに置いたHCLで、以下のような環境を作れます。
       <h2 class="subtitle is-6 date">June 17, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/">Azure Kubernetes Serviceでシークレットを管理する6つの方法</a></h1>
       <div class="content">
-        何の話か Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しましょう。この記事では主にDB接続文字列やAPIキーなど、アプリケーションが必要とする、限られた人のみが扱うべき情報を「シークレット」とします。
-それぞれの仕組みには踏み込まず、どんな課題を解決するか、どのように使えるか、その効果を中心に書きます。それでもちょっと長いですがご容赦ください。
-Azure Kubernetes Serviceを題材にしますが、他のKubernetes環境でも参考になると思います。
-6つの方法 以下の6つの方法を順に説明します。
- アプリケーションに書く マニフェストに書く KubernetesのSecretにする Key Vaultで管理し、その認証情報をKubernetesのSecretにする Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity) Key Vaultで管理し、Podにボリュームとしてマウントする (FlexVolume)  アプリケーションに書く いわゆるハードコーディングです。論外、としたいところですが、何が問題なのかざっと確認しておきましょう。代表的な問題点は、次の2つです。
- アプリケーションのソースコードにアクセスできるすべての人がシークレットを知り得る シークレットの変更時、影響するすべてのソースを変更し再ビルドが必要  シークレットが平文で書かれたソースコードリポジトリをパブリックに御開帳、という分かりやすい事案だけがリスクではありません。プライベートリポジトリを使っていても、人の出入りがあるチームでの開発運用、シークレット漏洩時の変更やローテーションなどの運用を考えると、ハードコーディングは取りづらい選択肢です。
-よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。
-マニフェストに書く Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。
-apiVersion: apps/v1 kind: Deployment [snip] spec: containers: - name: getsecret image: torumakabe/getsecret:from-env env: - name: SECRET_JOKE value: &quot;Selfish sell fish.&quot; これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。
-この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。
-package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;os&quot; ) func getSecret(w http.ResponseWriter, r *http.Request) { secret := os.
+        何の話か Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しま
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_how_to_keep_secret/" style="height:28px">
           Read more
@@ -291,23 +239,7 @@ package main import ( &quot;fmt&quot; &quot;io&quot; &quot;net/http&quot; &quot;
       <h2 class="subtitle is-6 date">June 1, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/k8s_descheduler/">Kubernetes DeschedulerでPodを再配置する</a></h1>
       <div class="content">
-        何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰後など、再配置したいケースはよくあります。Deschedulerはポリシーに合ったPodをNodeから退出させる機能で、SchedulerがPodを再配置する契機を作ります。Incubatorプロジェクトなのですが、もっと知られてもいいと思ったのでこの記事を書いています。
-機能をイメージしやすいよう、実際の動きを伝えるのがこの記事の目的です。Azure Kubernetes Serviceでの実行結果を紹介しますが、他のKubernetesでも同様に動くでしょう。
-Deschedulerとは @ponde_m さんの資料がとても分かりやすいので、おすすめです。この記事を書こうと思ったきっかけでもあります。
- 図で理解する Descheduler
- これを読んでからプロジェクトのREADMEに進むと理解が進むでしょう。
- Descheduler for Kubernetes
- OpenShiftはDeschedulerをPreview Featureとして提供しているので、こちらも参考になります。
- Descheduling
- 動きを見てみよう 実行した環境はAzure Kubernetes Serviceですが、特に環境依存する要素は見当たらないので、他のKubernetesでも動くでしょう。
-Deschedulerは、Nodeの数が少ないクラスターで特に有効です。Nodeの数が少ないと、偏りも大きくなるからです。
-例えばこんなシナリオです。あるある。
- 諸事情から2Nodeで運用を開始 知らずにか忘れてか、レプリカ数3のDeploymentを作る 当たり前だけど片方のNodeに2Pod寄ってる Node追加 Podは寄りっぱなし 残念  Nodeの障害から復帰後も、同様の寄りっぱなし問題が起こります。
-では、このシナリオで動きを追ってみましょう。
-事前準備 DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、プロジェクトのREADMEを参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。
-NodeにPodを寄せる はじめのNode数は2です。
-$ kubectl get nodes NAME STATUS ROLES AGE VERSION aks-pool1-27450415-vmss000000 Ready agent 34m v1.13.5 aks-pool1-27450415-vmss000001 Ready agent 34m v1.13.5 レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。
-apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx spec: replicas: 3 selector: matchLabels: app: nginx template: metadata: labels: app: nginx spec: containers: - name: nginx image: nginx resources: requests: cpu: 500m デプロイします。
+        何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/k8s_descheduler/" style="height:28px">
           Read more
@@ -335,21 +267,7 @@ apiVersion: apps/v1 kind: Deployment metadata: name: nginx labels: app: nginx sp
       <h2 class="subtitle is-6 date">April 26, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/">作りかけのAKSクラスターにTerraformで追いプロビジョニングする</a></h1>
       <div class="content">
-        何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terraformを使って楽に入れよう、という話です。アプリのデプロイメントとは分けられる話なので、それには触れません。インフラ担当者向け。
-動機 Azure CLIやポータルを使えば、AKSクラスターを楽に作れます。加えてAzure Monitorとの連携など、多くのユーザーが必要とする機能は、作成時にオプションで導入できます。
-ですが、実際にAKSクラスターを運用するなら、他にも導入したいインフラ関連の基盤ソフトやツールが出てきます。たとえばわたしは最近、クラスターを作る度に、後追いでこんなものを入れています。
- Istio Kured (ノードOSに再起動が必要なパッチが当たった時、ローリング再起動してくれる) HelmのTiller (helm initで作ると守りが緩いので、localhostに限定したdeploymentで入れる) AKSマスターコンポーネントのログ転送設定 (Azure Diagnostics) リアルタイムコンテナーログ表示設定  kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、過渡期に多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。
-とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。今年のはじめに書いた本でも、Terraformの活用例を紹介しています。サンプルコードはこちら。
-で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。リソースのライフサイクル管理はTerraformに集約しましょう。
-そしてここからが、このエントリーの本題です。
-AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。
- Virtual Node Cluster Autoscaler (on Virtual Machine Scale Sets) Network Policy (with Calico) Pod Security Policy Multi Nodepool リアルタイムコンテナーログ表示  これらの機能に、すぐにTerraformが対応するとは限りません。たいてい、遅れてやってきます。ということは、使うなら二択です。
- Terraformの対応を待つ、貢献する Azure CLIやポータルでプレビュー機能を有効化したクラスターを作り、Terraformで追いプロビジョニングする  インパクトの大きい機能は、その価値やリスクを見極めるため、早めに検証に着手したいものです。早めに着手すれば、要否を判断したり運用に組み込む時間を確保しやすいでしょう。そしてその時、本番に近い環境を楽に作れるようにしておけば、幸せになれます。
-ということで前置きが長くなりましたが、2が今回やりたいことです。本番のクラスター運用、というよりは、検証環境のセットアップを楽に、という話です。
-意外に知られていない Terraform Data Source Terraformを使い始めるとすぐにその存在に気付くのですが、使う前には気付きにくいものがいくつかあります。その代表例がData Sourceです。ざっくりいうと、参照用のリソースです。
-Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。
-CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。
-たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、
+        何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" style="height:28px">
           Read more
@@ -377,17 +295,7 @@ CLIやポータルで作った、すでにあるリソースに対して追い�
       <h2 class="subtitle is-6 date">December 22, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></h1>
       <div class="content">
-        (注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。
- Migrating GitHub Actions from HCL syntax to YAML syntax
- GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
-GitHub Actions
-数時間、触った印象。
- GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
-Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
- KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
-コードは ここ に。
-ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.
+        (注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
           Read more
@@ -417,13 +325,7 @@ Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみま�
       <h2 class="subtitle is-6 date">March 12, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_dns/">AKSのService作成時にホスト名を付ける</a></h1>
       <div class="content">
-        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
-わたしの知る限り、2つの方法があります。
- AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
-DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
-[nginx-label.yaml]
-apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80 デプロイ。
-$ kubectl create -f nginx-label.
+        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">
           Read more
@@ -451,14 +353,7 @@ $ kubectl create -f nginx-label.
       <h2 class="subtitle is-6 date">February 11, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/">AKSのIngress TLS証明書を自動更新する</a></h1>
       <div class="content">
-        カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
-さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
-そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
- TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&rsquo;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待    なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。この記事も参考に。
-$ helm install stable/nginx-ingress --name my-nginx サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.0.0.1 &lt;none&gt; 443/TCP 79d my-nginx-nginx-ingress-controller LoadBalancer 10.
+        カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" style="height:28px">
           Read more
@@ -486,15 +381,7 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
       <h2 class="subtitle is-6 date">February 10, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></h1>
       <div class="content">
-        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
-さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
-せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.
+        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more

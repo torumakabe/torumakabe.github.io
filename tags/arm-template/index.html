@@ -107,17 +107,7 @@
       <h2 class="subtitle is-6 date">March 23, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/arm_template_managed_disk/">Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</a></h1>
       <div class="content">
-        お伝えしたいこと  ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでManaged Diskを作る時のコツ 可用性セットを意識しよう  ARMテンプレートのドキュメントが使いやすくなった docs.microsoft.com の整備にともない、ARMテンプレートのドキュメントも使いやすくなりました。ARMテンプレート使いのみなさまは https://docs.microsoft.com/ja-jp/azure/templates/ をブックマークして、サクサク調べちゃってください。
-Visual Studio CodeとAzure Resource Manager Toolsを使おう これがあまり知られてないようなのでアピールしておきます。
-コードアシストしてくれます。
-画面スクロールが必要なほどのJSONをフリーハンドで書けるほど人類は進化していないというのがわたしの見解です。ぜひご活用ください。
-Get VS Code and extension
-ARMテンプレートでManaged Diskを作る時のコツ Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。
-Managed Diskは Microsoft.Compute/disks で個別に定義できますが、省略もできます。Microsoft.Compute/virtualMachines の中に書いてしまうやり口です。
-&quot;osDisk&quot;: { &quot;name&quot;: &quot;[concat(variables('vmName'),'-md-os')]&quot;, &quot;createOption&quot;: &quot;FromImage&quot;, &quot;managedDisk&quot;: { &quot;storageAccountType&quot;: &quot;Standard_LRS&quot; }, &quot;diskSizeGB&quot;: 128 } こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&ldquo;managedDisk&quot;の下ではありません。おじさんちょっと悩みました。
-可用性セットを意識しよう Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。
-Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。
-参考情報:Windows Azure ストレージ: 高可用性と強い一貫性を両立する クラウド ストレージ サービス(PDF)
+        お伝えしたいこと ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでMana
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/arm_template_managed_disk/" style="height:28px">
           Read more

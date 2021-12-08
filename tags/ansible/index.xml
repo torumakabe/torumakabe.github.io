@@ -14,18 +14,7 @@
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/openstack-tools/</guid>
-      <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。
-なぜ必要か? いけてるOpenStackerは、相手にするOpenStack環境がオンプレであろうがパブリッククラウドであろうが、すぐにコマンド叩いて「なるほどこの環境は。。。ニヤリ」とできるものです。そういうものです。
-やりたいこと  OpenStack CLIなどのツールを詰め込んだ環境を、必要な時に、すぐ使いたい・作りたい Windows、Macどちらでも同様の環境にしたい 相手にするOpenStackがオンプレでも、パブリッククラウドでも、また、ツールがぶら下がっているネットワーク環境の違いも、設定やスクリプトで吸収 Windows、Mac環境を汚さない、また、汚されない コマンド2、3発程度で、気軽に作って消せる VMできたらすぐログイン、即OpenStack CLIが使える  方針  OpenStackの各種ツールを動かすOSはLinuxとし、VM上に作る VagrantでWindows/Macの違いを吸収する VMイメージをこねくり回さず、常にまっさらなベースOSに対し構成管理ツールでプロビジョニングを行う 構成管理ツールはAnsibleを使う(本を買ったので、使いたかっただけ)  前提条件  Windows 8.1 &amp;amp; VMware Worksation 10.0.3 OSX 10.9.4 &amp;amp; VirtualBox 4.3.16 Vagrant 1.6.5 (VMware用ライセンス買いました) ひとまずOpenStack CLIを使えるところまで作る  ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
-  VMwareとVirtualBoxでなるべく環境を合わせるため、opscodeのBentoで、事前にboxファイルを作ってます。ubuntu14.04としました。
-  実行ディレクトリにprovision.shを置きます。
-  provision.shでubuntuへansibleをインストールし、追って入れたてホヤホヤのansibleで環境を整えます。
-  実行ディレクトリ内のansibleディレクトリに、ansibleのplaybook(site.yml)と変数定義ファイル(vars/env.yml)を置きます。
-  hostsファイルには以下のようにlocalhostを定義します。
-[localhost]
-127.0.0.1 ansible_connection=local
-  provision.sh解説  ansibleのインストールとplaybookの実行。playbookの実行が回りくどい感じなのは、Vagrantのフォルダ同期機能でパーミッションが正しく設定できなかったゆえのワークアラウンドです。
-playbook(site.yml)解説    varsディレクトリ配下に、環境変数を定義したenv.</description>
+      <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。 なぜ必要か? いけてるOpenS</description>
     </item>
     
   </channel>

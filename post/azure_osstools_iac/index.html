@@ -7,13 +7,7 @@
 <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化 | re-imagine</title>
 
 <meta property='og:title' content='VagrantとDockerによるAzure向けOSS開発・管理端末のコード化 - re-imagine'>
-<meta property='og:description' content='端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようという話です。結論から書くと、VagrantとDockerを活かします。超絶便利なのにAzure界隈ではあまり使われてない印象。もっと使われていいのではと思い、書いております。
-解決したい課題 こんな悩みを解決します。
- WindowsでOSS開発環境、Azure管理ツールのセットアップをするのがめんどくさい WindowsもMacも使っているので、どちらでも同じ環境を作りたい サーバはLinuxなので手元にもLinux環境欲しいけど、Linuxデスクトップはノーサンキュー 2016年にもなって長いコードをVimとかEmacsで書きたくない Hyper-VとかVirtualboxで仮想マシンのセットアップと起動、後片付けをGUIでするのがいちいちめんどくさい 仮想マシン起動したあとにターミナル起動-&gt;IP指定-&gt;ID/Passでログインとか、かったるい Azure CLIやTerraformなどクラウド管理ツールの進化が頻繁でつらい(月一回アップデートとか) でもアップデートのたびに超絶便利機能が追加されたりするので、なるべく追いかけたい 新メンバーがチームに入るたび、セットアップが大変 不思議とパソコンが生えてくる部屋に住んでおり、セットアップが大変 毎度作業のどこかが抜ける、漏れる、間違う 人間だもの  やり口 VagrantとDockerで解決します。
- Windows/Macどちらにも対応しているVirtualboxでLinux仮想マシンを作る Vagrantでセットアップを自動化する Vagrantfile(RubyベースのDSL)でシンプルに環境をコード化する Vagrant Puttyプラグインを使って、Windowsでもsshログインを簡素化する 公式dockerイメージがあるツールは、インストールせずコンテナを引っ張る Windows/MacのいまどきなIDEなりエディタを使えるようにする  セットアップ概要 簡単す。
- Virtualboxをインストール Vagrantをインストール Vagrant Putty Plugin(vagrant-multi-putty)をインストール #Windowsのみ。Puttyは別途入れてください 作業フォルダを作り、Vagrant ファイルを書く  もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。
-サンプル解説 OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。
-# -*- mode: ruby -*-# vi: set ft=ruby :# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!VAGRANTFILE_API_VERSION = &quot;2&quot;$bootstrap=&lt;&lt;SCRIPT#Common toolssudo apt-get updatesudo apt-get -y install wget unzip jq#Docker Enginesudo apt-get -y install apt-transport-https ca-certificatessudo apt-get -y install linux-image-extra-$(uname -r)sudo apt-key adv --keyserver hkp://p80.'>
+<meta property='og:description' content='端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようとい'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_osstools_iac/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Vagrant'><meta property='article:tag' content='Docker'><meta property='article:published_time' content='2016-05-13T18:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-05-13T18:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

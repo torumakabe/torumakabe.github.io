@@ -107,14 +107,7 @@
       <h2 class="subtitle is-6 date">February 11, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azureblobupload_perf/">Azure Blob Upload ツール別ベンチマーク</a></h1>
       <div class="content">
-        同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。
-端末からAzureへファイルをアップロードする手段は多くあります。CLIツール、GUIツール、SDKで自作する、etc。
-そして、端末と、そのおかれている環境も多様です。Windows、Mac。有線、無線。
-で、大事なのは平行度。ブロックBlobはブロックを平行に転送する方式がとれるため、ツールが平行転送をサポートしているか? どのくらい効くのか? は重要な評価ポイントです。
-なので、どのツールがおすすめ?と聞かれても、条件抜きでズバっとは答えにくい。そしてこの質問は頻出。なのでこんな記事を書いています。
-環境と測定方式 おそらくファイルを送る、という用途でもっとも重視すべき特徴は転送時間でしょう。ではツール、環境別に転送時間を測定してみます。
-環境は以下の通り。
- Windows端末  Surface Pro 4 Core i7/16GB Memory/802.11ac 1Gbps Ethernet (USB経由) Windows 10 (1511)   Mac端末  Macbook 12inch Core M/8GB Memory/802.11ac USB-C&hellip; 有線テストは省きます El Capitan   Wi-Fiアクセスポイント/端末間帯域  100~200Mbpsでつながっています   Azureデータセンタまでの接続  日本マイクロソフトの品川オフィスから、首都圏にあるAzure Japan Eastリージョンに接続 よってWAN側の遅延、帯域ともに条件がいい   対象ツール  AzCopy v5.0.0.27 (Windowsのみ) Azure CLI v0.9.15 Azure Storage Explorer - Cross Platform GUI v0.7   転送ファイル  Ubuntu 15.
+        同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。 端
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azureblobupload_perf/" style="height:28px">
           Read more

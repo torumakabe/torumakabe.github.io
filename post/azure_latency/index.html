@@ -7,9 +7,7 @@
 <title>Azureユーザー視点のLatency測定 2017/4版 | re-imagine</title>
 
 <meta property='og:title' content='Azureユーザー視点のLatency測定 2017/4版 - re-imagine'>
-<meta property='og:description' content='関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと思います。
-せっかくなので、
- 太平洋のそれも測定しましょう Azureバックボーンを通るリージョン間通信も測りましょう  計測パターン  自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure東日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure西日本リージョン 自宅(神奈川) -&gt; OCN光 -&gt; インターネット -&gt; Azure米国西海岸リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure西日本リージョン Azure東日本リージョン -&gt; Azureバックボーン -&gt; Azure米国西海岸リージョン  もろもろの条件  遅延測定ツール  PsPing Azure各リージョンにD1_v2/Windows Server 2016仮想マシンを作成しPsPing NSGでデフォルト許可されているRDPポートへのPsPing VPN接続せず、パブリックIPへPsPing リージョン間PsPingは仮想マシンから仮想マシンへ   自宅Wi-Fi環境  802.11ac(5GHz)   自宅加入インターネット接続サービス  OCN 光 マンション 100M   OCNゲートウェイ  (ほげほげ)hodogaya.kanagawa.ocn.ne.jp 神奈川県横浜市保土ケ谷区の局舎からインターネットに出ているようです   米国リージョン  US WEST (カリフォルニア)    測定結果 1.'>
+<meta property='og:description' content='関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_latency/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Network'><meta property='article:tag' content='Latency'><meta property='article:published_time' content='2017-04-09T15:15:00&#43;09:00'/><meta property='article:modified_time' content='2017-04-09T15:15:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

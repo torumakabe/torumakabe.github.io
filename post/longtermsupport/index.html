@@ -7,20 +7,7 @@
 <title>OpenStackと長期バージョン固定 | re-imagine</title>
 
 <meta property='og:title' content='OpenStackと長期バージョン固定 - re-imagine'>
-<meta property='og:description' content='このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。
-ソフトウェア、バージョン、サポート たいていのソフトウェアには、バージョンがあります。そしてそれぞれのソフトウェアには「直近2バージョンをサポートする。ユーザーがそれよりも古いバージョンを使いたい場合、ベストエフォートで対応する。サポート対象外のバージョンで不具合対応ができるかどうかは、場合による。」なんていうポリシーがあったりします。
-進化著しいソフト、OpenStackでは OpenStackは現在、半年ごとにアップデートします。進化が早いです。そして公式サイトを見て分かるとおり、直近2バージョンがサポート対象です。ちょっと短いですね。長期サポートよりも新規開発を優先しているわけですが、「もうちょっと長くサポートしてくれんか」というのが人情でしょう。
-でも、長期バージョン固定するとどうなるか では仮に「そのバージョンがリリースされてから3年間、同じバージョンで運用する」というポリシーでクラウドを作ったとしましょう。その間に、5〜6バージョン、進化してしまうわけですが。以下、ちょっと未来の想像です。
-[とあるクラウド その1]
- (Dev) 今度のシステムでAっちゅうライブラリ使いたいんだけど、OpenStackだと、サポートがLからなんだよね。 (Ops) あー、うちの環境Jよ。 (Dev) そうすか。じゃあ他のにするわ。  使われないクラウド。悲しい。これからOpenStackに対応したアプリやライブラリ、たくさん出てきそうなのに。
-[とあるクラウド その2]
- (Ops) うちはJで3年間バージョン固定、長期サポートです!! アップデート作業のために環境を止めたりしません!! (Dev) おーいいね。決定。3年のんびりするわ。
-〜3年後〜 (Ops) 約束の3年です。長年放置したのでバージョンアップは大手術です。システム止めます!! (Dev) いやいやいやいや、アプリも運用も、そんな準備できてないし。  リスクの先送りと大噴火。「小さな変更をこまめに行い、リスクを最小化する。人もプロセスも、アプリの作りも、変化に強くなる。」という、最近のDevOpsなりCI/CDといったトレンドとは逆のやり口です。
-アップデートの仕組みに投資したほうが建設的と思う もちろん、OpenStackの開発が落ち着いてきたら、長期のバージョン固定サポートは価値が高いと思います。ただし、イノベーションを求めて活発に開発しているソフトでは、結局それはユーザーにとって不利益になるのではないでしょうか。
-それよりは、アップデーターの開発、複数コントロールプレーンの平行運用の確立、アプリや運用でも対応するなど、「変化を受け入れる」ほうが建設的なのではと考える次第です。
-最後に、最新のOpenStack User Surveyを紹介します。注目はBusiness Driverです。OpenStackを使う、動機です。
-OpenStackのBusiness Driverとして、最もユーザーが重視しているのは、&ldquo;Ability to innovate&quot;なんですよね。 あまり変化なく、3年とか5年とか、言葉は悪いですが、塩漬けで使うような従来型システムとは、優先すべきところが違うのではなかろうかと。
-メインフレームから、クライアント/サーバー、そしてWebと、テクノロジーリフレッシュの機会が、これまではありました。そろそろ、リフレッシュしてみませんか。'>
+<meta property='og:description' content='このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。 ソフトウェア、バージョン、サポート たいていのソフトウェアには'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/longtermsupport/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='OpenStack'><meta property='article:published_time' content='2014-12-09T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2014-12-09T00:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

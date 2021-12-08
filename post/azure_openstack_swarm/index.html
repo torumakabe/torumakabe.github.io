@@ -7,23 +7,7 @@
 <title>OpenStackとAzureにDocker Swarmをかぶせてみた | re-imagine</title>
 
 <meta property='og:title' content='OpenStackとAzureにDocker Swarmをかぶせてみた - re-imagine'>
-<meta property='og:description' content='どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。
-OpenStackの最前線から離れて3か月がたちました。OpenStackつながりな方にお会いするたび、マイルドなかわいがりをうけます。ほんとうにありがとうございます。仕事としては専門でなくなりましたが、ユーザ会副会長の任期はまだ残っているので、積極的にいじられに行く所存です。でも笑いながら蹴ったりするのはやめてください。
-さて、毎年参加しているOpenStack Advent Calendarですが、せっかくだからいまの専門とOpenStackを組み合わせたいと思います。ここはひとつ、OpenStackとAzureを組み合わせて何かやってみましょう。
-乗るしかないこのDockerウェーブに どうせなら注目されている技術でフュージョンしたいですね。2015年を振り返って、ビッグウェーブ感が高かったのはなんでしょう。はい、Dockerです。Dockerを使ってOpenStackとAzureを組み合わせてみます。あまり難しいことをせず、シンプルにサクッとできることを。年末ですし、「正月休みにやってみっか」というニーズにこたえます。
-ところでOpenStack環境はどうやって調達しましょう。ちょっと前までは身の回りに売るほどあったのですが。探さないといけないですね。せっかくなので日本のサービスを探してみましょう。
-条件はAPIを公開していること。じゃないと、Dockerの便利なツール群が使えません。Linuxが動くサービスであれば、Docker環境をしみじみ手作業で夜なべして作れなくもないですが、嫌ですよね。正月休みは修行じゃなくて餅食って酒飲みたい。安心してください、わかってます。人力主義では、せっかくサクサク使えるDockerが台無しです。
-あと、当然ですが個人で気軽にオンラインで契約できることも条件です。
-そうすると、ほぼ一択。Conohaです。かわいらしい座敷童の&ldquo;このは&rdquo;がイメージキャラのサービスです。作っているのは手練れなOSSANたちですが。
-では、AzureとConohaにDocker環境をサクッと作り、どちらにもサクッと同じコンテナを作る。もちろん同じCLIから。ということをしてみようと思います。
-今回大活躍するDoker Machine、Swarmの説明はしませんが、関心のある方は前佛さんの資料を参考にしてください。
-ローカル環境  Mac OS X (El Capitan)  Docker Toolbox 1.9.1    ローカル、Azure、ConohaすべてのDocker環境はDocker Machineでサクッと作ります。 また、Swarmのマスタはローカルに配置します。
-いざ実行 まず、Docker Machineにクラウドの諸設定を食わせます。
-Azure向けにサブスクリプションIDとCertファイルの場所を指定します。詳細はここを。
-$ export AZURE_SUBSCRIPTION_ID=hoge-fuga-hoge-fuga-hoge$ export AZURE_SUBSCRIPTION_CERT=~/.ssh/yourcert.pem Conoha向けにOpenStack関連の環境変数をセットします。
-$ export OS_USERNAME=yourname$ export OS_TENANT_NAME=yourtenantname$ export OS_PASSWORD=yourpass$ export OS_AUTH_URL=https://identity.tyo1.conoha.io/v2.0 次はローカルコンテナ環境を整えます。
-Swarmコンテナを起動し、ディスカバリトークンを生成します。このトークンがSwarmクラスタの識別子です。
-$ docker-machine create -d virtualbox local$ eval &quot;$(docker-machine env local)&quot;$ docker run swarm create Status: Downloaded newer image for swarm:latesttokentokentokentoken このトークンは控えておきましょう。'>
+<meta property='og:description' content='どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。 OpenStackの最前線から離れて3か月がたちました。OpenStackつ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_openstack_swarm/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='OpenStack'><meta property='article:tag' content='Docker'><meta property='article:published_time' content='2015-12-19T00:01:00&#43;09:00'/><meta property='article:modified_time' content='2015-12-19T00:01:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

@@ -14,16 +14,7 @@
       <pubDate>Tue, 01 Sep 2020 14:30:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/webapp-outbound/</guid>
-      <description>(2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるようになりました
-何の話か ここ数週で同じ相談を3件いただきました。うごめくニーズを感じ取ったので、解決策を残しておきます。
-実現したいことは 「専用型でVNetに注入できるASEではなく、マルチテナント型のWeb AppsでアウトバウンドのIPアドレスを固定したい」 です。気持ちは分かります。マルチテナント型のほうが、よりクラウドらしいですものね。やりましょう。
-(注)2020年9月時点の解決策です。Azureのネットワークは急に進化することがあるので、他の選択肢が生まれてないかをご確認ください
-実現したいこと  マルチテナント型Web Appsに複数、ランダムに割り当てられるアウトバウンド通信用IPを使うのではなく、固定IPを割り当てたい  「連携する外部サービス/システムがIPアドレスでフィルタリングしている」というケースが多い   ついでにインターネットに出ていくトラフィックのログを採っておきたい できればWeb AppsからAzureの他サービスにはプライベートネットワークで接続したい  DBとか    解決策  Web AppsのリージョンVNet統合機能を使い、アウトバウンドトラフィックをVNet上の統合用サブネットに転送します  WEBSITE_VNET_ROUTE_ALL を設定し、すべてのアウトバウンドトラフィックをVNetに向けます   統合用サブネットのデフォルトルートをAzure Firewallに向けます  Azure Firewallに割り当てたパブリックIPでインターネットに出ていきます   Azureの他サービスにはプライベートエンドポイント経由でアクセスさせます  名前解決でプライベートエンドポイントのIPが返ってくるよう、プライベートDNSゾーンを作ってリンクします    Linux Web AppにPython(Django)アプリを載せ、Azure Database for PostgreSQLに繋ぐサンプルを例にすると、こんな感じです。
- コードを見たほうがピンとくると思うので、Terraformの構成ファイルをGistに置いておきます。上記の環境が一発で作れます。
-Azure Web Appsからのアウトバウンド通信をAzure FirewallのパブリックIPに固定する
-では設定できているか、確認してみましょう。
-まずはAzure Firewallに割り当てたIPでインターネットに出ているかです。該当のパブリックIPアドレスを確認します。
-az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup Location Zones Address AddressVersion AllocationMethod IdleTimeoutInMinutes ProvisioningState ------------ --------------- ---------- ------- ----------- ---------------- ------------------ ---------------------- ------------------- pip-firewall rg-webapp-ob-fw japaneast 20.</description>
+      <description>(2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるよ</description>
     </item>
     
     <item>
@@ -32,13 +23,7 @@ az network public-ip show -g rg-webapp-ob-fw -n pip-firewall Name ResourceGroup 
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
-      <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタップリマシマシな環境ではなく、サクッと楽してコンテナを使いたい人にオススメです。
-さっそくデプロイの自動化どうすっかな、と検討している人もちらほらいらっしゃるようです。CI/CD側でビルド、テストしたコンテナをAPIなりCLIでApp Serviceにデプロイするやり口、どうしましょうか。
-まだプレビューなのでAzureも、VSTSなどCI/CD側も機能追加が今後あると思いますし、使い方がこなれてベストプラクティスが生まれるとは思いますが、アーリーアダプターなあなた向けに、現時点でできることを書いておきます。
-Azure CLI 2.0 Azure CLI 2.0に&amp;quot;appservice web config container&amp;quot;コマンドがあります。これでコンテナイメージを更新できます。
-すでにyourrepoレポジトリのyourcontainerコンテナ、タグ1.0.0がデプロイされているとします。
-$ az appservice web config container show -n yourcontainerapp -g YourRG { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.0&amp;quot; } 新ビルドのタグ1.0.1をデプロイするには、update -c オプションを使います。
-$ az appservice web config container update -n yourcontainerapp -g YourRG -c &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; { &amp;quot;DOCKER_CUSTOM_IMAGE_NAME&amp;quot;: &amp;quot;yourrepo/yourcontainer:1.0.1&amp;quot; } これで更新されます。</description>
+      <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタッ</description>
     </item>
     
   </channel>

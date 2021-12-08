@@ -7,21 +7,7 @@
 <title>Azure &amp; Terraform エラーコード429の対処法 | re-imagine</title>
 
 <meta property='og:title' content='Azure &amp; Terraform エラーコード429の対処法 - re-imagine'>
-<meta property='og:description' content='Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイが追加されました。待っていた人も多いのではないでしょうか。
-追ってHashicorp認定パートナーのクリエーションラインさんから導入・サポートサービスがアナウンスされましたし、今後AzureをTerraformでコントロールしようという需要は増えそうです。
-エラーコード429 さて、TerraformでAzureをいじっていると、下記のようなエラーに出くわすことがあります。
-Error applying plan: 1 error(s) occurred: azurerm_virtual_network.vnet1: autorest:DoErrorUnlessStatusCode 429 PUT https://management.azure.com/subscriptions/my_subscription_id/resourceGroups/mygroup/providers/Microsoft.Network/virtualnetworks/vnet1?api-version=2015-06-15 failed with 429  autorestがステータスコード429をキャッチしました。RFC上で429は&ldquo;Too many requests&quot;です。何かが多すぎたようです。
-対処法 もう一度applyしてください
-冪等性最高。冪等性なんていらない、という人もいますが、こういうときはありがたい。Terraformが作成に失敗したリソースのみ再作成します。
-背景 エラーになった背景ですが、2つの可能性があります。
- APIリクエスト数上限に達した リソースの作成や更新に時間がかかっており、Azure側で処理を中断した  1. APIリクエスト数上限に達した Azure Resource Manager APIには時間当たりのリクエスト数制限があります。読み取り 15,000/時、書き込み1,200/時です。
-Azure サブスクリプションとサービスの制限、クォータ、制約
-Terraformは扱うリソースごとにAPIをコールするので、数が多い環境で作って壊してをやると、この上限にひっかかる可能性があります。
-長期的な対処として、Terraformにリトライ/Exponential Backoffロジックなどを実装してもらうのがいいのか、このままユーザ側でシンプルにリトライすべきか、悩ましいところです。
-ひとまずプロダクトの方針は確認したいので、Issueに質問をあげておきました。
-2. リソースの作成や更新に時間がかかっており、Azure側で処理を中断した Terraform側ではエラーコードで判断するしかありませんが、Azureの監査ログで詳細が確認できます。
-わたしが経験したエラーの中に、こんなものがありました。
-Cannot proceed with operation since resource /subscriptions/GUID/resourceGroups/xxxx/providers/Microsoft.Network/networkSecurityGroups/yyy allocated to resource /subscriptions/GUID/resourceGroups/***/providers/Microsoft.Network/virtualNetworks/yyy is not in Succeeded state. Resource is in Updating state and the last operation that updated/is updating the resource is PutSecurityRuleOperation.'>
+<meta property='og:description' content='Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager Providerのリソ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_terraform_429_workaround/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Terraform'><meta property='article:tag' content='ARM'><meta property='article:published_time' content='2016-03-23T13:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-03-23T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

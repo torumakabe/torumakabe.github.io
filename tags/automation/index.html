@@ -107,17 +107,7 @@
       <h2 class="subtitle is-6 date">October 13, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/intro_boxstarter/">自動化を愛するWindows使いへ Boxstarterのすすめ</a></h1>
       <div class="content">
-        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
-でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
-Boxstarter
-わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
-Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入   設定ファイルをネットワーク経由で読み込める  Gistから   ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
- スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force  Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
-Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots 以上。
-サンプルスクリプト スクリプトはこんな感じに書きます。
-ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
-# Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.
+        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いので
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/intro_boxstarter/" style="height:28px">
           Read more
@@ -143,18 +133,7 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
       <h2 class="subtitle is-6 date">April 6, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_auditlog_alert/">Azureの監査ログアラートからWebhookの流れで楽をする</a></h1>
       <div class="content">
-        監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利な機能です。日々の運用に効きます。
-どんな風に使えるか ルールに合致した監査ログが生成された場合、メール通知とWebhookによる自動アクションができます。可能性無限大です。
-たとえば、「特定のリソースグループにVMが生成された場合、そのVMに対し強制的にログ収集エージェントをインストールし、ログを集める」なんてことができます。
-これは「生産性を上げるため、アプリ開発チームにVMの生成は委任したい。でもセキュリティなどの観点から、ログは集めておきたい」なんてインフラ担当/Opsの課題に効きます。開発チームに「VM生成時には必ず入れてね」とお願いするのも手ですが、やはり人間は忘れる生き物ですので、自動で適用できる仕組みがあるとうれしい。
-これまでは監視用のVMを立てて、「新しいVMがあるかどうか定期的にチェックして、あったらエージェントを叩き込む」なんてことをしていたわけですが、もうそのVMは不要です。定期的なチェックも要りません。アラートからアクションを実現する仕組みを、Azureがマネージドサービスとして提供します。
-実装例 例としてこんな仕組みを作ってみましょう。
- 西日本リージョンのリソースグループ&quot;dev&quot;にVMが作成されたら、自動的にメール通知とWebhookを実行 WebhookでAzure AutomationのRunbook Jobを呼び出し、OMS(Operations Management Suite)エージェントを該当のVMにインストール、接続先OMSを設定する OMSでログ分析  準備 以下の準備ができているか確認します。
- Azure Automation向けADアプリ、サービスプリンシパル作成 サービスプリンシパルへのロール割り当て Azure Automationのアカウント作成 Azure Automation Runbook実行時ログインに必要な証明書や資格情報などの資産登録 Azure Automation Runbookで使う変数資産登録 (Runbook内でGet-AutomationVariableで取得できます。暗号化もできますし、コードに含めるべきでない情報は、登録しましょう。後述のサンプルではログイン関連情報、OMS関連情報を登録しています) OMSワークスペースの作成  もしAutomationまわりの作業がはじめてであれば、下記記事を参考にしてください。とてもわかりやすい。
-勤務時間中だけ仮想マシンを動かす（スケジュールによる自動起動・停止）
-Azure Automation側の仕掛け 先にAutomationのRunbookを作ります。アラート設定をする際、RunbookのWebhook URLが必要になるので。
-ちなみにわたしは証明書を使ってログインしています。資格情報を使う場合はログインまわりのコードを読み替えてください。
-param ( [object]$WebhookData	) if ($WebhookData -ne $null) { $WebhookName = $WebhookData.WebhookName $WebhookBody = $WebhookData.RequestBody $WebhookBody = (ConvertFrom-Json -InputObject $WebhookBody) $AlertContext = [object]$WebhookBody.context $SPAppID = Get-AutomationVariable -Name 'SPAppID' $Tenant = Get-AutomationVariable -Name 'TenantID' $OMSWorkspaceId = Get-AutomationVariable -Name 'OMSWorkspaceId' $OMSWorkspaceKey = Get-AutomationVariable -Name 'OMSWorkspaceKey' $CertificationName = Get-AutomationVariable -Name 'CertificationName' $Certificate = Get-AutomationCertificate -Name $CertificationName $CertThumbprint = ($Certificate.
+        監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_auditlog_alert/" style="height:28px">
           Read more

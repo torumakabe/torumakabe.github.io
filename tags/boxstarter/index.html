@@ -107,17 +107,7 @@
       <h2 class="subtitle is-6 date">October 13, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/intro_boxstarter/">自動化を愛するWindows使いへ Boxstarterのすすめ</a></h1>
       <div class="content">
-        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
-でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
-Boxstarter
-わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
-Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入   設定ファイルをネットワーク経由で読み込める  Gistから   ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
- スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force  Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
-Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots 以上。
-サンプルスクリプト スクリプトはこんな感じに書きます。
-ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
-# Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.
+        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いので
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/intro_boxstarter/" style="height:28px">
           Read more

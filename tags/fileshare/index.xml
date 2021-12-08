@@ -14,19 +14,7 @@
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</guid>
-      <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。
-さて、これからクラウド、というお客様に、よく聞かれる質問があります。それは「NFSとかの、ファイル共有使える?」です。頻出です。クラウド頻出質問選手権では、西東京予選で毎年ベスト8入りするレベルの強豪校です。
-ですが個人的にはあまりおすすめしません。クラウドはなるべく共有部分を減らして、スケーラブルに、かつ障害の影響範囲を局所化するべき、と考えるからです。特にストレージはボトルネックや広範囲な障害の要因になりやすい。障害事例が物語ってます。その代わりにオブジェクトストレージなど、クラウド向きの機能がおすすめです。
-でも、否定はしません。アプリの作りを変えられないケースもあるかと思います。
-そこで、もしAzureでファイル共有が必要であれば、Azure File Storageを検討してみてください。Azureのマネージドサービスなので、わざわざ自分でサーバたてて運用する必要がありません。楽。
-対応プロトコルは、SMB2.1 or 3.0。LinuxからはNFSじゃなくSMBでつついてください。
-使い方は公式ドキュメントを。
-&amp;ldquo;Azure Storage での Azure CLI の使用&amp;rdquo;
-&amp;ldquo;Linux で Azure File Storage を使用する方法&amp;rdquo;
-もうちょっと情報欲しいですね。補足のためにわたしも流します。
-Azure CLIでストレージアカウントを作成し、ファイル共有を設定 ストレージアカウントを作ります。fspocは事前に作っておいたリソースグループです。
-local$ azure storage account create tomakabefspoc -l &amp;quot;Japan East&amp;quot; --type LRS -g fspoc ストレージアカウントの接続情報を確認します。必要なのはdata: connectionstring:の行にあるAccountKey=以降の文字列です。このキーを使ってshareの作成、VMからのマウントを行うので、控えておいてください。
-local$ azure storage account connectionstring show tomakabefspoc -g fspocinfo: Executing command storage account connectionstring show+ Getting storage account keysdata: connectionstring: DefaultEndpointsProtocol=https;AccountName=tomakabefspoc;AccountKey=qwertyuiopasdfghjklzxcvbnm==info: storage account connectionstring show command OK shareを作成します。share名はfspocshareとしました。</description>
+      <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。 さて、これからクラウド、というお客様に、よく聞かれる質問があり</description>
     </item>
     
   </channel>

@@ -107,13 +107,7 @@
       <h2 class="subtitle is-6 date">October 8, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/">Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</a></h1>
       <div class="content">
-        動機 焦げlogさんで、とても興味深いエントリを拝見しました。
- Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか検証してみました  確かにActive/Active構成にはスループット向上を期待したくなります。その伸びが測定されており、胸が熱くなりました。ですが、ちょっと気になったのは
- ※それと、VpnGw3 よりも VpnGw2 のほうがスループットがよかったのが一番の謎ですが…
- ここです。VPN GatewayのSKU、VpnGw3とVpnGw2には小さくない価格差があり、その基準はスループットです。ここは現状を把握しておきたいところ。すごく。
-そこで、焦げlogさんの検証パターンの他に、追加で検証しました。それは同一リージョン内での測定です。リージョン内でVPNを張るケースはまれだと思いますが、リージョンが分かれることによる
- 遅延 リージョン間通信に関するサムシング  を除き、VPN Gateway自身のスループットを測定したいからです。焦げlogさんの測定は東日本/西日本リージョン間で行われたので、その影響を確認する価値はあるかと考えました。
-検証方針  同一リージョン(東日本)に、2つのVNETを作る それぞれのVNETにVPN Gatewayを配置し、接続する 比較しやすいよう、焦げlogさんの検証と条件を合わせる  同じ仮想マシンサイズ: DS3_V2 同じストレージ: Premium Storage Managed Disk 同じOS: Ubuntu 16.04 同じツール: ntttcp 同じパラメータ: ntttcp -r -m 16,*,-t 300   送信側 VNET1 -&gt; 受信側 VNET2 のパターンに絞る スループットのポテンシャルを引き出す検証はしない  結果 VpnGW1(650Mbps)    パターン　 送信側GW構成　 受信側GW構成　 送信側スループット　 受信側スループット スループット平均 パターン1との比較     パターン1　 Act/Stb Act/Stb 677.
+        動機 焦げlogさんで、とても興味深いエントリを拝見しました。 Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/" style="height:28px">
           Read more

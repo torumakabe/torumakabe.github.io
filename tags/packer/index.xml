@@ -14,11 +14,7 @@
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
-      <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10からかな。早く言ってください。
-ansible_localと組み合わせたサンプル さっそく試してそつなく動くことを確認しました。サンプルをGithubにあげておきます。
-手の込んだ設定もできるように、Provisonerにansible_localを使うサンプルで。
-前準備  リソースグループとストレージアカウントを作っておいてください。そこにイメージが格納されます。 認証情報の類は外だしします。builder/variables.sample.jsonを参考にしてください。 Packerの構成ファイルはOSに合わせて書きます。サンプルのbuilder/ubuntu.jsonはubuntuの例です。  Azure ARM BuilderはまだWindowsに対応していません。開発中とのこと。   ansibleはapache2をインストール、サービスEnableするサンプルにしました。  サンプル ubuntu.jsonはこんな感じです。
-{ &amp;quot;variables&amp;quot;: { &amp;quot;client_id&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;client_secret&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;resource_group&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;storage_account&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;subscription_id&amp;quot;: &amp;quot;&amp;quot;, &amp;quot;tenant_id&amp;quot;: &amp;quot;&amp;quot; }, &amp;quot;builders&amp;quot;: [{ &amp;quot;type&amp;quot;: &amp;quot;azure-arm&amp;quot;, &amp;quot;client_id&amp;quot;: &amp;quot;{{user `client_id`}}&amp;quot;, &amp;quot;client_secret&amp;quot;: &amp;quot;{{user `client_secret`}}&amp;quot;, &amp;quot;resource_group_name&amp;quot;: &amp;quot;{{user `resource_group`}}&amp;quot;, &amp;quot;storage_account&amp;quot;: &amp;quot;{{user `storage_account`}}&amp;quot;, &amp;quot;subscription_id&amp;quot;: &amp;quot;{{user `subscription_id`}}&amp;quot;, &amp;quot;tenant_id&amp;quot;: &amp;quot;{{user `tenant_id`}}&amp;quot;, &amp;quot;capture_container_name&amp;quot;: &amp;quot;images&amp;quot;, &amp;quot;capture_name_prefix&amp;quot;: &amp;quot;packer&amp;quot;, &amp;quot;image_publisher&amp;quot;: &amp;quot;Canonical&amp;quot;, &amp;quot;image_offer&amp;quot;: &amp;quot;UbuntuServer&amp;quot;, &amp;quot;image_sku&amp;quot;: &amp;quot;14.04.3-LTS&amp;quot;, &amp;quot;location&amp;quot;: &amp;quot;Japan West&amp;quot;, &amp;quot;vm_size&amp;quot;: &amp;quot;Standard_D1&amp;quot; }], &amp;quot;provisioners&amp;quot;: [{ &amp;quot;type&amp;quot;: &amp;quot;shell&amp;quot;, &amp;quot;scripts&amp;quot;: [ &amp;quot;.</description>
+      <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10</description>
     </item>
     
   </channel>

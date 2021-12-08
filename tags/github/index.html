@@ -107,16 +107,11 @@
       <h2 class="subtitle is-6 date">April 2, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-healthprobe/">Azure Application Insightsのカスタム可用性テストを使って プライベートネットワーク対応の可用性テストプローブをGoで書く</a></h1>
       <div class="content">
-        何の話か 以下のサンプル(C# &amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。
- Azure Functions を使用してカスタム可用性テストを作成して実行する
- 背景 ユーザ視点でサービス、サイトの可用性を客観的に把握できている、外形監視しているケースは、意外に少なかったりします。明らかにしてしまうといろいろ問題が、という裏事情はさておき、サービスレベル維持、改善のためには客観的な根拠があったほうがいいでしょう。
-Azure Application Insightsには可用性テストやSLAレポート機能があり、視覚化や分析、レポート作成をサクッと実現できます。
-なのですが、この可用性テストのプローブがインターネット上に配置されているため、監視対象もインターネットに口を開いている必要があります。Azureの仮想ネットワークなど、プライベートネットワークにあるサイト向けには使えません。
-ああ残念、と思いきや、手はあります。Application Insightsは可用性テスト結果を受け取るAPIを公開しているので、そこにデータを送るカスタムプローブを作って、プライベートネットワークに配置すれば、実現できます。
-そんな背景があり、公開されているのが前述のサンプルです。C#とFunctions使いであればこれでOK。このエントリはGoなど他言語での実装に関心がある人向けです。
-作ったもの Goで書いたプローブのコードと、環境構築、デプロイに使うTerraform、GitHub Actionsのコードは公開してありますので、詳しくはそちらを。
-  Goが動いて監視対象とApplication Insights APIエンドポイントにアクセスできる環境であればOK 可搬性を考慮し、プローブはDockerコンテナにしました このサンプルではプローブをAzure Container Instancesで動かします GitHubから監視対象のリスト(csv)をクローン、コンテナにマウントします リストには監視対称名、監視URL、間隔(秒)を書きます 監視対象の可用性が閾値を下回った場合と、プローブから可用性テスト結果が送られてこない場合に、アラートアクションを実行します  考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
- Goでもカスタムハンドラを使えば、Azure Functionsで似たようなことができます。でもこのユースケースでAzure Container Instanceを選んだ理由は以下です。  コスト。Azure Functionsで仮想ネットワーク統合ができるプランと比較すると安い。プローブのためだけだと、Functionsは過剰か。他の用途ですでにApp Serviceプランがあって相乗りできるなら、ありかも。 配布イメージが軽量。Functionsでデプロイ方式にコンテナを選んだ場合、Function Hostをコンテナイメージに含める必要があり、サイズが大きくなる。圧縮しても300MBを超える。Functionsで実装するなら、コンテナにしない手を選んだかもしれない。 トリガーとバインドが不要。プローブの実行契機がタイマーなので、Functionsの持つ豊富なイベントトリガーが不要。監視対象ごとにタイマー設定するなら、リストを読み込んでアプリのロジックでやったほうが楽。入出力バインドも要らない。 シンプル。カスタムハンドラを書かなくていいので。カスタムハンドラ、難しくはないですが。   Application Insightsのメトリックアラートは即時性に欠けることを考慮しましょう。  Application Insightsに送られたテレメトリがメトリックアラートに利用できるようになるまで準備時間が必要なので、即時性が必要な場合には可用性テストだけに頼らず、サービス側のAzure Monitorメトリックアラートを組み合わせましょう。    
+        何の話か 以下のサンプル(C# &amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。 Azure Functions を使用してカス
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/az-healthprobe/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>
@@ -140,13 +135,7 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
       <h2 class="subtitle is-6 date">February 25, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/servicetag-checker/">Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する</a></h1>
       <div class="content">
-        何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。
- 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーティング処理がある いずれその機能はサービスとして提供されそう/リクエストしているが、それまでの間をつなぐ仕組みを作りたい KubernetesやTerraformなど、利用しているOSSの習熟も兼ねて、Goで書きたい Azureのリソースを操作するので、権限割り当てやシークレット管理は気を付けたい、アプリのコードに書くなんてもってのほか ハウスキーピングアプリだけでなく環境全体をコード化し、ライフサイクル管理したい  いずれこの仕組みが不要になったらサクッと消す    作ったもの 例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。Service Tag Discovery APIを使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。
-  GitHub Actionsのスケジュール機能で日次実行 アプリ実行環境はAzure Container Instances アプリのAzureリソース認証認可はManaged Identityを利用 APIから取得したタグデータ、作成した差分レポートはblobへ保管 実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知  環境はTerraformでライフサイクル管理します。
-  必要なリソース作成や権限割り当ては全てTerraformで行う GitHubリポジトリへのシークレット登録もTerraformで実行  環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。
-  ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行  コードはGitHubに公開しています。
-考えたことメモ 作りながら考えたことが参考になるかもしれないので、残しておきます。
- ハウスキーピングアプリの実行環境として、Azure FunctionsやLogic Appsもありです。それらを手の内に入れており、言語にこだわりがなければ、そのほうが楽かも FunctionsであればGoをカスタムハンドラーで動かす手もあります。ただ、ユースケースが定期実行、つまりタイマトリガだと、入出力バインディングなどFunctionsのおいしいところを活かせないので、あえてカスタムハンドラーを使って書くこともないかな、という気持ちに Rustで書いちゃおっかな、とも思ったのですが、Azure SDK for Rustが現状 &ldquo;very active development&rdquo;なので、この用途では深呼吸 GoはAzure SDKのファーストクラス言語ではありませんが、KubernetesやTerraformのAzure対応で活発に利用されており、実用的です。ただ、Azureリソースの管理系操作、つまりコントロールプレーンと、blobの操作などデータプレーン向けSDKが分離されているので注意が必要です  どちらかだけならいいのですが、このサンプルのようにどちらも使うケースで課題になる このサンプルではGiovanniやTerraform AzureRM Providerを参考に、クライアントビルダーをまとめた   リトライは大事です。コケても再実行できるようにしましょう  例えば、このサンプルではAzure Container InstancesのManaged Identityサポートが作成時点でプレビューということもあり、Managed Identityエンドポイントの準備が整う前にコンテナが起動するケースが報告されています このサンプルのように常時起動が不要なケースでは、Azure Container Instancesを&ndash;restart-policy OnFailureオプションで起動すれば、異常終了時に再実行されます。また、正常終了時にはコンテナが停止し課金も止まります   Actionsでの認証認可やAzure Container Instancesの実行パラメータ用途で、GitHubに登録するシークレットが多めです。Terraform実行時に.
+        何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/servicetag-checker/" style="height:28px">
           Read more
@@ -174,10 +163,7 @@ Azure Application Insightsには可用性テストやSLAレポート機能があ
       <h2 class="subtitle is-6 date">May 21, 2020</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/">Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</a></h1>
       <div class="content">
-        何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他にもいろいろ仕込んでおきたいことがあります。監視であったり、ストレージクラスを用意したり、最近ではGitOps関連もあるでしょう。
-ということで、最近わたしがAzure Kubernetes Service(AKS)の環境を作るコードを開発する際のサンプルコードとワークフローを紹介します。以下がポイントです。
- BootstrapとConfigurationを分割する  環境構築、維持をまるっと大きなひとつの仕組みに押し込まず、初期構築(Bootstrap)とその後の作成維持(Configuration)を分割しています 前者をTerraform、後者をFluxとHelm-Operatorによるプル型のGitOpsで実現します  FluxとHelm-OperatorはAzure Arcでも採用されており、注目しています   分割した理由はライフサイクルと責務に応じたリソースとツールの分離です 前者はインフラチームに閉じ、後者はインフラチームとアプリチームの共同作業になりがちなので どっちに置くか悩ましいものはあるのですが、入れた後に変化しがちなものはなるべくConfigurationでカバーするようにしてます  わたしの場合はPrometheusとか     GitHubのプルリクを前提としたワークフロー  Bootstrapを開発する人はローカルでコーディング、テストしてからプルリク プルリクによってCIのGitHub Actionsワークフローが走ります terraformのformatとplanが実行され、結果がプルリクのコメントに追加されます レビュワーはそれを見てmasterへのマージを判断します    メインとなるHCLの概説 ちょっと長いのですが、AKSに関するHCLコードは通して読まないとピンとこないと思うので解説します。全体像はGitHubを確認してください。
-data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_workspace_name resource_group_name = var.la_workspace_rg } resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; { name = var.aks_cluster_name kubernetes_version = &#34;1.18.2&#34; location = var.aks_cluster_location resource_group_name = var.aks_cluster_rg dns_prefix = var.aks_cluster_name default_node_pool { name = &#34;default&#34; type = &#34;VirtualMachineScaleSets&#34; enable_auto_scaling = true vnet_subnet_id = var.
+        何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-bootstrap-202005/" style="height:28px">
           Read more
@@ -203,15 +189,7 @@ data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; { name = var.la_wor
       <h2 class="subtitle is-6 date">December 22, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/">GitHub Actionsでオンデマンドに環境を再現する</a></h1>
       <div class="content">
-        何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフローに取り組むケースも増えてきました。
- プルリクエストイベントをトリガーにコードの検証やテストを行い、マージの判断に使う マージされたら、ステージングや本番環境へデプロイする  こんなワークフローが一般的と思います。ですが一時的に「コードは変えてないけど、一時的に環境を再現したい」なんてこともあります。不具合対応とか。環境を作るコードはあるので、どこかにコードを持っていって実行すればいいのですが、せっかくGitHub Actionsで仕組みを作った手前、チョイっといじってできるなら、そうしたい。
-アイデア GitHub Actionsを使ってコードから環境をデプロイする環境はすでにある、という前提なので、論点は「どのトリガーを使うか」です。
- ワークフローをトリガーするイベント
- トリガーにできるイベントは多くありますが「コードは変えない」という条件だと、悩みます。プルリクやプッシュでの発火がわかりやすいからといって、そのためのフラグファイル的なものを作りたくもありません。
-GitHubでコミュニケーションしているのであれば、環境を再現したいような事案発生時にはIssueを作るでしょう。であれば、特定のキーワードを含むIssueを作った/消したタイミングで発火させましょうか。でもこのやり口では、チェックなしで環境が作られてしまいます。それがプライベートリポジトリであっても、気前良すぎ良太郎な感は否めません。
-そこで、Issueイベントのタイプ labeled/unlabeled を使ってみましょう。ラベルを付与できるのはTriage以上の権限を持った人です。権限を持った人がIssueに「環境を再現」するラベルを付け/外しした時に発火するようなワークフローを作ります。
-ワークフロー例 以下、Azureで環境を作る例です。ラベルがIssueに付く、外れるのを契機にワークフローが流れ、条件を満たした場合に環境のデプロイか削除を行います。インフラのコード化はAzure Resource Managerテンプレートでされており、ファイルはリポジトリの deployment/azuredeploy.json に置かれている、というサンプルです。
-name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: AZURE_GROUP_NAME: rg-repro-gh-actions-trigger-label YOUR_PARAM: hoge jobs: deploy-or-delete: runs-on: ubuntu-latest steps: - uses: actions/checkout@master - uses: azure/login@v1 with: creds: ${{ secrets.AZURE_CREDENTIALS }} - if: github.event.label.name == &#39;repro&#39; &amp;&amp; github.event.action == &#39;labeled&#39; run: |az group create -n ${{ env.
+        何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフロー
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/gh-actions-trigger-label/" style="height:28px">
           Read more
@@ -239,17 +217,7 @@ name: gh-actions-trigger-labeled on: issues: types: - labeled - unlabeled env: A
       <h2 class="subtitle is-6 date">December 22, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/github_actions_aks/">GitHub ActionsでAzure CLIとkubectlを動かす</a></h1>
       <div class="content">
-        (注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。
- Migrating GitHub Actions from HCL syntax to YAML syntax
- GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
-GitHub Actions
-数時間、触った印象。
- GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
-Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
- KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
-コードは ここ に。
-ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.
+        (注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/github_actions_aks/" style="height:28px">
           Read more

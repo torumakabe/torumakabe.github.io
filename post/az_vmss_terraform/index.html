@@ -7,11 +7,7 @@
 <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る | re-imagine</title>
 
 <meta property='og:title' content='AzureのAvailability Zonesへ分散するVMSSをTerraformで作る - re-imagine'>
-<meta property='og:description' content='動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zonesはインフラの根っこの仕組みなので、現在(2018/3)限定されたリージョンで長めのプレビュー期間がとられています。ですが、GAやグローバル展開を見据え、素振りしておきましょう。
-前提条件  Availability Zones対応リージョンを選びます。現在は5リージョンです。この記事ではEast US 2とします。 Availability Zonesのプレビューにサインアップ済みとします。 bashでsshの公開鍵が~/.ssh/id_rsa.pubにあると想定します。 動作確認した環境は以下です。  Terraform 0.11.2 Terraform Azure Provider 1.3.0 WSL (ubuntu 16.04) macos (High Sierra 10.13.3)    コード 以下のファイルを同じディレクトリに作成します。
-Terraform メインコード VMSSと周辺リソースを作ります。
- 最終行近くの &ldquo;zones = [1, 2, 3]&rdquo; がポイントです。これだけで、インスタンスを散らす先のゾーンを指定できます。 クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。  [main.tf]
-resource &quot;azurerm_resource_group&quot; &quot;poc&quot; { name = &quot;${var.resource_group_name}&quot; location = &quot;East US 2&quot; } resource &quot;azurerm_virtual_network&quot; &quot;poc&quot; { name = &quot;vnet01&quot; resource_group_name = &quot;${azurerm_resource_group.'>
+<meta property='og:description' content='動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zones'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/az_vmss_terraform/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='AZ'><meta property='article:tag' content='VMSS'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-03-26T00:08:30&#43;09:00'/><meta property='article:modified_time' content='2018-03-26T00:08:30&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

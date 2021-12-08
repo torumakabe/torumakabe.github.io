@@ -106,19 +106,7 @@
       <h2 class="subtitle is-6 date">November 16, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</a></h1>
       <div class="content">
-        何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。
-前回はIngress編、今回は定期実行とgraceful shutdownについて、です。
-Container Appsはプレビュー中ということもあり、これから説明する内容は変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
-背景 システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。
-Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。
-選択肢 アプリへの定期実行ロジック組み込みや外部からの起動を含めると、選択肢は多くあります。その中で、Container Appsの特徴を活かす、「らしい」やり方は、以下の2つです。
- Dapr Cronバインディングを使い、定期的にハンドラを呼び出す 加えて、KEDA Cronスケーラを使い、ジョブが動かない時間はレプリカ数をゼロにする  考慮点 レプリカ数をゼロにするのであれば、そのタイミングでアプリを安全に停止したいことでしょう。仮にCronに指定する想定実行時間を、余裕をもって長めにとるとしても、データの整合性など確認した上で停止したいものです。万が一のオーバーランなど、あるかもしれませんし。いわゆるgraceful shutdownを考慮すべきです。
-Azure FunctionsなどApp Serviceシリーズでコンテナを使う場合、graceful shutdownの実装は課題でした。いっぽう、Container AppsはベースとしているKubernetesと同じように、シグナルハンドラの実装で対応できます。
- Azure Container Apps プレビューでのアプリケーション ライフサイクル管理
-  コンテナアプリのスケールイン時 コンテナアプリが削除された時 リビジョンが非アクティブ化された時  上記タイミングでコンテナにシグナル(SIGTERM)が送られます。
-なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。
-Dapr Cronバインディング 実装例 では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。
-package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;syscall&#34; &#34;time&#34; &#34;net/http&#34; &#34;os&#34; &#34;github.
+        何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実す
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/" style="height:28px">
           Read more
@@ -144,17 +132,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
       <h2 class="subtitle is-6 date">November 8, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - Ingress編</a></h1>
       <div class="content">
-        何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロジェクトの成果物をマネージドサービスとして提供するサービスです。ここ数年、マイクロソフトがCNCFで取り組んできたことをまとめてドン、という感じで、なかなか熱いものがあります。
-ですが、プレビュー初期ということもあり、公式ドキュメントが充実しているとは言いにくい状況です。そこで、ドキュメントが整備されるまで、試す前に知っておくといいかな、ということをいくつか紹介します。
-なお、プレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
-今回はIngress編です。
-Azure Container Apps Ingressとは EnvoyをベースとしたProxyです。
- Azure Container Apps プレビューでの HTTPS イングレスの設定
- Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットもできます。Container Appsの使いこなしのカギのひとつです。
-以下の3つは、わたしが初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
- gRPC使える？ 名前解決やサービスディスカバリってどうなってる？ 同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？  gRPC使える？ 使えます。
-では試してみましょう。grpc/grpc-go のhelloworldサンプルをベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。
-package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#34; &#34;net&#34; &#34;os&#34; &#34;google.golang.org/grpc&#34; pb &#34;google.golang.org/grpc/examples/helloworld/helloworld&#34; &#34;google.golang.org/grpc/reflection&#34; ) var ( port = flag.Int(&#34;port&#34;, 50051, &#34;The server port&#34;) ) type server struct { pb.UnimplementedGreeterServer } func (s *server) SayHello(ctx context.
+        何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/" style="height:28px">
           Read more
@@ -180,26 +158,7 @@ package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#3
       <h2 class="subtitle is-6 date">July 21, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/">Azure Kubernetes Service アップグレード戦略 2021夏版</a></h1>
       <div class="content">
-        何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩和手段を整える重要性は従来から変わりませんが、負担を軽減するため、自動アップグレードの適用を意識する段階にあると考えています。
-なお、アップグレードのリスク、インパクト評価は使い手によります。「全てのアップグレードをクラスター新規作成で行う」という戦略もあれば、「インプレース中心。当たらなければどうということはない」というユーザーもいらっしゃいます。条件や方針、環境に合わせ、妥当な戦略を検討してください。
-背景 Kubernetesは2014年の初回コミットから7年経った2021年夏時点においても、活発に開発されているオープンソースソフトウェアです。バージョン1.22からリリースサイクルがおおよそ15週になり、若干落ち着きますが、それでも年間3回の大きな機能変更を意識する必要があります。たとえば、1.22ではIngressなど利用ユーザーが多いであろうAPIの廃止が予定されています。いま動いているシステム、アプリケーションが影響なくアップグレードできるか、変更が必要か、ユーザーは評価、対応しなければなりません。
-AKSは&ldquo;N-2&quot;サポートポリシーを採用しています。(N (最新リリース) - 2 (マイナー バージョン))がサポート対象なので、短期間で廃止するシステムでない限り、アップグレードは避けられません。
-AKSはアップグレード作業の負担軽減のため、クラスターのアップグレード機能を提供しています。ですが、その方式はインプレースであり、動いているクラスターに変更を加えます。ダウングレードは、できません。
-そこで、アップグレード作業のリスク緩和を目的とした
- 新規クラスターを新バージョンで作成し アプリケーションの動作確認を行った後 トラフィックを新規クラスターに向け 安定後に旧クラスターを消す  という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。
-  Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy
- IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。
-とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。
-AKSにおけるアップグレード、メンテナンスの現状整理 AKSでアップグレードやメンテナンスの対象となる要素は大きく分けて、マスターとノードです。それぞれ、Kubernetesのバージョンアップ有無で内容が異なります。
- マスター(Kubernetesバージョンアップを伴わない) マスター(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴う) ノード(Kubernetesバージョンアップを伴わない)  1は、マスターコンポーネントに対するセキュリティやバグの修正パッチ、Azure連携機能の追加が主です。おおむね週次で自動的に行われており、GitHubにチェンジログが公開されています。Kubernetesのバージョンを変えず、短時間で実施されるためインパクトが小さく、気づいていないユーザーも多い印象です。アップグレードというよりは、メンテナンスです。
-このメンテナンスは、実施時間を指定できるようになりました。現時点ではプレビュー機能で制限事項もありますが、可能な限り利用者の少ない夜間に実行したい、また逆に、何か起こっても担当者がすぐに対応できる平日昼間を指定したい、などのニーズに合います。
-そして2と3は、Kubernetesのバージョンアップを伴う、影響の大きな作業です。従来、ユーザーがポータルやCLIから手動で実施する作業でしたが、アップグレードチャネルを設定することで、自動化も可能になりました。チャネル指定機能は、現時点ではプレビューです。
- 自動アップグレード チャネルを設定する
- チャネルはアップグレードのアグレッシブさに応じ、none(既定)、patch、stable、rapid、node-imageから選択できます。たとえばpatchを指定すると、バージョン1.17.7を実行しているとき、1.17.9、1.18.4、1.18.6、1.19.1が利用できる場合、クラスターは 1.17.9 に自動でアップグレードされます。
-ノードのアップグレードは、既定ではノードプールを構成するVMSSに1ノードを追加し、既存ノードをdrainして行われます。1ノードずつ行うため、プールのノード数が多い場合にアップグレードにかかる時間が長くなるおそれがありますが、サージ値の指定によって短縮できます。サージ値の増加に応じ、複数ノードでdrainが同時に行われるため、アプリケーションへの影響は考慮してください。
-なお、この自動アップグレードは、1の計画メンテナンスで指定したスケジュールを加味して実行されます。
- Using Planned Maintenance with Cluster Auto-Upgrade
- 最後に4ですが、ノード(Linux/Ubuntu、Windows)のVMイメージの更新です。AKSではおおむね週次で新規ノードイメージの公開が行われ、Kubernetesのバージョンアップとは別に適用できます。内容はチェンジログで確認できます。セキュリティ関連更新が主目的です。ノードイメージの更新にはOSカーネル関連だけでなく、Kubernetes関連コンポーネントも含まれるため、定期的に行ったほうがよいでしょう。なお、OSの自動セキュリティアップデート機能やkuredと併用できます。
+        何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/" style="height:28px">
           Read more
@@ -227,25 +186,7 @@ AKSにおけるアップグレード、メンテナンスの現状整理 AKSで�
       <h2 class="subtitle is-6 date">July 5, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aci-runner-on-functions/">Azure Container Instancesの定期実行をAzure Functionsのタイマートリガーで行うパターン</a></h1>
       <div class="content">
-        何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点があります。そこで、実装例とともにまとめておきます。
- サンプルコードはGitHubに公開しているので、合わせて参照してください。Pythonで書きました。
- ACI Runner on Azure Functions
- 背景 以前、ACIの定期実行をGitHub Actionsで行う記事を書きました。
- Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する
- その後、同様のご相談をいくつかいただきました。ACIの定期実行は、ニーズがあるのでしょう。
-アプリの定期実行であればAzure Functionsのタイマートリガー関数という手もあります。それでもACIが選ばれる理由としてよく耳にするのは、「これから作るアプリはできる限りコンテナー化したい」「Functionsでもコンテナーは動かせるが、コンテナーの実行環境としてはFunctionsよりシンプルなACIがいい」です。App Service/Functionsの習熟度も、判断に影響するでしょう。いずれにせよ、実現手段が選択できるのは、良いことだと思います。
-ところで、ACIを定期的に走らせるランナーの実装にははいくつかパターンがあります。前述の通りGitHub ActionsなどAzure外部のスケジューラを使う他に、Logic AppsなどAzureのサービスを使う手があります。
- Azure Logic Apps で自動化された定期的なタスク、プロセス、ワークフローのスケジュールを設定して実行する
-  Azure Logic Apps を使用して Azure Container Instances をデプロイおよび管理する
- 昨今、Logic Appsのようなローコード環境が注目されています。いっぽう、可能な限りコードで表現、維持したいというニーズも多いです。そこで、Azure Functionsのタイマートリガー関数でランナーを書くならどうする、というのが、この記事の背景です。
-考慮点 作るのは難しくありません。ですが、設計や実装にあたって、いくつかの考慮点があります。
-Functionsのホスティングオプションと言語ランタイム 1日1回、数十秒で終わるジョブなど、ランナーの実行回数が少なく、短時間で終了するケースもあるでしょう。その場合、コストを考えると、Functionsのプランは従量課金を使いたいものです。従量課金プランの適用可否の判断材料となりがちなVNet統合も、非データプレーンアプリであるACIランナーの用途では不要、と判断できる案件が多いのではないでしょうか。また、オフラインバッチならコールドスタートも問題にならないでしょう。
- Azure Functions のホスティング オプション
- 従量課金プランをターゲットにすると、次はOSと言語ランタイムの選択です。従量課金プランを選択する場合、カスタムコンテナーは利用できないため、言語ランタイムは提供されているものの中から選択する必要があります。選択肢の中から、開発、運用主体の習熟度やチームの意志で決定してください。
-冒頭で紹介した、わたしの作ったサンプルはLinux/Pythonです。わたしの周辺、半径10mくらいの意見で決めました。
-Windowsの場合には、HTTPトリガーの例ではありますが、PowerShellでのチュートリアルが公開されています。参考にしてください。
- チュートリアル:HTTP によってトリガーされる Azure Functions を使用してコンテナー グループを作成する
- ロジックと構成、パラメータの分離 ACIのコンテナーグループを作成、実行するロジックはシンプルです。
+        何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点が
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aci-runner-on-functions/" style="height:28px">
           Read more
@@ -273,11 +214,7 @@ Windowsの場合には、HTTPトリガーの例ではありますが、PowerShel
       <h2 class="subtitle is-6 date">April 12, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/website-vnet-route-all/">Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</a></h1>
       <div class="content">
-        何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&ldquo;WEBSITE_VNET_ROUTE_ALL = 1&rdquo;設定が可能です。すこぶる便利な反面、設定ひとつでルーティングがごそっと変わってしまう気持ち悪さは否めません。そこで、設定することでどのような効果があるのか、実際にインターフェースやルートの設定を見て、理解しておきましょう。ドキュメントを読めばだいたい想像できるのですが、トラブルシューティングの際に念のためルートを確認したいなんてこともあるでしょうから、知っておいて損はありません。
-確認環境と手法 App Service (Linux/.NET Core 3.1)のアプリコンテナーへsshし、インターフェースやルートを確認します。
- VNet統合なし VNet統合あり VNet統合あり(WEBSITE_VNET_ROUTE_ALL = 1)  この流れで、設定の効果を見ていきましょう。
-VNet統合なし まずは、IPアドレスとインターフェースの設定を確認します。
-root@96d38124b1f4:~/site/wwwroot# ip a 1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000 link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo valid_lft forever preferred_lft forever 34: eth0@if35: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default link/ether 02:42:ac:10:02:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0 inet 172.16.2.2/24 brd 172.
+        何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&ldquo;WEBSITE_VNET
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/website-vnet-route-all/" style="height:28px">
           Read more

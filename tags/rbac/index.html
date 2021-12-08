@@ -105,16 +105,7 @@
       <h2 class="subtitle is-6 date">January 22, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_rg_contributor/">Azureのリソースグループ限定 共同作成者をいい感じに作る</a></h1>
       <div class="content">
-        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
-ユースケースのひとつに、&ldquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
-なのですが、このようなケースで、権限付与の落とし穴があります。
- サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
-いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
-シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
-{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] } 組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
-では、カスタムロールを作成します。
-$ az role definition create --role-definition ./role.json 出力にカスタムロールのIDが入っていますので、控えておきます。
-&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot; カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる 次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。
+        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利な
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_rg_contributor/" style="height:28px">
           Read more

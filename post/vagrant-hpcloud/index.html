@@ -7,11 +7,7 @@
 <title>Vagrant HP Public Cloud Pluginを試す | re-imagine</title>
 
 <meta property='og:title' content='Vagrant HP Public Cloud Pluginを試す - re-imagine'>
-<meta property='og:description' content='みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作はVagrantでしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。
-VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。
-前提条件  Vagrant 1.5.4 vagrant-hp 0.1.4 HP Public Cloud (2014/5/5)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
-ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、Githubの説明には若干のトラップがありますのでご注意を。
- イメージにUbuntu 14.04 LTSを使う例です。 Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。 Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。 Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。 ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。  それではさっそくvagrant up $ vagrant up --provider=hp Bringing machine &#39;default&#39; up with &#39;hp&#39; provider... WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1 ==&gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant ==&gt; default: high-level network configurations (`config.'>
+<meta property='og:description' content='みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/vagrant-hpcloud/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Vagrant'><meta property='article:tag' content='HP Public Cloud'><meta property='article:published_time' content='2014-05-05T00:00:00&#43;09:00'/><meta property='article:modified_time' content='2014-05-05T00:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

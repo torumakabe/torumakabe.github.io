@@ -109,13 +109,7 @@
       <h2 class="subtitle is-6 date">May 8, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/">Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</a></h1>
       <div class="content">
-        まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。
-Azure Functionsは、
- アプリを放り込めば動く。サーバの管理が要らない。サーバレス。 #でもこれは従来のPaaSもそう 利用メモリ単位での、粒度の細かい課金。 #現在プレビュー中にて、詳細は今後発表 Azure内外機能との、容易なイベント連動。  が特徴です。AWSのLambdaと似てるっちゃ似ています。
-何が新しいかというと、特に3つ目の特徴、イベント連動です。触ってみなければわからん、ということで、流行りのBotでも作ってみたいと思います。
-基本方針  FunctionsはAzure内の様々な機能とイベント連動できるが、あえてサンプルの少ないAzure外とつないでみる Facebook Messenger APIを使って、webhook連動する Facebook Messenger向けに書き込みがあると、ランダムでビールの種類と参考URLを返す ビールはCraft Beer Associationの分類に従い、協会のビアスタイル・ガイドライン参考ページの該当URLを返す Botらしく、それらしい文末表現をランダムで返す 好みとか文脈は全く聞かないぜSorry アプリはNodeで書く。C#のサンプルは増えてきたので 静的データをランダムに返す、かつ少量なのでメモリ上に広げてもいいが、せっかくなのでNodeと相性のいいDocumentDBを使う DocumentDBではSQLでいうORDER BY RAND()のようなランダムな問い合わせを書けないため、ストアドプロシージャで実装する #サンプル FunctionsとGithubを連携し、GithubへのPush -&gt; Functionsへのデプロイというフローを作る 拡張性はひとまず目をつぶる #この辺の話  ひとまずFunctionsとBotの枠組みの理解をゴールとします。ロジックをたくさん書けばそれなりに文脈を意識した返事はできるのですが、書かずに済む仕組みがこれからいろいろ出てきそうなので、書いたら負けの精神でぐっと堪えます。
-必要な作業 以下が必要な作業の流れです。
- Azureで  Function Appの作成 #1 Bot用Functionの作成 #2 Facebook Messenger APIとの接続検証 #6 Facebook Messenger API接続用Tokenの設定 #8 DocumentDBのデータベース、コレクション作成、ドキュメント投入 #9 DocumentDBのストアドプロシージャ作成 #10 Function Appを書く #11 FunctionsのサイトにDocumentDB Node SDKを導入 #12 Function AppのGithub連携設定 #13 Function Appのデプロイ (GithubへのPush) #14   Facebookで  Facebook for Developersへの登録 #3 Botをひも付けるFacebook Pageの作成 #4 Bot用マイアプリの作成 #5 Azure Functionsからのcallback URLを登録、接続検証 #6 Azure Functions向けTokenを生成 #7    アプリのコード書きの他はそれほど重くない作業ですが、すべての手順を書くと本ができそうです。Function Appの作りにポイントを絞りたいので、以下、参考になるサイトをご紹介します。
+        まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。 Azure Functionsは、 アプリを放り込めば動く。サーバ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/" style="height:28px">
           Read more

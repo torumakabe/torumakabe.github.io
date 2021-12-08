@@ -7,14 +7,7 @@
 <title>Azure DNS Private Zonesの動きを確認する | re-imagine</title>
 
 <meta property='og:title' content='Azure DNS Private Zonesの動きを確認する - re-imagine'>
-<meta property='og:description' content='プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレビューのプライベートとパブリックが入り混じって、なにやら紛らわしいですが。
-さて、このプライベートゾーン対応ですが、名前のとおりAzure DNSをプライベートな仮想ネットワーク(VNet)で使えるようになります。加えて、しみじみと嬉しい便利機能がついています。
- Split-Horizonに対応します。VNet内からの問い合わせにはプライベートゾーン、それ以外からはパブリックゾーンのレコードを返します。 仮想マシンの作成時、プライベートゾーンへ自動でホスト名を追加します。 プライベートゾーンとVNetをリンクして利用します。複数のVNetをリンクすることが可能です。 リンクの種類として、仮想マシンホスト名の自動登録が行われるVNetをRegistration VNet、名前解決(正引き)のみ可能なResolution VNetがあります。 プライベートゾーンあたり、Registration VNetの現時点の上限数は1、Resolution VNetは10です。  公式ドキュメントはこちら。現時点の制約もまとまっているので、目を通しておきましょう。
-動きを見てみよう 公式ドキュメントには想定シナリオがあり、これを読めばできることがだいたい分かります。ですが、名前解決は呼吸のようなもの、体に叩き込みたいお気持ちです。手を動かして確認します。
-事前に準備する環境 下記リソースを先に作っておきます。手順は割愛。ドメイン名はexample.comとしましたが、適宜読み替えてください。
- VNet *2  vnet01  subnet01  subnet01-nsg (allow ssh)     vnet02  subnet01  subnet01-nsg (allow ssh)       Azure DNS Public Zone  example.com    Azure CLIへDNS拡張を導入 プレビュー機能をCLIに導入します。いずれ要らなくなるかもしれませんので、要否は公式ドキュメントで確認してください。
-$ az extension add --name dns プライベートゾーンの作成 既存のゾーンを確認します。パブリックゾーンがあります。
-$ az network dns zone list -o table ZoneName ResourceGroup RecordSets MaxRecordSets ------------ ---------------------- ------------ --------------- example.'>
+<meta property='og:description' content='プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_private_dns_preview/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='DNS'><meta property='article:published_time' content='2018-03-27T00:10:30&#43;09:00'/><meta property='article:modified_time' content='2018-03-27T00:10:30&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

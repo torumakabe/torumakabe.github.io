@@ -14,18 +14,7 @@
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
-      <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャルです。
-クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、 節約」でしょう。
-ですが、仕組み作りが意外に面倒なんですよね。管理サーバを作って、ジョブ管理ソフト入れて、Azure SDK/CLI入れて。クレデンシャルを安全に管理して。可用性確保して。バックアップして。で、管理サーバは消せずに常時起動。なんか中途半端です。
-その課題、Azure Batchを使って解決しましょう。レッツ管理サーバレスバッチ処理。
-コンセプト  管理サーバを作らない Azure Batchコマンドでジョブを投入したら、あとはスケジュール通りに定期実行される ジョブ実行サーバ群(Pool)は必要な時に作成され、処理が終わったら削除される サーバの迅速な作成とアプリ可搬性担保のため、dockerを使う セットアップスクリプト、タスク実行ファイル、アプリ向け入力/出力ファイルはオブジェクトストレージに格納  サンプル Githubにソースを置いておきます。
-バッチアカウントとストレージアカウント、コンテナの作成とアプリ、データの配置 公式ドキュメントで概要を確認しましょう。うっすら理解できたら、バッチアカウントとストレージアカウントを作成します。
-ストレージアカウントに、Blobコンテナを作ります。サンプルの構成は以下の通り。
-. ├── blob │ ├── application │ │ ├── starttask.sh │ │ └── task.sh │ ├── input │ │ └── the_star_spangled_banner.txt │ └── output  applicationコンテナに、ジョブ実行サーバ作成時のスクリプト(starttask.sh)と、タスク実行時のスクリプト(task.sh)を配置します。
- starttask.sh - docker engineをインストールします task.sh - docker hubからサンプルアプリが入ったコンテナを持ってきて実行します。サンプルはPythonで書いたシンプルなWord Countアプリです  また、アプリにデータをわたすinputコンテナと、実行結果を書き込むoutputコンテナも作ります。サンプルのinputデータはアメリカ国歌です。
-コンテナ、ファイルには、適宜SASを生成しておいてください。inputではreadとlist、outputでは加えてwrite権限を。
-さて、いよいよジョブをJSONで定義します。詳細は公式ドキュメントを確認してください。ポイントだけまとめます。
- 2016/04/29 05:30(UTC)から開始する - schedule/doNotRunUntil 4時間ごとに実行する - schedule/recurrenceInterval ジョブ実行後にサーバプールを削除する - jobSpecification/poolInfo/autoPoolSpecification/poolLifetimeOption ジョブ実行時にtask.</description>
+      <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル</description>
     </item>
     
   </channel>

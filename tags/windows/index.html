@@ -107,9 +107,11 @@
       <h2 class="subtitle is-6 date">December 4, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/">Windows上でLinux向けGoバイナリをDockerでビルドする</a></h1>
       <div class="content">
-        小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要ります。正直なところ入れたくありません。なのでDockerでやります。
-条件  Docker for Windows  Linuxモード ドライブ共有    PowerShell窓で実行 ビルドしたいGoのソースがあるディレクトリで以下のコマンドを実行します。Linux向けバイナリーが同じディレクトリに出来ます。
-docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=/go --mount type=bind,source=${PWD},target=/work -w /work golang:1.9.2-alpine go build -a -tags netgo -installsuffix netgo -o yourapp_linux  golang:1.9.2-alpine DockerイメージはGOPATHに/goを設定してビルドされていますが、念のため実行時にも設定 -v オプションでのマウントは非推奨になったので &ndash;mount で スタティックリンク  
+        小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要りま
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>
@@ -133,17 +135,7 @@ docker run --rm -it -e GOPATH=/go --mount type=bind,source=${env:GOPATH},target=
       <h2 class="subtitle is-6 date">October 13, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/intro_boxstarter/">自動化を愛するWindows使いへ Boxstarterのすすめ</a></h1>
       <div class="content">
-        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いのではないでしょうか。端末って使っているうちに汚れていく宿命なので、わたしは定期的に「こうあるべき」という状態に戻します。年に2～3回はスッキリしたい派なので、アップデートはいいタイミングです。
-でもクリーンインストールすると、設定やアプリケーションの導入をGUIでやり直すのが、すこぶるめんどくせぇわけです。自動化したいですね。そこでBoxstarterをおすすめします。便利なのに、意外に知られていない。
-Boxstarter
-わたしはマイクロソフトの仲間、Jessieのポストで知りました。サンクスJessie。
-Boxstarterで出来ること  シンプルなスクリプトで  Windowsの各種設定 Chocolateyパッケージの導入   設定ファイルをネットワーク経由で読み込める  Gistから   ベアメタルでも仮想マシンでもOK  実行手順 手順はBoxstarterのサイトで紹介されています。
- スクリプトを作る Gistに上げる Boxstarterを導入する  PowerShell 3以降であれば
-. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force  Gist上のスクリプトを指定して実行する  なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)
-Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&quot; -DisableReboots 以上。
-サンプルスクリプト スクリプトはこんな感じに書きます。
-ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。
-# Learn more: http://boxstarter.org/Learn/WebLauncher # Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。 # Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool) #---- TEMPORARY --- Disable-UAC #--- Fonts --- choco install inconsolata #--- Windows Settings --- # 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.
+        Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いので
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/intro_boxstarter/" style="height:28px">
           Read more
@@ -171,16 +163,11 @@ Install-BoxstarterPackage -PackageName &quot;https://gist.githubusercontent.com/
       <h2 class="subtitle is-6 date">September 14, 2016</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/bashonwindows_nvm/">Bash on WindowsでNode開発環境を作る</a></h1>
       <div class="content">
-        Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータなので本気運用ではないのですが、開発ツールを動かすのに使い始めてます。Linux/Macと同じツールが使えるってのは便利です。
-たとえばNodeのバージョン管理。Windowsにはnodistがありますが、Linux/Macでは動きません。Linux/Macで使ってるNVMがWindowsで動いたら、いくつもバージョン管理ツールを覚えずに済むのに！あ、Bash on Windowsあるよ！！おお、そうだな！！！という話です。
-最近、Azure FunctionsでNode v6.4.0が使えるようになったので、「これからバージョン管理どうすっかな」と考えていた人も多いのでは。それはわたしです。
-NVMのインストール  Bash on Ubuntu on Windowsを入れます (参考) Bash on Ubuntu on Windowsを起動します build-essentialとlibssl-devを入れます  sudo apt-get install build-essential checkinstall sudo apt-get install libssl-dev  インストールスクリプトを流します  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash バージョンアップを考慮し、インストールのつど公式ページを確認してください。
-以上。
-NVMの使い方 nvm install 6.4.0 指定のバージョンをインストールします。
-nvm use 6.4.0 使うバージョンを指定します。
-簡単ですね。
-cd /mnt/c/your_work_directory node ./index.js なんて感じで、書いたコードをテストしちゃってください。
-なお、Visual Studio Code使いの人は統合ターミナルをBashにしておくと、さらに幸せになれます。
+        Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータ
+        
+        <a class="button is-link" href="https://ToruMakabe.github.io/post/bashonwindows_nvm/" style="height:28px">
+          Read more
+        </a>
         
       </div>
     </article>

@@ -14,8 +14,7 @@
       <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/migrate-to-hugo/</guid>
-      <description>JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。
-移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。</description>
+      <description>JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソ</description>
     </item>
     
   </channel>

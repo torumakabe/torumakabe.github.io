@@ -14,14 +14,7 @@
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
-      <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも最近、より汎用的で開発が活発なvagrant-openstack-pluginへ鞍替えを画策しております。そろそろOpenStackのツールやSDKは、スタンダードになりそうなものを盛り上げた方がいいかな、と思っていたところだったので。
-多様性はオープンソースの魅力ですが、選択肢が多すぎるとユーザーは迷子になります。OpenStackのアプリデベロッパーは増えつつあるので、そろそろコミュニティでツールやSDKの集約を考える時期かなあ、と。
-さて、このPlug-in、あまり情報ないので、使用感をまとめておきます。
-前提条件  Vagrant 1.6.3 vagrant-openstack-plugin 0.8.0 HP Public Cloud (2014/9/6)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
-ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。
- フレーバーとイメージ名は正規表現で指定できます。 OpenStack CLI群と同じ環境変数を使ってます。 Floating IPは&amp;quot;:auto&amp;quot;指定にてVMへ自動割当できますが、IPは事前に確保しておいてください。  で、ふつーに動きます。乗り換え決定です。
-スナップショット便利 vagrant-hpでは使えなかったはず。こいつは便利だ。
-$ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server instance is snapshoting! ==&amp;gt; default: Snapshot is ok </description>
+      <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも</description>
     </item>
     
     <item>
@@ -30,11 +23,7 @@ $ vagrant openstack snapshot -n lab01_snap ==&amp;gt; default: This server insta
       <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/vagrant-hpcloud/</guid>
-      <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て続けにイカしてる製品をリリースしております。まあ小生は、正直なところConsulあたりから置いてかれてますが。でも、やはり代表作はVagrantでしょう。vagrant up! vagrant destroy! いやー気軽でいいですね。
-VagrantはローカルのVirtualBoxやVMwareの他に、Providerとしてパブリッククラウドを選択できるのも魅力です。そこで当エントリではHP Public Cloud向けのVagrant Pluginを試してみます。
-前提条件  Vagrant 1.5.4 vagrant-hp 0.1.4 HP Public Cloud (2014/5/5)  プラグインのインストールと前準備 Githubを見て、プラグインのインストールとboxファイルの作成を行ってください。boxファイルがない状態でvagrant upすると怒られます。
-ではVagrantfileを見てみましょう  これがわたしが作ったVagrantfileです。見ての通りですが、以下に補足します。2014/5/5時点、Githubの説明には若干のトラップがありますのでご注意を。
- イメージにUbuntu 14.04 LTSを使う例です。 Availability Zoneパラメータには、Regionを指定してください。おっぷ。ここでちょいハマった。 Security Groupは任意ですが、sshしたい場合はsshを通すSecurity Groupを指定してください。 Floating IPは任意ですが、外部ネットワークからsshしたいときは必須です。 ネットワーク指定は任意ですが、複数ネットワークを有している場合は、いずれか指定してください。  それではさっそくvagrant up $ vagrant up --provider=hp Bringing machine &#39;default&#39; up with &#39;hp&#39; provider... WARNING: Nokogiri was built against LibXML version 2.8.0, but has dynamically loaded 2.9.1 ==&amp;gt; default: Warning! The HP provider doesn&#39;t support any of the Vagrant ==&amp;gt; default: high-level network configurations (`config.</description>
+      <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て</description>
     </item>
     
   </channel>

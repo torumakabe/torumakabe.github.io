@@ -110,13 +110,7 @@
       <h2 class="subtitle is-6 date">March 12, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_dns/">AKSのService作成時にホスト名を付ける</a></h1>
       <div class="content">
-        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
-わたしの知る限り、2つの方法があります。
- AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
-DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
-[nginx-label.yaml]
-apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80 デプロイ。
-$ kubectl create -f nginx-label.
+        2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_dns/" style="height:28px">
           Read more
@@ -144,14 +138,7 @@ $ kubectl create -f nginx-label.
       <h2 class="subtitle is-6 date">February 11, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/">AKSのIngress TLS証明書を自動更新する</a></h1>
       <div class="content">
-        カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になりました。
-さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。
-そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。
- TLSはIngress(NGINX Ingress Controller)でまとめて終端 Let&rsquo;s Encyptから証明書を入手 Kubenetesのアドオンであるcert-managerで証明書の入手、更新とIngressへの適用を自動化  ACME(Automatic Certificate Management Environment)対応 cert-managerはまだ歴史の浅いプロジェクトだが、kube-legoの後継として期待    なおKubernetes/AKSは開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。この記事も参考に。
-$ helm install stable/nginx-ingress --name my-nginx サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes ClusterIP 10.0.0.1 &lt;none&gt; 443/TCP 79d my-nginx-nginx-ingress-controller LoadBalancer 10.
+        カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" style="height:28px">
           Read more
@@ -179,15 +166,7 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE kubernetes Cluste
       <h2 class="subtitle is-6 date">February 10, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/">AKSのNGINX Ingress Controllerのデプロイで悩んだら</a></h1>
       <div class="content">
-        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッピングやTLS終端がしたくなります。方法は色々あるのですが、シンプルな選択肢はNGINX Ingress Controllerでしょう。
-さて、そのNGINX Ingress ControllerのデプロイはGitHubのドキュメント通りに淡々とやればいいのですが、helmを使えばコマンド一発です。そのようにドキュメントにも書いてあるのですが、最後の方で出てくるので「それ早く言ってよ」な感じです。
-せっかくなので、Azure(AKS)での使い方をまとめておきます。開発ペースやエコシステムの変化が速いので要注意。この記事は2018/2/10に書いています。
-使い方 AKSクラスターと、Azure DNS上に利用可能なゾーンがあることを前提にします。ない場合、それぞれ公式ドキュメントを参考にしてください。
- Azure Container Service (AKS) クラスターのデプロイ Azure CLI 2.0 で Azure DNS の使用を開始する  ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、入れておいてください。デプロイはこれだけ。Chartはここ。
-$ helm install stable/nginx-ingress --name my-nginx バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。
-$ kubectl run nginx --image nginx --port 80 $ kubectl run apache --image httpd --port 80 サービスとしてexposeします。
-$ kubectl expose deployment nginx --type NodePort $ kubectl expose deployment apache --type NodePort 現時点のサービスたちを確認します。
-$ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 10.
+        楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/" style="height:28px">
           Read more
@@ -213,16 +192,7 @@ $ kubectl get svc NAME TYPE CLUSTER-IP EXTERNAL-IP PORT(S) AGE apache NodePort 1
       <h2 class="subtitle is-6 date">January 22, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/azure_rg_contributor/">Azureのリソースグループ限定 共同作成者をいい感じに作る</a></h1>
       <div class="content">
-        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利なコンセプトです。
-ユースケースのひとつに、&ldquo;本番とは分離した開発向けリソースグループを作って、アプリ/インフラ開発者に開放したい&rdquo;、があります。新しい技術は試行錯誤で身につくので、こういった環境は重要です。
-なのですが、このようなケースで、権限付与の落とし穴があります。
- サブスクリプション所有者が開発用リソースグループを作る スコープを開発用リソースグループに限定し、開発者に対し共同作成者ロールを割り当てる 開発者はリソースグループ限定で、のびのび試行錯誤できて幸せ 開発者がスッキリしたくなり、リソースグループごとバッサリ削除 (共同作成者なので可能) 開発者にはサブスクリプションレベルの権限がないため、リソースグループを作成できない 詰む サブスクリプション所有者が、リソースグループ作成と権限付与をやり直し  共同作成者ロールから、リソースグループの削除権限だけを除外できると、いいんですが。そこでカスタムロールの出番です。リソースグループ限定、グループ削除権限なしの共同作成者を作ってみましょう。
-いい感じのカスタムロールを作る Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。
-シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。
-{ &quot;Name&quot;: &quot;Resource Group Contributor&quot;, &quot;IsCustom&quot;: true, &quot;Description&quot;: &quot;Lets you manage everything except access to resources, but can not delete Resouce Group&quot;, &quot;Actions&quot;: [ &quot;*&quot; ], &quot;NotActions&quot;: [ &quot;Microsoft.Authorization/*/Delete&quot;, &quot;Microsoft.Authorization/*/Write&quot;, &quot;Microsoft.Authorization/elevateAccess/Action&quot;, &quot;Microsoft.Resources/subscriptions/resourceGroups/Delete&quot; ], &quot;AssignableScopes&quot;: [ &quot;/subscriptions/your-subscriotion-id&quot; ] } 組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。
-では、カスタムロールを作成します。
-$ az role definition create --role-definition ./role.json 出力にカスタムロールのIDが入っていますので、控えておきます。
-&quot;id&quot;: &quot;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&quot; カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる 次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。
+        共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利な
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/azure_rg_contributor/" style="height:28px">
           Read more
@@ -248,21 +218,7 @@ $ az role definition create --role-definition ./role.json 出力にカスタム�
       <h2 class="subtitle is-6 date">January 8, 2018</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/">TerraformでAzure サンプル 2018/1版</a></h1>
       <div class="content">
-        サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいとして、サンプルは2年物で腐りかけです。ということでアップデートします。
-インパクトの大きな変更点 Terraformの、ここ2年の重要なアップデートは以下でしょうか。Azure視点で。
- BackendにAzure Blobを使えるようになった Workspaceで同一コード・複数環境管理ができるようになった 対応リソースが増えた Terraform Module Registryが公開された  更新版サンプルの方針 重要アップデートをふまえ、以下の方針で新サンプルを作りました。
-チーム、複数端末での運用 BackendにAzure Blobがサポートされたので、チーム、複数端末でstateの共有がしやすくなりました。ひとつのプロジェクトや環境を、チームメンバーがどこからでも、だけでなく、複数プロジェクトでのstate共有もできます。
-Workspaceの導入 従来は /dev /stage /prodなど、環境別にコードを分けて管理していました。ゆえに環境間のコード同期が課題でしたが、TerraformのWorkspace機能で解決しやすくなりました。リソース定義で ${terraform.workspace} 変数を参照するように書けば、ひとつのコードで複数環境を扱えます。
-要件によっては、従来通り環境別にコードを分けた方がいいこともあるでしょう。環境間の差分が大きい、開発とデプロイのタイミングやライフサイクルが異なるなど、Workspaceが使いづらいケースもあるでしょう。その場合は無理せず従来のやり方で。今回のサンプルは「Workspaceを使ったら何ができるか？」を考えるネタにしてください。
-Module、Terraform Module Registryの活用 TerraformのModuleはとても強力な機能なのですが、あーでもないこーでもないと、こだわり過ぎるとキリがありません。「うまいやり方」を見てから使いたいのが人情です。そこでTerraform Module Registryを活かします。お墨付きのVerifiedモジュールが公開されていますので、そのまま使うもよし、ライセンスを確認の上フォークするのもよし、です。
-リソースグループは環境ごとに準備し、管理をTerraformから分離 AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。
-TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。
-ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。
-terraform workspace select prod みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。
-サンプル解説 サンプルはGitHubに置きました。合わせてご確認ください。
-このコードをapplyすると、以下のリソースが出来上がります。
- NGINX on Ubuntu Webサーバー VMスケールセット VMスケールセット向けロードバランサー 踏み台サーバー 上記を配置するネットワーク (仮想ネットワーク、サブネット、NSG)  リポジトリ構造 サンプルのリポジトリ構造です。
-├── modules │ ├── computegroup │ │ ├── main.
+        サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp; Azureの記事に目が止まりました。原則はいいと
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/terraform_azure_sample_201801/" style="height:28px">
           Read more

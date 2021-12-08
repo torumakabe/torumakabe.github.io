@@ -7,13 +7,7 @@
 <title>AKSのService作成時にホスト名を付ける | re-imagine</title>
 
 <meta property='og:title' content='AKSのService作成時にホスト名を付ける - re-imagine'>
-<meta property='og:description' content='2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時に差し出して欲しいケースがありますよね。
-わたしの知る限り、2つの方法があります。
- AKS(k8s) 1.9で対応したDNSラベル名付与機能を使う Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する  以下、AKS 1.9.2での実現手順です。
-DNSラベル名付与機能 簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。
-[nginx-label.yaml]
-apiVersion: apps/v1beta1 kind: Deployment metadata: name: nginx spec: template: metadata: labels: app: nginx spec: containers: - image: nginx name: nginx ports: - containerPort: 80 --- apiVersion: v1 kind: Service metadata: name: hogeginx annotations: service.beta.kubernetes.io/azure-dns-label-name: hogeginx spec: selector: app: nginx type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 80 デプロイ。
-$ kubectl create -f nginx-label.'>
+<meta property='og:description' content='2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/aks_dns/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='AKS'><meta property='article:tag' content='Kubernetes'><meta property='article:tag' content='DNS'><meta property='article:published_time' content='2018-03-12T00:21:00&#43;09:00'/><meta property='article:modified_time' content='2018-03-12T00:21:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

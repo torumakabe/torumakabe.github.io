@@ -105,19 +105,7 @@
       <h2 class="subtitle is-6 date">November 16, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</a></h1>
       <div class="content">
-        何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実するまでの、つなぎ的な企画です。
-前回はIngress編、今回は定期実行とgraceful shutdownについて、です。
-Container Appsはプレビュー中ということもあり、これから説明する内容は変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
-背景 システムを作る際、それが主役かどうかはさておき、定期的に実行したいジョブやタスクがひとつふたつあるのではないでしょうか。代表例は、日次の締め処理、監視目的のポーリングなどです。
-Azure Container Appsは従量課金のマネージドサービスです。できる限りサービスの提供する機能を利用して楽をしたい、また、ジョブが動いていない時間帯は止めてコストを抑えたい、というニーズは、きっとあるでしょう。定期実行のうまいやり方は、Container as a Serviceの先輩であるAzure Container Instances、コンテナが使えるFunctions as a ServiceのAzure Functionsを使うユーザーから、これまで多く質問をいただいてきたテーマでもあります。
-選択肢 アプリへの定期実行ロジック組み込みや外部からの起動を含めると、選択肢は多くあります。その中で、Container Appsの特徴を活かす、「らしい」やり方は、以下の2つです。
- Dapr Cronバインディングを使い、定期的にハンドラを呼び出す 加えて、KEDA Cronスケーラを使い、ジョブが動かない時間はレプリカ数をゼロにする  考慮点 レプリカ数をゼロにするのであれば、そのタイミングでアプリを安全に停止したいことでしょう。仮にCronに指定する想定実行時間を、余裕をもって長めにとるとしても、データの整合性など確認した上で停止したいものです。万が一のオーバーランなど、あるかもしれませんし。いわゆるgraceful shutdownを考慮すべきです。
-Azure FunctionsなどApp Serviceシリーズでコンテナを使う場合、graceful shutdownの実装は課題でした。いっぽう、Container AppsはベースとしているKubernetesと同じように、シグナルハンドラの実装で対応できます。
- Azure Container Apps プレビューでのアプリケーション ライフサイクル管理
-  コンテナアプリのスケールイン時 コンテナアプリが削除された時 リビジョンが非アクティブ化された時  上記タイミングでコンテナにシグナル(SIGTERM)が送られます。
-なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。
-Dapr Cronバインディング 実装例 では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。
-package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;syscall&#34; &#34;time&#34; &#34;net/http&#34; &#34;os&#34; &#34;github.
+        何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実す
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/" style="height:28px">
           Read more
@@ -143,17 +131,7 @@ package main import ( &#34;context&#34; &#34;log&#34; &#34;os/signal&#34; &#34;s
       <h2 class="subtitle is-6 date">November 8, 2021</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/">Azure Container Appsを試す前に知っておきたいこと - Ingress編</a></h1>
       <div class="content">
-        何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロジェクトの成果物をマネージドサービスとして提供するサービスです。ここ数年、マイクロソフトがCNCFで取り組んできたことをまとめてドン、という感じで、なかなか熱いものがあります。
-ですが、プレビュー初期ということもあり、公式ドキュメントが充実しているとは言いにくい状況です。そこで、ドキュメントが整備されるまで、試す前に知っておくといいかな、ということをいくつか紹介します。
-なお、プレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
-今回はIngress編です。
-Azure Container Apps Ingressとは EnvoyをベースとしたProxyです。
- Azure Container Apps プレビューでの HTTPS イングレスの設定
- Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットもできます。Container Appsの使いこなしのカギのひとつです。
-以下の3つは、わたしが初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
- gRPC使える？ 名前解決やサービスディスカバリってどうなってる？ 同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？  gRPC使える？ 使えます。
-では試してみましょう。grpc/grpc-go のhelloworldサンプルをベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。
-package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#34; &#34;net&#34; &#34;os&#34; &#34;google.golang.org/grpc&#34; pb &#34;google.golang.org/grpc/examples/helloworld/helloworld&#34; &#34;google.golang.org/grpc/reflection&#34; ) var ( port = flag.Int(&#34;port&#34;, 50051, &#34;The server port&#34;) ) type server struct { pb.UnimplementedGreeterServer } func (s *server) SayHello(ctx context.
+        何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロ
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/" style="height:28px">
           Read more
@@ -181,18 +159,7 @@ package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#3
       <h2 class="subtitle is-6 date">August 9, 2019</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/aqua_acr/">Azure Container Registry TasksでAqua MicroScannerを自動実行する</a></h1>
       <div class="content">
-        何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。
-@ehotinger のブログを読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!
-Aqua MicroScannerとは Aqua Security社はコンテナー関連の包括的な製品を提供していますが、MicroScannerはコンテナーイメージ含まれるパッケージの脆弱性スキャンに特化したソフトウェアで、無償で利用できます。もちろん有償版のほうが機能豊富で幅広い脅威に対応できるのですが、パッケージの脆弱性スキャンで十分という場合には、感謝してMicroScannerを使わせていただきましょう。無償/有償の機能差はこちらを。
-MicroScannerのコンセプトは、以下のリンク先にある記事やスライドがわかりやすいです。
- Aqua’s MicroScanner: Free Image Vulnerability Scanner for Developers
-  What&rsquo;s so hard about vulnerability scanning?
-  Aqua MicroScanner - A free-to-use tool that scans container images for package vulnerabilities - GitHub
- トークンの取得 MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。
-$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt; コンテナービルド時に実行してみる 以降、ここにサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。
-ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。
-まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。
-FROM alpine:3.3 RUN apk add --no-cache ca-certificates ADD https://get.
+        何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/aqua_acr/" style="height:28px">
           Read more

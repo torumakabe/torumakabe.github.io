@@ -7,17 +7,7 @@
 <title>Azure Container Appsを試す前に知っておきたいこと - Ingress編 | re-imagine</title>
 
 <meta property='og:title' content='Azure Container Appsを試す前に知っておきたいこと - Ingress編 - re-imagine'>
-<meta property='og:description' content='何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロジェクトの成果物をマネージドサービスとして提供するサービスです。ここ数年、マイクロソフトがCNCFで取り組んできたことをまとめてドン、という感じで、なかなか熱いものがあります。
-ですが、プレビュー初期ということもあり、公式ドキュメントが充実しているとは言いにくい状況です。そこで、ドキュメントが整備されるまで、試す前に知っておくといいかな、ということをいくつか紹介します。
-なお、プレビュー中ということもあり、これから説明する内容には変更される可能性があります。公式ドキュメントを正としてください。また、選定や設計するにあたって足りない情報があれば、どしどし要求しましょう。公式ドキュメント(英語)の各ページ下部にGitHub Issuesへのリンクがあります。
-今回はIngress編です。
-Azure Container Apps Ingressとは EnvoyをベースとしたProxyです。
- Azure Container Apps プレビューでの HTTPS イングレスの設定
- Ingressはユーザの作成したContainer Appsアプリケーションに対し、Container Apps環境内外からアクセスできるよう、エンドポイントを提供します。TLS終端はもちろん、複数リビジョンへのトラフィックスプリットもできます。Container Appsの使いこなしのカギのひとつです。
-以下の3つは、わたしが初見の際に持った疑問です。みなさんも、知っておく価値はあると思います。
- gRPC使える？ 名前解決やサービスディスカバリってどうなってる？ 同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？  gRPC使える？ 使えます。
-では試してみましょう。grpc/grpc-go のhelloworldサンプルをベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。
-package main import ( &#34;context&#34; &#34;flag&#34; &#34;fmt&#34; &#34;log&#34; &#34;net&#34; &#34;os&#34; &#34;google.golang.org/grpc&#34; pb &#34;google.golang.org/grpc/examples/helloworld/helloworld&#34; &#34;google.golang.org/grpc/reflection&#34; ) var ( port = flag.Int(&#34;port&#34;, 50051, &#34;The server port&#34;) ) type server struct { pb.UnimplementedGreeterServer } func (s *server) SayHello(ctx context.'>
+<meta property='og:description' content='何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Container'><meta property='article:published_time' content='2021-11-08T19:30:00&#43;09:00'/><meta property='article:modified_time' content='2021-11-08T19:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

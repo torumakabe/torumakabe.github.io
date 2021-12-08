@@ -14,25 +14,7 @@
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/aci-runner-on-functions/</guid>
-      <description>何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点があります。そこで、実装例とともにまとめておきます。
- サンプルコードはGitHubに公開しているので、合わせて参照してください。Pythonで書きました。
- ACI Runner on Azure Functions
- 背景 以前、ACIの定期実行をGitHub Actionsで行う記事を書きました。
- Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する
- その後、同様のご相談をいくつかいただきました。ACIの定期実行は、ニーズがあるのでしょう。
-アプリの定期実行であればAzure Functionsのタイマートリガー関数という手もあります。それでもACIが選ばれる理由としてよく耳にするのは、「これから作るアプリはできる限りコンテナー化したい」「Functionsでもコンテナーは動かせるが、コンテナーの実行環境としてはFunctionsよりシンプルなACIがいい」です。App Service/Functionsの習熟度も、判断に影響するでしょう。いずれにせよ、実現手段が選択できるのは、良いことだと思います。
-ところで、ACIを定期的に走らせるランナーの実装にははいくつかパターンがあります。前述の通りGitHub ActionsなどAzure外部のスケジューラを使う他に、Logic AppsなどAzureのサービスを使う手があります。
- Azure Logic Apps で自動化された定期的なタスク、プロセス、ワークフローのスケジュールを設定して実行する
-  Azure Logic Apps を使用して Azure Container Instances をデプロイおよび管理する
- 昨今、Logic Appsのようなローコード環境が注目されています。いっぽう、可能な限りコードで表現、維持したいというニーズも多いです。そこで、Azure Functionsのタイマートリガー関数でランナーを書くならどうする、というのが、この記事の背景です。
-考慮点 作るのは難しくありません。ですが、設計や実装にあたって、いくつかの考慮点があります。
-Functionsのホスティングオプションと言語ランタイム 1日1回、数十秒で終わるジョブなど、ランナーの実行回数が少なく、短時間で終了するケースもあるでしょう。その場合、コストを考えると、Functionsのプランは従量課金を使いたいものです。従量課金プランの適用可否の判断材料となりがちなVNet統合も、非データプレーンアプリであるACIランナーの用途では不要、と判断できる案件が多いのではないでしょうか。また、オフラインバッチならコールドスタートも問題にならないでしょう。
- Azure Functions のホスティング オプション
- 従量課金プランをターゲットにすると、次はOSと言語ランタイムの選択です。従量課金プランを選択する場合、カスタムコンテナーは利用できないため、言語ランタイムは提供されているものの中から選択する必要があります。選択肢の中から、開発、運用主体の習熟度やチームの意志で決定してください。
-冒頭で紹介した、わたしの作ったサンプルはLinux/Pythonです。わたしの周辺、半径10mくらいの意見で決めました。
-Windowsの場合には、HTTPトリガーの例ではありますが、PowerShellでのチュートリアルが公開されています。参考にしてください。
- チュートリアル:HTTP によってトリガーされる Azure Functions を使用してコンテナー グループを作成する
- ロジックと構成、パラメータの分離 ACIのコンテナーグループを作成、実行するロジックはシンプルです。</description>
+      <description>何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点が</description>
     </item>
     
     <item>
@@ -41,23 +23,7 @@ Windowsの場合には、HTTPトリガーの例ではありますが、PowerShel
       <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/aci_graceful_shutdown/</guid>
-      <description>何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネクションをぶっちぎってもいい、何かしらの書き込み処理が中途半端に終わっても問題ない、という人でなければ読む価値があります。
-ACIはKubernetesで言うところのポッドを1つから使えるサービスです。概念や用語もKubernetesに似ています。家族や親戚という感じではありますが、&amp;ldquo;Kubernetesである&amp;quot;とは明言されていないので、その違いは意識しておいたほうがいいでしょう。この記事ではコンテナーの停止、削除処理に絞って解説します。
-Kubernetesのポッド停止処理 Kubernetesのポッド停止については、@superbrothersさんの素晴らしい解説記事があります。
- Kubernetes: 詳解 Pods の終了
- 書籍 みんなのDocker/KubernetesのPart2 第3章でも最新の動向を交えて説明されています。しっかり理解したい人に、おすすめです。
-ざっくりまとめると、ポッドをGraceful Shutdownする方法は次の2つです。
- PreStop処理を書いて、コンテナー停止に備える コンテナー停止時に送られるシグナルを、適切に扱う  ACIでは現在PreStop処理を書けません。なので、シグナルをどう扱うかがポイントです。
-DockerのPID 1問題 シグナルハンドリングの前に、DockerのPID 1問題について触れておきます。
- Docker and the PID 1 zombie reaping problem
- Unix/LinuxではプロセスIDの1番はシステム起動時にinit(systemd)へ割り当てられます。そして親を失ったプロセスの代理親となったり、終了したプロセスを管理テーブルから消したりします。いわゆるゾンビプロセスのお掃除役も担います。
-しかしDockerでは、コンテナーではじめに起動したプロセスにPID 1が割り当てられます。それはビルド時にDockerfileのENTRYPOINTにexec形式で指定したアプリであったり、シェル形式であれば/bin/sh -cだったりします。
-この仕様には、次の課題があります。
- コンテナーにゾンビプロセスのお掃除をするinitがいない docker stopを実行するとPID 1のプロセスに対してSIGTERMが、一定時間の経過後(既定は10秒)にSIGKILLが送られる。PID 1はLinuxで特別な扱いであり、SIGTERMのハンドラーがない場合、それを無視する。ただしinitの他はSIGKILLを無視できない。つまりPID 1で動いたアプリは待たされた挙句、強制終了してしまう。また、転送しなければ子プロセスにSIGTERMが伝わらない  前者が問題になるかは、コンテナーでどれだけプロセスを起動するかにもよります。いっぽうで後者は、PID 1となるアプリで意識してSIGTERMを処理しなければ、常に強制終了されることを意味します。穏やかではありません。
-解決の選択肢 シグナルハンドリングについては、解決の選択肢がいくつかあります。
- SIGTERMを受け取って、終了処理をするようアプリを書く PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす PID 1で動く擬似initを挟み、その子プロセスとしてアプリを動かす (シグナル変換)  Docker APIを触れる環境であれば、docker run時に&amp;ndash;initオプションをつければ擬似init(tini)をPID 1で起動できます。ですがACIはコンテナーの起動処理を抽象化しているため、ユーザーから&amp;ndash;initオプションを指定できません。なので別の方法で擬似initを挟みます。
-それぞれのやり方と動き ではそれぞれのやり方と動きを見てみましょう。シグナルの送られ方がわかるように、Goで簡単なアプリを作りました。
-package main import ( &amp;quot;log&amp;quot; &amp;quot;os&amp;quot; &amp;quot;os/signal&amp;quot; &amp;quot;syscall&amp;quot; ) func main() { sigs := make(chan os.</description>
+      <description>何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネ</description>
     </item>
     
   </channel>

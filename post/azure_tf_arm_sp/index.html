@@ -7,17 +7,7 @@
 <title>TerraformをAzure ARMで使う時の認証 | re-imagine</title>
 
 <meta property='og:title' content='TerraformをAzure ARMで使う時の認証 - re-imagine'>
-<meta property='og:description' content='高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。
-Terraformのマイナーバージョンアップのたびに、Azure Resource Manager Providerのリソースが追加されているので、ぼちぼちClassic(Service Management)からの移行を考えよう、という人もいるのでは。VMリソースが追加されたら、いよいよ、ですかね。
-そこで、Classicとは認証方式が変わっているので、ご注意を、という話です。
-client_id/client_secret って何よ 以下がARM向けのProvider設定です。
-# Configure the Azure Resource Manager Provider provider &quot;azurerm&quot; { subscription_id = &quot;...&quot; client_id = &quot;...&quot; client_secret = &quot;...&quot; tenant_id = &quot;...&quot; }  subscription_idは、いつものあれ。tenant_idは普段使わないけどどこかで見た気がする。でも、client_id/client_secret って何よ。ためしにポータルログインで使うID/パスワード指定したら、盛大にコケた。
-&quot;The provider needs to be configured with the credentials needed to generate OAuth tokens for the ARM API.&quot;  おっとそういうことか。OAuth。
-サービスプリンシパルを使おう Terraformをアプリケーションとして登録し、そのサービスプリンシパルを作成し権限を付与すると、使えるようになります。
-&ldquo;アプリケーション オブジェクトおよびサービス プリンシパル オブジェクト&rdquo;
-&ldquo;Azure リソース マネージャーでのサービス プリンシパルの認証&rdquo;
-以下、Azure CLIでの実行結果をのせておきます。WindowsでもMacでもLinuxでも手順は同じです。
-まずは、Terraformをアプリとして登録します。&ndash;identifier-urisの存在チェックはないですが、ユニークにしなければいけません。また、&ndash;passwordはclient_secretになるので、おぼえておきましょう。'>
+<meta property='og:description' content='高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。 Terraformのマイナーバ'>
 <meta property='og:url' content='https://ToruMakabe.github.io/post/azure_tf_arm_sp/'>
 <meta property='og:site_name' content='re-imagine'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Terraform'><meta property='article:tag' content='ARM'><meta property='article:published_time' content='2016-02-27T12:30:00&#43;09:00'/><meta property='article:modified_time' content='2016-02-27T12:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>

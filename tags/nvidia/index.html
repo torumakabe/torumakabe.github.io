@@ -107,17 +107,7 @@
       <h2 class="subtitle is-6 date">February 3, 2017</h2>
       <h1 class="title"><a href="https://ToruMakabe.github.io/post/paintschainer_on_azure/">Azure N-SeriesでPaintsChainerを動かす</a></h1>
       <div class="content">
-        PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&ldquo;PaintsChainerをAmazon EC2で動かしてみた&rdquo;が、とても面白いです。
-畳みこみニューラルネットワークを駆使して白黒線画に色付けしちゃうPaintsChainerすごい。EC2のGPUインスタンスでさくっと動かせるのもいいですね。
-せっかくなのでAzureでもやってみようと思います。AzurerはN-Series &amp; NVIDIA-Dockerのサンプルとして、Azurerでない人はUbuntuでPaintsChainerを動かす参考手順として見ていただいてもいいかと。
-試した環境  米国中南部リージョン Standard NC6 (6 コア、56 GB メモリ、NVIDIA Tesla K80) Ubuntu 16.04 NSGはSSH(22)の他にHTTP(80)を受信許可  導入手順 NVIDIA Tesla driversのインストール マイクロソフト公式ドキュメントの通りに導入します。
-Set up GPU drivers for N-series VMs
-Dockerのインストール Docker公式ドキュメントの通りに導入します。
-Get Docker for Ubuntu
-NVIDIA Dockerのインストール GitHub上のNVIDIAのドキュメント通りに導入します。
-NVIDIA Docker
-ここまでの作業に問題がないか、確認します。
-$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi Using default tag: latest latest: Pulling from nvidia/cuda 8aec416115fd: Pull complete [...] Status: Downloaded newer image for nvidia/cuda:latest Fri Feb 3 06:43:18 2017 +-----------------------------------------------------------------------------+ | NVIDIA-SMI 367.
+        PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&ldquo;PaintsChainerをAmaz
         
         <a class="button is-link" href="https://ToruMakabe.github.io/post/paintschainer_on_azure/" style="height:28px">
           Read more
