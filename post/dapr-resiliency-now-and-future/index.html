@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Daprの回復性を支える仕組み 現状と展望 | re-imagine</title>
+
+<meta property='og:title' content='Daprの回復性を支える仕組み 現状と展望 - re-imagine'>
+<meta property='og:description' content='このエントリは、Dapr Advent Calendar 2021の参加作品(12/11)です。 何の話か クラウドでは、一過性の障害が起こりがちです。その原因は、以下のドキ'>
+<meta property='og:url' content='https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/'>
+<meta property='og:site_name' content='re-imagine'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Dapr'><meta property='article:published_time' content='2021-12-11T00:05:00&#43;09:00'/><meta property='article:modified_time' content='2021-12-11T00:05:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
+
+
+<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
+
+<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<link rel="canonical" href="https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<section class="section">
+  <div class="container">
+    <nav id="nav-main" class="nav">
+      <div id="nav-name" class="nav-left">
+        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
+          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
+        </a>
+      </div>
+      <div class="nav-right">
+        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
+    
+  </svg></i>
+            </span>
+          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
+            target='_blank' rel='noopener'>
+            <span class="icon">
+              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
+    
+    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
+    
+  </svg></i>
+            </span>
+          </a></nav>
+      </div>
+    </nav>
+
+    <nav class="nav">
+      
+
+      
+    </nav>
+
+  </div>
+  <script src="/js/navicon-shift.js"></script>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="subtitle tags is-6 is-pulled-right">
+      
+      
+<a class="subtitle is-6" href="/tags/dapr">#Dapr</a>
+
+
+
+      
+    </div>
+    <h2 class="subtitle is-6">December 11, 2021</h2>
+    <h1 class="title">Daprの回復性を支える仕組み 現状と展望</h1>
+    
+    <div class="content">
+      <p>このエントリは、<a href="https://adventar.org/calendars/6242">Dapr Advent Calendar 2021</a>の参加作品(12/11)です。</p>
+<h2 id="何の話か">何の話か</h2>
+<p>クラウドでは、一過性の障害が起こりがちです。その原因は、以下のドキュメントで具体的に説明されています。</p>
+<p><strong><a href="https://docs.microsoft.com/ja-jp/azure/architecture/best-practices/transient-faults#why-do-transient-faults-occur-in-the-cloud">クラウドで一過性の障害が起こる理由 - 一時的な障害の処理</a></strong></p>
+<p>故障や負荷だけでなく、メンテナンスも原因となり得ます。</p>
+<p>しかし多くの場合、クラウド内部で復旧や切り替えが行われます。呼び出し元が少し時間をおいてからリトライすれば、高い確率で成功するでしょう。よって、リトライなど回復性向上の仕組みを、アプリケーションに組み込むことが<a href="https://docs.microsoft.com/ja-jp/azure/architecture/framework/resiliency/reliability-patterns#resiliency">推奨されています</a>。</p>
+<p>Daprをクラウド上で使いたい、という人は多いでしょう。そしてDaprは、分散アプリケーションを作る開発者の負担を減らすために生まれました。アプリケーション開発者が「回復性に関わるあれこれは、Daprさんのほうで面倒を見てくれないかな」と思うのは自然です。</p>
+<p>そこでこのエントリでは、Daprの回復性を高める仕組みについて、現状と展望をまとめます。</p>
+<p>なお展望について、Daprコミュニティでの議論を直に見たいのであれば、ぜひ以下のIssueを読んでください。よく整理された提案です。</p>
+<p><strong><a href="https://github.com/dapr/dapr/issues/3586">[Proposal] Resiliency policies across all building blocks</a></strong></p>
+<p>前置きが長くなりました。当エントリの目的は、いま紹介したIssueを読む時間と、 現状調査をする余裕がない人向けのまとめです。また、Daprの回復性について関心を持つきっかけになればいいな、と思いながら書いています。</p>
+<h2 id="現状-dapr-v15">現状 (Dapr v1.5)</h2>
+<p>呼び出し元側のDaprランタイム(サイドカー)の実装が、今回整理する対象です。呼び出す先の回復性は、Kubernetesの各種回復機能など基盤を活用して担保するものとします。</p>
+<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/dapr-overview.png?raw=true" width="800"/>
+</figure>
+
+<p>呼び出しパターンは、サービス呼び出し(Service-to-service Invocation)と、コンポーネント呼び出しに分けられます。それぞれの現状は以下の通りです。</p>
+<ul>
+<li>サービス呼び出しは、失敗したら1秒空けて<a href="https://v1-5.docs.dapr.io/developing-applications/building-blocks/service-invocation/service-invocation-overview/#retries">リトライ</a>する(3回まで)
+<ul>
+<li>実装: <a href="https://github.com/dapr/dapr/blob/7c44c95cadfea3626224ae4c0f316f0556421c13/pkg/messaging/direct_messaging.go#L128">invokeWithRetry</a></li>
+<li><a href="https://github.com/dapr/dapr/blob/7c44c95cadfea3626224ae4c0f316f0556421c13/pkg/retry/retry.go#L10">定義は定数</a></li>
+</ul>
+</li>
+<li>コンポーネント呼び出しは、それぞれの実装による
+<ul>
+<li><a href="https://v1-5.docs.dapr.io/reference/components-reference/">ビルディングブロック別 各コンポーネント向け仕様</a>
+<ul>
+<li>リトライに関するパラメータを指定できるものもある
+<ul>
+<li>例: <a href="https://v1-5.docs.dapr.io/reference/components-reference/supported-bindings/blobstorage/">Azure Blob Storage binding</a></li>
+<li>例: <a href="https://v1-5.docs.dapr.io/reference/components-reference/supported-state-stores/setup-redis/">Redis state store</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/dapr/components-contrib">ビルディングブロック別 各コンポーネント向けパッケージのソースコード(components-contrib)</a>
+<ul>
+<li>各ビルディングブロックのディレクトリの下に、コンポーネントごとのGoパッケージがある</li>
+<li>コンポーネント向けパッケージの多くは個別にリトライ機能を実装している</li>
+<li><a href="https://github.com/dapr/kit/blob/main/retry/retry.go">dapr/kitにretryパッケージ</a>があるが、利用は任意
+<ul>
+<li>使っている例: <a href="https://github.com/dapr/components-contrib/blob/release-1.5/bindings/azure/servicebusqueues/servicebusqueues.go#L192">Azure Service Bus Queues binding</a></li>
+<li>使っていない例: <a href="https://github.com/dapr/components-contrib/blob/4c88775d7d917b8adc5eb7adf04d8c0384145f1f/bindings/azure/blobstorage/blobstorage.go#L265">Azure Storage Blob binding</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>このように、面倒を見てくれるいっぽう、課題もあります。</p>
+<h3 id="課題">課題</h3>
+<ul>
+<li>サービス、コンポーネント間で仕様や実装の一貫性がない</li>
+<li>仕様に明記されておらず、実装の確認が必要なものがある</li>
+<li>リトライ回数や間隔など、パラメータを指定できないものがある</li>
+<li>リトライの実装が多いが、サーキットブレイカーなど他のパターンも欲しい</li>
+</ul>
+<p>ということで、仕切り直しましょう、という状況です。</p>
+<h2 id="展望">展望</h2>
+<p>前述した<a href="https://github.com/dapr/dapr/issues/3586">提案</a>で、課題解決の方向性と進め方が議論されています。</p>
+<p>回復性を高める仕組みは利益が大きい反面、提案のCautions/Considerationsで触れられている通り、リスクも含みます。リトライによる重複書き込みが代表的です。なので慎重に、段階的なアプローチが検討されています。</p>
+<ul>
+<li>フェーズ1: 回復性に関するポリシーを共通化し、各ビルディングブロックやコンポーネントに割り当てられるようにする
+<ul>
+<li>回復性ポリシーをKubernetesのカスタムリソースとして定義</li>
+<li>タイムアウト、リトライ、サーキットブレイカーに関するポリシーから</li>
+</ul>
+</li>
+<li>フェーズ2: API固有のポリシーで、上書きできるようにする</li>
+</ul>
+<p>おそらくフェーズ1のリリース後に、多くのフィードバックがあるでしょう。それを見越し、フェーズ1では基本的な機能にフォーカスしています。</p>
+<h3 id="フェーズ1">フェーズ1</h3>
+<p>フェーズ1では、以下のようなカスタムリソースが提案されています。代表的な部分を抜き出します。コメントは削っていますが参考になるため、ぜひ<a href="https://github.com/dapr/dapr/issues/3586">原文</a>もご覧ください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">dapr.io/v1alpha1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Resiliency</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">daprResiliency</span>
+<span style="color:#f92672">scopes</span>:
+  - <span style="color:#ae81ff">app1</span>
+  - <span style="color:#ae81ff">app2</span>
+...
+  <span style="color:#f92672">policies</span>:
+    <span style="color:#f92672">timeouts</span>:
+      <span style="color:#f92672">general</span>: <span style="color:#ae81ff">5s</span>
+      <span style="color:#f92672">important</span>: <span style="color:#ae81ff">60s</span>
+      <span style="color:#f92672">largeResponse</span>: <span style="color:#ae81ff">10s</span>
+
+    <span style="color:#f92672">retries</span>:
+      <span style="color:#f92672">general</span>: {}
+
+      <span style="color:#f92672">pubsubRetry</span>:
+        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">constant</span>
+        <span style="color:#f92672">duration</span>: <span style="color:#ae81ff">5s</span>
+        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">10</span>
+
+      <span style="color:#f92672">retryForever</span>:
+        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">exponential</span>
+        <span style="color:#f92672">maxInterval</span>: <span style="color:#ae81ff">15s</span>
+        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">0</span>
+...
+    <span style="color:#f92672">circuitBreakers</span>:
+      <span style="color:#f92672">general</span>: {}
+
+      <span style="color:#f92672">pubsubCB</span>:
+        <span style="color:#f92672">maxRequests</span>: <span style="color:#ae81ff">1</span>
+        <span style="color:#f92672">interval</span>: <span style="color:#ae81ff">8s</span>
+        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">45s</span>
+        <span style="color:#f92672">trip</span>: <span style="color:#ae81ff">consecutiveFailures &gt; 8</span>
+
+  <span style="color:#f92672">buildingBlocks</span>:
+    <span style="color:#f92672">services</span>:
+      <span style="color:#f92672">appB</span>:
+        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
+        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
+        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
+...
+    <span style="color:#f92672">components</span>:
+      <span style="color:#f92672">statestore1</span>:
+        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
+        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
+        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
+
+      <span style="color:#f92672">pubsub1</span>:
+        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">pubsubRetry</span>
+        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">pubsubCB</span>
+...
+</code></pre></div><p>タイムアウト、リトライ、サーキットブレイカーのポリシーをそれぞれ定義し、ビルディングブロックを構成するサービスやコンポーネントに割り当てます。タイムアウトを判断するまでの時間や、リトライ間隔を固定にする/指数的に増やすなど、目的に応じたポリシーを作れます。</p>
+<p>現時点でフェーズ1は、2022/1に予定されているDapr v1.6でのリリースを<a href="https://github.com/dapr/dapr/milestone/12">目指しています</a>。もちろんこのカスタムリソースを使うように、各コンポーネント向けパッケージでも対応しなければいけませんが、まずは重要な一歩目です。</p>
+<h3 id="フェーズ2">フェーズ2</h3>
+<p>フェーズ1のフィードバックによりますが、現時点ではAPI固有のポリシー定義による上書き機能が予定されています。代表例を抜き出します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">...
+  <span style="color:#f92672">apis</span>:
+    <span style="color:#f92672">invoke</span>:
+      - <span style="color:#f92672">match</span>: <span style="color:#ae81ff">appId == &#34;appB&#34;</span>
+        <span style="color:#f92672">rules</span>:
+          - <span style="color:#f92672">match</span>:
+              <span style="color:#ae81ff">request.method == &#34;GET&#34; &amp;&amp;</span>
+              <span style="color:#ae81ff">request.metadata.count &gt; 1000</span>
+            <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">largeResponse</span>
+            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">largeResponse</span>
+          - <span style="color:#f92672">match</span>:
+              <span style="color:#ae81ff">request.path == &#34;/someOperation&#34;</span>
+            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">someOperation</span>
+...
+</code></pre></div><p>サービス呼び出しのポリシーを、リクエストのメソッドやパスに合わせて個別のポリシーで上書きする、という使い方は分かりやすい例ですね。</p>
+<h2 id="いま意識したいこと">いま意識したいこと</h2>
+<p>以上、Daprの回復性を支える仕組みについて、現状と展望をざっと整理しました。それを踏まえ、いまDaprを使うなら、以下を意識するといいかな、と思います。</p>
+<ul>
+<li>各コンポーネント向けパッケージが、どのような回復性向上機能を持っているか、選定時に確認する</li>
+<li>呼び出し元のサービス、アプリケーションで実装すべき機能を検討する
+<ul>
+<li>将来の拡充を期待するにせよ、最低限のエラーハンドリングは必要</li>
+<li><a href="https://docs.dapr.io/developing-applications/sdks/">SDKとその使い方</a>を参考にする
+<ul>
+<li>SDK視点でも既知の問題や課題、経緯を確認しておくとなお良し</li>
+<li>例: <a href="https://github.com/dapr/go-sdk/issues/36">Remove retry options from state apis - Go SDK</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>展望として紹介した回復性ポリシーはすぐに使えるわけではないが、状況をウォッチしておく
+<ul>
+<li>導入タイミングを見極める</li>
+</ul>
+</li>
+</ul>
+<p>Enjoy Dapr!</p>
+
+      
+    </div>
+    
+  </div>
+</section>
+
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; Copyright 2021 Toru Makabe</p>
+    
+      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
+    
+  </div>
+</section>
+
+
+
+</body>
+</html>
+
