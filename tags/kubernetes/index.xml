@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
-    <lastBuildDate>Wed, 21 Jul 2021 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>
+      <link>https://ToruMakabe.github.io/post/aks-disable-local-account/</link>
+      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aks-disable-local-account/</guid>
+      <description>何の話か Azure Kubernetes Service(AKS)でローカルアカウントを無効化できるようになり、GAしました。ローカルアカウントを無効にすると、AKSをセ</description>
+    </item>
+    
     <item>
       <title>Azure Kubernetes Service アップグレード戦略 2021夏版</title>
       <link>https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/</link>
