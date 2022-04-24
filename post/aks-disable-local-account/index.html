@@ -270,7 +270,7 @@ subjects:
   }
 }
 </code></pre></div><p>kubeloginは実行可能なプログラムです。パスを通し、client-goが実行できるようにしておきます。そして&quot;get-token&quot;は、Azure ADからトークンを得るサブコマンドです。また、&quot;&ndash;login azurecli&quot;オプションで、Azure CLIの認証情報を利用します。すでにAzure CLIでAzureにログインしている状態であれば、改めてAzure AD認証をする必要がありません。これが非対話型ログインできる理由です。</p>
-<p>なお、kubeloginにはget-tokenの他に、convert-kubeconfigサブコマンドがあります。このサブコマンドは、kubedonfigファイルに、プラグインを使うように設定を書き込みます。例えばkubectlを非対話型ログインで使うことができる、というわけです。</p>
+<p>なお、kubeloginにはget-tokenの他に、convert-kubeconfigサブコマンドがあります。このサブコマンドは、kubeconfigファイルに、プラグインを使うように設定を書き込みます。例えばkubectlを非対話型ログインで使うことができる、というわけです。</p>
 <p>ではconvert-kubeconfigサブコマンドも試してみましょう。kubeconfigファイルの変化を見たいため、az aks get-credentialsコマンドを&ndash;overwrite-existingオプションで実行し、すでに取得したトークンなど認証情報をリセットします。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az aks get-credentials -g my-rg -n my-cluster --overwrite-existing 
 Merged <span style="color:#e6db74">&#34;my-cluster&#34;</span> as current context in /home/ubuntu/.kube/config
