@@ -1,15 +1,21 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Github on re-imagine</title>
+    <title>GitHub on re-imagine</title>
     <link>https://ToruMakabe.github.io/categories/github/</link>
-    <description>Recent content in Github on re-imagine</description>
+    <description>Recent content in GitHub on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 22 Dec 2018 20:00:00 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/categories/github/index.xml" rel="self" type="application/rss+xml" />
-    
+    <copyright>Copyright 2021 Toru Makabe</copyright>
+    <lastBuildDate>Sun, 22 Dec 2019 23:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/github/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GitHub Actionsでオンデマンドに環境を再現する</title>
+      <link>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</link>
+      <pubDate>Sun, 22 Dec 2019 23:30:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</guid>
+      <description>何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフロー</description>
+    </item>
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
@@ -17,15 +23,7 @@
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
-      <description>GitHub Actionsのプレビュー招待がきた ので試します。プレビュー中なので細かいことは抜きに、ざっくりどんなことができるか。
-GitHub Actions
-数時間、触った印象。
- GitHubへのPushなどイベントをトリガーにWorkflowを流せる シンプルなWorkflow記法 (TerraformのHCLに似ている) Workflowから呼び出すActionはDockerコンテナー Dockerコンテナーをビルドしておかなくてもいい (Dockerfileをリポジトリに置けば実行時にビルドされる)  Dockerに慣れていて、ちょっとしたタスクの自動化を、GitHubで完結したい人に良さそうです。
-Azure CLI/Kubernetes(AKS) kubectlサンプル こんなことを試してみました。
- KubernetesのマニフェストをGitHubリポジトリへPush PushイベントをトリガーにWorkflowを起動 Azure CLIを使ってAKSクラスターのCredentialを取得 イベント発生元がmasterブランチであれば継続 kubectl applyでマニフェストを適用  kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。
-コードは ここ に。
-ディレクトリ構造は、こうです。
-. ├── .git │ └── (省略) ├── .github │ └── main.workflow ├── LICENSE ├── README.md ├── azure-cli │ ├── Dockerfile │ └── entrypoint.sh └── sampleapp.yaml   .github の下にWorkflowを書きます azure-cli の下に自作Actionを置きました sampleapp.yaml がkubernetesのマニフェストです  Workflow まず、 .</description>
+      <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移</description>
     </item>
     
   </channel>

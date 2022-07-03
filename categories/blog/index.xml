@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blog on re-imagine</title>
@@ -6,19 +6,15 @@
     <description>Recent content in Blog on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 20 Sep 2015 15:27:03 +0900</lastBuildDate>
-    
-	<atom:link href="https://ToruMakabe.github.io/categories/blog/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>Copyright 2021 Toru Makabe</copyright>
+    <lastBuildDate>Sun, 20 Sep 2015 15:27:03 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Hugoへ移行</title>
       <link>https://ToruMakabe.github.io/post/migrate-to-hugo/</link>
       <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/migrate-to-hugo/</guid>
-      <description>JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソース管理、Werckerで自動ビルド、最後にGithub Pagesにデプロイするフローを作りました。
-移行にあたり、Jekyllの前(Blogger)に使っていたフォーマットを変換するのが面倒だったので、その時代のエントリーをえいっと削除しました。リンクいただいたみなさん、すいません。内容も古くなっていたので、リフレッシュのいい機会ということで、ご容赦を。</description>
+      <description>JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソ</description>
     </item>
     
   </channel>

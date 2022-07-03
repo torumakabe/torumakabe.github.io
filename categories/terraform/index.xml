@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Terraform on re-imagine</title>
+    <link>https://ToruMakabe.github.io/categories/terraform/</link>
+    <description>Recent content in Terraform on re-imagine</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <copyright>Copyright 2021 Toru Makabe</copyright>
+    <lastBuildDate>Fri, 26 Apr 2019 18:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/terraform/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする</title>
+      <link>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
+      <pubDate>Fri, 26 Apr 2019 18:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
+      <description>何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr</description>
+    </item>
+    
+  </channel>
+</rss>

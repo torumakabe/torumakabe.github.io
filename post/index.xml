@@ -6,7 +6,7 @@
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
+    <copyright>Copyright 2021 Toru Makabe</copyright>
     <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>

@@ -6,7 +6,7 @@
     <description>Recent content in HP Public Cloud on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>&amp;copy; Copyright 2021 Toru Makabe</copyright>
+    <copyright>Copyright 2021 Toru Makabe</copyright>
     <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>

@@ -11,7 +11,16 @@
     <loc>https://ToruMakabe.github.io/tags/azure/</loc>
     <lastmod>2021-12-26T15:00:00+09:00</lastmod>
   </url><url>
+    <loc>https://ToruMakabe.github.io/categories/azure/</loc>
+    <lastmod>2021-12-26T15:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/</loc>
+    <lastmod>2021-12-26T15:00:00+09:00</lastmod>
+  </url><url>
     <loc>https://ToruMakabe.github.io/tags/kubernetes/</loc>
+    <lastmod>2021-12-26T15:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/kubernetes/</loc>
     <lastmod>2021-12-26T15:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/post/</loc>
@@ -24,6 +33,9 @@
     <lastmod>2021-12-26T15:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/dapr/</loc>
+    <lastmod>2021-12-11T00:05:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/dapr/</loc>
     <lastmod>2021-12-11T00:05:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</loc>
@@ -86,6 +98,9 @@
     <loc>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</loc>
     <lastmod>2020-05-21T13:05:00+09:00</lastmod>
   </url><url>
+    <loc>https://ToruMakabe.github.io/categories/github/</loc>
+    <lastmod>2019-12-22T23:30:00+09:00</lastmod>
+  </url><url>
     <loc>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</loc>
     <lastmod>2019-12-22T23:30:00+09:00</lastmod>
   </url><url>
@@ -107,6 +122,9 @@
     <loc>https://ToruMakabe.github.io/post/k8s_descheduler/</loc>
     <lastmod>2019-06-01T09:00:00+09:00</lastmod>
   </url><url>
+    <loc>https://ToruMakabe.github.io/categories/terraform/</loc>
+    <lastmod>2019-04-26T18:00:00+09:00</lastmod>
+  </url><url>
     <loc>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</loc>
     <lastmod>2019-04-26T18:00:00+09:00</lastmod>
   </url><url>
@@ -117,6 +135,9 @@
     <lastmod>2018-05-02T17:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/wsl/</loc>
+    <lastmod>2018-05-02T17:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/wsl/</loc>
     <lastmod>2018-05-02T17:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/post/wslenv_golang/</loc>
@@ -174,6 +195,9 @@
     <lastmod>2017-12-04T22:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/windows/</loc>
+    <lastmod>2017-12-04T22:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/windows/</loc>
     <lastmod>2017-12-04T22:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</loc>
@@ -272,6 +296,9 @@
     <loc>https://ToruMakabe.github.io/tags/node/</loc>
     <lastmod>2016-09-14T15:00:00+09:00</lastmod>
   </url><url>
+    <loc>https://ToruMakabe.github.io/categories/node/</loc>
+    <lastmod>2016-09-14T15:00:00+09:00</lastmod>
+  </url><url>
     <loc>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</loc>
     <lastmod>2016-09-13T17:30:00+09:00</lastmod>
   </url><url>
@@ -330,6 +357,9 @@
     <lastmod>2016-04-06T17:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/book/</loc>
+    <lastmod>2016-03-27T20:00:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/book/</loc>
     <lastmod>2016-03-27T20:00:00+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/google/</loc>
@@ -412,6 +442,9 @@
   </url><url>
     <loc>https://ToruMakabe.github.io/post/azure_docker_extension/</loc>
     <lastmod>2015-11-05T15:40:00+09:00</lastmod>
+  </url><url>
+    <loc>https://ToruMakabe.github.io/categories/blog/</loc>
+    <lastmod>2015-09-20T15:27:03+09:00</lastmod>
   </url><url>
     <loc>https://ToruMakabe.github.io/tags/hugo/</loc>
     <lastmod>2015-09-20T15:27:03+09:00</lastmod>

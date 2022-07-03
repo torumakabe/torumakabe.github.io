@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dapr on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/dapr/</link>
+    <link>https://ToruMakabe.github.io/categories/dapr/</link>
     <description>Recent content in Dapr on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright 2021 Toru Makabe</copyright>
-    <lastBuildDate>Sat, 11 Dec 2021 00:05:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/dapr/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 11 Dec 2021 00:05:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/dapr/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Daprの回復性を支える仕組み 現状と展望</title>
       <link>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</link>
