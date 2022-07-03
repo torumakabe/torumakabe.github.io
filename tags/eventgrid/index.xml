@@ -6,7 +6,7 @@
     <description>Recent content in EventGrid on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Copyright 2021 Toru Makabe</copyright>
+    <copyright>Copyright Toru Makabe</copyright>
     <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>

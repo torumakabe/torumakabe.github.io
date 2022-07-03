@@ -192,7 +192,7 @@
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;kubernetes&#34;</span> {
-</span></span><span style="display:flex;"><span>  host                   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${data.azurerm_kubernetes_cluster.example.kube_config.0.host}&#34;</span>
+</span></span><span style="display:flex;"><span>  host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">example</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
 </span></span><span style="display:flex;"><span>  client_certificate     <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${base64decode(data.azurerm_kubernetes_cluster.example.kube_config.0.client_certificate)}&#34;</span>
 </span></span><span style="display:flex;"><span>  client_key             <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${base64decode(data.azurerm_kubernetes_cluster.example.kube_config.0.client_key)}&#34;</span>
 </span></span><span style="display:flex;"><span>  cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${base64decode(data.azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)}&#34;</span>
@@ -202,7 +202,7 @@
 <p>kubeloginは、<a href="https://kubernetes.io/docs/reference/access-authn-authz/authentication/#client-go-credential-plugins">client-go credential プラグイン</a>のAzure向け実装です。client-goは代表的なKubernetesクライアントで、kubectlやTerraform Kubernetesプロバイダーでも使われています。kubeloginは、client-goがAzure ADからトークンなどのクレデンシャルを取得できるようサポートします。非対話型ログインはそのシナリオのひとつです。</p>
 <p>使い方から入るとピンときやすいと思います。例えばTerraformのKubernetesプロバイダーでは、以下のように使います。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-HCL" data-lang="HCL"><span style="display:flex;"><span><span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;kubernetes&#34;</span> {
-</span></span><span style="display:flex;"><span>  host                   <span style="color:#f92672">=</span> <span style="color:#e6db74">${</span><span style="color:#960050;background-color:#1e0010">data</span>.<span style="color:#960050;background-color:#1e0010">azurerm_kubernetes_cluster</span>.<span style="color:#960050;background-color:#1e0010">example</span>.<span style="color:#960050;background-color:#1e0010">kube_config</span>.<span style="color:#960050;background-color:#1e0010">0</span>.<span style="color:#960050;background-color:#1e0010">host</span><span style="color:#e6db74">}</span><span style="color:#960050;background-color:#1e0010">&#34;</span>
+</span></span><span style="display:flex;"><span>  host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">example</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
 </span></span><span style="display:flex;"><span>  cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;${base64decode(data.azurerm_kubernetes_cluster.example.kube_config.0.cluster_ca_certificate)}&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">exec</span> {
@@ -315,7 +315,7 @@
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright 2021 Toru Makabe |  <a
+    2022  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

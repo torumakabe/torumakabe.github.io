@@ -6,7 +6,7 @@
     <description>Recent content in WSL on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Copyright 2021 Toru Makabe</copyright>
+    <copyright>Copyright Toru Makabe</copyright>
     <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/wsl/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</title>
