@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure BatchとDockerで管理サーバレスバッチ環境を作る - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure BatchとDockerで管理サーバレスバッチ環境を作る" />
+<meta property="og:description" content="サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/azure_batch_docker/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2016-04-29T17:00:00+09:00" />
+<meta property="article:modified_time" content="2016-04-29T17:00:00+09:00" />
 
-<title>Azure BatchとDockerで管理サーバレスバッチ環境を作る | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure BatchとDockerで管理サーバレスバッチ環境を作る"/>
+<meta name="twitter:description" content="サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='Azure BatchとDockerで管理サーバレスバッチ環境を作る - re-imagine'>
-<meta property='og:description' content='サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/azure_batch_docker/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Docker'><meta property='article:tag' content='Batch'><meta property='article:published_time' content='2016-04-29T17:00:00&#43;09:00'/><meta property='article:modified_time' content='2016-04-29T17:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/azure_batch_docker/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</h1>
+			<div class="meta">Posted on Apr 29, 2016</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/docker">#Docker</a>
-  
-  | <a class="subtitle is-6" href="/tags/batch">#Batch</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">April 29, 2016</h2>
-    <h1 class="title">Azure BatchとDockerで管理サーバレスバッチ環境を作る</h1>
-    
-    <div class="content">
-      <h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
+		<section class="body">
+			<h2 id="サーバレスって言いたいだけじゃないです">サーバレスって言いたいだけじゃないです</h2>
 <p>Linux向けAzure BatchのPreviewが<a href="https://azure.microsoft.com/ja-jp/blog/announcing-support-of-linux-vm-on-azure-batch-service/">はじまり</a>ました。地味ですが、なかなかのポテンシャルです。</p>
 <p>クラウドでバッチを走らせる時にチャレンジしたいことの筆頭は「ジョブを走らせる時だけサーバ使う。待機時間は消しておいて、
 節約」でしょう。</p>
@@ -151,85 +100,85 @@
 <li>サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
 <li>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
 </ul>
-<pre tabindex="0"><code>  {
-  &quot;odata.metadata&quot;:&quot;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&quot;,
-  &quot;id&quot;:&quot;myjobschedule1&quot;,
-  &quot;schedule&quot;: {
-    &quot;doNotRunUntil&quot;:&quot;2016-04-29T05:30:00.000Z&quot;,
-    &quot;recurrenceInterval&quot;:&quot;PT4H&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">  {
+  &#34;odata.metadata&#34;:&#34;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&#34;,
+  &#34;id&#34;:&#34;myjobschedule1&#34;,
+  &#34;schedule&#34;: {
+    &#34;doNotRunUntil&#34;:&#34;2016-04-29T05:30:00.000Z&#34;,
+    &#34;recurrenceInterval&#34;:&#34;PT4H&#34;
   },
-  &quot;jobSpecification&quot;: {
-    &quot;priority&quot;:100,
-    &quot;constraints&quot;: {
-      &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-      &quot;maxTaskRetryCount&quot;:-1
+  &#34;jobSpecification&#34;: {
+    &#34;priority&#34;:100,
+    &#34;constraints&#34;: {
+      &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
+      &#34;maxTaskRetryCount&#34;:-1
     },
-    &quot;jobManagerTask&quot;: {
-      &quot;id&quot;:&quot;mytask1&quot;,
-      &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./task.sh'&quot;,
-      &quot;resourceFiles&quot;: [ {
-        &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-        &quot;filePath&quot;:&quot;task.sh&quot;
+    &#34;jobManagerTask&#34;: {
+      &#34;id&#34;:&#34;mytask1&#34;,
+      &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&#34;,
+      &#34;resourceFiles&#34;: [ {
+        &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
+        &#34;filePath&#34;:&#34;task.sh&#34;
       }], 
-      &quot;environmentSettings&quot;: [ {
-        &quot;name&quot;:&quot;VAR1&quot;,
-        &quot;value&quot;:&quot;hello&quot;
+      &#34;environmentSettings&#34;: [ {
+        &#34;name&#34;:&#34;VAR1&#34;,
+        &#34;value&#34;:&#34;hello&#34;
       } ],
-      &quot;constraints&quot;: {
-        &quot;maxWallClockTime&quot;:&quot;PT1H&quot;,
-        &quot;maxTaskRetryCount&quot;:0,
-        &quot;retentionTime&quot;:&quot;PT1H&quot;
+      &#34;constraints&#34;: {
+        &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
+        &#34;maxTaskRetryCount&#34;:0,
+        &#34;retentionTime&#34;:&#34;PT1H&#34;
       },
-      &quot;killJobOnCompletion&quot;:false,
-      &quot;runElevated&quot;:true,
-      &quot;runExclusive&quot;:true
+      &#34;killJobOnCompletion&#34;:false,
+      &#34;runElevated&#34;:true,
+      &#34;runExclusive&#34;:true
       },
-      &quot;poolInfo&quot;: {
-        &quot;autoPoolSpecification&quot;: {
-          &quot;autoPoolIdPrefix&quot;:&quot;mypool&quot;,
-          &quot;poolLifetimeOption&quot;:&quot;job&quot;,
-          &quot;pool&quot;: {
-            &quot;vmSize&quot;:&quot;STANDARD_D1&quot;,
-            &quot;virtualMachineConfiguration&quot;: {
-              &quot;imageReference&quot;: {
-                &quot;publisher&quot;:&quot;Canonical&quot;,
-                &quot;offer&quot;:&quot;UbuntuServer&quot;,
-                &quot;sku&quot;:&quot;14.04.4-LTS&quot;,
-                &quot;version&quot;:&quot;latest&quot;
+      &#34;poolInfo&#34;: {
+        &#34;autoPoolSpecification&#34;: {
+          &#34;autoPoolIdPrefix&#34;:&#34;mypool&#34;,
+          &#34;poolLifetimeOption&#34;:&#34;job&#34;,
+          &#34;pool&#34;: {
+            &#34;vmSize&#34;:&#34;STANDARD_D1&#34;,
+            &#34;virtualMachineConfiguration&#34;: {
+              &#34;imageReference&#34;: {
+                &#34;publisher&#34;:&#34;Canonical&#34;,
+                &#34;offer&#34;:&#34;UbuntuServer&#34;,
+                &#34;sku&#34;:&#34;14.04.4-LTS&#34;,
+                &#34;version&#34;:&#34;latest&#34;
               },
-              &quot;nodeAgentSKUId&quot;:&quot;batch.node.ubuntu 14.04&quot;
+              &#34;nodeAgentSKUId&#34;:&#34;batch.node.ubuntu 14.04&#34;
             },
-            &quot;resizeTimeout&quot;:&quot;PT15M&quot;,
-            &quot;targetDedicated&quot;:1,
-            &quot;maxTasksPerNode&quot;:1,
-            &quot;taskSchedulingPolicy&quot;: {
-              &quot;nodeFillType&quot;:&quot;Spread&quot;
+            &#34;resizeTimeout&#34;:&#34;PT15M&#34;,
+            &#34;targetDedicated&#34;:1,
+            &#34;maxTasksPerNode&#34;:1,
+            &#34;taskSchedulingPolicy&#34;: {
+              &#34;nodeFillType&#34;:&#34;Spread&#34;
             },
-            &quot;enableAutoScale&quot;:false,
-            &quot;enableInterNodeCommunication&quot;:false,
-            &quot;startTask&quot;: {
-              &quot;commandLine&quot;:&quot;/bin/bash -c 'export LC_ALL=en_US.UTF-8; ./starttask.sh'&quot;,
-              &quot;resourceFiles&quot;: [ {
-                &quot;blobSource&quot;:&quot;yourbloburi&amp;sas&quot;,
-                &quot;filePath&quot;:&quot;starttask.sh&quot;
+            &#34;enableAutoScale&#34;:false,
+            &#34;enableInterNodeCommunication&#34;:false,
+            &#34;startTask&#34;: {
+              &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&#34;,
+              &#34;resourceFiles&#34;: [ {
+                &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
+                &#34;filePath&#34;:&#34;starttask.sh&#34;
               } ],
-              &quot;environmentSettings&quot;: [ {
-                &quot;name&quot;:&quot;VAR2&quot;,
-                &quot;value&quot;:&quot;Chao&quot;
+              &#34;environmentSettings&#34;: [ {
+                &#34;name&#34;:&#34;VAR2&#34;,
+                &#34;value&#34;:&#34;Chao&#34;
               } ],
-              &quot;runElevated&quot;:true,
-              &quot;waitForSuccess&quot;:true
+              &#34;runElevated&#34;:true,
+              &#34;waitForSuccess&#34;:true
             },
-            &quot;metadata&quot;: [ {
-              &quot;name&quot;:&quot;myproperty&quot;,
-              &quot;value&quot;:&quot;myvalue&quot;
+            &#34;metadata&#34;: [ {
+              &#34;name&#34;:&#34;myproperty&#34;,
+              &#34;value&#34;:&#34;myvalue&#34;
             } ]
           }
         }
       }
     }
   }
-</code></pre><p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
+</code></pre></div><p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
 <p>それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。</p>
 <p>ではスケジュールジョブをAzure BatchにCLIで送り込みます。</p>
 <pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey
@@ -238,25 +187,40 @@
 <h2 id="azure-automationとの使い分け">Azure Automationとの使い分け</h2>
 <p>Azure Automationを使っても、ジョブの定期実行はできます。大きな違いは、PowerShellの要否と並列実行フレームワークの有無です。Azure AutomationはPowerShell前提ですが、Azure BatchはPowerShellに馴染みのない人でも使うことができます。また、今回は触れませんでしたが、Azure Batchは並列バッチ、オートスケールなど、バッチ処理に特化した機能を提供していることが特長です。うまく使い分けましょう。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/docker">Docker</a></li>
+					
+					<li><a href="/tags/batch">Batch</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

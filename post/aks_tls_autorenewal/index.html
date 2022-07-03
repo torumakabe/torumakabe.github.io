@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>AKSのIngress TLS証明書を自動更新する - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="AKSのIngress TLS証明書を自動更新する" />
+<meta property="og:description" content="カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/aks_tls_autorenewal/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2018-02-11T00:20:00+09:00" />
+<meta property="article:modified_time" content="2018-02-11T00:20:00+09:00" />
 
-<title>AKSのIngress TLS証明書を自動更新する | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="AKSのIngress TLS証明書を自動更新する"/>
+<meta name="twitter:description" content="カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='AKSのIngress TLS証明書を自動更新する - re-imagine'>
-<meta property='og:description' content='カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/aks_tls_autorenewal/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='AKS'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2018-02-11T00:20:00&#43;09:00'/><meta property='article:modified_time' content='2018-02-11T00:20:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/aks_tls_autorenewal/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">AKSのIngress TLS証明書を自動更新する</h1>
+			<div class="meta">Posted on Feb 11, 2018</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/aks">#AKS</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">February 11, 2018</h2>
-    <h1 class="title">AKSのIngress TLS証明書を自動更新する</h1>
-    
-    <div class="content">
-      <h2 id="カジュアルな証明書管理方式が欲しい">カジュアルな証明書管理方式が欲しい</h2>
+		<section class="body">
+			<h2 id="カジュアルな証明書管理方式が欲しい">カジュアルな証明書管理方式が欲しい</h2>
 <p>ChromeがHTTPサイトに対する警告を<a href="https://japan.cnet.com/article/35100589/">強化するそうです</a>。非HTTPSサイトには、生きづらい世の中になりました。</p>
 <p>さてそうなると、TLS証明書の入手と更新、めんどくさいですね。ガチなサイトでは証明書の維持管理を計画的に行うべきですが、検証とかちょっとした用途で立てるサイトでは、とにかくめんどくさい。カジュアルな方式が望まれます。</p>
 <p>そこで、Azure Container Service(AKS)で使える気軽な方法をご紹介します。</p>
@@ -128,21 +77,21 @@
 <li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
 </ul>
 <p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
-<pre tabindex="0"><code>$ helm install stable/nginx-ingress --name my-nginx
-</code></pre><p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
-<pre tabindex="0"><code>$ kubectl get svc
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ helm install stable/nginx-ingress --name my-nginx
+</code></pre></div><p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get svc
 NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
 kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
 my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
 my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
-</code></pre><p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
-<pre tabindex="0"><code>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
-</code></pre><p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&quot;&ndash;set rbac.create=false&quot;オプションを指定しています。</p>
-<pre tabindex="0"><code>$ git clone https://github.com/jetstack/cert-manager
+</code></pre></div><p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
+</code></pre></div><p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&quot;&ndash;set rbac.create=false&quot;オプションを指定しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/jetstack/cert-manager
 $ cd cert-manager/
 $ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
-</code></pre><p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
-<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
+</code></pre></div><p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
   name: letsencrypt-staging
@@ -158,12 +107,12 @@ spec:
       name: letsencrypt-staging
     # Enable the HTTP-01 challenge provider
     http01: {}
-</code></pre><p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
+</code></pre></div><p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
 <p>なお、Let&rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも<a href="https://github.com/jetstack/cert-manager/pull/246">いずれ対応する見込み</a>です。</p>
 <p>では、Issuerを登録します。</p>
-<pre tabindex="0"><code>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
-</code></pre><p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
-<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-issuer-le-staging-sample.yaml
+</code></pre></div><p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: example-com
@@ -181,17 +130,17 @@ spec:
         ingressClass: nginx
       domains:
       - www.example.com
-</code></pre><p>証明書設定をデプロイします。</p>
-<pre tabindex="0"><code>$ kubectl apply -f cm-cert-le-staging-sample.yaml
-</code></pre><p>証明書の発行状況を確認します。</p>
-<pre tabindex="0"><code>$ kubectl describe certificate example-com
+</code></pre></div><p>証明書設定をデプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-cert-le-staging-sample.yaml
+</code></pre></div><p>証明書の発行状況を確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe certificate example-com
 Name:         example-com
 Namespace:    default
 [snip]
 Events:
   Type     Reason                 Age              From                     Message
   ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &quot;example-com-tls&quot; not found
+  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &#34;example-com-tls&#34; not found
   Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
   Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
   Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
@@ -199,9 +148,9 @@ Events:
   Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
   Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
   Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
-</code></pre><p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
+</code></pre></div><p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
 <p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
-<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
 kind: Issuer
 metadata:
   name: letsencrypt-prod
@@ -217,10 +166,10 @@ spec:
       name: letsencrypt-prod
     # Enable the HTTP-01 challenge provider
     http01: {}
-</code></pre><p>デプロイします。</p>
-<pre tabindex="0"><code>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
-</code></pre><p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
-<pre tabindex="0"><code>apiVersion: certmanager.k8s.io/v1alpha1
+</code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-issuer-le-prod-sample.yaml
+</code></pre></div><p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: prod-example-com
@@ -238,17 +187,17 @@ spec:
         ingressClass: nginx
       domains:
       - www.example.com
-</code></pre><p>デプロイします。</p>
-<pre tabindex="0"><code>$ kubectl apply -f cm-cert-le-prod-sample.yaml
-</code></pre><p>発行状況を確認します。</p>
-<pre tabindex="0"><code>$ kubectl describe certificate prod-example-com
+</code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-cert-le-prod-sample.yaml
+</code></pre></div><p>発行状況を確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe certificate prod-example-com
 Name:         prod-example-com
 Namespace:    default
 [snip]
 Events:
   Type     Reason                 Age              From                     Message
   ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &quot;prod-example-com-tls&quot; not found
+  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &#34;prod-example-com-tls&#34; not found
   Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
   Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
   Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
@@ -256,12 +205,12 @@ Events:
   Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
   Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
   Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
-</code></pre><p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
+</code></pre></div><p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
 <p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
-<pre tabindex="0"><code>$ kubectl run nginx --image nginx --port 80
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl run nginx --image nginx --port 80
 $ kubectl expose deployment nginx --type NodePort
-</code></pre><p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
-<pre tabindex="0"><code>apiVersion: extensions/v1beta1
+</code></pre></div><p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -281,36 +230,51 @@ spec:
     - hosts:
       - www.example.com
       secretName: prod-example-com-tls
-</code></pre><p>デプロイします。</p>
-<pre tabindex="0"><code>$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre><p>いざ確認。</p>
-<pre tabindex="0"><code>$ curl https://www.example.com/
+</code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f ingress-nginx-sample.yaml
+</code></pre></div><p>いざ確認。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://www.example.com/
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
 &lt;title&gt;Welcome to nginx!&lt;/title&gt;
 [snip]
-</code></pre><p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
+</code></pre></div><p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/aks">AKS</a></li>
+					
+					<li><a href="/tags/kubernetes">Kubernetes</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

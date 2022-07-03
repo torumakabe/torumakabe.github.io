@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える" />
+<meta property="og:description" content="TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/azure_msi_terraform/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2018-03-30T16:30:00+09:00" />
+<meta property="article:modified_time" content="2018-03-30T16:30:00+09:00" />
 
-<title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える"/>
+<meta name="twitter:description" content="TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える - re-imagine'>
-<meta property='og:description' content='TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/azure_msi_terraform/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='MSI'><meta property='article:tag' content='Terraform'><meta property='article:published_time' content='2018-03-30T16:30:00&#43;09:00'/><meta property='article:modified_time' content='2018-03-30T16:30:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/azure_msi_terraform/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</h1>
+			<div class="meta">Posted on Mar 30, 2018</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/msi">#MSI</a>
-  
-  | <a class="subtitle is-6" href="/tags/terraform">#Terraform</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">March 30, 2018</h2>
-    <h1 class="title">Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</h1>
-    
-    <div class="content">
-      <h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
+		<section class="body">
+			<h2 id="terraformのプロビジョニングがmarketplaceから可能に">TerraformのプロビジョニングがMarketplaceから可能に</h2>
 <p>Terraform使ってますか。Azureのリソースプロビジョニングの基本はAzure Resource Manager Template Deployである、がわたしの持論ですが、Terraformを使う/併用する方がいいな、というケースは結構あります。使い分けは<a href="https://www.slideshare.net/ToruMakabe/azure-infrastructure-as-code">この資料</a>も参考に。</p>
 <p>さて、先日Azure Marketplaceから<a href="https://azuremarketplace.microsoft.com/en-us/marketplace/apps/azure-oss.terraform">Terraform入りの仮想マシン</a>をプロビジョニングできるようになりました。Ubuntuに以下のアプリが導入、構成されます。</p>
 <ul>
@@ -141,114 +90,114 @@
 <li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
 <li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
 </ul>
-<pre tabindex="0"><code>[snip]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[snip]
         {
-            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/MSILinuxExtension')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-12-01&quot;,
-            &quot;location&quot;: &quot;[parameters('location')]&quot;,
-            &quot;properties&quot;: {
-                &quot;publisher&quot;: &quot;Microsoft.ManagedIdentity&quot;,
-                &quot;type&quot;: &quot;ManagedIdentityExtensionForLinux&quot;,
-                &quot;typeHandlerVersion&quot;: &quot;1.0&quot;,
-                &quot;autoUpgradeMinorVersion&quot;: true,
-                &quot;settings&quot;: {
-                    &quot;port&quot;: 50342
+            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
+            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&#34;,
+            &#34;apiVersion&#34;: &#34;2017-12-01&#34;,
+            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
+            &#34;properties&#34;: {
+                &#34;publisher&#34;: &#34;Microsoft.ManagedIdentity&#34;,
+                &#34;type&#34;: &#34;ManagedIdentityExtensionForLinux&#34;,
+                &#34;typeHandlerVersion&#34;: &#34;1.0&#34;,
+                &#34;autoUpgradeMinorVersion&#34;: true,
+                &#34;settings&#34;: {
+                    &#34;port&#34;: 50342
                 },
-                &quot;protectedSettings&quot;: {}
+                &#34;protectedSettings&#34;: {}
             },
-            &quot;dependsOn&quot;: [
-                &quot;[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]&quot;
+            &#34;dependsOn&#34;: [
+                &#34;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&#34;
             ]
         },
         {
-            &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;,
-            &quot;name&quot;: &quot;[variables('resourceGuid')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-09-01&quot;,
-            &quot;properties&quot;: {
-                &quot;roleDefinitionId&quot;: &quot;[variables('contributor')]&quot;,
-                &quot;principalId&quot;: &quot;[reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId]&quot;,
-                &quot;scope&quot;: &quot;[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name)]&quot;
+            &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;,
+            &#34;name&#34;: &#34;[variables(&#39;resourceGuid&#39;)]&#34;,
+            &#34;apiVersion&#34;: &#34;2017-09-01&#34;,
+            &#34;properties&#34;: {
+                &#34;roleDefinitionId&#34;: &#34;[variables(&#39;contributor&#39;)]&#34;,
+                &#34;principalId&#34;: &#34;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&#34;,
+                &#34;scope&#34;: &#34;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&#34;
             },
-            &quot;dependsOn&quot;: [
-                &quot;[resourceId('Microsoft.Compute/virtualMachines/extensions/', parameters('vmName'),'MSILinuxExtension')]&quot;
+            &#34;dependsOn&#34;: [
+                &#34;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&#34;
             ]
         },
         {
-            &quot;type&quot;: &quot;Microsoft.Compute/virtualMachines/extensions&quot;,
-            &quot;name&quot;: &quot;[concat(parameters('vmName'),'/customscriptextension')]&quot;,
-            &quot;apiVersion&quot;: &quot;2017-03-30&quot;,
-            &quot;location&quot;: &quot;[parameters('location')]&quot;,
-            &quot;properties&quot;: {
-                &quot;publisher&quot;: &quot;Microsoft.Azure.Extensions&quot;,
-                &quot;type&quot;: &quot;CustomScript&quot;,
-                &quot;typeHandlerVersion&quot;: &quot;2.0&quot;,
-                &quot;autoUpgradeMinorVersion&quot;: true,
-                &quot;settings&quot;: {
-                    &quot;fileUris&quot;: [
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/infra.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/install.sh', parameters('artifactsLocationSasToken'))]&quot;,
-                        &quot;[concat(parameters('artifactsLocation'), '/scripts/azureProviderAndCreds.tf', parameters('artifactsLocationSasToken'))]&quot;
+            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
+            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&#34;,
+            &#34;apiVersion&#34;: &#34;2017-03-30&#34;,
+            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
+            &#34;properties&#34;: {
+                &#34;publisher&#34;: &#34;Microsoft.Azure.Extensions&#34;,
+                &#34;type&#34;: &#34;CustomScript&#34;,
+                &#34;typeHandlerVersion&#34;: &#34;2.0&#34;,
+                &#34;autoUpgradeMinorVersion&#34;: true,
+                &#34;settings&#34;: {
+                    &#34;fileUris&#34;: [
+                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
+                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
+                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;
                     ]
                 },
-                &quot;protectedSettings&quot;: {
-                    &quot;commandToExecute&quot;: &quot;[concat('bash infra.sh &amp;&amp; bash install.sh ', variables('installParm1'), variables('installParm2'), variables('installParm3'), variables('installParm4'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('stateStorageAccountName')), '2017-10-01').keys[0].value, ' -l ', reference(concat(resourceId('Microsoft.Compute/virtualMachines/', parameters('vmName')),'/providers/Microsoft.ManagedIdentity/Identities/default'),'2015-08-31-PREVIEW').principalId)]&quot;
+                &#34;protectedSettings&#34;: {
+                    &#34;commandToExecute&#34;: &#34;[concat(&#39;bash infra.sh &amp;&amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&#34;
                 }
             },
-            &quot;dependsOn&quot;: [
-                &quot;[resourceId('Microsoft.Authorization/roleAssignments', variables('resourceGuid'))]&quot;
+            &#34;dependsOn&#34;: [
+                &#34;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&#34;
             ]
         }
 [snip]
-</code></pre><h3 id="vmにログインし環境を確認">VMにログインし、環境を確認</h3>
+</code></pre></div><h3 id="vmにログインし環境を確認">VMにログインし、環境を確認</h3>
 <p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
-<pre tabindex="0"><code>$ ssh your-vm-public-ip
-</code></pre><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
-<pre tabindex="0"><code>$ terraform -v
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh your-vm-public-ip
+</code></pre></div><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform -v
 Terraform v0.11.5
-</code></pre><p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
-<pre tabindex="0"><code>$ echo $ARM_USE_MSI
+</code></pre></div><p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ echo $ARM_USE_MSI
 true
-</code></pre><p>MSIも有効化されています(SystemAssigned)。</p>
-<pre tabindex="0"><code>$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
+</code></pre></div><p>MSIも有効化されています(SystemAssigned)。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
 {
-  &quot;additionalProperties&quot;: {},
-  &quot;identityIds&quot;: null,
-  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
-  &quot;tenantId&quot;: &quot;tttt-tttt-tttt-tttt&quot;,
-  &quot;type&quot;: &quot;SystemAssigned&quot;
+  &#34;additionalProperties&#34;: {},
+  &#34;identityIds&#34;: null,
+  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
+  &#34;tenantId&#34;: &#34;tttt-tttt-tttt-tttt&#34;,
+  &#34;type&#34;: &#34;SystemAssigned&#34;
 }
-</code></pre><p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
-<pre tabindex="0"><code>$ ls
+</code></pre></div><p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls
 tfEnv.sh  tfTemplate
 
 $ cat tfEnv.sh
 az login
-az role assignment create  --assignee &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot; --role 'b24988ac-6180-42a0-ab88-20f7382dd24c'  --scope /subscriptions/&quot;cccc-cccc-cccc-cccc&quot;
+az role assignment create  --assignee &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34; --role &#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;  --scope /subscriptions/&#34;cccc-cccc-cccc-cccc&#34;
 
 $ . ~/tfEnv.sh
 To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
 [snip]
 {
-  &quot;additionalProperties&quot;: {},
-  &quot;canDelegate&quot;: null,
-  &quot;id&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&quot;,
-  &quot;name&quot;: &quot;ffff-ffff-ffff-ffff&quot;,
-  &quot;principalId&quot;: &quot;aaaa-aaaa-aaaa-aaaa-aaaa&quot;,
-  &quot;roleDefinitionId&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&quot;,
-  &quot;scope&quot;: &quot;/subscriptions/cccc-cccc-cccc-cccc&quot;,
-  &quot;type&quot;: &quot;Microsoft.Authorization/roleAssignments&quot;
+  &#34;additionalProperties&#34;: {},
+  &#34;canDelegate&#34;: null,
+  &#34;id&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&#34;,
+  &#34;name&#34;: &#34;ffff-ffff-ffff-ffff&#34;,
+  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
+  &#34;roleDefinitionId&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&#34;,
+  &#34;scope&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc&#34;,
+  &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;
 }
-</code></pre><p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&quot;はContributorを指します。</p>
+</code></pre></div><p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&quot;はContributorを指します。</p>
 <p>tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。</p>
-<pre tabindex="0"><code>$ ls tfTemplate/
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls tfTemplate/
 azureProviderAndCreds.tf  remoteState.tf
-</code></pre><p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
-<pre tabindex="0"><code>$ cat tfTemplate/azureProviderAndCreds.tf
+</code></pre></div><p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat tfTemplate/azureProviderAndCreds.tf
 #
 #
 # Provider and credential snippet to add to configurations
-# Assumes that there's a terraform.tfvars file with the var values
+# Assumes that there&#39;s a terraform.tfvars file with the var values
 #
 # Uncomment the creds variables if using service principal auth
 # Leave them commented to use MSI auth
@@ -258,66 +207,66 @@ azureProviderAndCreds.tf  remoteState.tf
 #variable client_id {}
 #variable client_secret {}
 
-provider &quot;azurerm&quot; {
-#    subscription_id = &quot;${var.subscription_id}&quot;
-#    tenant_id = &quot;${var.tenant_id}&quot;
-#    client_id = &quot;${var.client_id}&quot;
-#    client_secret = &quot;${var.client_secret}&quot;
+provider &#34;azurerm&#34; {
+#    subscription_id = &#34;${var.subscription_id}&#34;
+#    tenant_id = &#34;${var.tenant_id}&#34;
+#    client_id = &#34;${var.client_id}&#34;
+#    client_secret = &#34;${var.client_secret}&#34;
 }
-</code></pre><p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
-<pre tabindex="0"><code>$ cat tfTemplate/remoteState.tf
+</code></pre></div><p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat tfTemplate/remoteState.tf
 terraform {
- backend &quot;azurerm&quot; {
-  storage_account_name = &quot;storestaterandomid&quot;
-  container_name       = &quot;terraform-state&quot;
-  key                  = &quot;prod.terraform.tfstate&quot;
-  access_key           = &quot;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&quot;
+ backend &#34;azurerm&#34; {
+  storage_account_name = &#34;storestaterandomid&#34;
+  container_name       = &#34;terraform-state&#34;
+  key                  = &#34;prod.terraform.tfstate&#34;
+  access_key           = &#34;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&#34;
   }
 }
-</code></pre><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
+</code></pre></div><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
 <h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
 <p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
-<pre tabindex="0"><code>$ mkdir sample
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ mkdir sample
 $ cd sample/
-</code></pre><p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
-<pre tabindex="0"><code>$ cp ../tfTemplate/remoteState.tf ./
-</code></pre><p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
+</code></pre></div><p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cp ../tfTemplate/remoteState.tf ./
+</code></pre></div><p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
 <p>ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。</p>
-<pre tabindex="0"><code>$ vim main.tf
-resource &quot;azurerm_resource_group&quot; &quot;tf-msi-poc&quot; {
-    name     = &quot;tf-msi-poc-aci-wus-rg&quot;
-    location = &quot;West US&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim main.tf
+resource &#34;azurerm_resource_group&#34; &#34;tf-msi-poc&#34; {
+    name     = &#34;tf-msi-poc-aci-wus-rg&#34;
+    location = &#34;West US&#34;
 }
 
-resource &quot;random_integer&quot; &quot;random_int&quot; {
+resource &#34;random_integer&#34; &#34;random_int&#34; {
     min = 100
     max = 999
 }
 
-resource &quot;azurerm_container_group&quot; &quot;aci-example&quot; {
-    name                = &quot;aci-cg-${random_integer.random_int.result}&quot;
-    location            = &quot;${azurerm_resource_group.tf-msi-poc.location}&quot;
-    resource_group_name = &quot;${azurerm_resource_group.tf-msi-poc.name}&quot;
-    ip_address_type     = &quot;public&quot;
-    dns_name_label      = &quot;tomakabe-aci-cg-${random_integer.random_int.result}&quot;
-    os_type             = &quot;linux&quot;
+resource &#34;azurerm_container_group&#34; &#34;aci-example&#34; {
+    name                = &#34;aci-cg-${random_integer.random_int.result}&#34;
+    location            = &#34;${azurerm_resource_group.tf-msi-poc.location}&#34;
+    resource_group_name = &#34;${azurerm_resource_group.tf-msi-poc.name}&#34;
+    ip_address_type     = &#34;public&#34;
+    dns_name_label      = &#34;tomakabe-aci-cg-${random_integer.random_int.result}&#34;
+    os_type             = &#34;linux&#34;
 
     container {
-        name    = &quot;nginx&quot;
-        image   = &quot;nginx&quot;
-        cpu     = &quot;0.5&quot;
-        memory  = &quot;1.0&quot;
-        port    = &quot;80&quot;
+        name    = &#34;nginx&#34;
+        image   = &#34;nginx&#34;
+        cpu     = &#34;0.5&#34;
+        memory  = &#34;1.0&#34;
+        port    = &#34;80&#34;
     }
 }
-</code></pre><p>init、plan、アプラーイ。アプライ王子。</p>
-<pre tabindex="0"><code>$ terraform init
+</code></pre></div><p>init、plan、アプラーイ。アプライ王子。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform init
 $ terraform plan
 $ terraform apply -auto-approve
 [snip]
 Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-</code></pre><p>できたか確認。</p>
-<pre tabindex="0"><code>$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
+</code></pre></div><p>できたか確認。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
 Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
 ----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
 aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
@@ -327,31 +276,46 @@ $ curl 13.91.90.117
 &lt;head&gt;
 &lt;title&gt;Welcome to nginx!&lt;/title&gt;
 [snip]
-</code></pre><h2 id="おまけ">おまけ</h2>
+</code></pre></div><h2 id="おまけ">おまけ</h2>
 <p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
 <p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
-<pre tabindex="0"><code>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
-Resource 'aaaa-aaaa-aaaa-aaaa-aaaa' does not exist or one of its queried reference-property objects are not present.
-</code></pre>
-      
-    </div>
-    
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
+Resource &#39;aaaa-aaaa-aaaa-aaaa-aaaa&#39; does not exist or one of its queried reference-property objects are not present.
+</code></pre></div>
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/msi">MSI</a></li>
+					
+					<li><a href="/tags/terraform">Terraform</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

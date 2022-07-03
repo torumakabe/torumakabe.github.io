@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure Container Registry TasksでAqua MicroScannerを自動実行する - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure Container Registry TasksでAqua MicroScannerを自動実行する" />
+<meta property="og:description" content="何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/aqua_acr/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2019-08-09T13:00:00+09:00" />
+<meta property="article:modified_time" content="2019-08-09T13:00:00+09:00" />
 
-<title>Azure Container Registry TasksでAqua MicroScannerを自動実行する | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure Container Registry TasksでAqua MicroScannerを自動実行する"/>
+<meta name="twitter:description" content="何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='Azure Container Registry TasksでAqua MicroScannerを自動実行する - re-imagine'>
-<meta property='og:description' content='何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/aqua_acr/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Aqua'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Container'><meta property='article:published_time' content='2019-08-09T13:00:00&#43;09:00'/><meta property='article:modified_time' content='2019-08-09T13:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/aqua_acr/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure Container Registry TasksでAqua MicroScannerを自動実行する</h1>
+			<div class="meta">Posted on Aug 9, 2019</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/aqua">#Aqua</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/container">#Container</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">August 9, 2019</h2>
-    <h1 class="title">Azure Container Registry TasksでAqua MicroScannerを自動実行する</h1>
-    
-    <div class="content">
-      <h2 id="何の話か">何の話か</h2>
+		<section class="body">
+			<h2 id="何の話か">何の話か</h2>
 <p>コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Registry(ACR)のACR Tasks ビルド時でも実行できるとうれしいですよね。その手順をまとめます。</p>
 <p>@ehotinger の<a href="https://ehotinger.github.io/blog/acr-tasks-image-scanning/">ブログ</a>を読み、このアイデアはもっと知られてもいいなぁと思ったのが書いたきっかけです。Thanks Eric!</p>
 <h2 id="aqua-microscannerとは">Aqua MicroScannerとは</h2>
@@ -123,117 +72,117 @@
 </blockquote>
 <h2 id="トークンの取得">トークンの取得</h2>
 <p>MicroScannerの実行にはトークンが要ります。以下の手順で、指定したメールアドレスに送られてきます。メールを確認し、控えておきましょう。</p>
-<pre tabindex="0"><code>$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
-</code></pre><h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker run --rm -it aquasec/microscanner --register &lt;email address&gt;
+</code></pre></div><h2 id="コンテナービルド時に実行してみる">コンテナービルド時に実行してみる</h2>
 <p>以降、<a href="https://github.com/ToruMakabe/aqua-sample/tree/master">ここ</a>にサンプルを置いておきましたので、このfork、cloneを前提に話をすすめます。</p>
 <p>ACRでの自動実行の前に、MicroScannerをどう使うか、どんな動きをするのかを見ておきましょう。</p>
 <p>まずはじめに、こんなコンテナーイメージを作ります。ファイルはallin.Dockerfileです。</p>
-<pre tabindex="0"><code>FROM alpine:3.3
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
 ADD https://get.aquasec.com/microscanner /
 RUN chmod +x /microscanner
 ARG token
 RUN /microscanner ${token} &amp;&amp; rm /microscanner
-RUN echo &quot;No vulnerabilities!&quot;
-CMD [&quot;echo&quot;, &quot;Hello&quot;]
-</code></pre><p>Apline Linuxをベースに、実行したらHelloとechoするだけのコンテナーです。ビルド時にイメージ作成環境内でMicroScannerをダウンロードし、実行します。Alpineのバージョンは3.3で、ちょっと古いものを指定しています。さあ何が起こるでしょう。</p>
-<pre tabindex="0"><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
+RUN echo &#34;No vulnerabilities!&#34;
+CMD [&#34;echo&#34;, &#34;Hello&#34;]
+</code></pre></div><p>Apline Linuxをベースに、実行したらHelloとechoするだけのコンテナーです。ビルド時にイメージ作成環境内でMicroScannerをダウンロードし、実行します。Alpineのバージョンは3.3で、ちょっと古いものを指定しています。さあ何が起こるでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.3
  ---&gt; a6fc1dbfa81a
 [snip]
 Step 6/8 : RUN /microscanner ${token} &amp;&amp; rm /microscanner
  ---&gt; Running in 5fc877fe03b3
-2019-08-04 14:02:23.822 INFO    Contacting CyberCenter...       {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}
-2019-08-04 14:02:25.090 INFO    CyberCenter connection established      {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;, &quot;api_version&quot;: &quot;4&quot;}
-2019-08-04 14:02:25.771 INFO    Processing results...   {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}
-2019-08-04 14:02:27.065 INFO    Applying image assurance policies...    {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}
+2019-08-04 14:02:23.822 INFO    Contacting CyberCenter...       {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}
+2019-08-04 14:02:25.090 INFO    CyberCenter connection established      {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;, &#34;api_version&#34;: &#34;4&#34;}
+2019-08-04 14:02:25.771 INFO    Processing results...   {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}
+2019-08-04 14:02:27.065 INFO    Applying image assurance policies...    {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}
 {
-  &quot;scan_started&quot;: {
-    &quot;seconds&quot;: 1564927343,
-    &quot;nanos&quot;: 722759087
+  &#34;scan_started&#34;: {
+    &#34;seconds&#34;: 1564927343,
+    &#34;nanos&#34;: 722759087
   },
-  &quot;scan_duration&quot;: 2,
-  &quot;digest&quot;: &quot;cbaf1026d5a0e866536032b2c5bae5a4ead085f61900b9e976e50030c0b7163e&quot;,
-  &quot;os&quot;: &quot;alpine&quot;,
-  &quot;version&quot;: &quot;3.3.3&quot;,
-  &quot;resources&quot;: [
+  &#34;scan_duration&#34;: 2,
+  &#34;digest&#34;: &#34;cbaf1026d5a0e866536032b2c5bae5a4ead085f61900b9e976e50030c0b7163e&#34;,
+  &#34;os&#34;: &#34;alpine&#34;,
+  &#34;version&#34;: &#34;3.3.3&#34;,
+  &#34;resources&#34;: [
     {
-      &quot;resource&quot;: {
-        &quot;format&quot;: &quot;apk&quot;,
-        &quot;name&quot;: &quot;busybox&quot;,
-        &quot;version&quot;: &quot;1.24.2-r2&quot;,
-        &quot;arch&quot;: &quot;x86_64&quot;,
-        &quot;cpe&quot;: &quot;pkg:/alpine:3.3.3:busybox:1.24.2-r2&quot;,
-        &quot;license&quot;: &quot;GPL2&quot;,
-        &quot;name_hash&quot;: &quot;1a0be787cebd01a5ca5d163e1502c1c6&quot;
+      &#34;resource&#34;: {
+        &#34;format&#34;: &#34;apk&#34;,
+        &#34;name&#34;: &#34;busybox&#34;,
+        &#34;version&#34;: &#34;1.24.2-r2&#34;,
+        &#34;arch&#34;: &#34;x86_64&#34;,
+        &#34;cpe&#34;: &#34;pkg:/alpine:3.3.3:busybox:1.24.2-r2&#34;,
+        &#34;license&#34;: &#34;GPL2&#34;,
+        &#34;name_hash&#34;: &#34;1a0be787cebd01a5ca5d163e1502c1c6&#34;
       },
-      &quot;scanned&quot;: true,
-      &quot;vulnerabilities&quot;: [
+      &#34;scanned&#34;: true,
+      &#34;vulnerabilities&#34;: [
         {
-          &quot;name&quot;: &quot;CVE-2015-9261&quot;,
-          &quot;description&quot;: &quot;huft_build in archival/libarchive/decompress_gunzip.c in BusyBox before 1.27.2 misuses a pointer, causing segfaults and an application crash during an unzip operation on a specially crafted ZIP file.&quot;,
-          &quot;nvd_score&quot;: 4.3,
-          &quot;nvd_score_version&quot;: &quot;CVSS v2&quot;,
-          &quot;nvd_vectors&quot;: &quot;AV:N/AC:M/Au:N/C:N/I:N/A:P&quot;,
-          &quot;nvd_severity&quot;: &quot;medium&quot;,
-          &quot;nvd_url&quot;: &quot;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-9261&quot;,
-          &quot;vendor_score&quot;: 4.3,
-          &quot;vendor_score_version&quot;: &quot;CVSS v2&quot;,
-          &quot;vendor_vectors&quot;: &quot;AV:N/AC:M/Au:N/C:N/I:N/A:P&quot;,
-          &quot;vendor_severity&quot;: &quot;medium&quot;,
-          &quot;publish_date&quot;: &quot;2018-07-26&quot;,
-          &quot;modification_date&quot;: &quot;2019-06-13&quot;,
-          &quot;nvd_score_v3&quot;: 5.5,
-          &quot;nvd_vectors_v3&quot;: &quot;CVSS:3.0/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&quot;,
-          &quot;nvd_severity_v3&quot;: &quot;medium&quot;,
-          &quot;vendor_score_v3&quot;: 5.5,
-          &quot;vendor_vectors_v3&quot;: &quot;CVSS:3.0/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&quot;,
-          &quot;vendor_severity_v3&quot;: &quot;medium&quot;
+          &#34;name&#34;: &#34;CVE-2015-9261&#34;,
+          &#34;description&#34;: &#34;huft_build in archival/libarchive/decompress_gunzip.c in BusyBox before 1.27.2 misuses a pointer, causing segfaults and an application crash during an unzip operation on a specially crafted ZIP file.&#34;,
+          &#34;nvd_score&#34;: 4.3,
+          &#34;nvd_score_version&#34;: &#34;CVSS v2&#34;,
+          &#34;nvd_vectors&#34;: &#34;AV:N/AC:M/Au:N/C:N/I:N/A:P&#34;,
+          &#34;nvd_severity&#34;: &#34;medium&#34;,
+          &#34;nvd_url&#34;: &#34;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-9261&#34;,
+          &#34;vendor_score&#34;: 4.3,
+          &#34;vendor_score_version&#34;: &#34;CVSS v2&#34;,
+          &#34;vendor_vectors&#34;: &#34;AV:N/AC:M/Au:N/C:N/I:N/A:P&#34;,
+          &#34;vendor_severity&#34;: &#34;medium&#34;,
+          &#34;publish_date&#34;: &#34;2018-07-26&#34;,
+          &#34;modification_date&#34;: &#34;2019-06-13&#34;,
+          &#34;nvd_score_v3&#34;: 5.5,
+          &#34;nvd_vectors_v3&#34;: &#34;CVSS:3.0/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&#34;,
+          &#34;nvd_severity_v3&#34;: &#34;medium&#34;,
+          &#34;vendor_score_v3&#34;: 5.5,
+          &#34;vendor_vectors_v3&#34;: &#34;CVSS:3.0/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&#34;,
+          &#34;vendor_severity_v3&#34;: &#34;medium&#34;
         },
         {
-          &quot;name&quot;: &quot;CVE-2016-2147&quot;,
-          &quot;description&quot;: &quot;Integer overflow in the DHCP client (udhcpc) in BusyBox before 1.25.0 allows remote attackers to cause a denial of service (crash) via a malformed RFC1035-encoded domain name, which triggers an out-of-bounds heap write.&quot;,
-          &quot;nvd_score&quot;: 5,
-          &quot;nvd_score_version&quot;: &quot;CVSS v2&quot;,
-          &quot;nvd_vectors&quot;: &quot;AV:N/AC:L/Au:N/C:N/I:N/A:P&quot;,
-          &quot;nvd_severity&quot;: &quot;medium&quot;,
-          &quot;nvd_url&quot;: &quot;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2147&quot;,
-          &quot;vendor_score&quot;: 5,
-          &quot;vendor_score_version&quot;: &quot;CVSS v2&quot;,
-          &quot;vendor_vectors&quot;: &quot;AV:N/AC:L/Au:N/C:N/I:N/A:P&quot;,
-          &quot;vendor_severity&quot;: &quot;medium&quot;,
-          &quot;publish_date&quot;: &quot;2017-02-09&quot;,
-          &quot;modification_date&quot;: &quot;2019-06-13&quot;,
-          &quot;nvd_score_v3&quot;: 7.5,
-          &quot;nvd_vectors_v3&quot;: &quot;CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&quot;,
-          &quot;nvd_severity_v3&quot;: &quot;high&quot;,
-          &quot;vendor_score_v3&quot;: 7.5,
-          &quot;vendor_vectors_v3&quot;: &quot;CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&quot;,
-          &quot;vendor_severity_v3&quot;: &quot;high&quot;
+          &#34;name&#34;: &#34;CVE-2016-2147&#34;,
+          &#34;description&#34;: &#34;Integer overflow in the DHCP client (udhcpc) in BusyBox before 1.25.0 allows remote attackers to cause a denial of service (crash) via a malformed RFC1035-encoded domain name, which triggers an out-of-bounds heap write.&#34;,
+          &#34;nvd_score&#34;: 5,
+          &#34;nvd_score_version&#34;: &#34;CVSS v2&#34;,
+          &#34;nvd_vectors&#34;: &#34;AV:N/AC:L/Au:N/C:N/I:N/A:P&#34;,
+          &#34;nvd_severity&#34;: &#34;medium&#34;,
+          &#34;nvd_url&#34;: &#34;https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2147&#34;,
+          &#34;vendor_score&#34;: 5,
+          &#34;vendor_score_version&#34;: &#34;CVSS v2&#34;,
+          &#34;vendor_vectors&#34;: &#34;AV:N/AC:L/Au:N/C:N/I:N/A:P&#34;,
+          &#34;vendor_severity&#34;: &#34;medium&#34;,
+          &#34;publish_date&#34;: &#34;2017-02-09&#34;,
+          &#34;modification_date&#34;: &#34;2019-06-13&#34;,
+          &#34;nvd_score_v3&#34;: 7.5,
+          &#34;nvd_vectors_v3&#34;: &#34;CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&#34;,
+          &#34;nvd_severity_v3&#34;: &#34;high&#34;,
+          &#34;vendor_score_v3&#34;: 7.5,
+          &#34;vendor_vectors_v3&#34;: &#34;CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&#34;,
+          &#34;vendor_severity_v3&#34;: &#34;high&#34;
         },
 [snip]
-  &quot;vulnerability_summary&quot;: {
-    &quot;total&quot;: 8,
-    &quot;high&quot;: 1,
-    &quot;medium&quot;: 7,
-    &quot;low&quot;: 0,
-    &quot;negligible&quot;: 0,
-    &quot;sensitive&quot;: 0,
-    &quot;malware&quot;: 0,
-    &quot;score_average&quot;: 4.9624996,
-    &quot;max_score&quot;: 7.5
+  &#34;vulnerability_summary&#34;: {
+    &#34;total&#34;: 8,
+    &#34;high&#34;: 1,
+    &#34;medium&#34;: 7,
+    &#34;low&#34;: 0,
+    &#34;negligible&#34;: 0,
+    &#34;sensitive&#34;: 0,
+    &#34;malware&#34;: 0,
+    &#34;score_average&#34;: 4.9624996,
+    &#34;max_score&#34;: 7.5
   },
-  &quot;scan_options&quot;: {},
-  &quot;initiating_user&quot;: &quot;token&quot;,
-  &quot;data_date&quot;: 1564873427,
-  &quot;changed_result&quot;: false,
-  &quot;function_metadata&quot;: {}
+  &#34;scan_options&#34;: {},
+  &#34;initiating_user&#34;: &#34;token&#34;,
+  &#34;data_date&#34;: 1564873427,
+  &#34;changed_result&#34;: false,
+  &#34;function_metadata&#34;: {}
 }
-The command '/bin/sh -c /microscanner ${token} &amp;&amp; rm /microscanner' returned a non-zero code: 4
-</code></pre><p>スペースの都合で省きましたが、いっぱいひっかかりましたね。そして深刻度highの脆弱性が検出されたので、そこで終了しています。</p>
+The command &#39;/bin/sh -c /microscanner ${token} &amp;&amp; rm /microscanner&#39; returned a non-zero code: 4
+</code></pre></div><p>スペースの都合で省きましたが、いっぱいひっかかりましたね。そして深刻度highの脆弱性が検出されたので、そこで終了しています。</p>
 <p>では、alpineのバージョンを現時点で最新の3.10にしてみましょう。</p>
-<pre tabindex="0"><code>$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ docker build . -f ./allin.Dockerfile --build-arg=token=&lt;your token&gt; --no-cache
 Sending build context to Docker daemon  43.01kB
 Step 1/8 : FROM alpine:3.10
  ---&gt; b7b28af77ffe
@@ -241,34 +190,34 @@ Step 1/8 : FROM alpine:3.10
 Step 6/8 : RUN /microscanner ${token} &amp;&amp; rm /microscanner
  ---&gt; Running in ed5ee7337de6
 [snip]
-  &quot;vulnerability_summary&quot;: {
-    &quot;total&quot;: 0,
-    &quot;high&quot;: 0,
-    &quot;medium&quot;: 0,
-    &quot;low&quot;: 0,
-    &quot;negligible&quot;: 0,
-    &quot;sensitive&quot;: 0,
-    &quot;malware&quot;: 0
+  &#34;vulnerability_summary&#34;: {
+    &#34;total&#34;: 0,
+    &#34;high&#34;: 0,
+    &#34;medium&#34;: 0,
+    &#34;low&#34;: 0,
+    &#34;negligible&#34;: 0,
+    &#34;sensitive&#34;: 0,
+    &#34;malware&#34;: 0
   },
-  &quot;scan_options&quot;: {},
-  &quot;initiating_user&quot;: &quot;token&quot;,
-  &quot;data_date&quot;: 1564873427,
-  &quot;changed_result&quot;: false,
-  &quot;function_metadata&quot;: {}
+  &#34;scan_options&#34;: {},
+  &#34;initiating_user&#34;: &#34;token&#34;,
+  &#34;data_date&#34;: 1564873427,
+  &#34;changed_result&#34;: false,
+  &#34;function_metadata&#34;: {}
 }
 Removing intermediate container ed5ee7337de6
  ---&gt; e76950bc83eb
-Step 7/8 : RUN echo &quot;No vulnerabilities!&quot;
+Step 7/8 : RUN echo &#34;No vulnerabilities!&#34;
  ---&gt; Running in 1afef0fa5ace
 No vulnerabilities!
 Removing intermediate container 1afef0fa5ace
  ---&gt; b36bd76dd37b
-Step 8/8 : CMD [&quot;echo&quot;, &quot;Hello&quot;]
+Step 8/8 : CMD [&#34;echo&#34;, &#34;Hello&#34;]
  ---&gt; Running in 33b0f554bb3f
 Removing intermediate container 33b0f554bb3f
  ---&gt; a4f61c940dce
 Successfully built a4f61c940dce
-</code></pre><p>脆弱性は検出されず、ビルドが正常終了しました。これがMicroScannerの基本的な動きです。ちなみに&ndash;continue-on-failureオプションで、脆弱性highのブツが見つかっても処理を継続することはできます。</p>
+</code></pre></div><p>脆弱性は検出されず、ビルドが正常終了しました。これがMicroScannerの基本的な動きです。ちなみに&ndash;continue-on-failureオプションで、脆弱性highのブツが見つかっても処理を継続することはできます。</p>
 <h2 id="acr-tasksでのビルドに組み込む">ACR Tasksでのビルドに組み込む</h2>
 <p>ではACR Tasksに組み込みましょう。ポイントはMicroScannerに渡すトークンをいかに秘匿し、ACR Tasksに渡すかです。GitHubとかでご開帳しないように気を付けましょう。</p>
 <ul>
@@ -278,22 +227,22 @@ Successfully built a4f61c940dce
 </ul>
 <p>この方針とします。これであればトークンをDockerfileやタスク定義ファイルに書く必要がなく、ご開帳のリスクを減らせます。</p>
 <p>リソースグループ、Key Vaultとシークレットを作成します。</p>
-<pre tabindex="0"><code>$ az group create -n rg-aqua-sample -l japaneast
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group create -n rg-aqua-sample -l japaneast
 $ az keyvault create -g rg-aqua-sample -n your-aqua-sample
-$ az keyvault secret set --vault-name your-aqua-sample -n aqua-key --value &quot;&lt;your token&gt;&quot;
-</code></pre><p>ユーザー割り当てManaged Identityを作り、IDを取得して変数へ入れておきます。</p>
-<pre tabindex="0"><code>$ az identity create -g rg-aqua-sample -n aqua-identity
+$ az keyvault secret set --vault-name your-aqua-sample -n aqua-key --value &#34;&lt;your token&gt;&#34;
+</code></pre></div><p>ユーザー割り当てManaged Identityを作り、IDを取得して変数へ入れておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az identity create -g rg-aqua-sample -n aqua-identity
 $ resourceID=$(az identity show -g rg-aqua-sample -n aqua-identity --query id -o tsv)
 $ principalID=$(az identity show -g rg-aqua-sample -n aqua-identity --query principalId -o tsv)
-</code></pre><p>Key Vaultシークレットの読み取り権限を、先ほど作ったManaged Identityに付与します。</p>
-<pre tabindex="0"><code>$ az keyvault set-policy -g rg-aqua-sample -n your-aqua-sample --object-id $principalID --secret-permissions get
-</code></pre><p>これで準備はOKです。次はACR Tasksでのビルド定義をします。</p>
+</code></pre></div><p>Key Vaultシークレットの読み取り権限を、先ほど作ったManaged Identityに付与します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az keyvault set-policy -g rg-aqua-sample -n your-aqua-sample --object-id $principalID --secret-permissions get
+</code></pre></div><p>これで準備はOKです。次はACR Tasksでのビルド定義をします。</p>
 <p>まずはDockerfileです。先ほどはビルド時にコンテナー作成環境内でMicroScannerを実行しましたが、ACR Tasksはマルチステップ定義ができるので、コンテナーイメージのビルドとスキャンをステップ分離します。なのでDockerfileはシンプルです。脆弱性検出時の動きを見たいので、Alpineのバージョンは3.3としました。</p>
-<pre tabindex="0"><code>FROM alpine:3.3
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">FROM alpine:3.3
 RUN apk add --no-cache ca-certificates
-CMD [&quot;echo&quot;, &quot;Hello&quot;]
-</code></pre><p>そしてACR Tasksのタスク定義をします。ファイルはaqua-scan.yamlです。コンテナーイメージビルドのステップと、脆弱性スキャンのステップを分離しています。脆弱性スキャンのステップが失敗したらそこでタスクは終了し、レジストリへpushしません。</p>
-<pre tabindex="0"><code>version: v1.0.0
+CMD [&#34;echo&#34;, &#34;Hello&#34;]
+</code></pre></div><p>そしてACR Tasksのタスク定義をします。ファイルはaqua-scan.yamlです。コンテナーイメージビルドのステップと、脆弱性スキャンのステップを分離しています。脆弱性スキャンのステップが失敗したらそこでタスクは終了し、レジストリへpushしません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">version: v1.0.0
 
 secrets:
   - id: key
@@ -304,41 +253,41 @@ steps:
 
   # Create a new Dockerfile with the scanner added to the previous image.
   - cmd: |
-      bash -c 'echo &quot;FROM {{.Run.Registry}}/alpine-hello:{{.Run.ID}}
+      bash -c &#39;echo &#34;FROM {{.Run.Registry}}/alpine-hello:{{.Run.ID}}
       ADD https://get.aquasec.com/microscanner /
       RUN chmod +x /microscanner
-      RUN /microscanner {{.Secrets.key}}&quot; &gt; scan.Dockerfile'
+      RUN /microscanner {{.Secrets.key}}&#34; &gt; scan.Dockerfile&#39;
 
   # Scan the image using the Dockerfile I created.
   - build: . -f scan.Dockerfile -t scanned
 
   # Only push the image if the scan was successful.
-  - push: [&quot;{{.Run.Registry}}/alpine-hello:{{.Run.ID}}&quot;]
-</code></pre><p>MicroScannerのトークンをKey Vaultシークレットから渡していますね。それではタスクを作成してみましょう。</p>
-<pre tabindex="0"><code>$ az acr task create -r your-acr -n aqua-scan -c https://github.com/your-repo/aqua-sample.git -f aqua-scan.yaml --commit-trigger-enabled false --pull-request-trigger-enabled false --assign-identity $resourceID
-</code></pre><p>タスクを実行します。</p>
-<pre tabindex="0"><code>$ az acr task run -r your-acr -n aqua-scan                                                                           
+  - push: [&#34;{{.Run.Registry}}/alpine-hello:{{.Run.ID}}&#34;]
+</code></pre></div><p>MicroScannerのトークンをKey Vaultシークレットから渡していますね。それではタスクを作成してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az acr task create -r your-acr -n aqua-scan -c https://github.com/your-repo/aqua-sample.git -f aqua-scan.yaml --commit-trigger-enabled false --pull-request-trigger-enabled false --assign-identity $resourceID
+</code></pre></div><p>タスクを実行します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az acr task run -r your-acr -n aqua-scan                                                                           
 Queued a run with ID: ce9                                                                                               
 Waiting for an agent...                                                                                                 
 2019/08/05 05:20:21 Downloading source code...
 2019/08/05 05:20:26 Finished downloading source code
 2019/08/05 05:20:26 Using acb_vol_b9db0e18-786e-46bc-8b96-831ec44fd8ea as the home volume
-2019/08/05 05:20:28 Creating Docker network: acb_default_network, driver: 'bridge'
+2019/08/05 05:20:28 Creating Docker network: acb_default_network, driver: &#39;bridge&#39;
 2019/08/05 05:20:29 Successfully set up Docker network: acb_default_network
 2019/08/05 05:20:29 Setting up Docker configuration...
 2019/08/05 05:20:30 Successfully set up Docker configuration
 2019/08/05 05:20:30 Logging in to registry: your-acr.azurecr.io
 2019/08/05 05:20:31 Successfully logged into your-acr.azurecr.io
-2019/08/05 05:20:31 Executing step ID: acb_step_0. Timeout(sec): 600, Working directory: '', Network: 'acb_default_network'
+2019/08/05 05:20:31 Executing step ID: acb_step_0. Timeout(sec): 600, Working directory: &#39;&#39;, Network: &#39;acb_default_network&#39;
 2019/08/05 05:20:31 Scanning for dependencies...
 2019/08/05 05:20:31 Successfully scanned dependencies
 2019/08/05 05:20:31 Launching container with name: acb_step_0
 [snip]
 2019/08/05 05:20:40 Successfully executed container: acb_step_0
-2019/08/05 05:20:40 Executing step ID: acb_step_1. Timeout(sec): 600, Working directory: '', Network: 'acb_default_network'
+2019/08/05 05:20:40 Executing step ID: acb_step_1. Timeout(sec): 600, Working directory: &#39;&#39;, Network: &#39;acb_default_network&#39;
 2019/08/05 05:20:40 Launching container with name: acb_step_1
 2019/08/05 05:20:41 Successfully executed container: acb_step_1
-2019/08/05 05:20:41 Executing step ID: acb_step_2. Timeout(sec): 600, Working directory: '', Network: 'acb_default_network'
+2019/08/05 05:20:41 Executing step ID: acb_step_2. Timeout(sec): 600, Working directory: &#39;&#39;, Network: &#39;acb_default_network&#39;
 2019/08/05 05:20:41 Scanning for dependencies...
 2019/08/05 05:20:42 Successfully scanned dependencies
 2019/08/05 05:20:42 Launching container with name: acb_step_2
@@ -354,37 +303,37 @@ Removing intermediate container ef6f0e640feb
  ---&gt; 289d9803ee00
 Step 4/4 : RUN /microscanner your-token
  ---&gt; Running in 52c234f73757
-2019-08-05 05:20:51.051 INFO    Contacting CyberCenter...       {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}                           2019-08-05 05:20:52.259 INFO    CyberCenter connection established      {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;, &quot;api_version&quot;: &quot;4&quot;}
-2019-08-05 05:20:52.929 INFO    Processing results...   {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}                                   2019-08-05 05:20:54.308 INFO    Applying image assurance policies...    {&quot;registry&quot;: &quot;&quot;, &quot;image&quot;: &quot;&quot;}                   {
-  &quot;scan_started&quot;: {
-    &quot;seconds&quot;: 1564982450,
-    &quot;nanos&quot;: 892464816
+2019-08-05 05:20:51.051 INFO    Contacting CyberCenter...       {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}                           2019-08-05 05:20:52.259 INFO    CyberCenter connection established      {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;, &#34;api_version&#34;: &#34;4&#34;}
+2019-08-05 05:20:52.929 INFO    Processing results...   {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}                                   2019-08-05 05:20:54.308 INFO    Applying image assurance policies...    {&#34;registry&#34;: &#34;&#34;, &#34;image&#34;: &#34;&#34;}                   {
+  &#34;scan_started&#34;: {
+    &#34;seconds&#34;: 1564982450,
+    &#34;nanos&#34;: 892464816
   },
 [snip]
-  &quot;vulnerability_summary&quot;: {
-    &quot;total&quot;: 8,
-    &quot;high&quot;: 1,
-    &quot;medium&quot;: 7,
-    &quot;low&quot;: 0,
-    &quot;negligible&quot;: 0,
-    &quot;sensitive&quot;: 0,
-    &quot;malware&quot;: 0,
-    &quot;score_average&quot;: 4.9624996,
-    &quot;max_score&quot;: 7.5
+  &#34;vulnerability_summary&#34;: {
+    &#34;total&#34;: 8,
+    &#34;high&#34;: 1,
+    &#34;medium&#34;: 7,
+    &#34;low&#34;: 0,
+    &#34;negligible&#34;: 0,
+    &#34;sensitive&#34;: 0,
+    &#34;malware&#34;: 0,
+    &#34;score_average&#34;: 4.9624996,
+    &#34;max_score&#34;: 7.5
   },
-  &quot;scan_options&quot;: {},
-  &quot;initiating_user&quot;: &quot;token&quot;,
-  &quot;data_date&quot;: 1564959825,
-  &quot;changed_result&quot;: false,
-  &quot;function_metadata&quot;: {}
+  &#34;scan_options&#34;: {},
+  &#34;initiating_user&#34;: &#34;token&#34;,
+  &#34;data_date&#34;: 1564959825,
+  &#34;changed_result&#34;: false,
+  &#34;function_metadata&#34;: {}
 }
-The command '/bin/sh -c /microscanner your-token' returned a non-zero code: 4
+The command &#39;/bin/sh -c /microscanner your-token&#39; returned a non-zero code: 4
 2019/08/05 05:20:54 Container failed during run: acb_step_2. No retries remaining.
 failed to run step ID: acb_step_2: exit status 4
 
 Run ID: ce9 failed after 34s. Error: failed during run, err: exit status 1
-</code></pre><p>コンテナーイメージに脆弱性のあるパッケージが含まれているため、レジストリへpushをせずに終了しました。ではDockerfileのベースイメージバージョンをAlpine 3.10に変えてタスクを再実行してみます。</p>
-<pre tabindex="0"><code>$ az acr task run -r your-acr -n aqua-scan
+</code></pre></div><p>コンテナーイメージに脆弱性のあるパッケージが含まれているため、レジストリへpushをせずに終了しました。ではDockerfileのベースイメージバージョンをAlpine 3.10に変えてタスクを再実行してみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az acr task run -r your-acr -n aqua-scan
 Queued a run with ID: cea                                                                                               
 Waiting for an agent...                                                                                                 
 2019/08/05 05:22:25 Downloading source code...
@@ -400,7 +349,7 @@ Waiting for an agent...
   runtime-dependency:
     registry: registry.hub.docker.com
     repository: library/alpine
-    tag: &quot;3.10&quot;
+    tag: &#34;3.10&#34;
     digest: sha256:6a92cd1fcdc8d8cdec60f33dda4db2cb1fcdcacf3410a8e05b3741f44a9b5998
   git:
     git-head-revision: b88031f5eb47acfe4ed83f8beda3758f8441d2e8
@@ -418,27 +367,42 @@ Waiting for an agent...
 
 
 Run ID: cea was successful after 38s
-</code></pre><p>pushできました。</p>
+</code></pre></div><p>pushできました。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/aqua">Aqua</a></li>
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/container">Container</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

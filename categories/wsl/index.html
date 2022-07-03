@@ -1,332 +1,70 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wsl &middot; re-imagine</title>
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>WSL - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="" />
+	<meta property="og:image" content=""/>
+	<link rel="alternate" type="application/rss+xml" href="https://ToruMakabe.github.io/categories/wsl/index.xml" title="re-imagine" />
+	<meta property="og:title" content="WSL" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ToruMakabe.github.io/categories/wsl/" />
 
-    <meta name="description" content="my life is the sum of my imagination">
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WSL"/>
+<meta name="twitter:description" content=""/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-    <meta name="generator" content="Hugo 0.39" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="tmak_tw" />
-    <meta name="twitter:title" content="Wsl &middot; re-imagine">
-    <meta name="twitter:description" content="my life is the sum of my imagination">
-
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Wsl &middot; re-imagine">
-    <meta property="og:description" content="my life is the sum of my imagination">
-
-    <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Oxygen:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
-    <![endif]-->
-    <!--[if gt IE 8]><!-->
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
-    <!--<![endif]-->
-
-    <link rel="stylesheet" href="https://ToruMakabe.github.io//css/all.min.css">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link rel="alternate" type="application/rss+xml" title="re-imagine" href="https://ToruMakabe.github.io//index.xml" />
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
+
+
+<h1>Entries tagged - "WSL"</h1>
+
+
+<ul class="posts"><li class="post">
+			<a href="/post/wslenv_golang/">WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</a> <span class="meta">May 2, 2018</span>
+		</li></ul>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
 
-
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-    <div class="header">
-        <hgroup>
-            <h1 class="brand-title"><a href="https://ToruMakabe.github.io/">re-imagine</a></h1>
-            <h2 class="brand-tagline"> my life is the sum of my imagination </h2>
-        </hgroup>
-
-        <nav class="nav">
-            <ul class="nav-list">
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://twitter.com/tmak_tw"><i class="fa fa-twitter"></i> Twitter</a>
-                </li>
-                
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://github.com/ToruMakabe "><i class="fa fa-github-alt"></i> github</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="pure-button" href="https://ToruMakabe.github.io//index.xml"><i class="fa fa-rss"></i> rss</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
-
-
-    <div class="content pure-u-1 pure-u-md-3-4">
-        <div>
-            
-            <div class="posts">
-                
-                <h1 class="content-subhead">02 May 2018, 17:00</h1>
-                <section class="post">
-                    <header class="post-header">
-
-                        <a href="https://ToruMakabe.github.io/post/wslenv_golang/" class="post-title">WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</a>
-
-                        <p class="post-meta">
-                            
-                            
-                                under 
-                                
-                                <a class="post-category post-category-WSL" href="https://ToruMakabe.github.io//categories/wsl">WSL</a>
-                            
-                        </p>
-                    </header>
-
-                    <div class="post-description">
-                        
-
-<h2 id="見た目は地味だが役に立つ">見た目は地味だが役に立つ</h2>
-
-<p>Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支援系の機能、ツールも<a href="https://blogs.msdn.microsoft.com/commandline/2018/03/07/windows10v1803/">拡充</a>されています。特に、WSL/Windowsの連携、相互運用まわりは着実に進化しています。そのうちのひとつが、このエントリーで紹介するWSLENVです。</p>
-
-<p>WSLENVは、WSL/Windows間で環境変数を共有する仕組みです。ただ単純に共有するだけでなく、ルールに従って変換も行います。これが地味に便利。でも地味だから、あまり話題になっていない。なので具体例で紹介しよう、というのがこのエントリーの目的です。</p>
-
-<h2 id="tl-dr">TL;DR</h2>
-
-<p>英語が読めて、「あ、それ便利ね」とピンとくる人は以下を。</p>
-
-<p><a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">Share Environment Vars between WSL and Windows</a></p>
-
-<h2 id="go開発環境を例に">Go開発環境を例に</h2>
-
-<p>前述のリンクでも紹介されていますが、Goの開発環境はWSLENVの代表的なユースケースです。GOPATHをいい感じにWSL/Windowsで共有できます。掘り下げていきましょう。</p>
-
-<h3 id="想定開発者像-ペルソナ">想定開発者像、ペルソナ</h3>
-
-<ul>
-<li>Windows端末を使っている</li>
-<li>Go言語を使っている</li>
-<li>CLIはbash/WSL中心
-
-<ul>
-<li>スクリプト書くならPowerShellもいいけど、インタラクティブな操作はbashが楽</li>
-<li>アプリをDockerコンテナーとしてビルドするなど、OSSエコシステム、ツールとの連携を考慮</li>
-</ul></li>
-<li>とはいえエディタ/IDEはWindows側で動かしたい、最近はVS Code中心</li>
-</ul>
-
-<h3 id="前提条件">前提条件</h3>
-
-<ul>
-<li>WSL、WindowsそれぞれにGoを導入
-
-<ul>
-<li>バージョン管理のためにも、パッケージマネージャーがおすすめ</li>
-<li>わたしはWSL(Ubuntu)でapt、WindowsではChocolateyを使ってGoを導入しています</li>
-</ul></li>
-<li>GOPATHは %USERPROFILE%go とする
-
-<ul>
-<li>ユーザー名を tomakabeとすると C:\Users\tomakabe\go</li>
-<li>setx GOPATH &ldquo;$env:USERPROFILE\go&rdquo; で設定</li>
-<li>WSLでもこのディレクトリをGOPATHとする</li>
-</ul></li>
-<li>VS Code + <a href="https://github.com/Microsoft/vscode-go">Go拡張</a>をWindowsに導入</li>
-<li>WindowsのCLIはPowerShellを利用</li>
-</ul>
-
-<h3 id="そぞろ歩き-その1-windowsでのgo開発">そぞろ歩き その1(WindowsでのGo開発)</h3>
-
-<p>では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。</p>
-
-<p>まず、Windowsで環境変数GOPATHを確認します。</p>
-
-<pre><code>PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
-
-Name                           Value
-----                           -----
-GOPATH                         C:\Users\tomakabe\go
-</code></pre>
-
-<p>GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</p>
-
-<pre><code>PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
-PS C:\Users\tomakabe\go&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2018/05/02     11:10                bin
-d-----       2018/05/02     11:06                src
-
-PS C:\Users\tomakabe\go&gt; ls .\bin\
-
-
-    ディレクトリ: C:\Users\tomakabe\go\bin
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:10       14835200 dlv.exe
--a----       2018/05/02     11:09        4239360 go-outline.exe
--a----       2018/05/02     11:09        4045824 go-symbols.exe
--a----       2018/05/02     11:08       11094528 gocode.exe
--a----       2018/05/02     11:09        5708288 godef.exe
-[snip]
-</code></pre>
-
-<p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
-
-<pre><code>PS C:\Users\tomakabe\go&gt; cd .\src\github.com\ToruMakabe\work\
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; cat .\hello.go
-package main
-
-import &quot;fmt&quot;
-
-func main() {
-        fmt.Println(&quot;Hello Go on the new WSL&quot;)
-}
-</code></pre>
-
-<p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
-
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go\src\github.com\ToruMakabe\work
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:54        2049536 hello.exe
--a----       2018/05/02     11:10             91 hello.go
-
-
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; .\hello.exe
-Hello Go on the new WSL
-</code></pre>
-
-<p>ここまでは従来のWindowsにおけるGo開発環境です。ではWSLに話を移しましょう。</p>
-
-<h3 id="そぞろ歩き-その2-wslでのgo開発">そぞろ歩き その2(WSLでのGo開発)</h3>
-
-<p>WSLにつなぎます。ターミナルは任意ですが、わたしはVS Codeの統合ターミナルが好きです。コードを書きながら操作できるので。</p>
-
-<p>GOPATHを確認します。空っぽです。WSLは既定でWindowsから環境変数PATHを受け取ります。PATHは特別扱いです。ですが、他の環境変数は、指定しないと渡されません。よってWindowsで設定していても、WSLから見るとGOPATHは空っぽです。</p>
-
-<pre><code>~ $ echo $GOPATH
-
-</code></pre>
-
-<p>$HOMEもきれいな状態です。</p>
-
-<pre><code>~ $ ls
-~ $
-</code></pre>
-
-<p>ではGOPATHに指定したい、先ほどWindowsで確認したディレクトリへ移動します。ちなみにWindowsのCドライブはWSLで/mnt/c/に変換されます。先ほど確認したbin、srcが見えています。</p>
-
-<pre><code>~ $ cd /mnt/c/Users/tomakabe/go/
-/mnt/c/Users/tomakabe/go $ ls
-bin  src
-</code></pre>
-
-<p>ではここで実験。試しにパッケージをインポートしてみましょう。定番の<a href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>をインポートしてみます。わざとらしいですが、なんだか嫌な予感がします。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
-Fetching https://golang.org/x/tools/cmd/goimports?go-get=1
-Parsing meta tags from https://golang.org/x/tools/cmd/goimports?go-get=1 (status code 200)
-get &quot;golang.org/x/tools/cmd/goimports&quot;: found meta tag get.metaImport{Prefix:&quot;golang.org/x/tools&quot;, VCS:&quot;git&quot;, RepoRoot:&quot;https://go.googlesource.com/tools&quot;} at https://golang.org/x/tools/cmd/goimports?go-get=1
-get &quot;golang.org/x/tools/cmd/goimports&quot;: verifying non-authoritative meta tag
-Fetching https://golang.org/x/tools?go-get=1
-Parsing meta tags from https://golang.org/x/tools?go-get=1 (status code 200)
-golang.org/x/tools (download)
-created GOPATH=/home/tomakabe/go; see 'go help gopath'
-</code></pre>
-
-<p>嫌な予感は予定調和で的中します。GOPATHがいらっしゃらないので、/home/tomakabe/go とみなしてしまいました。先ほど確認した際、$HOMEはきれいな状態でした、が。新たにお作りになられたようです。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ ls ~/
-go
-/mnt/c/Users/tomakabe/go $ ls ~/go
-bin  src
-</code></pre>
-
-<p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
-
-<h3 id="そぞろ歩き-その3-解決編">そぞろ歩き その3(解決編)</h3>
-
-<p>そこで登場するのが、WSLENVです。Windowsで作業します。Windowsの環境変数GOPATHを、環境変数WSLENVへスイッチとともに設定します。/pスイッチは、「この環境変数はパスを格納しているから、いい感じにして」という指定です。</p>
-
-<pre><code>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &quot;$env:WSLENV`:GOPATH/p&quot;
-
-成功: 指定した値は保存されました。
-</code></pre>
-
-<p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ echo $GOPATH
-/mnt/c/Users/tomakabe/go
-</code></pre>
-
-<p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
-
-<p>ではWSLでサンプルコードを触ってみましょう。ソースのあるディレクトリへ移動します。ソースと先ほどビルドしたexeがあります。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello.exe  hello.go
-</code></pre>
-
-<p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
-
-<pre><code>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello  hello.exe  hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello
-./hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, not stripped
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ./hello
-Hello Go on the new WSL
-</code></pre>
-
-<h2 id="まとめ">まとめ</h2>
-
-<p>代表例としてGoの開発環境で説明しましたが、WSLENVは他の用途でも応用できるでしょう。スイッチの説明など、詳細は先ほど紹介した、<a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">こちら</a>を。</p>
-
-                    </div>
-                </section>
-                
-            </div>
-            
-
-            <div class="footer">
-    <div class="pure-menu pure-menu-horizontal pure-menu-open">
-        <ul>
-            <li>Powered by <a class="hugo" href="http://hugo.spf13.com/" target="_blank">hugo</a></li>
-        </ul>
-    </div>
-</div>
-<script src="https://ToruMakabe.github.io//js/all.min.js"></script>
-        </div>
-    </div>
-</div>
 
 <script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', '', 'auto');
-ga('send', 'pageview');
-
-</script>
-
-</body>
+  feather.replace()
+</script></div>
+    </body>
 </html>

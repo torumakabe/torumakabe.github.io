@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure Blob アップローダーをGoで書いた、そしてその理由 - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure Blob アップローダーをGoで書いた、そしてその理由" />
+<meta property="og:description" content="Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/azblob_golang/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2017-11-28T08:45:00+09:00" />
+<meta property="article:modified_time" content="2017-11-28T08:45:00+09:00" />
 
-<title>Azure Blob アップローダーをGoで書いた、そしてその理由 | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure Blob アップローダーをGoで書いた、そしてその理由"/>
+<meta name="twitter:description" content="Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='Azure Blob アップローダーをGoで書いた、そしてその理由 - re-imagine'>
-<meta property='og:description' content='Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/azblob_golang/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Golang'><meta property='article:tag' content='Storage'><meta property='article:published_time' content='2017-11-28T08:45:00&#43;09:00'/><meta property='article:modified_time' content='2017-11-28T08:45:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/azblob_golang/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure Blob アップローダーをGoで書いた、そしてその理由</h1>
+			<div class="meta">Posted on Nov 28, 2017</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/golang">#Golang</a>
-  
-  | <a class="subtitle is-6" href="/tags/storage">#Storage</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">November 28, 2017</h2>
-    <h1 class="title">Azure Blob アップローダーをGoで書いた、そしてその理由</h1>
-    
-    <div class="content">
-      <h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
+		<section class="body">
+			<h2 id="azure-blob-アップローダーをgoで書いた">Azure Blob アップローダーをGoで書いた</h2>
 <p>ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。</p>
 <h2 id="ひとつめの理由-sdkが新しくなったから">ひとつめの理由: SDKが新しくなったから</h2>
 <p>最近公式ブログで<a href="https://azure.microsoft.com/en-us/blog/preview-the-new-azure-storage-sdk-for-go-storage-sdks-roadmap/">紹介された</a>通り、Azure Storage SDK for Goが再設計され、プレビューが始まりました。GoはDockerやKubernetes、Terraformなど最近話題のプラットフォームやツールを書くのに使われており、ユーザーも増えています。再設計してもっと使いやすくしてちょ、という要望が多かったのも、うなずけます。</p>
@@ -118,95 +67,95 @@
 <li>Parallelism オプションを追加</li>
 <li>ヘルパー関数 handleErrors を追加</li>
 </ul>
-<pre tabindex="0"><code>package main
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 
-import (
-	&quot;context&quot;
-	&quot;flag&quot;
-	&quot;fmt&quot;
-	&quot;log&quot;
-	&quot;net/url&quot;
-	&quot;os&quot;
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;context&#34;</span>
+	<span style="color:#e6db74">&#34;flag&#34;</span>
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;log&#34;</span>
+	<span style="color:#e6db74">&#34;net/url&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
 
-	&quot;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&quot;
+	<span style="color:#e6db74">&#34;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&#34;</span>
 )
 
-var (
-	accountName    string
-	accountKey     string
-	containerName  string
-	fileName       string
-	blockSize      int64
-	blockSizeBytes int64
-	parallelism    int64
+<span style="color:#66d9ef">var</span> (
+	<span style="color:#a6e22e">accountName</span>    <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">accountKey</span>     <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">containerName</span>  <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">fileName</span>       <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">blockSize</span>      <span style="color:#66d9ef">int64</span>
+	<span style="color:#a6e22e">blockSizeBytes</span> <span style="color:#66d9ef">int64</span>
+	<span style="color:#a6e22e">parallelism</span>    <span style="color:#66d9ef">int64</span>
 )
 
-func init() {
-	flag.StringVar(&amp;accountName, &quot;account-name&quot;, &quot;&quot;, &quot;(Required) Storage Account Name&quot;)
-	flag.StringVar(&amp;accountKey, &quot;account-key&quot;, &quot;&quot;, &quot;(Required) Storage Account Key&quot;)
-	flag.StringVar(&amp;containerName, &quot;c&quot;, &quot;&quot;, &quot;(Required - short option) Blob Container Name&quot;)
-	flag.StringVar(&amp;containerName, &quot;container-name&quot;, &quot;&quot;, &quot;(Required) Blob Container Name&quot;)
-	flag.StringVar(&amp;fileName, &quot;f&quot;, &quot;&quot;, &quot;(Required - short option) Upload filename&quot;)
-	flag.StringVar(&amp;fileName, &quot;file&quot;, &quot;&quot;, &quot;(Required) Upload filename&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;b&quot;, 4, &quot;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Int64Var(&amp;blockSize, &quot;blocksize&quot;, 4, &quot;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&quot;)
-	flag.Int64Var(&amp;parallelism, &quot;p&quot;, 5, &quot;(Optional - short option) Parallelism - From 0 to 32. Default 5.&quot;)
-	flag.Int64Var(&amp;parallelism, &quot;parallelism&quot;, 5, &quot;(Optional) Parallelism - From 0 to 32. Default 5.&quot;)
-	flag.Parse()
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountName</span>, <span style="color:#e6db74">&#34;account-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Name&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountKey</span>, <span style="color:#e6db74">&#34;account-key&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Key&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;c&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Blob Container Name&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;container-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Blob Container Name&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;f&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Upload filename&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;file&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Upload filename&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;b&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;blocksize&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;p&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional - short option) Parallelism - From 0 to 32. Default 5.&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;parallelism&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional) Parallelism - From 0 to 32. Default 5.&#34;</span>)
+	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
 
-	if (blockSize &lt; 1) || (blockSize &gt; 100) {
-		fmt.Println(&quot;Blocksize must be from 1MB to 100MB&quot;)
-		os.Exit(1)
+	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blockSize</span> &lt; <span style="color:#ae81ff">1</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">blockSize</span> &gt; <span style="color:#ae81ff">100</span>) {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Blocksize must be from 1MB to 100MB&#34;</span>)
+		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
 	}
-	blockSizeBytes = blockSize * 1024 * 1024
+	<span style="color:#a6e22e">blockSizeBytes</span> = <span style="color:#a6e22e">blockSize</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
 
-	if (parallelism &lt; 0) || (parallelism &gt; 32) {
-		fmt.Println(&quot;Parallelism must be from 0 to 32&quot;)
-		os.Exit(1)
+	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">parallelism</span> &lt; <span style="color:#ae81ff">0</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">parallelism</span> &gt; <span style="color:#ae81ff">32</span>) {
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Parallelism must be from 0 to 32&#34;</span>)
+		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
 	}
 }
 
-func handleErrors(err error) {
-	if err != nil {
-		if serr, ok := err.(azblob.StorageError); ok { // This error is a Service-specific
-			switch serr.ServiceCode() { // Compare serviceCode to ServiceCodeXxx constants
-			case azblob.ServiceCodeContainerAlreadyExists:
-				fmt.Println(&quot;Received 409. Container already exists&quot;)
-				return
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">serr</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">err</span>.(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">StorageError</span>); <span style="color:#a6e22e">ok</span> { <span style="color:#75715e">// This error is a Service-specific
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">serr</span>.<span style="color:#a6e22e">ServiceCode</span>() { <span style="color:#75715e">// Compare serviceCode to ServiceCodeXxx constants
+</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">ServiceCodeContainerAlreadyExists</span>:
+				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Received 409. Container already exists&#34;</span>)
+				<span style="color:#66d9ef">return</span>
 			}
 		}
-		log.Fatal(err)
+		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
 	}
 }
 
-func main() {
-	file, err := os.Open(fileName)
-	handleErrors(err)
-	defer file.Close()
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#a6e22e">fileName</span>)
+	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
 
-	fileSize, err := file.Stat()
-	handleErrors(err)
+	<span style="color:#a6e22e">fileSize</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Stat</span>()
+	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
 
-	u, _ := url.Parse(fmt.Sprintf(&quot;https://%s.blob.core.windows.net/%s/%s&quot;, accountName, containerName, fileName))
-	blockBlobURL := azblob.NewBlockBlobURL(*u, azblob.NewPipeline(azblob.NewSharedKeyCredential(accountName, accountKey), azblob.PipelineOptions{}))
+	<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;https://%s.blob.core.windows.net/%s/%s&#34;</span>, <span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">containerName</span>, <span style="color:#a6e22e">fileName</span>))
+	<span style="color:#a6e22e">blockBlobURL</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewBlockBlobURL</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewPipeline</span>(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewSharedKeyCredential</span>(<span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">accountKey</span>), <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">PipelineOptions</span>{}))
 
-	ctx := context.Background()
+	<span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
 
-	fmt.Println(&quot;Uploading block blob...&quot;)
-	response, err := azblob.UploadFileToBlockBlob(ctx, file, blockBlobURL,
-		azblob.UploadToBlockBlobOptions{
-			BlockSize: blockSizeBytes,
-			Progress: func(bytesTransferred int64) {
-				fmt.Printf(&quot;Uploaded %d of %d bytes.\n&quot;, bytesTransferred, fileSize.Size())
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Uploading block blob...&#34;</span>)
+	<span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadFileToBlockBlob</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">blockBlobURL</span>,
+		<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadToBlockBlobOptions</span>{
+			<span style="color:#a6e22e">BlockSize</span>: <span style="color:#a6e22e">blockSizeBytes</span>,
+			<span style="color:#a6e22e">Progress</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">bytesTransferred</span> <span style="color:#66d9ef">int64</span>) {
+				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Uploaded %d of %d bytes.\n&#34;</span>, <span style="color:#a6e22e">bytesTransferred</span>, <span style="color:#a6e22e">fileSize</span>.<span style="color:#a6e22e">Size</span>())
 			},
-			Parallelism: uint16(parallelism),
+			<span style="color:#a6e22e">Parallelism</span>: uint16(<span style="color:#a6e22e">parallelism</span>),
 		})
-	handleErrors(err)
-	_ = response // Avoid compiler's &quot;declared and not used&quot; error
-
-	fmt.Println(&quot;Done&quot;)
+	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
+	<span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">response</span> <span style="color:#75715e">// Avoid compiler&#39;s &#34;declared and not used&#34; error
+</span><span style="color:#75715e"></span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Done&#34;</span>)
 }
-</code></pre><p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
+</code></pre></div><p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
 <p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
 <h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
 <p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>
@@ -215,25 +164,40 @@ func main() {
 <p>ファイルのアップロードだけでなく、Azureにちょっとした処理を任せたい、でもそれはいじりづらいシステムの上なのねん、って話は、結構多いんですよね。ということでシングルバイナリーを作って、ポンと置いて、動かせるGoは尊いわけです。大事なことなので2回書きました。</p>
 <p>C#やNode、Python SDKと比較してGoのそれはまだ物足りないところも多いわけですが、今後注目ということで地道に盛り上がっていこうと思います。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/golang">Golang</a></li>
+					
+					<li><a href="/tags/storage">Storage</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

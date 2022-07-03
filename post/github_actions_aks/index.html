@@ -1,112 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>GitHub ActionsでAzure CLIとkubectlを動かす - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="GitHub ActionsでAzure CLIとkubectlを動かす" />
+<meta property="og:description" content="(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/github_actions_aks/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2018-12-22T20:00:00+09:00" />
+<meta property="article:modified_time" content="2018-12-22T20:00:00+09:00" />
 
-<title>GitHub ActionsでAzure CLIとkubectlを動かす | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="GitHub ActionsでAzure CLIとkubectlを動かす"/>
+<meta name="twitter:description" content="(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='GitHub ActionsでAzure CLIとkubectlを動かす - re-imagine'>
-<meta property='og:description' content='(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/github_actions_aks/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GitHub'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Kubernetes'><meta property='article:published_time' content='2018-12-22T20:00:00&#43;09:00'/><meta property='article:modified_time' content='2018-12-22T20:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/github_actions_aks/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">GitHub ActionsでAzure CLIとkubectlを動かす</h1>
+			<div class="meta">Posted on Dec 22, 2018</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/github">#GitHub</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/azure">#Azure</a>
-  
-  | <a class="subtitle is-6" href="/tags/kubernetes">#Kubernetes</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">December 22, 2018</h2>
-    <h1 class="title">GitHub ActionsでAzure CLIとkubectlを動かす</h1>
-    
-    <div class="content">
-      <h2 id="注-2019819追記">(注: 2019/8/19追記)</h2>
+		<section class="body">
+			<h2 id="注-2019819追記">(注: 2019/8/19追記)</h2>
 <p>GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移行方法は以下を参考にしてください。</p>
 <blockquote>
 <p><a href="https://help.github.com/en/articles/migrating-github-actions-from-hcl-syntax-to-yaml-syntax">Migrating GitHub Actions from HCL syntax to YAML syntax</a></p>
@@ -134,7 +83,7 @@
 <p>kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
 <p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
 <p>ディレクトリ構造は、こうです。</p>
-<pre tabindex="0"><code>.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">.
 ├── .git
 │   └── (省略)
 ├── .github
@@ -145,45 +94,45 @@
 │   ├── Dockerfile
 │   └── entrypoint.sh
 └── sampleapp.yaml
-</code></pre><ul>
+</code></pre></div><ul>
 <li>.github の下にWorkflowを書きます</li>
 <li>azure-cli の下に自作Actionを置きました</li>
 <li>sampleapp.yaml がkubernetesのマニフェストです</li>
 </ul>
 <h3 id="workflow">Workflow</h3>
 <p>まず、 .github/main.workflow を見てみましょう</p>
-<pre tabindex="0"><code>workflow &quot;Deploy app to AKS&quot; {
-  on = &quot;push&quot;
-  resolves = [&quot;Deploy to AKS&quot;]
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">workflow &#34;Deploy app to AKS&#34; {
+  on = &#34;push&#34;
+  resolves = [&#34;Deploy to AKS&#34;]
 }
 
-action &quot;Load AKS credential&quot; {
-  uses = &quot;./azure-cli/&quot;
-  secrets = [&quot;AZURE_SERVICE_APP_ID&quot;, &quot;AZURE_SERVICE_PASSWORD&quot;, &quot;AZURE_SERVICE_TENANT&quot;]
-  args = &quot;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&quot;
+action &#34;Load AKS credential&#34; {
+  uses = &#34;./azure-cli/&#34;
+  secrets = [&#34;AZURE_SERVICE_APP_ID&#34;, &#34;AZURE_SERVICE_PASSWORD&#34;, &#34;AZURE_SERVICE_TENANT&#34;]
+  args = &#34;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&#34;
   env = {
-    AZ_OUTPUT_FORMAT = &quot;table&quot;
-    AKS_RG_NAME = &quot;your-aks-rg&quot;
-    AKS_CLUSTER_NAME = &quot;youraks&quot;
+    AZ_OUTPUT_FORMAT = &#34;table&#34;
+    AKS_RG_NAME = &#34;your-aks-rg&#34;
+    AKS_CLUSTER_NAME = &#34;youraks&#34;
   }
 }
 
-action &quot;Deploy branch filter&quot; {
-  uses = &quot;actions/bin/filter@master&quot;
-  args = &quot;branch master&quot;
+action &#34;Deploy branch filter&#34; {
+  uses = &#34;actions/bin/filter@master&#34;
+  args = &#34;branch master&#34;
 }
 
-action &quot;Deploy to AKS&quot; {
-  needs = [&quot;Load AKS credential&quot;, &quot;Deploy branch filter&quot;]
-  uses = &quot;docker://gcr.io/cloud-builders/kubectl&quot;
-  runs = &quot;sh -l -c&quot;
-  args = [&quot;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e 's/YOUR_VALUE/'\&quot;$YOUR_VALUE\&quot;'/' -e 's/YOUR_DNS_LABEL_NAME/'$YOUR_DNS_LABEL_NAME'/' | kubectl apply -f - &quot;]
+action &#34;Deploy to AKS&#34; {
+  needs = [&#34;Load AKS credential&#34;, &#34;Deploy branch filter&#34;]
+  uses = &#34;docker://gcr.io/cloud-builders/kubectl&#34;
+  runs = &#34;sh -l -c&#34;
+  args = [&#34;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e &#39;s/YOUR_VALUE/&#39;\&#34;$YOUR_VALUE\&#34;&#39;/&#39; -e &#39;s/YOUR_DNS_LABEL_NAME/&#39;$YOUR_DNS_LABEL_NAME&#39;/&#39; | kubectl apply -f - &#34;]
   env = {
-    YOUR_VALUE = &quot;Ale&quot;
-    YOUR_DNS_LABEL_NAME = &quot;yournamedispvar&quot;
+    YOUR_VALUE = &#34;Ale&#34;
+    YOUR_DNS_LABEL_NAME = &#34;yournamedispvar&#34;
   }
 }
-</code></pre><p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
+</code></pre></div><p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
 <p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&ldquo;Load AKS credential&quot;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
 <p>&ldquo;Deploy branch filter&quot;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&ldquo;Deploy to AKS&quot;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
 <p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&quot;Actions&quot;タブで実行結果を確認できます。</p>
@@ -200,30 +149,45 @@ action &quot;Deploy to AKS&quot; {
 <p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
 <p>このactionが実行されると、envの&quot;YOUR_VALUE&quot;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&ldquo;YOUR_DNS_LABEL_NAME&quot;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
 <p>アプリのパスは /dispvar です。curlしてみると。</p>
-<pre tabindex="0"><code>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
-Hello. You set &quot;Ale&quot;
-</code></pre><h2 id="まとめ">まとめ</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
+Hello. You set &#34;Ale&#34;
+</code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/github">GitHub</a></li>
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/kubernetes">Kubernetes</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-

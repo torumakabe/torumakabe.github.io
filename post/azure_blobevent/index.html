@@ -1,114 +1,61 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"  lang="ja">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure Event GridでBlobイベントを拾う - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure Event GridでBlobイベントを拾う" />
+<meta property="og:description" content="Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/azure_blobevent/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2017-09-05T12:00:00+09:00" />
+<meta property="article:modified_time" content="2017-09-05T12:00:00+09:00" />
 
-<title>Azure Event GridでBlobイベントを拾う | re-imagine</title>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure Event GridでBlobイベントを拾う"/>
+<meta name="twitter:description" content="Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
 
-<meta property='og:title' content='Azure Event GridでBlobイベントを拾う - re-imagine'>
-<meta property='og:description' content='Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手'>
-<meta property='og:url' content='https://ToruMakabe.github.io/post/azure_blobevent/'>
-<meta property='og:site_name' content='re-imagine'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Azure'><meta property='article:tag' content='Blob'><meta property='article:tag' content='EventGrid'><meta property='article:tag' content='Functions'><meta property='article:published_time' content='2017-09-05T12:00:00&#43;09:00'/><meta property='article:modified_time' content='2017-09-05T12:00:00&#43;09:00'/><meta name='twitter:card' content='summary'><meta name='twitter:site' content='@tmak_tw'><meta name='twitter:creator' content='@tmak_tw'>
-
-
-<link href="https://ToruMakabe.github.io/index.xml" rel="alternate" type="application/rss+xml" title="re-imagine" />
-
-<link rel="stylesheet" href="/css/style.css"/><link rel='stylesheet' href='https://ToruMakabe.github.io/css/custom.css'><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<link rel="canonical" href="https://ToruMakabe.github.io/post/azure_blobevent/">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.d1574b43a51792a446cd761d6f9b1c9abb39ed2c36ca6984f74aef729eb9f245.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
 </head>
 <body>
-<section class="section">
-  <div class="container">
-    <nav id="nav-main" class="nav">
-      <div id="nav-name" class="nav-left">
-        <a id="nav-anchor" class="nav-item" href="https://ToruMakabe.github.io/">
-          <h1 id="nav-heading" class="title is-4">re-imagine</h1>
-        </a>
-      </div>
-      <div class="nav-right">
-        <nav id="nav-items" class="nav-item level is-mobile"><a class="level-item" aria-label="github" href='https://github.com/ToruMakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="twitter" href='https://twitter.com/tmak_tw'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="instagram" href='https://instagram.com/torumakabe'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/>
-    
-  </svg></i>
-            </span>
-          </a><a class="level-item" aria-label="linkedin" href='https://linkedin.com/in/toru-makabe-b436b117'
-            target='_blank' rel='noopener'>
-            <span class="icon">
-              <i class><svg viewbox='0 0 24 24' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true'>
-    
-    <path stroke-width="1.8" d="m5.839218,4.101561c0,1.211972 -0.974141,2.194011 -2.176459,2.194011s-2.176459,-0.982039 -2.176459,-2.194011c0,-1.211094 0.974141,-2.194011 2.176459,-2.194011s2.176459,0.982917 2.176459,2.194011zm0.017552,3.94922l-4.388022,0l0,14.04167l4.388022,0l0,-14.04167zm7.005038,0l-4.359939,0l0,14.04167l4.360816,0l0,-7.370999c0,-4.098413 5.291077,-4.433657 5.291077,0l0,7.370999l4.377491,0l0,-8.89101c0,-6.915523 -7.829986,-6.66365 -9.669445,-3.259423l0,-1.891237z"/>
-    
-  </svg></i>
-            </span>
-          </a></nav>
-      </div>
-    </nav>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
 
-    <nav class="nav">
-      
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure Event GridでBlobイベントを拾う</h1>
+			<div class="meta">Posted on Sep 5, 2017</div>
+		</div>
+		
 
-      
-    </nav>
-
-  </div>
-  <script src="/js/navicon-shift.js"></script>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="subtitle tags is-6 is-pulled-right">
-      
-      
-<a class="subtitle is-6" href="/tags/azure">#Azure</a>
-
-
-
-  
-  | <a class="subtitle is-6" href="/tags/blob">#Blob</a>
-  
-  | <a class="subtitle is-6" href="/tags/eventgrid">#EventGrid</a>
-  
-  | <a class="subtitle is-6" href="/tags/functions">#Functions</a>
-  
-
-      
-    </div>
-    <h2 class="subtitle is-6">September 5, 2017</h2>
-    <h1 class="title">Azure Event GridでBlobイベントを拾う</h1>
-    
-    <div class="content">
-      <h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
+		<section class="body">
+			<h2 id="event-gridがblobに対応">Event GridがBlobに対応</h2>
 <p>Event GridがBlobのイベントを拾えるように<a href="https://azure.microsoft.com/en-us/blog/announcing-azure-blob-storage-events-preview/">なりました</a>。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手の良いサービスに育つ予感がします。このたび検証する機会があったので、共有を。</p>
 <p>プレビュー中なので、今後仕様が変わるかもしれないこと、不具合やメンテナンス作業の可能性などは、ご承知おきください。</p>
 <h2 id="event-gridがblobに対応して何がうれしいか">Event GridがBlobに対応して何がうれしいか</h2>
@@ -151,21 +98,21 @@
 <li>プライベートプレビューは申請が必要です</li>
 </ul>
 <p>Azure CLIの下記コマンドでプレビューに申請できます。</p>
-<pre tabindex="0"><code>az provider register --namespace  Microsoft.EventGrid
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az provider register --namespace  Microsoft.EventGrid
 az feature register --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre><p>以下のコマンドで確認し、statusが&quot;Registered&quot;であれば使えます。</p>
-<pre tabindex="0"><code>az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
-</code></pre><h2 id="使い方">使い方</h2>
+</code></pre></div><p>以下のコマンドで確認し、statusが&quot;Registered&quot;であれば使えます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az feature show --name storageEventSubscriptions --namespace Microsoft.EventGrid
+</code></pre></div><h2 id="使い方">使い方</h2>
 <p>ストレージアカウントの作成からSubscription作成までの流れを追ってみましょう。</p>
 <p>リソースグループを作ります。</p>
-<pre tabindex="0"><code>$ az group create -n blobeventpoc-rg -l westcentralus
-</code></pre><p>Blobストレージアカウントを作ります。</p>
-<pre tabindex="0"><code>$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
-</code></pre><p>ではいよいよEvent GridのSubscriptionを作ります。</p>
-<pre tabindex="0"><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group create -n blobeventpoc-rg -l westcentralus
+</code></pre></div><p>Blobストレージアカウントを作ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az storage account create -n blobeventpoc01 -l westcentralus -g blobeventpoc-rg --sku Standard_LRS --kind BlobStorage --access-tier Hot
+</code></pre></div><p>ではいよいよEvent GridのSubscriptionを作ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpg --prov
 ider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated
 -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpg
-</code></pre><p>以下はパラメーターの補足です。</p>
+</code></pre></div><p>以下はパラメーターの補足です。</p>
 <ul>
 <li>&ndash;endpoint
 <ul>
@@ -185,54 +132,54 @@ ider-namespace Microsoft.Storage --resource-type storageAccounts --included-even
 </ul>
 <p>では作成したストレージアカウントにBlobコンテナーを作成し、jpgファイルを置いてみましょう。テストには<a href="https://azure.microsoft.com/ja-jp/features/storage-explorer/">Azure Storage Explorer</a>が便利です。</p>
 <p>RequestBinにWebhookが飛び、中身を見られます。スキーマの確認は<a href="https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-event-overview#event-schema">こちら</a>から。</p>
-<pre tabindex="0"><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:25:15.2635962Z&quot;,
-  &quot;id&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea0684d2&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;f3cab560-8f85-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;f3ff6b96-001e-001d-6e92-23bdea000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1A9D8A6703A&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060986&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;f3a538cf-5b88-4bbf-908a-20a37c65e238&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[{
+  &#34;topic&#34;: &#34;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&#34;,
+  &#34;subject&#34;: &#34;/blobServices/default/containers/images/blobs/handsomeyoungman.jpg&#34;,
+  &#34;eventType&#34;: &#34;Microsoft.Storage.BlobCreated&#34;,
+  &#34;eventTime&#34;: &#34;2017-09-02T02:25:15.2635962Z&#34;,
+  &#34;id&#34;: &#34;f3ff6b96-001e-001d-6e92-23bdea0684d2&#34;,
+  &#34;data&#34;: {
+    &#34;api&#34;: &#34;PutBlob&#34;,
+    &#34;clientRequestId&#34;: &#34;f3cab560-8f85-11e7-bad1-53b58c70ab53&#34;,
+    &#34;requestId&#34;: &#34;f3ff6b96-001e-001d-6e92-23bdea000000&#34;,
+    &#34;eTag&#34;: &#34;0x8D4F1A9D8A6703A&#34;,
+    &#34;contentType&#34;: &#34;image/jpeg&#34;,
+    &#34;contentLength&#34;: 42497,
+    &#34;blobType&#34;: &#34;BlockBlob&#34;,
+    &#34;url&#34;: &#34;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpg&#34;,
+    &#34;sequencer&#34;: &#34;0000000000000BAB0000000000060986&#34;,
+    &#34;storageDiagnostics&#34;: {
+      &#34;batchId&#34;: &#34;f3a538cf-5b88-4bbf-908a-20a37c65e238&#34;
     }
   }
 }]
-</code></pre><p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
-<pre tabindex="0"><code>$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
+</code></pre></div><p>.jpgだけじゃなくて.jpegも使われるかもしれませんね。ということで、エンドポイントが同じでフィルタ定義を変えたSubscriptionを追加します。&ndash;subject-ends-withをjpegとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az eventgrid resource event-subscription create --endpoint https://requestb.in/y4jgj2x0 -n blobeventpocsub-jpeg --pro
 vider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types Microsoft.Storage.BlobCreated -
 g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
-</code></pre><p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
-<pre tabindex="0"><code>[{
-  &quot;topic&quot;: &quot;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&quot;,
-  &quot;subject&quot;: &quot;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&quot;,
-  &quot;eventType&quot;: &quot;Microsoft.Storage.BlobCreated&quot;,
-  &quot;eventTime&quot;: &quot;2017-09-02T02:36:33.827967Z&quot;,
-  &quot;id&quot;: &quot;e8b036ee-001e-00e7-4994-23740d06225b&quot;,
-  &quot;data&quot;: {
-    &quot;api&quot;: &quot;PutBlob&quot;,
-    &quot;clientRequestId&quot;: &quot;883ff7e0-8f87-11e7-bad1-53b58c70ab53&quot;,
-    &quot;requestId&quot;: &quot;e8b036ee-001e-00e7-4994-23740d000000&quot;,
-    &quot;eTag&quot;: &quot;0x8D4F1AB6D1B24F6&quot;,
-    &quot;contentType&quot;: &quot;image/jpeg&quot;,
-    &quot;contentLength&quot;: 42497,
-    &quot;blobType&quot;: &quot;BlockBlob&quot;,
-    &quot;url&quot;: &quot;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&quot;,
-    &quot;sequencer&quot;: &quot;0000000000000BAB0000000000060D42&quot;,
-    &quot;storageDiagnostics&quot;: {
-      &quot;batchId&quot;: &quot;9ec5c091-061d-4111-ad82-52d9803ce373&quot;
+</code></pre></div><p>すると、拡張子.jpegのファイルをアップロードしても発火しました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[{
+  &#34;topic&#34;: &#34;/subscriptions/xxxxx-xxxxx-xxxxx-xxxxx/resourceGroups/blobeventpoc-rg/providers/Microsoft.Storage/storageAccounts/blobeventpoc01&#34;,
+  &#34;subject&#34;: &#34;/blobServices/default/containers/images/blobs/handsomeyoungman.jpeg&#34;,
+  &#34;eventType&#34;: &#34;Microsoft.Storage.BlobCreated&#34;,
+  &#34;eventTime&#34;: &#34;2017-09-02T02:36:33.827967Z&#34;,
+  &#34;id&#34;: &#34;e8b036ee-001e-00e7-4994-23740d06225b&#34;,
+  &#34;data&#34;: {
+    &#34;api&#34;: &#34;PutBlob&#34;,
+    &#34;clientRequestId&#34;: &#34;883ff7e0-8f87-11e7-bad1-53b58c70ab53&#34;,
+    &#34;requestId&#34;: &#34;e8b036ee-001e-00e7-4994-23740d000000&#34;,
+    &#34;eTag&#34;: &#34;0x8D4F1AB6D1B24F6&#34;,
+    &#34;contentType&#34;: &#34;image/jpeg&#34;,
+    &#34;contentLength&#34;: 42497,
+    &#34;blobType&#34;: &#34;BlockBlob&#34;,
+    &#34;url&#34;: &#34;https://blobeventpoc01.blob.core.windows.net/images/handsomeyoungman.jpeg&#34;,
+    &#34;sequencer&#34;: &#34;0000000000000BAB0000000000060D42&#34;,
+    &#34;storageDiagnostics&#34;: {
+      &#34;batchId&#34;: &#34;9ec5c091-061d-4111-ad82-52d9803ce373&#34;
     }
   }
 }]
-</code></pre><h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
+</code></pre></div><h2 id="azure-functionsに画像リサイズファンクションを作って連携してみる">Azure Functionsに画像リサイズファンクションを作って連携してみる</h2>
 <p>Gvent Grid側の動きが確認できたので、サンプルアプリを作って検証してみましょう。Azure Functions上に画像ファイルのサイズを変えるHandlerアプリを作ってみます。</p>
 <h3 id="概要">概要</h3>
 <p>当初想定したのは、ひとつのファンクションで、トリガーはEventGrid、入出力バインドにBlob、という作りでした。ですが、以下のように設計を変えました。</p>
@@ -245,48 +192,48 @@ g blobeventpoc-rg --resource-name blobeventpoc01 --subject-ends-with jpeg
 <h3 id="handler">Handler</h3>
 <p>C#(csx)で、Event GridからのWebhookを受けるHandlerを作ります。PublisherがBlobの場合、ペイロードにBlobのURLが入っていますので、そこからファイル名を抽出します。そして、そのファイル名をQueueに送ります。ファンクション名はBlobEventHandlerとしました。なおEventGridTriggerテンプレートは、現在は[試験段階]シナリオに入っています。</p>
 <p>[run.csx]</p>
-<pre tabindex="0"><code>#r &quot;Newtonsoft.json&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#r &#34;Newtonsoft.json&#34;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 
 public static void Run(EventGridEvent eventGridEvent, out string outputQueueItem, TraceWriter log)
 {
-    string imageUrl = eventGridEvent.Data[&quot;url&quot;].ToString();
+    string imageUrl = eventGridEvent.Data[&#34;url&#34;].ToString();
     outputQueueItem = System.IO.Path.GetFileName(imageUrl);
 }
-</code></pre><p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
+</code></pre></div><p>Event GridのWebJobs拡張向けパッケージを指定します。</p>
 <p>[project.json]</p>
-<pre tabindex="0"><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;Microsoft.Azure.WebJobs.Extensions.EventGrid&quot;: &quot;1.0.0-beta1-10006&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+&#34;frameworks&#34;: {
+  &#34;net46&#34;:{
+    &#34;dependencies&#34;: {
+      &#34;Microsoft.Azure.WebJobs.Extensions.EventGrid&#34;: &#34;1.0.0-beta1-10006&#34;
     }
   }
  }
 }
-</code></pre><p>トリガーとバインドは以下の通りです。</p>
+</code></pre></div><p>トリガーとバインドは以下の通りです。</p>
 <p>[function.json]</p>
-<pre tabindex="0"><code>{
-  &quot;bindings&quot;: [
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+  &#34;bindings&#34;: [
     {
-      &quot;type&quot;: &quot;eventGridTrigger&quot;,
-      &quot;name&quot;: &quot;eventGridEvent&quot;,
-      &quot;direction&quot;: &quot;in&quot;
+      &#34;type&#34;: &#34;eventGridTrigger&#34;,
+      &#34;name&#34;: &#34;eventGridEvent&#34;,
+      &#34;direction&#34;: &#34;in&#34;
     },
     {
-      &quot;type&quot;: &quot;queue&quot;,
-      &quot;name&quot;: &quot;outputQueueItem&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;,
-      &quot;direction&quot;: &quot;out&quot;
+      &#34;type&#34;: &#34;queue&#34;,
+      &#34;name&#34;: &#34;outputQueueItem&#34;,
+      &#34;queueName&#34;: &#34;imagefilename&#34;,
+      &#34;connection&#34;: &#34;AzureWebJobsStorage&#34;,
+      &#34;direction&#34;: &#34;out&#34;
     }
   ],
-  &quot;disabled&quot;: false
+  &#34;disabled&#34;: false
 }
-</code></pre><h3 id="resizer">Resizer</h3>
+</code></pre></div><h3 id="resizer">Resizer</h3>
 <p>Queueをトリガーに、Blobから画像ファイルを取り出し、縮小、出力するファンクションを作ります。ファンクション名はResizerとしました。</p>
 <p>[run.csx]</p>
-<pre tabindex="0"><code>using ImageResizer;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">using ImageResizer;
 
 public static void Run(string myQueueItem, Stream inputBlob, Stream outputBlob, TraceWriter log)
 {
@@ -307,70 +254,87 @@ private static Dictionary&lt;ImageSize, Tuple&lt;int, int&gt;&gt; imageDimension
 {
   { ImageSize.Small, Tuple.Create(100, 100) }
 };
-</code></pre><p>ImageResizerのパッケージを指定します。</p>
+</code></pre></div><p>ImageResizerのパッケージを指定します。</p>
 <p>[project.json]</p>
-<pre tabindex="0"><code>{
-&quot;frameworks&quot;: {
-  &quot;net46&quot;:{
-    &quot;dependencies&quot;: {
-      &quot;ImageResizer&quot;: &quot;4.1.9&quot;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+&#34;frameworks&#34;: {
+  &#34;net46&#34;:{
+    &#34;dependencies&#34;: {
+      &#34;ImageResizer&#34;: &#34;4.1.9&#34;
     }
   }
  }
 }
-</code></pre><p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
+</code></pre></div><p>トリガーとバインドは以下の通りです。{QueueTrigger}メタデータで、QueueのペイロードをBlobのpathに使います。ペイロードにはファイル名が入っています。</p>
 <p>また、画像を保存するBlobストレージアカウントの接続文字列は、環境変数BLOB_IMAGESへ事前に設定しています。なお、リサイズ後の画像を格納するBlobコンテナーは、&ldquo;images-s&quot;として別途作成しました。コンテナー&quot;images&quot;をイベントの発火対象コンテナーとして、Subscriptionにフィルタを定義したいからです。</p>
 <p>[function.json]</p>
-<pre tabindex="0"><code>{
-  &quot;bindings&quot;: [
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
+  &#34;bindings&#34;: [
     {
-      &quot;name&quot;: &quot;myQueueItem&quot;,
-      &quot;type&quot;: &quot;queueTrigger&quot;,
-      &quot;direction&quot;: &quot;in&quot;,
-      &quot;queueName&quot;: &quot;imagefilename&quot;,
-      &quot;connection&quot;: &quot;AzureWebJobsStorage&quot;
+      &#34;name&#34;: &#34;myQueueItem&#34;,
+      &#34;type&#34;: &#34;queueTrigger&#34;,
+      &#34;direction&#34;: &#34;in&#34;,
+      &#34;queueName&#34;: &#34;imagefilename&#34;,
+      &#34;connection&#34;: &#34;AzureWebJobsStorage&#34;
     },
     {
-      &quot;name&quot;: &quot;inputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;in&quot;
+      &#34;name&#34;: &#34;inputBlob&#34;,
+      &#34;type&#34;: &#34;blob&#34;,
+      &#34;path&#34;: &#34;images/{QueueTrigger}&#34;,
+      &#34;connection&#34;: &#34;BLOB_IMAGES&#34;,
+      &#34;direction&#34;: &#34;in&#34;
     },
     {
-      &quot;name&quot;: &quot;outputBlob&quot;,
-      &quot;type&quot;: &quot;blob&quot;,
-      &quot;path&quot;: &quot;images-s/{QueueTrigger}&quot;,
-      &quot;connection&quot;: &quot;BLOB_IMAGES&quot;,
-      &quot;direction&quot;: &quot;out&quot;
+      &#34;name&#34;: &#34;outputBlob&#34;,
+      &#34;type&#34;: &#34;blob&#34;,
+      &#34;path&#34;: &#34;images-s/{QueueTrigger}&#34;,
+      &#34;connection&#34;: &#34;BLOB_IMAGES&#34;,
+      &#34;direction&#34;: &#34;out&#34;
     }
   ],
-  &quot;disabled&quot;: false
+  &#34;disabled&#34;: false
 }
-</code></pre><p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
-<pre tabindex="0"><code>$ az eventgrid resource event-subscription create --endpoint &quot;https://blobeventpoc.azurewebsites.net/admin/exte
-nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&quot; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &quot;Microsoft.Storage.BlobCreated&quot; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &quot;/blobServices/default/containers/images/&quot;  --subject-ends-with jpg
-</code></pre><p>これで、コンテナー&quot;images&quot;にjpgファイルがアップロードされると、コンテナー&quot;images-s&quot;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
+</code></pre></div><p>Handlerの準備が整いました。最後にEvent GridのSubscriptionを作成します。Azure FunctionsのBlobEventHandlerのトークン付きエンドポイントは、ポータルの[統合]で確認できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az eventgrid resource event-subscription create --endpoint &#34;https://blobeventpoc.azurewebsites.net/admin/exte
+nsions/EventGridExtensionConfig?functionName=BlobEventHandler&amp;code=tokenTOKEN1234567890==&#34; -n blobeventpocsub-jpg --provider-namespace Microsoft.Storage --resource-type storageAccounts --included-event-types &#34;Microsoft.Storage.BlobCreated&#34; -g blobeventpoc-rg --resource-name blobeventpoc01 --subject-begins-with &#34;/blobServices/default/containers/images/&#34;  --subject-ends-with jpg
+</code></pre></div><p>これで、コンテナー&quot;images&quot;にjpgファイルがアップロードされると、コンテナー&quot;images-s&quot;に、リサイズされた同じファイル名の画像ファイルが出来上がります。</p>
 
-      
-    </div>
-    
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/blob">Blob</a></li>
+					
+					<li><a href="/tags/eventgrid">EventGrid</a></li>
+					
+					<li><a href="/tags/functions">Functions</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright 2021 Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
-</section>
+</footer>
 
 
-
-<section class="section">
-  <div class="container has-text-centered">
-    <p>&copy; Copyright 2021 Toru Makabe</p>
-    
-      <p>Powered by <a href="https://gohugo.io/">Hugo</a> &amp; <a href="https://github.com/ribice/kiss">Kiss</a>.</p>
-    
-  </div>
-</section>
-
-
-
-</body>
+<script>
+  feather.replace()
+</script></div>
+    </body>
 </html>
-
