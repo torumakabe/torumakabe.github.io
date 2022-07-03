@@ -83,60 +83,60 @@
 <li>Boxstarterを導入する</li>
 </ul>
 <p>PowerShell 3以降であれば</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>. { iwr -useb http://boxstarter.org/bootstrapper.ps1 } | iex; get-boxstarter -Force
+</span></span></code></pre></div><ul>
 <li>Gist上のスクリプトを指定して実行する</li>
 </ul>
 <p>なお2017/10/13時点で、Boxstarterサイトのサンプルにはtypoがあるので注意 (-PackageNameオプション)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Install-BoxstarterPackage -PackageName &#34;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&#34; -DisableReboots
-</code></pre></div><p>以上。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Install-BoxstarterPackage -PackageName &#34;https://gist.githubusercontent.com/ToruMakabe/976ceab239ec930f8651cfd72087afac/raw/4fc77a1d08f078869962ae82233b2f8abc32d31f/boxstarter.txt&#34; -DisableReboots
+</span></span></code></pre></div><p>以上。</p>
 <h2 id="サンプルスクリプト">サンプルスクリプト</h2>
 <p>スクリプトは<a href="https://gist.github.com/ToruMakabe/976ceab239ec930f8651cfd72087afac">こんな感じ</a>に書きます。</p>
 <p>ちなみに、わたしの環境です。こまごまとした設定やツールの導入はもちろん、Hyper-Vやコンテナ、Windows Subsystem for Linuxの導入も、一気にやっつけます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># Learn more: http://boxstarter.org/Learn/WebLauncher
-
-# Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
-# Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)
-
-#---- TEMPORARY ---
-Disable-UAC
-
-#--- Fonts ---
-choco install inconsolata
-  
-#--- Windows Settings ---
-# 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.org/WinConfig)
-Disable-GameBarTips
-
-Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowFileExtensions
-Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
-
-Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name NavPaneShowAllFolders -Value 1
-
-#--- Windows Subsystems/Features ---
-choco install Microsoft-Hyper-V-All -source windowsFeatures
-choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
-choco install containers -source windowsfeatures
-
-#--- Tools ---
-choco install git.install
-choco install yarn
-choco install sysinternals
-choco install 7zip
-
-#--- Apps ---
-choco install googlechrome
-choco install docker-for-windows
-choco install microsoft-teams
-choco install slack
-choco install putty
-choco install visualstudiocode
-
-#--- Restore Temporary Settings ---
-Enable-UAC
-Enable-MicrosoftUpdate
-Install-WindowsUpdate -acceptEula
-</code></pre></div><p>便利。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># Learn more: http://boxstarter.org/Learn/WebLauncher
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Chocolateyパッケージがないもの、パッケージ更新が遅いものは別途入れます。メモです。
+</span></span><span style="display:flex;"><span># Install manually (Ubuntu, VS, snip, Azure CLI/PS/Storage Explorer, Terraform, Go, 1Password 6, Driver Management Tool)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#---- TEMPORARY ---
+</span></span><span style="display:flex;"><span>Disable-UAC
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#--- Fonts ---
+</span></span><span style="display:flex;"><span>choco install inconsolata
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>#--- Windows Settings ---
+</span></span><span style="display:flex;"><span># 可能な設定はここで確認 --&gt; [Boxstarter WinConfig Features](http://boxstarter.org/WinConfig)
+</span></span><span style="display:flex;"><span>Disable-GameBarTips
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowFileExtensions
+</span></span><span style="display:flex;"><span>Set-TaskbarOptions -Size Small -Dock Bottom -Combine Full -Lock
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Set-ItemProperty -Path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name NavPaneShowAllFolders -Value 1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#--- Windows Subsystems/Features ---
+</span></span><span style="display:flex;"><span>choco install Microsoft-Hyper-V-All -source windowsFeatures
+</span></span><span style="display:flex;"><span>choco install Microsoft-Windows-Subsystem-Linux -source windowsfeatures
+</span></span><span style="display:flex;"><span>choco install containers -source windowsfeatures
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#--- Tools ---
+</span></span><span style="display:flex;"><span>choco install git.install
+</span></span><span style="display:flex;"><span>choco install yarn
+</span></span><span style="display:flex;"><span>choco install sysinternals
+</span></span><span style="display:flex;"><span>choco install 7zip
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#--- Apps ---
+</span></span><span style="display:flex;"><span>choco install googlechrome
+</span></span><span style="display:flex;"><span>choco install docker-for-windows
+</span></span><span style="display:flex;"><span>choco install microsoft-teams
+</span></span><span style="display:flex;"><span>choco install slack
+</span></span><span style="display:flex;"><span>choco install putty
+</span></span><span style="display:flex;"><span>choco install visualstudiocode
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#--- Restore Temporary Settings ---
+</span></span><span style="display:flex;"><span>Enable-UAC
+</span></span><span style="display:flex;"><span>Enable-MicrosoftUpdate
+</span></span><span style="display:flex;"><span>Install-WindowsUpdate -acceptEula
+</span></span></code></pre></div><p>便利。</p>
 <p>ちなみにわたしはドキュメント類はOneDrive、コードはプライベートGit/GitHub、エディタの設定はVisual Studio Code <a href="https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync">Settings Sync拡張</a>を使っているので、Boxstarterと合わせ、 環境の再現は2～3時間もあればできます。最近、バックアップからのリストアとか、してないです。</p>
 <p>新しい端末の追加もすぐできるので、物欲が捗るという副作用もあります。</p>
 

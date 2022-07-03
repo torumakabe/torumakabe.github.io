@@ -83,188 +83,188 @@
 <p>なお、graceful shutdownの実装は、スケールアウト/インやアプリケーションの更新時の安全性向上にも寄与します。定期実行ジョブに限らず、他の用途でも検討をおすすめします。</p>
 <h2 id="dapr-cronバインディング-実装例">Dapr Cronバインディング 実装例</h2>
 <p>では、シンプルな検証用アプリケーション(Go)を作り、実装と挙動を確認しましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;context&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;os/signal&#34;</span>
-	<span style="color:#e6db74">&#34;syscall&#34;</span>
-	<span style="color:#e6db74">&#34;time&#34;</span>
-
-	<span style="color:#e6db74">&#34;net/http&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
-
-	<span style="color:#e6db74">&#34;github.com/dapr/go-sdk/service/common&#34;</span>
-	<span style="color:#a6e22e">daprd</span> <span style="color:#e6db74">&#34;github.com/dapr/go-sdk/service/http&#34;</span>
-	<span style="color:#a6e22e">flag</span> <span style="color:#e6db74">&#34;github.com/spf13/pflag&#34;</span>
-)
-
-<span style="color:#66d9ef">var</span> (
-	<span style="color:#a6e22e">logger</span>  = <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#ae81ff">0</span>)
-	<span style="color:#a6e22e">address</span> <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">wait</span>    <span style="color:#66d9ef">int</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#75715e">// SIGINTとSIGTERMを登録
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">stop</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">signal</span>.<span style="color:#a6e22e">NotifyContext</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">SIGINT</span>, <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">SIGTERM</span>)
-	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">stop</span>()
-
-	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Starting...&#34;</span>)
-
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">address</span>, <span style="color:#e6db74">&#34;address&#34;</span>, <span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#e6db74">&#34;set ip:port of this app&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">IntVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">wait</span>, <span style="color:#e6db74">&#34;wait&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>, <span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#34;set wait seconds after getting signal for testing&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
-
-	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">daprd</span>.<span style="color:#a6e22e">NewService</span>(<span style="color:#a6e22e">address</span>)
-
-	<span style="color:#75715e">// cronハンドラを登録
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">AddBindingInvocationHandler</span>(<span style="color:#e6db74">&#34;/cron&#34;</span>, <span style="color:#a6e22e">cronHandler</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Error adding binding handler: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-	}
-
-	<span style="color:#75715e">// シグナルハンドラ
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>() {
-		<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Done</span>()
-		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Got signal. shutting down...&#34;</span>)
-		<span style="color:#75715e">// シグナル受信からSIGKILLまでの猶予時間を検証するための待ち
-</span><span style="color:#75715e"></span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">wait</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
-			<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">1</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
-			<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Waited for %d seconds...&#34;</span>, <span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
-		}
-		<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Stop</span>()
-	}()
-
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Start</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ErrServerClosed</span> {
-		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Error starting service: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-	}
-
-	<span style="color:#75715e">// シグナルハンドラでdaprdサービスを正常終了(Stop)できれば、到達
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Exit.&#34;</span>)
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">cronHandler</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">in</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">common</span>.<span style="color:#a6e22e">BindingEvent</span>) (<span style="color:#a6e22e">out</span> []<span style="color:#66d9ef">byte</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
-	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Got cron event.&#34;</span>)
-	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#66d9ef">nil</span>
-}
-</code></pre></div><p>では、このアプリをコンテナアプリとしてデプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os/signal&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;syscall&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;github.com/dapr/go-sdk/service/common&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">daprd</span> <span style="color:#e6db74">&#34;github.com/dapr/go-sdk/service/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span> <span style="color:#e6db74">&#34;github.com/spf13/pflag&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logger</span>  = <span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">New</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">address</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">wait</span>    <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// SIGINTとSIGTERMを登録
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">stop</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">signal</span>.<span style="color:#a6e22e">NotifyContext</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">SIGINT</span>, <span style="color:#a6e22e">syscall</span>.<span style="color:#a6e22e">SIGTERM</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">stop</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Starting...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">address</span>, <span style="color:#e6db74">&#34;address&#34;</span>, <span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#e6db74">&#34;set ip:port of this app&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">IntVarP</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">wait</span>, <span style="color:#e6db74">&#34;wait&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>, <span style="color:#ae81ff">0</span>, <span style="color:#e6db74">&#34;set wait seconds after getting signal for testing&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">daprd</span>.<span style="color:#a6e22e">NewService</span>(<span style="color:#a6e22e">address</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// cronハンドラを登録
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">AddBindingInvocationHandler</span>(<span style="color:#e6db74">&#34;/cron&#34;</span>, <span style="color:#a6e22e">cronHandler</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Error adding binding handler: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// シグナルハンドラ
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">go</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&lt;-</span><span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Done</span>()
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Got signal. shutting down...&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// シグナル受信からSIGKILLまでの猶予時間を検証するための待ち
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">wait</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">1</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Waited for %d seconds...&#34;</span>, <span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Stop</span>()
+</span></span><span style="display:flex;"><span>	}()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Start</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ErrServerClosed</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;Error starting service: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// シグナルハンドラでdaprdサービスを正常終了(Stop)できれば、到達
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Exit.&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">cronHandler</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">in</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">common</span>.<span style="color:#a6e22e">BindingEvent</span>) (<span style="color:#a6e22e">out</span> []<span style="color:#66d9ef">byte</span>, <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">logger</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Got cron event.&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>では、このアプリをコンテナアプリとしてデプロイします。</p>
 <p>なお余談ですが、現状、Container AppsのデプロイはAzure CLIではなくARMテンプレートをおすすめします。CLIのcontainerapp拡張は、開発が<a href="https://github.com/MicrosoftDocs/azure-docs/issues/83785">サービスに追いついていない</a>印象です。Terraformなどサードパーティーツールのサポート状況は<a href="https://github.com/hashicorp/terraform-provider-azurerm/issues/14122">適宜確認</a>してください。</p>
 <p>ポイントだけ抜き出したARMテンプレートを以下に説明します。全体は<a href="https://gist.github.com/ToruMakabe/f08a5a1c45d40290aca8350b824cdd3d#file-dapr-json">Gist</a>を参照してください。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
-<span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
-    {
-        <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
-        <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
-        <span style="color:#f92672">&#34;resources&#34;</span>: {
-            <span style="color:#f92672">&#34;cpu&#34;</span>: <span style="color:#ae81ff">0.25</span>,
-            <span style="color:#f92672">&#34;memory&#34;</span>: <span style="color:#e6db74">&#34;0.5Gi&#34;</span>
-        },
-        <span style="color:#f92672">&#34;command&#34;</span>: [
-            <span style="color:#e6db74">&#34;/dapr-cron-handler&#34;</span>,
-            <span style="color:#e6db74">&#34;-w&#34;</span>,
-            <span style="color:#e6db74">&#34;3&#34;</span>
-        ]
-    }
-]<span style="color:#960050;background-color:#1e0010">,</span>
-<span style="color:#e6db74">&#34;scale&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;minReplicas&#34;</span>: <span style="color:#ae81ff">1</span>,
-    <span style="color:#f92672">&#34;maxReplicas&#34;</span>: <span style="color:#ae81ff">1</span>
-}<span style="color:#960050;background-color:#1e0010">,</span>
-<span style="color:#e6db74">&#34;dapr&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;enabled&#34;</span>: <span style="color:#66d9ef">true</span>,
-    <span style="color:#f92672">&#34;appPort&#34;</span>: <span style="color:#ae81ff">8080</span>,
-    <span style="color:#f92672">&#34;appId&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
-    <span style="color:#f92672">&#34;components&#34;</span>: [
-        {
-            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
-            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;bindings.cron&#34;</span>,
-            <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1&#34;</span>,
-            <span style="color:#f92672">&#34;metadata&#34;</span>: [
-                {
-                    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;schedule&#34;</span>,
-                    <span style="color:#f92672">&#34;value&#34;</span>: <span style="color:#e6db74">&#34;0 0 * * * *&#34;</span>
-                }
-            ]
-        }
-    ]
-}
-<span style="color:#960050;background-color:#1e0010">...</span>
-</code></pre></div><p>おおよそ、定義は読めばわかりますね。<a href="https://docs.dapr.io/reference/components-reference/supported-bindings/cron/">Dapr Cronバインディングのcronフォーマット</a>は秒指定できる6フィールド型です。@dailyなどのマクロも使えます。この検証では、毎時0分0秒に実行するよう指定しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JSON" data-lang="JSON"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;resources&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;cpu&#34;</span>: <span style="color:#ae81ff">0.25</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;memory&#34;</span>: <span style="color:#e6db74">&#34;0.5Gi&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;command&#34;</span>: [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;/dapr-cron-handler&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;-w&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;3&#34;</span>
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]<span style="color:#960050;background-color:#1e0010">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;scale&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;minReplicas&#34;</span>: <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;maxReplicas&#34;</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>}<span style="color:#960050;background-color:#1e0010">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;dapr&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;enabled&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;appPort&#34;</span>: <span style="color:#ae81ff">8080</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;appId&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;components&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;bindings.cron&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;metadata&#34;</span>: [
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;schedule&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;value&#34;</span>: <span style="color:#e6db74">&#34;0 0 * * * *&#34;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span>
+</span></span></code></pre></div><p>おおよそ、定義は読めばわかりますね。<a href="https://docs.dapr.io/reference/components-reference/supported-bindings/cron/">Dapr Cronバインディングのcronフォーマット</a>は秒指定できる6フィールド型です。@dailyなどのマクロも使えます。この検証では、毎時0分0秒に実行するよう指定しています。</p>
 <p>なお、SIGTERMのシグナルハンドリングに3秒かかるよう設定しました。</p>
 <p>では、デプロイ後に数時間放置し、コンテナアプリを削除した後、ログを見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">11/15/2021, 11:19:49.486 PM	Starting...
-11/15/2021, 11:19:49.827 PM	2021/11/15 23:19:33 http: superfluous response.WriteHeader call from github.com/dapr/go-sdk/service/http.(*Server).registerBaseHandler.func3 (topic.go:60)
-11/16/2021, 12:00:01.483 AM	Got cron event.
-11/16/2021, 1:00:01.335 AM	Got cron event.
-11/16/2021, 1:30:11.799 AM	Got signal. shutting down...
-11/16/2021, 1:30:12.240 AM	Waited for 1 seconds...
-11/16/2021, 1:30:13.488 AM	Waited for 2 seconds...
-11/16/2021, 1:30:14.263 AM	Waited for 3 seconds...
-11/16/2021, 1:30:14.263 AM	Exit.
-</code></pre></div><p>ログ <code>http: superfluous response.WriteHeader call[...]</code> は、Dapr Go SDKからの<a href="https://github.com/dapr/go-sdk/issues/218">不要なメッセージ</a>なので気にしないでください。SDKで修正中です。動作には問題ありませんので、以降省略します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>11/15/2021, 11:19:49.486 PM	Starting...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:19:49.827 PM	2021/11/15 23:19:33 http: superfluous response.WriteHeader call from github.com/dapr/go-sdk/service/http.(*Server).registerBaseHandler.func3 (topic.go:60)
+</span></span><span style="display:flex;"><span>11/16/2021, 12:00:01.483 AM	Got cron event.
+</span></span><span style="display:flex;"><span>11/16/2021, 1:00:01.335 AM	Got cron event.
+</span></span><span style="display:flex;"><span>11/16/2021, 1:30:11.799 AM	Got signal. shutting down...
+</span></span><span style="display:flex;"><span>11/16/2021, 1:30:12.240 AM	Waited for 1 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 1:30:13.488 AM	Waited for 2 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 1:30:14.263 AM	Waited for 3 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 1:30:14.263 AM	Exit.
+</span></span></code></pre></div><p>ログ <code>http: superfluous response.WriteHeader call[...]</code> は、Dapr Go SDKからの<a href="https://github.com/dapr/go-sdk/issues/218">不要なメッセージ</a>なので気にしないでください。SDKで修正中です。動作には問題ありませんので、以降省略します。</p>
 <p>1秒ほどのオーバーヘッドはありますが、毎時0分0秒にDapr Cronバインディングから呼び出されている(Got cron event)ことがわかります。また、コンテナアプリの削除時にSIGTERMをハンドリングし、3秒待った後に正常終了(Exit)できています。</p>
 <h2 id="keda-cronスケーラを組み合わせる">KEDA Cronスケーラを組み合わせる</h2>
 <p>では次に、KEDA Cronスケーラを組み合わせた場合も見てみましょう。Daprの定義は同じです。これもポイントのみ抜き出し、全体は<a href="https://gist.github.com/ToruMakabe/f08a5a1c45d40290aca8350b824cdd3d#file-both-json">Gist</a>に置いておきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-JSON" data-lang="JSON"><span style="color:#960050;background-color:#1e0010">...</span>
-<span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
-    {
-        <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
-        <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
-        <span style="color:#f92672">&#34;resources&#34;</span>: {
-            <span style="color:#f92672">&#34;cpu&#34;</span>: <span style="color:#ae81ff">0.25</span>,
-            <span style="color:#f92672">&#34;memory&#34;</span>: <span style="color:#e6db74">&#34;0.5Gi&#34;</span>
-        },
-        <span style="color:#f92672">&#34;command&#34;</span>: [
-            <span style="color:#e6db74">&#34;/dapr-cron-handler&#34;</span>,
-            <span style="color:#e6db74">&#34;-w&#34;</span>,
-            <span style="color:#e6db74">&#34;60&#34;</span>
-        ]
-    }
-]<span style="color:#960050;background-color:#1e0010">,</span>
-<span style="color:#e6db74">&#34;scale&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
-    <span style="color:#f92672">&#34;minReplicas&#34;</span>: <span style="color:#ae81ff">0</span>,
-    <span style="color:#f92672">&#34;maxReplicas&#34;</span>: <span style="color:#ae81ff">1</span>,
-    <span style="color:#f92672">&#34;rules&#34;</span>: [
-        {
-            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
-            <span style="color:#f92672">&#34;custom&#34;</span>: {
-                <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
-                <span style="color:#f92672">&#34;metadata&#34;</span>: {
-                    <span style="color:#f92672">&#34;timezone&#34;</span>: <span style="color:#e6db74">&#34;UTC&#34;</span>,
-                    <span style="color:#f92672">&#34;start&#34;</span>: <span style="color:#e6db74">&#34;50 * * * *&#34;</span>,
-                    <span style="color:#f92672">&#34;end&#34;</span>: <span style="color:#e6db74">&#34;10 * * * *&#34;</span>,
-                    <span style="color:#f92672">&#34;desiredReplicas&#34;</span>: <span style="color:#e6db74">&#34;1&#34;</span>
-                }
-            }
-        }
-    ]
-}<span style="color:#960050;background-color:#1e0010">,</span>
-<span style="color:#960050;background-color:#1e0010">...</span>
-</code></pre></div><p>scaleのminReplicasを0にし、ルールに合致しない時間にはレプリカ数をゼロにします。そして、0分0秒のDapr Cronバインディングからの呼び出しに間に合うよう、余裕をもって毎時50分にレプリカ数をdesiredReplicasで指定した1にスケールします。そして、アプリケーションの実行は10分以内に終わる、という想定で、毎時10分にスケールインします。なお、<a href="https://keda.sh/docs/2.0/scalers/cron/">KEDA Cronスケーラのcronフォーマット</a>は5フィールドです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JSON" data-lang="JSON"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;containers&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;torumakabe/dapr-cron-handler:1.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;dapr-cron-handler&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;resources&#34;</span>: {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;cpu&#34;</span>: <span style="color:#ae81ff">0.25</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;memory&#34;</span>: <span style="color:#e6db74">&#34;0.5Gi&#34;</span>
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;command&#34;</span>: [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;/dapr-cron-handler&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;-w&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;60&#34;</span>
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>]<span style="color:#960050;background-color:#1e0010">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;scale&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;minReplicas&#34;</span>: <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;maxReplicas&#34;</span>: <span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;rules&#34;</span>: [
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;custom&#34;</span>: {
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;cron&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&#34;metadata&#34;</span>: {
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;timezone&#34;</span>: <span style="color:#e6db74">&#34;UTC&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;start&#34;</span>: <span style="color:#e6db74">&#34;50 * * * *&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;end&#34;</span>: <span style="color:#e6db74">&#34;10 * * * *&#34;</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">&#34;desiredReplicas&#34;</span>: <span style="color:#e6db74">&#34;1&#34;</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}<span style="color:#960050;background-color:#1e0010">,</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span>
+</span></span></code></pre></div><p>scaleのminReplicasを0にし、ルールに合致しない時間にはレプリカ数をゼロにします。そして、0分0秒のDapr Cronバインディングからの呼び出しに間に合うよう、余裕をもって毎時50分にレプリカ数をdesiredReplicasで指定した1にスケールします。そして、アプリケーションの実行は10分以内に終わる、という想定で、毎時10分にスケールインします。なお、<a href="https://keda.sh/docs/2.0/scalers/cron/">KEDA Cronスケーラのcronフォーマット</a>は5フィールドです。</p>
 <p>また、SIGTERM受信後の待ち時間を長めに、60秒としました。<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/application-lifecycle-management#shutdown">SIGTERMからSIGKILLまでの猶予時間</a>がどれだけあるかを確認したいからです。Kubernetesの<a href="https://kubernetes.io/ja/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination">既定値は30秒</a>ですが、さて同じでしょうか。</p>
 <p>こちらは、デプロイ後に1時間ほど放置し、ログを見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">11/15/2021, 11:21:08.265 PM	Starting...
-11/15/2021, 11:25:35.590 PM	Got signal. shutting down...
-11/15/2021, 11:25:36.360 PM	Waited for 1 seconds...
-11/15/2021, 11:25:37.558 PM	Waited for 2 seconds...
-11/15/2021, 11:25:38.388 PM	Waited for 3 seconds...
-...
-11/15/2021, 11:26:03.892 PM	Waited for 28 seconds...
-11/15/2021, 11:26:04.421 PM	Waited for 29 seconds...
-11/15/2021, 11:26:05.385 PM	Waited for 30 seconds...
-11/15/2021, 11:50:08.577 PM	Starting...
-11/16/2021, 12:00:01.774 AM	Got cron event.
-11/16/2021, 12:14:35.524 AM	Got signal. shutting down...
-11/16/2021, 12:14:36.448 AM	Waited for 1 seconds...
-11/16/2021, 12:14:37.289 AM	Waited for 2 seconds...
-11/16/2021, 12:14:38.733 AM	Waited for 3 seconds...
-...
-11/16/2021, 12:15:03.972 AM	Waited for 28 seconds...
-11/16/2021, 12:15:05.609 AM	Waited for 29 seconds...
-11/16/2021, 12:15:05.829 AM	Waited for 30 seconds...
-11/16/2021, 12:50:08.335 AM	Starting...
-</code></pre></div><p>まず、11:21の開始は、デプロイ時にコンテナが起動したことを意味します。定義したminReplicasは0ですが、コンテナアプリの作成(アクティベーション)時には、最低1つのレプリカが起動します。そして起動後に、ルールに合わせてスケールアウト/インが実施されます。11:25にKEDA Cronスケーラがルールに合わない時間帯であると判断し、レプリカを削除、ゼロにしました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>11/15/2021, 11:21:08.265 PM	Starting...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:25:35.590 PM	Got signal. shutting down...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:25:36.360 PM	Waited for 1 seconds...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:25:37.558 PM	Waited for 2 seconds...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:25:38.388 PM	Waited for 3 seconds...
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:26:03.892 PM	Waited for 28 seconds...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:26:04.421 PM	Waited for 29 seconds...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:26:05.385 PM	Waited for 30 seconds...
+</span></span><span style="display:flex;"><span>11/15/2021, 11:50:08.577 PM	Starting...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:00:01.774 AM	Got cron event.
+</span></span><span style="display:flex;"><span>11/16/2021, 12:14:35.524 AM	Got signal. shutting down...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:14:36.448 AM	Waited for 1 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:14:37.289 AM	Waited for 2 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:14:38.733 AM	Waited for 3 seconds...
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:15:03.972 AM	Waited for 28 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:15:05.609 AM	Waited for 29 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:15:05.829 AM	Waited for 30 seconds...
+</span></span><span style="display:flex;"><span>11/16/2021, 12:50:08.335 AM	Starting...
+</span></span></code></pre></div><p>まず、11:21の開始は、デプロイ時にコンテナが起動したことを意味します。定義したminReplicasは0ですが、コンテナアプリの作成(アクティベーション)時には、最低1つのレプリカが起動します。そして起動後に、ルールに合わせてスケールアウト/インが実施されます。11:25にKEDA Cronスケーラがルールに合わない時間帯であると判断し、レプリカを削除、ゼロにしました。</p>
 <p>ところで、SIGTERMを受け取った後に60秒待つように設定しましたが、ログは30秒で止まっています。そして、Exitも出力されていません。これは、SIGTERMを受け取った後、30秒後にSIGKILLされたことを意味します。30秒で支度しな、です。Kubernetesの既定値と同じですね。この仕様は念のため、公式ドキュメントへの記載を<a href="https://github.com/MicrosoftDocs/azure-docs/issues/83863">要求</a>しています。</p>
 <p>そして11:50ごろ、ルールに合わせてコンテナが起動しています。そして12:00にDapr Cronバインディングから呼び出され、12:14にはSIGTERMを受け取っています。</p>
 <p>このように、KEDA Cronスケーラは定義した時間にどんぴしゃりで開始、終了されません。これは主に、KEDAのルール評価間隔(pollingInterval)と、スケールをゼロにするまでの猶予時間(cooldownPeriod)の影響です。よって、余裕をもって設定しましょう。なお、Container Appsにおけるこれらの設定値についても、公式ドキュメントへの記載を<a href="https://github.com/MicrosoftDocs/azure-docs/issues/83902">要求</a>しています。</p>

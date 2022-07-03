@@ -73,15 +73,15 @@
 <h2 id="armテンプレートでmanaged-diskを作る時のコツ">ARMテンプレートでManaged Diskを作る時のコツ</h2>
 <p>Managed Diskが使えるようになって、ARMテンプレートでもストレージアカウントの定義を省略できるようになりました。Managed Diskの実体は内部的にAzureが管理するストレージアカウントに置かれるのですが、ユーザーからは隠蔽されます。</p>
 <p>Managed Diskは <a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/disks">Microsoft.Compute/disks</a>  で個別に定義できますが、省略もできます。<a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/virtualmachines">Microsoft.Compute/virtualMachines</a> の中に書いてしまうやり口です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&#34;osDisk&#34;: {
-  &#34;name&#34;: &#34;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&#34;,
-  &#34;createOption&#34;: &#34;FromImage&#34;,
-  &#34;managedDisk&#34;: {
-    &#34;storageAccountType&#34;: &#34;Standard_LRS&#34;
-  },
-  &#34;diskSizeGB&#34;: 128
-}
-</code></pre></div><p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&ldquo;managedDisk&quot;の下ではありません。おじさんちょっと悩みました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&#34;osDisk&#34;: {
+</span></span><span style="display:flex;"><span>  &#34;name&#34;: &#34;[concat(variables(&#39;vmName&#39;),&#39;-md-os&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>  &#34;createOption&#34;: &#34;FromImage&#34;,
+</span></span><span style="display:flex;"><span>  &#34;managedDisk&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;storageAccountType&#34;: &#34;Standard_LRS&#34;
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;diskSizeGB&#34;: 128
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>こんな感じで書けます。ポイントはサイズ指定 &ldquo;diskSizeGB&rdquo; の位置です。&ldquo;managedDisk&quot;の下ではありません。おじさんちょっと悩みました。</p>
 <h2 id="可用性セットを意識しよう">可用性セットを意識しよう</h2>
 <p>Managed Diskを使う利点のひとつが、可用性セットを意識したディスク配置です。可用性セットに仮想マシンを配置し、かつManaged Diskを使うと、可用性を高めることができます。</p>
 <p>Azureのストレージサービスは、多数のサーバーで構成された分散ストレージで実現されています。そのサーバー群をStorage Unitと呼びます。StampとかClusterと表現されることもあります。Storage Unitは数十のサーバーラック、数百サーバーで構成され、Azureの各リージョンに複数配置されます。</p>
@@ -90,25 +90,25 @@
 <p><img src="https://msdnshared.blob.core.windows.net/media/2017/03/92.jpg" alt="Unmanaged vs Managed" title="Unmanaged vs Managed"></p>
 <p>すなわち、Storage Unitの障害に耐えることができます。Storage Unitは非常に可用性高く設計されており、長期に運用されてきた実績もあるのですが、ダウンする可能性はゼロではありません。可用性セットとManaged Diskの組み合わせは、可用性を追求したいシステムでは、おすすめです。</p>
 <p>さて、この場合の可用性セット定義ですが、以下のように書きます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-  &#34;type&#34;: &#34;Microsoft.Compute/availabilitySets&#34;,
-  &#34;name&#34;: &#34;AvSet01&#34;,
-  &#34;apiVersion&#34;: &#34;2016-04-30-preview&#34;,
-  &#34;location&#34;: &#34;[resourceGroup().location]&#34;,
-  &#34;properties&#34;: {
-    &#34;managed&#34;: true,
-    &#34;platformFaultDomainCount&#34;: 2,
-    &#34;platformUpdateDomainCount&#34;: 5
-  }
-},
-</code></pre></div><p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&quot;propaties&quot;の&quot;managed&quot;をtrueにすべし、とあります。なるほど。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;type&#34;: &#34;Microsoft.Compute/availabilitySets&#34;,
+</span></span><span style="display:flex;"><span>  &#34;name&#34;: &#34;AvSet01&#34;,
+</span></span><span style="display:flex;"><span>  &#34;apiVersion&#34;: &#34;2016-04-30-preview&#34;,
+</span></span><span style="display:flex;"><span>  &#34;location&#34;: &#34;[resourceGroup().location]&#34;,
+</span></span><span style="display:flex;"><span>  &#34;properties&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;managed&#34;: true,
+</span></span><span style="display:flex;"><span>    &#34;platformFaultDomainCount&#34;: 2,
+</span></span><span style="display:flex;"><span>    &#34;platformUpdateDomainCount&#34;: 5
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>},
+</span></span></code></pre></div><p><a href="https://docs.microsoft.com/ja-jp/azure/templates/microsoft.compute/availabilitysets">Microsoft.Compute/availabilitySets</a> を読むと、Managed Diskを使う場合は&quot;propaties&quot;の&quot;managed&quot;をtrueにすべし、とあります。なるほど。</p>
 <p>そしてポイントです。合わせて&quot;platformFaultDomainCount&quot;を指定してください。managedにする場合は必須パラメータです。</p>
 <p>なお、リージョンによって配備されているStorage Unit数には違いがあるのでご注意を。例えば東日本リージョンは2です。3のリージョンもあります。それに合わせて可用性セットの障害ドメイン数を指定します。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/azure/storage/storage-faq-for-disks">Azure IaaS VM ディスクと Premium 管理ディスクおよび非管理ディスクについてよく寄せられる質問</a></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
-
-Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数はいくつですか?
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Managed Disks を使用する可用性セットでサポートされる障害ドメイン数は 2 または 3 です。これは、配置されているリージョンによって異なります。
+</span></span></code></pre></div>
 		</section>
 
 		<div class="post-tags">

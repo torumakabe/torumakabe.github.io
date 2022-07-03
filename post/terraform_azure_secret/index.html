@@ -128,63 +128,63 @@
 </ol>
 <p>var.で参照している変数は、別ファイルに書いています。</p>
 <p>[main.tf]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_resource_group&#34; &#34;rg&#34; {
-  name     = &#34;${var.resource_group_name}&#34;
-  location = &#34;${var.resource_group_location}&#34;
-}
-
-resource &#34;random_integer&#34; &#34;ri&#34; {
-  min = 10000
-  max = 99999
-}
-
-resource &#34;azurerm_cosmosdb_account&#34; &#34;db&#34; {
-  name                = &#34;your-cosmos-db-${random_integer.ri.result}&#34;
-  location            = &#34;${azurerm_resource_group.rg.location}&#34;
-  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
-  offer_type          = &#34;Standard&#34;
-  kind                = &#34;MongoDB&#34;
-
-  enable_automatic_failover = true
-
-  consistency_policy {
-    consistency_level       = &#34;BoundedStaleness&#34;
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
-  }
-
-  geo_location {
-    location          = &#34;${azurerm_resource_group.rg.location}&#34;
-    failover_priority = 0
-  }
-
-  geo_location {
-    location          = &#34;${var.failover_location}&#34;
-    failover_priority = 1
-  }
-}
-
-resource &#34;azurerm_container_group&#34; &#34;aci-todo&#34; {
-  name                = &#34;aci-todo&#34;
-  location            = &#34;${azurerm_resource_group.rg.location}&#34;
-  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
-  ip_address_type     = &#34;public&#34;
-  dns_name_label      = &#34;yourtodo&#34;
-  os_type             = &#34;linux&#34;
-
-  container {
-    name   = &#34;todo&#34;
-    image  = &#34;torumakabe/nodetodo&#34;
-    cpu    = &#34;1&#34;
-    memory = &#34;1.5&#34;
-    port   = &#34;8080&#34;
-
-    environment_variables {
-      &#34;MONGO_URL&#34; = &#34;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&#34;
-    }
-  }
-}
-</code></pre></div><p>containerのenvironment_variablesブロックでCosmos DBの属性を参照し、接続文字列を生成しています。簡単ですね。これで接続文字列コピペ作業から解放されます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_resource_group&#34; &#34;rg&#34; {
+</span></span><span style="display:flex;"><span>  name     = &#34;${var.resource_group_name}&#34;
+</span></span><span style="display:flex;"><span>  location = &#34;${var.resource_group_location}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;random_integer&#34; &#34;ri&#34; {
+</span></span><span style="display:flex;"><span>  min = 10000
+</span></span><span style="display:flex;"><span>  max = 99999
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_cosmosdb_account&#34; &#34;db&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;your-cosmos-db-${random_integer.ri.result}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
+</span></span><span style="display:flex;"><span>  offer_type          = &#34;Standard&#34;
+</span></span><span style="display:flex;"><span>  kind                = &#34;MongoDB&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  enable_automatic_failover = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  consistency_policy {
+</span></span><span style="display:flex;"><span>    consistency_level       = &#34;BoundedStaleness&#34;
+</span></span><span style="display:flex;"><span>    max_interval_in_seconds = 10
+</span></span><span style="display:flex;"><span>    max_staleness_prefix    = 200
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  geo_location {
+</span></span><span style="display:flex;"><span>    location          = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>    failover_priority = 0
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  geo_location {
+</span></span><span style="display:flex;"><span>    location          = &#34;${var.failover_location}&#34;
+</span></span><span style="display:flex;"><span>    failover_priority = 1
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_container_group&#34; &#34;aci-todo&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;aci-todo&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
+</span></span><span style="display:flex;"><span>  ip_address_type     = &#34;public&#34;
+</span></span><span style="display:flex;"><span>  dns_name_label      = &#34;yourtodo&#34;
+</span></span><span style="display:flex;"><span>  os_type             = &#34;linux&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  container {
+</span></span><span style="display:flex;"><span>    name   = &#34;todo&#34;
+</span></span><span style="display:flex;"><span>    image  = &#34;torumakabe/nodetodo&#34;
+</span></span><span style="display:flex;"><span>    cpu    = &#34;1&#34;
+</span></span><span style="display:flex;"><span>    memory = &#34;1.5&#34;
+</span></span><span style="display:flex;"><span>    port   = &#34;8080&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    environment_variables {
+</span></span><span style="display:flex;"><span>      &#34;MONGO_URL&#34; = &#34;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>containerのenvironment_variablesブロックでCosmos DBの属性を参照し、接続文字列を生成しています。簡単ですね。これで接続文字列コピペ作業から解放されます。</p>
 <h2 id="aks">AKS</h2>
 <p>AKSの場合、流れは以下の通りです。</p>
 <ol>
@@ -195,129 +195,129 @@ resource &#34;azurerm_container_group&#34; &#34;aci-todo&#34; {
 <li>k8s Secretをコンテナーの環境変数として参照し、アプリをデプロイ</li>
 </ol>
 <p>[main.tf]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_resource_group&#34; &#34;rg&#34; {
-  name     = &#34;${var.resource_group_name}&#34;
-  location = &#34;${var.resource_group_location}&#34;
-}
-
-resource &#34;random_integer&#34; &#34;ri&#34; {
-  min = 10000
-  max = 99999
-}
-
-resource &#34;azurerm_cosmosdb_account&#34; &#34;db&#34; {
-  name                = &#34;your-cosmos-db-${random_integer.ri.result}&#34;
-  location            = &#34;${azurerm_resource_group.rg.location}&#34;
-  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
-  offer_type          = &#34;Standard&#34;
-  kind                = &#34;MongoDB&#34;
-
-  enable_automatic_failover = true
-
-  consistency_policy {
-    consistency_level       = &#34;BoundedStaleness&#34;
-    max_interval_in_seconds = 10
-    max_staleness_prefix    = 200
-  }
-
-  geo_location {
-    location          = &#34;${azurerm_resource_group.rg.location}&#34;
-    failover_priority = 0
-  }
-
-  geo_location {
-    location          = &#34;${var.failover_location}&#34;
-    failover_priority = 1
-  }
-}
-
-resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; {
-  name                = &#34;yourakstf&#34;
-  location            = &#34;${azurerm_resource_group.rg.location}&#34;
-  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
-  dns_prefix          = &#34;yourakstf&#34;
-  kubernetes_version  = &#34;1.9.6&#34;
-
-  linux_profile {
-    admin_username = &#34;${var.admin_username}&#34;
-
-    ssh_key {
-      key_data = &#34;${var.key_data}&#34;
-    }
-  }
-
-  agent_pool_profile {
-    name            = &#34;default&#34;
-    count           = 3
-    vm_size         = &#34;Standard_B2ms&#34;
-    os_type         = &#34;Linux&#34;
-    os_disk_size_gb = 30
-  }
-
-  service_principal {
-    client_id     = &#34;${var.client_id}&#34;
-    client_secret = &#34;${var.client_secret}&#34;
-  }
-}
-
-provider &#34;kubernetes&#34; {
-  host = &#34;${azurerm_kubernetes_cluster.aks.kube_config.0.host}&#34;
-
-  client_certificate     = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&#34;
-  client_key             = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&#34;
-  cluster_ca_certificate = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&#34;
-}
-
-resource &#34;kubernetes_secret&#34; &#34;cosmosdb_secret&#34; {
-  metadata {
-    name = &#34;cosmosdb-secret&#34;
-  }
-
-  data {
-    MONGO_URL = &#34;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&#34;
-  }
-}
-</code></pre></div><p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_resource_group&#34; &#34;rg&#34; {
+</span></span><span style="display:flex;"><span>  name     = &#34;${var.resource_group_name}&#34;
+</span></span><span style="display:flex;"><span>  location = &#34;${var.resource_group_location}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;random_integer&#34; &#34;ri&#34; {
+</span></span><span style="display:flex;"><span>  min = 10000
+</span></span><span style="display:flex;"><span>  max = 99999
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_cosmosdb_account&#34; &#34;db&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;your-cosmos-db-${random_integer.ri.result}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
+</span></span><span style="display:flex;"><span>  offer_type          = &#34;Standard&#34;
+</span></span><span style="display:flex;"><span>  kind                = &#34;MongoDB&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  enable_automatic_failover = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  consistency_policy {
+</span></span><span style="display:flex;"><span>    consistency_level       = &#34;BoundedStaleness&#34;
+</span></span><span style="display:flex;"><span>    max_interval_in_seconds = 10
+</span></span><span style="display:flex;"><span>    max_staleness_prefix    = 200
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  geo_location {
+</span></span><span style="display:flex;"><span>    location          = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>    failover_priority = 0
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  geo_location {
+</span></span><span style="display:flex;"><span>    location          = &#34;${var.failover_location}&#34;
+</span></span><span style="display:flex;"><span>    failover_priority = 1
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;yourakstf&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.rg.location}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.rg.name}&#34;
+</span></span><span style="display:flex;"><span>  dns_prefix          = &#34;yourakstf&#34;
+</span></span><span style="display:flex;"><span>  kubernetes_version  = &#34;1.9.6&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  linux_profile {
+</span></span><span style="display:flex;"><span>    admin_username = &#34;${var.admin_username}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ssh_key {
+</span></span><span style="display:flex;"><span>      key_data = &#34;${var.key_data}&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  agent_pool_profile {
+</span></span><span style="display:flex;"><span>    name            = &#34;default&#34;
+</span></span><span style="display:flex;"><span>    count           = 3
+</span></span><span style="display:flex;"><span>    vm_size         = &#34;Standard_B2ms&#34;
+</span></span><span style="display:flex;"><span>    os_type         = &#34;Linux&#34;
+</span></span><span style="display:flex;"><span>    os_disk_size_gb = 30
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  service_principal {
+</span></span><span style="display:flex;"><span>    client_id     = &#34;${var.client_id}&#34;
+</span></span><span style="display:flex;"><span>    client_secret = &#34;${var.client_secret}&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>provider &#34;kubernetes&#34; {
+</span></span><span style="display:flex;"><span>  host = &#34;${azurerm_kubernetes_cluster.aks.kube_config.0.host}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  client_certificate     = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&#34;
+</span></span><span style="display:flex;"><span>  client_key             = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&#34;
+</span></span><span style="display:flex;"><span>  cluster_ca_certificate = &#34;${base64decode(azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;kubernetes_secret&#34; &#34;cosmosdb_secret&#34; {
+</span></span><span style="display:flex;"><span>  metadata {
+</span></span><span style="display:flex;"><span>    name = &#34;cosmosdb-secret&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  data {
+</span></span><span style="display:flex;"><span>    MONGO_URL = &#34;mongodb://${azurerm_cosmosdb_account.db.name}:${azurerm_cosmosdb_account.db.primary_master_key}@${azurerm_cosmosdb_account.db.name}.documents.azure.com:10255/?ssl=true&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Cosmos DB、AKSクラスターを作ったのち、kubernetesプロバイダーを使ってSecretを登録しています。複数のプロバイダーを組み合わせられる、Terraformの特長が活きています。</p>
 <p>そしてアプリのデプロイ時に、登録したSecretを指定します。ここからはkubernetesワールドなので、kubectlなどを使います。マニフェストは以下のように。</p>
 <p>[todo.yaml]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: todoapp
-spec:
-  selector:
-    matchLabels:
-      app: todoapp
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: todoapp
-    spec:
-      containers:
-        - name: todoapp
-          image: torumakabe/nodetodo
-          ports:
-            - containerPort: 8080
-          env:
-            - name: MONGO_URL
-              valueFrom:
-                secretKeyRef:
-                  name: cosmosdb-secret
-                  key: MONGO_URL
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: todoapp
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 8080
-  selector:
-    app: todoapp
-</code></pre></div><p>シークレットの中身を見ることなく、コピペもせず、もちろんメールやチャットやファイルも使わず、アプリからCosmos DBへ接続できました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1beta1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: todoapp
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: todoapp
+</span></span><span style="display:flex;"><span>  replicas: 2
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: todoapp
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>        - name: todoapp
+</span></span><span style="display:flex;"><span>          image: torumakabe/nodetodo
+</span></span><span style="display:flex;"><span>          ports:
+</span></span><span style="display:flex;"><span>            - containerPort: 8080
+</span></span><span style="display:flex;"><span>          env:
+</span></span><span style="display:flex;"><span>            - name: MONGO_URL
+</span></span><span style="display:flex;"><span>              valueFrom:
+</span></span><span style="display:flex;"><span>                secretKeyRef:
+</span></span><span style="display:flex;"><span>                  name: cosmosdb-secret
+</span></span><span style="display:flex;"><span>                  key: MONGO_URL
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: todoapp
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  type: LoadBalancer
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>    - port: 80
+</span></span><span style="display:flex;"><span>      targetPort: 8080
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: todoapp
+</span></span></code></pre></div><p>シークレットの中身を見ることなく、コピペもせず、もちろんメールやチャットやファイルも使わず、アプリからCosmos DBへ接続できました。</p>
 <p>シークレットに限らず、Terraformの属性参照、変数表現は強力ですので、ぜひ活用してみてください。数多くの<a href="https://www.terraform.io/docs/providers/azurerm/">Azureリソース</a>が対応しています。</p>
 
 		</section>

@@ -125,108 +125,108 @@
 <h2 id="function-appのサンプル">Function Appのサンプル</h2>
 <p>Githubにソースを<a href="https://github.com/ToruMakabe/MakabeerBot">置いておきます</a>。</p>
 <p>ちなみにこのディレクトリ階層はGithub連携を考慮し、Function Appサイトのそれと合わせています。以下がデプロイ後のサイト階層です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">D:\home\site\wwwroot
-├── fb-message-callback
-│   ├── TestOutput.json
-│   ├── function.json
-│   └── index.js  #これが今回のアプリ
-├── node_modules  #DocumentDB Node SDKが入っている
-├── host.json
-├── README.md
-</code></pre></div><p>なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>D:\home\site\wwwroot
+</span></span><span style="display:flex;"><span>├── fb-message-callback
+</span></span><span style="display:flex;"><span>│   ├── TestOutput.json
+</span></span><span style="display:flex;"><span>│   ├── function.json
+</span></span><span style="display:flex;"><span>│   └── index.js  #これが今回のアプリ
+</span></span><span style="display:flex;"><span>├── node_modules  #DocumentDB Node SDKが入っている
+</span></span><span style="display:flex;"><span>├── host.json
+</span></span><span style="display:flex;"><span>├── README.md
+</span></span></code></pre></div><p>なお、DocumentDBのSDKパッケージは、なぜかfb-message-callbackローカルに置くと読み込まれないため、暫定的にルートへ配置しています。</p>
 <p>ではFunction Appの実体、index.jsを見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">var https = require(&#39;https&#39;);
-var documentClient = require(&#34;documentdb&#34;).DocumentClient;
-const databaseUrl = &#34;dbs/&#34; + process.env.APPSETTING_DOCDB_DB_ID;
-
-var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &#34;masterKey&#34;: process.env.APPSETTING_DOCDB_AUTHKEY });
-
-function sendTextMessage(sender, text, context) {
-  getDataFromDocDB().then(function (value) {
-    var msgAll = value[0].randomDocument.beer + &#34; &#34; + value[1].randomDocument.msg;
-    var postData = JSON.stringify({
-      recipient: sender,
-      message: {
-        &#34;attachment&#34;:{
-          &#34;type&#34;:&#34;template&#34;,
-          &#34;payload&#34;:{
-            &#34;template_type&#34;:&#34;button&#34;,
-            &#34;text&#34;:msgAll,
-            &#34;buttons&#34;:[
-              {
-                &#34;type&#34;:&#34;web_url&#34;,
-                &#34;url&#34;:value[0].randomDocument.url,
-                &#34;title&#34;:&#34;詳しく&#34;
-              }
-            ]
-          }
-        }
-      }
-    });
-    var req = https.request({
-      hostname: &#39;graph.facebook.com&#39;,
-      port: 443,
-      path: &#39;/v2.6/me/messages&#39;,
-      method: &#39;POST&#39;,
-      headers: {
-        &#39;Content-Type&#39;: &#39;application/json&#39;,
-        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
-      }
-    });
-    req.write(postData);
-    req.end();
-  }).catch(function(err){
-    context.log(err);
-  });  
-}
-
-function getRandomDoc(sprocUrl){
-  return new Promise(function (resolve, reject) {
-    const sprocParams = {};
-    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
-      if (err) {
-        reject(err);
-      }
-      if (result) {
-        resolve(result);
-      }
-    });
-  });
-}
-
-var results = {
-  beer: function getBeer() {
-    var collectionUrl = databaseUrl + &#34;/colls/beer&#34;;
-    var sprocUrl = collectionUrl + &#34;/sprocs/GetRandomDoc&#34;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  },
-  eom: function getEom() {
-    var collectionUrl = databaseUrl + &#34;/colls/eom&#34;;
-    var sprocUrl = collectionUrl + &#34;/sprocs/GetRandomDoc&#34;;
-    return getRandomDoc(sprocUrl).then(function (result) {
-      return result;
-    });
-  }
-}
-
-function getDataFromDocDB() {
-  return Promise.all([results.beer(), results.eom()]);
-}
-
-module.exports = function (context, req) {
-  messaging_evts = req.body.entry[0].messaging;
-  for (i = 0; i &lt; messaging_evts.length; i++) {
-    evt = req.body.entry[0].messaging[i];
-    sender = evt.sender;
-    if (evt.message &amp;&amp; evt.message.text, context) {
-      sendTextMessage(sender, evt.message.text, context);
-    }
-  }
-  context.done();
-};
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>var https = require(&#39;https&#39;);
+</span></span><span style="display:flex;"><span>var documentClient = require(&#34;documentdb&#34;).DocumentClient;
+</span></span><span style="display:flex;"><span>const databaseUrl = &#34;dbs/&#34; + process.env.APPSETTING_DOCDB_DB_ID;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>var client = new documentClient(process.env.APPSETTING_DOCDB_ENDPOINT, { &#34;masterKey&#34;: process.env.APPSETTING_DOCDB_AUTHKEY });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>function sendTextMessage(sender, text, context) {
+</span></span><span style="display:flex;"><span>  getDataFromDocDB().then(function (value) {
+</span></span><span style="display:flex;"><span>    var msgAll = value[0].randomDocument.beer + &#34; &#34; + value[1].randomDocument.msg;
+</span></span><span style="display:flex;"><span>    var postData = JSON.stringify({
+</span></span><span style="display:flex;"><span>      recipient: sender,
+</span></span><span style="display:flex;"><span>      message: {
+</span></span><span style="display:flex;"><span>        &#34;attachment&#34;:{
+</span></span><span style="display:flex;"><span>          &#34;type&#34;:&#34;template&#34;,
+</span></span><span style="display:flex;"><span>          &#34;payload&#34;:{
+</span></span><span style="display:flex;"><span>            &#34;template_type&#34;:&#34;button&#34;,
+</span></span><span style="display:flex;"><span>            &#34;text&#34;:msgAll,
+</span></span><span style="display:flex;"><span>            &#34;buttons&#34;:[
+</span></span><span style="display:flex;"><span>              {
+</span></span><span style="display:flex;"><span>                &#34;type&#34;:&#34;web_url&#34;,
+</span></span><span style="display:flex;"><span>                &#34;url&#34;:value[0].randomDocument.url,
+</span></span><span style="display:flex;"><span>                &#34;title&#34;:&#34;詳しく&#34;
+</span></span><span style="display:flex;"><span>              }
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    var req = https.request({
+</span></span><span style="display:flex;"><span>      hostname: &#39;graph.facebook.com&#39;,
+</span></span><span style="display:flex;"><span>      port: 443,
+</span></span><span style="display:flex;"><span>      path: &#39;/v2.6/me/messages&#39;,
+</span></span><span style="display:flex;"><span>      method: &#39;POST&#39;,
+</span></span><span style="display:flex;"><span>      headers: {
+</span></span><span style="display:flex;"><span>        &#39;Content-Type&#39;: &#39;application/json&#39;,
+</span></span><span style="display:flex;"><span>        &#39;Authorization&#39;: &#39;Bearer &#39; + process.env.APPSETTING_FB_PAGE_TOKEN
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    req.write(postData);
+</span></span><span style="display:flex;"><span>    req.end();
+</span></span><span style="display:flex;"><span>  }).catch(function(err){
+</span></span><span style="display:flex;"><span>    context.log(err);
+</span></span><span style="display:flex;"><span>  });  
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>function getRandomDoc(sprocUrl){
+</span></span><span style="display:flex;"><span>  return new Promise(function (resolve, reject) {
+</span></span><span style="display:flex;"><span>    const sprocParams = {};
+</span></span><span style="display:flex;"><span>    client.executeStoredProcedure(sprocUrl, sprocParams, function(err, result, responseHeaders) {
+</span></span><span style="display:flex;"><span>      if (err) {
+</span></span><span style="display:flex;"><span>        reject(err);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>      if (result) {
+</span></span><span style="display:flex;"><span>        resolve(result);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>var results = {
+</span></span><span style="display:flex;"><span>  beer: function getBeer() {
+</span></span><span style="display:flex;"><span>    var collectionUrl = databaseUrl + &#34;/colls/beer&#34;;
+</span></span><span style="display:flex;"><span>    var sprocUrl = collectionUrl + &#34;/sprocs/GetRandomDoc&#34;;
+</span></span><span style="display:flex;"><span>    return getRandomDoc(sprocUrl).then(function (result) {
+</span></span><span style="display:flex;"><span>      return result;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  eom: function getEom() {
+</span></span><span style="display:flex;"><span>    var collectionUrl = databaseUrl + &#34;/colls/eom&#34;;
+</span></span><span style="display:flex;"><span>    var sprocUrl = collectionUrl + &#34;/sprocs/GetRandomDoc&#34;;
+</span></span><span style="display:flex;"><span>    return getRandomDoc(sprocUrl).then(function (result) {
+</span></span><span style="display:flex;"><span>      return result;
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>function getDataFromDocDB() {
+</span></span><span style="display:flex;"><span>  return Promise.all([results.beer(), results.eom()]);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>module.exports = function (context, req) {
+</span></span><span style="display:flex;"><span>  messaging_evts = req.body.entry[0].messaging;
+</span></span><span style="display:flex;"><span>  for (i = 0; i &lt; messaging_evts.length; i++) {
+</span></span><span style="display:flex;"><span>    evt = req.body.entry[0].messaging[i];
+</span></span><span style="display:flex;"><span>    sender = evt.sender;
+</span></span><span style="display:flex;"><span>    if (evt.message &amp;&amp; evt.message.text, context) {
+</span></span><span style="display:flex;"><span>      sendTextMessage(sender, evt.message.text, context);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  context.done();
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><ul>
 <li>最下部のmodule.export以降のブロックで、webhookイベントを受け取ります</li>
 <li>それがmessageイベントで、テキストが入っていれば、sendTextMessage関数を呼びます
 <ul>
@@ -239,16 +239,16 @@ module.exports = function (context, req) {
 </ul>
 </li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-  &#34;url&#34;: &#34;http://beertaster.org/beerstyle/web/001A.html#japanese&#34;,
-  &#34;beer&#34;: &#34;酵母なし、ライトアメリカン・ウィートビール&#34;,
-  &#34;id&#34;: &#34;bf3636c5-4284-4e7a-b587-9002a771f214&#34;
-}
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-  &#34;msg&#34;: &#34;はウマい&#34;,
-  &#34;id&#34;: &#34;acd63222-2138-4e19-894e-dc85a950be64&#34;
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;url&#34;: &#34;http://beertaster.org/beerstyle/web/001A.html#japanese&#34;,
+</span></span><span style="display:flex;"><span>  &#34;beer&#34;: &#34;酵母なし、ライトアメリカン・ウィートビール&#34;,
+</span></span><span style="display:flex;"><span>  &#34;id&#34;: &#34;bf3636c5-4284-4e7a-b587-9002a771f214&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;msg&#34;: &#34;はウマい&#34;,
+</span></span><span style="display:flex;"><span>  &#34;id&#34;: &#34;acd63222-2138-4e19-894e-dc85a950be64&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>DocumentDBの2つのコレクションへの問い合わせが終わった後、Facebookへメッセージを返すため、逐次処理目的でJavaScriptの<a href="http://azu.github.io/promises-book/">Promise</a>を使っています</li>
 </ul>
 <p>いかがでしょう。好みを聞かない気まぐれBotとはいえ、気軽に作れることがわかりました。ゼロからこの手のイベント処理を作るの、面倒ですものね。</p>

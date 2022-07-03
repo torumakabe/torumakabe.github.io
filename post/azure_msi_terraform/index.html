@@ -90,198 +90,198 @@
 <li>VMに対してリソースグループスコープでContributorロールを割り当て</li>
 <li>スクリプト実行 VM拡張でTerraform関連のプロビジョニング</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[snip]
-        {
-            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
-            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&#34;,
-            &#34;apiVersion&#34;: &#34;2017-12-01&#34;,
-            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
-            &#34;properties&#34;: {
-                &#34;publisher&#34;: &#34;Microsoft.ManagedIdentity&#34;,
-                &#34;type&#34;: &#34;ManagedIdentityExtensionForLinux&#34;,
-                &#34;typeHandlerVersion&#34;: &#34;1.0&#34;,
-                &#34;autoUpgradeMinorVersion&#34;: true,
-                &#34;settings&#34;: {
-                    &#34;port&#34;: 50342
-                },
-                &#34;protectedSettings&#34;: {}
-            },
-            &#34;dependsOn&#34;: [
-                &#34;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&#34;
-            ]
-        },
-        {
-            &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;,
-            &#34;name&#34;: &#34;[variables(&#39;resourceGuid&#39;)]&#34;,
-            &#34;apiVersion&#34;: &#34;2017-09-01&#34;,
-            &#34;properties&#34;: {
-                &#34;roleDefinitionId&#34;: &#34;[variables(&#39;contributor&#39;)]&#34;,
-                &#34;principalId&#34;: &#34;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&#34;,
-                &#34;scope&#34;: &#34;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&#34;
-            },
-            &#34;dependsOn&#34;: [
-                &#34;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&#34;
-            ]
-        },
-        {
-            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
-            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&#34;,
-            &#34;apiVersion&#34;: &#34;2017-03-30&#34;,
-            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
-            &#34;properties&#34;: {
-                &#34;publisher&#34;: &#34;Microsoft.Azure.Extensions&#34;,
-                &#34;type&#34;: &#34;CustomScript&#34;,
-                &#34;typeHandlerVersion&#34;: &#34;2.0&#34;,
-                &#34;autoUpgradeMinorVersion&#34;: true,
-                &#34;settings&#34;: {
-                    &#34;fileUris&#34;: [
-                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
-                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
-                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;
-                    ]
-                },
-                &#34;protectedSettings&#34;: {
-                    &#34;commandToExecute&#34;: &#34;[concat(&#39;bash infra.sh &amp;&amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&#34;
-                }
-            },
-            &#34;dependsOn&#34;: [
-                &#34;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&#34;
-            ]
-        }
-[snip]
-</code></pre></div><h3 id="vmにログインし環境を確認">VMにログインし、環境を確認</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
+</span></span><span style="display:flex;"><span>            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/MSILinuxExtension&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>            &#34;apiVersion&#34;: &#34;2017-12-01&#34;,
+</span></span><span style="display:flex;"><span>            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>            &#34;properties&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;publisher&#34;: &#34;Microsoft.ManagedIdentity&#34;,
+</span></span><span style="display:flex;"><span>                &#34;type&#34;: &#34;ManagedIdentityExtensionForLinux&#34;,
+</span></span><span style="display:flex;"><span>                &#34;typeHandlerVersion&#34;: &#34;1.0&#34;,
+</span></span><span style="display:flex;"><span>                &#34;autoUpgradeMinorVersion&#34;: true,
+</span></span><span style="display:flex;"><span>                &#34;settings&#34;: {
+</span></span><span style="display:flex;"><span>                    &#34;port&#34;: 50342
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                &#34;protectedSettings&#34;: {}
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;dependsOn&#34;: [
+</span></span><span style="display:flex;"><span>                &#34;[concat(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;))]&#34;
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;,
+</span></span><span style="display:flex;"><span>            &#34;name&#34;: &#34;[variables(&#39;resourceGuid&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>            &#34;apiVersion&#34;: &#34;2017-09-01&#34;,
+</span></span><span style="display:flex;"><span>            &#34;properties&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;roleDefinitionId&#34;: &#34;[variables(&#39;contributor&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>                &#34;principalId&#34;: &#34;[reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId]&#34;,
+</span></span><span style="display:flex;"><span>                &#34;scope&#34;: &#34;[concat(&#39;/subscriptions/&#39;, subscription().subscriptionId, &#39;/resourceGroups/&#39;, resourceGroup().name)]&#34;
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;dependsOn&#34;: [
+</span></span><span style="display:flex;"><span>                &#34;[resourceId(&#39;Microsoft.Compute/virtualMachines/extensions/&#39;, parameters(&#39;vmName&#39;),&#39;MSILinuxExtension&#39;)]&#34;
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            &#34;type&#34;: &#34;Microsoft.Compute/virtualMachines/extensions&#34;,
+</span></span><span style="display:flex;"><span>            &#34;name&#34;: &#34;[concat(parameters(&#39;vmName&#39;),&#39;/customscriptextension&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>            &#34;apiVersion&#34;: &#34;2017-03-30&#34;,
+</span></span><span style="display:flex;"><span>            &#34;location&#34;: &#34;[parameters(&#39;location&#39;)]&#34;,
+</span></span><span style="display:flex;"><span>            &#34;properties&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;publisher&#34;: &#34;Microsoft.Azure.Extensions&#34;,
+</span></span><span style="display:flex;"><span>                &#34;type&#34;: &#34;CustomScript&#34;,
+</span></span><span style="display:flex;"><span>                &#34;typeHandlerVersion&#34;: &#34;2.0&#34;,
+</span></span><span style="display:flex;"><span>                &#34;autoUpgradeMinorVersion&#34;: true,
+</span></span><span style="display:flex;"><span>                &#34;settings&#34;: {
+</span></span><span style="display:flex;"><span>                    &#34;fileUris&#34;: [
+</span></span><span style="display:flex;"><span>                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/infra.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
+</span></span><span style="display:flex;"><span>                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/install.sh&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;,
+</span></span><span style="display:flex;"><span>                        &#34;[concat(parameters(&#39;artifactsLocation&#39;), &#39;/scripts/azureProviderAndCreds.tf&#39;, parameters(&#39;artifactsLocationSasToken&#39;))]&#34;
+</span></span><span style="display:flex;"><span>                    ]
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                &#34;protectedSettings&#34;: {
+</span></span><span style="display:flex;"><span>                    &#34;commandToExecute&#34;: &#34;[concat(&#39;bash infra.sh &amp;&amp; bash install.sh &#39;, variables(&#39;installParm1&#39;), variables(&#39;installParm2&#39;), variables(&#39;installParm3&#39;), variables(&#39;installParm4&#39;), &#39; -k &#39;, listKeys(resourceId(&#39;Microsoft.Storage/storageAccounts&#39;, variables(&#39;stateStorageAccountName&#39;)), &#39;2017-10-01&#39;).keys[0].value, &#39; -l &#39;, reference(concat(resourceId(&#39;Microsoft.Compute/virtualMachines/&#39;, parameters(&#39;vmName&#39;)),&#39;/providers/Microsoft.ManagedIdentity/Identities/default&#39;),&#39;2015-08-31-PREVIEW&#39;).principalId)]&#34;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;dependsOn&#34;: [
+</span></span><span style="display:flex;"><span>                &#34;[resourceId(&#39;Microsoft.Authorization/roleAssignments&#39;, variables(&#39;resourceGuid&#39;))]&#34;
+</span></span><span style="display:flex;"><span>            ]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><h3 id="vmにログインし環境を確認">VMにログインし、環境を確認</h3>
 <p>では出来上がったVMにsshし、いろいろのぞいてみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh your-vm-public-ip
-</code></pre></div><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform -v
-Terraform v0.11.5
-</code></pre></div><p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ echo $ARM_USE_MSI
-true
-</code></pre></div><p>MSIも有効化されています(SystemAssigned)。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
-{
-  &#34;additionalProperties&#34;: {},
-  &#34;identityIds&#34;: null,
-  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
-  &#34;tenantId&#34;: &#34;tttt-tttt-tttt-tttt&#34;,
-  &#34;type&#34;: &#34;SystemAssigned&#34;
-}
-</code></pre></div><p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls
-tfEnv.sh  tfTemplate
-
-$ cat tfEnv.sh
-az login
-az role assignment create  --assignee &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34; --role &#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;  --scope /subscriptions/&#34;cccc-cccc-cccc-cccc&#34;
-
-$ . ~/tfEnv.sh
-To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
-[snip]
-{
-  &#34;additionalProperties&#34;: {},
-  &#34;canDelegate&#34;: null,
-  &#34;id&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&#34;,
-  &#34;name&#34;: &#34;ffff-ffff-ffff-ffff&#34;,
-  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
-  &#34;roleDefinitionId&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&#34;,
-  &#34;scope&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc&#34;,
-  &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;
-}
-</code></pre></div><p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&quot;はContributorを指します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ssh your-vm-public-ip
+</span></span></code></pre></div><p>Terraformのバージョンは、現時点で最新の0.11.5が入っています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform -v
+</span></span><span style="display:flex;"><span>Terraform v0.11.5
+</span></span></code></pre></div><p>環境変数ARM_USE_MSIはtrueに設定されています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ echo $ARM_USE_MSI
+</span></span><span style="display:flex;"><span>true
+</span></span></code></pre></div><p>MSIも有効化されています(SystemAssigned)。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az vm identity show -g tf-msi-poc-ejp-rg -n tfmsipocvm01
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;additionalProperties&#34;: {},
+</span></span><span style="display:flex;"><span>  &#34;identityIds&#34;: null,
+</span></span><span style="display:flex;"><span>  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
+</span></span><span style="display:flex;"><span>  &#34;tenantId&#34;: &#34;tttt-tttt-tttt-tttt&#34;,
+</span></span><span style="display:flex;"><span>  &#34;type&#34;: &#34;SystemAssigned&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>さて、このVMはMSIが使えるようになったわけですが、操作できるリソースのスコープは、このVMが属するリソースグループに限定されてます。新たなリソースグループを作成したい場合は、ロールを付与し、スコープを広げます。~/にtfEnv.shというスクリプトが用意されています。用意されたスクリプトを実行すると、サブスクリプションスコープのContributorがVMに割り当てられます。必要に応じて変更しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ls
+</span></span><span style="display:flex;"><span>tfEnv.sh  tfTemplate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ cat tfEnv.sh
+</span></span><span style="display:flex;"><span>az login
+</span></span><span style="display:flex;"><span>az role assignment create  --assignee &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34; --role &#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;  --scope /subscriptions/&#34;cccc-cccc-cccc-cccc&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ . ~/tfEnv.sh
+</span></span><span style="display:flex;"><span>To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code HOGEHOGE to authenticate.
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;additionalProperties&#34;: {},
+</span></span><span style="display:flex;"><span>  &#34;canDelegate&#34;: null,
+</span></span><span style="display:flex;"><span>  &#34;id&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleAssignments/ffff-ffff-ffff-ffff&#34;,
+</span></span><span style="display:flex;"><span>  &#34;name&#34;: &#34;ffff-ffff-ffff-ffff&#34;,
+</span></span><span style="display:flex;"><span>  &#34;principalId&#34;: &#34;aaaa-aaaa-aaaa-aaaa-aaaa&#34;,
+</span></span><span style="display:flex;"><span>  &#34;roleDefinitionId&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c&#34;,
+</span></span><span style="display:flex;"><span>  &#34;scope&#34;: &#34;/subscriptions/cccc-cccc-cccc-cccc&#34;,
+</span></span><span style="display:flex;"><span>  &#34;type&#34;: &#34;Microsoft.Authorization/roleAssignments&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ちなみに、role id &ldquo;b24988ac-6180-42a0-ab88-20f7382dd24c&quot;はContributorを指します。</p>
 <p>tfTemplateというディレクトリも用意されているようです。2つのファイルがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ls tfTemplate/
-azureProviderAndCreds.tf  remoteState.tf
-</code></pre></div><p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat tfTemplate/azureProviderAndCreds.tf
-#
-#
-# Provider and credential snippet to add to configurations
-# Assumes that there&#39;s a terraform.tfvars file with the var values
-#
-# Uncomment the creds variables if using service principal auth
-# Leave them commented to use MSI auth
-#
-#variable subscription_id {}
-#variable tenant_id {}
-#variable client_id {}
-#variable client_secret {}
-
-provider &#34;azurerm&#34; {
-#    subscription_id = &#34;${var.subscription_id}&#34;
-#    tenant_id = &#34;${var.tenant_id}&#34;
-#    client_id = &#34;${var.client_id}&#34;
-#    client_secret = &#34;${var.client_secret}&#34;
-}
-</code></pre></div><p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cat tfTemplate/remoteState.tf
-terraform {
- backend &#34;azurerm&#34; {
-  storage_account_name = &#34;storestaterandomid&#34;
-  container_name       = &#34;terraform-state&#34;
-  key                  = &#34;prod.terraform.tfstate&#34;
-  access_key           = &#34;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&#34;
-  }
-}
-</code></pre></div><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ls tfTemplate/
+</span></span><span style="display:flex;"><span>azureProviderAndCreds.tf  remoteState.tf
+</span></span></code></pre></div><p>azureProviderAndCreds.tfは、tfファイルのテンプレートです。コメントアウトと説明のとおり、MSIを使う場合には、このテンプレートは必要ありません。subscription_idとtenant_idは、VMのプロビジョニング時に環境変数にセットされています。そしてclient_idとclient_secretは、MSIを通じて取得されます。明示的に変えたい時のみ指定しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ cat tfTemplate/azureProviderAndCreds.tf
+</span></span><span style="display:flex;"><span>#
+</span></span><span style="display:flex;"><span>#
+</span></span><span style="display:flex;"><span># Provider and credential snippet to add to configurations
+</span></span><span style="display:flex;"><span># Assumes that there&#39;s a terraform.tfvars file with the var values
+</span></span><span style="display:flex;"><span>#
+</span></span><span style="display:flex;"><span># Uncomment the creds variables if using service principal auth
+</span></span><span style="display:flex;"><span># Leave them commented to use MSI auth
+</span></span><span style="display:flex;"><span>#
+</span></span><span style="display:flex;"><span>#variable subscription_id {}
+</span></span><span style="display:flex;"><span>#variable tenant_id {}
+</span></span><span style="display:flex;"><span>#variable client_id {}
+</span></span><span style="display:flex;"><span>#variable client_secret {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>provider &#34;azurerm&#34; {
+</span></span><span style="display:flex;"><span>#    subscription_id = &#34;${var.subscription_id}&#34;
+</span></span><span style="display:flex;"><span>#    tenant_id = &#34;${var.tenant_id}&#34;
+</span></span><span style="display:flex;"><span>#    client_id = &#34;${var.client_id}&#34;
+</span></span><span style="display:flex;"><span>#    client_secret = &#34;${var.client_secret}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>remoteState.tfは、TerraformのstateをAzureのBlob上に置く場合に使います。Blobの<a href="https://azure.microsoft.com/en-us/blog/soft-delete-for-azure-storage-blobs-now-in-public-preview/">soft delete</a>が使えるようになったこともあり、事件や事故を考慮すると、できればstateはローカルではなくBlobで管理したいところです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ cat tfTemplate/remoteState.tf
+</span></span><span style="display:flex;"><span>terraform {
+</span></span><span style="display:flex;"><span> backend &#34;azurerm&#34; {
+</span></span><span style="display:flex;"><span>  storage_account_name = &#34;storestaterandomid&#34;
+</span></span><span style="display:flex;"><span>  container_name       = &#34;terraform-state&#34;
+</span></span><span style="display:flex;"><span>  key                  = &#34;prod.terraform.tfstate&#34;
+</span></span><span style="display:flex;"><span>  access_key           = &#34;KYkCz88z+7yoyoyoiyoyoyoiyoyoyoiyoiTDZRbrwAWIPWD+rU6g==&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>soft delete設定は、別途 <a href="https://docs.microsoft.com/en-us/cli/azure/storage/blob/service-properties/delete-policy?view=azure-cli-latest#az-storage-blob-service-properties-delete-policy-update">az storage blob service-properties delete-policy update</a> コマンドで行ってください。</p>
 <h3 id="プロビジョニングしてみる">プロビジョニングしてみる</h3>
 <p>ではTerraformを動かしてみましょう。サブディレクトリsampleを作り、そこで作業します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ mkdir sample
-$ cd sample/
-</code></pre></div><p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ cp ../tfTemplate/remoteState.tf ./
-</code></pre></div><p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ mkdir sample
+</span></span><span style="display:flex;"><span>$ cd sample/
+</span></span></code></pre></div><p>stateはBlobで管理しましょう。先ほどのremoteState.tfを実行ディレクトリにコピーします。アクセスキーが入っていますので、このディレクトリをコード管理システム配下に置くのであれば、.gitignoreなどで除外をお忘れなく。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ cp ../tfTemplate/remoteState.tf ./
+</span></span></code></pre></div><p>ここのキーが残ってしまうのが現時点での課題。ストレージのキー問題は<a href="https://feedback.azure.com/forums/217298-storage/suggestions/14831712-allow-user-based-access-to-blob-containers-for-su">対応がはじまったので</a>、いずれ解決するはずです。</p>
 <p>ではTerraformで作るリソースを書きます。さくっとACI上にnginxコンテナーを作りましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ vim main.tf
-resource &#34;azurerm_resource_group&#34; &#34;tf-msi-poc&#34; {
-    name     = &#34;tf-msi-poc-aci-wus-rg&#34;
-    location = &#34;West US&#34;
-}
-
-resource &#34;random_integer&#34; &#34;random_int&#34; {
-    min = 100
-    max = 999
-}
-
-resource &#34;azurerm_container_group&#34; &#34;aci-example&#34; {
-    name                = &#34;aci-cg-${random_integer.random_int.result}&#34;
-    location            = &#34;${azurerm_resource_group.tf-msi-poc.location}&#34;
-    resource_group_name = &#34;${azurerm_resource_group.tf-msi-poc.name}&#34;
-    ip_address_type     = &#34;public&#34;
-    dns_name_label      = &#34;tomakabe-aci-cg-${random_integer.random_int.result}&#34;
-    os_type             = &#34;linux&#34;
-
-    container {
-        name    = &#34;nginx&#34;
-        image   = &#34;nginx&#34;
-        cpu     = &#34;0.5&#34;
-        memory  = &#34;1.0&#34;
-        port    = &#34;80&#34;
-    }
-}
-</code></pre></div><p>init、plan、アプラーイ。アプライ王子。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform init
-$ terraform plan
-$ terraform apply -auto-approve
-[snip]
-Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
-</code></pre></div><p>できたか確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
-Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
-----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
-aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
-$ curl 13.91.90.117
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre></div><h2 id="おまけ">おまけ</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ vim main.tf
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_resource_group&#34; &#34;tf-msi-poc&#34; {
+</span></span><span style="display:flex;"><span>    name     = &#34;tf-msi-poc-aci-wus-rg&#34;
+</span></span><span style="display:flex;"><span>    location = &#34;West US&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;random_integer&#34; &#34;random_int&#34; {
+</span></span><span style="display:flex;"><span>    min = 100
+</span></span><span style="display:flex;"><span>    max = 999
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_container_group&#34; &#34;aci-example&#34; {
+</span></span><span style="display:flex;"><span>    name                = &#34;aci-cg-${random_integer.random_int.result}&#34;
+</span></span><span style="display:flex;"><span>    location            = &#34;${azurerm_resource_group.tf-msi-poc.location}&#34;
+</span></span><span style="display:flex;"><span>    resource_group_name = &#34;${azurerm_resource_group.tf-msi-poc.name}&#34;
+</span></span><span style="display:flex;"><span>    ip_address_type     = &#34;public&#34;
+</span></span><span style="display:flex;"><span>    dns_name_label      = &#34;tomakabe-aci-cg-${random_integer.random_int.result}&#34;
+</span></span><span style="display:flex;"><span>    os_type             = &#34;linux&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    container {
+</span></span><span style="display:flex;"><span>        name    = &#34;nginx&#34;
+</span></span><span style="display:flex;"><span>        image   = &#34;nginx&#34;
+</span></span><span style="display:flex;"><span>        cpu     = &#34;0.5&#34;
+</span></span><span style="display:flex;"><span>        memory  = &#34;1.0&#34;
+</span></span><span style="display:flex;"><span>        port    = &#34;80&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>init、plan、アプラーイ。アプライ王子。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform init
+</span></span><span style="display:flex;"><span>$ terraform plan
+</span></span><span style="display:flex;"><span>$ terraform apply -auto-approve
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+</span></span></code></pre></div><p>できたか確認。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az container show -g tf-msi-poc-aci-wus-rg -n aci-cg-736 -o table
+</span></span><span style="display:flex;"><span>Name        ResourceGroup          ProvisioningState    Image    IP:ports         CPU/Memory       OsType    Location
+</span></span><span style="display:flex;"><span>----------  ---------------------  -------------------  -------  ---------------  ---------------  --------  ----------
+</span></span><span style="display:flex;"><span>aci-cg-736  tf-msi-poc-aci-wus-rg  Succeeded            nginx    13.91.90.117:80  0.5 core/1.0 gb  Linux     westus
+</span></span><span style="display:flex;"><span>$ curl 13.91.90.117
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><h2 id="おまけ">おまけ</h2>
 <p>サービスプリンシパルは、アプリに対して権限を付与するために必要な仕組みなのですが、使わなくなった際に消し忘れることが多いです。意識して消さないと、散らかり放題。</p>
 <p>MSIの場合、対象のVMを消すとそのプリンシパルも消えます。爽快感ほとばしる。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
-Resource &#39;aaaa-aaaa-aaaa-aaaa-aaaa&#39; does not exist or one of its queried reference-property objects are not present.
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az ad sp show --id aaaa-aaaa-aaaa-aaaa-aaaa
+</span></span><span style="display:flex;"><span>Resource &#39;aaaa-aaaa-aaaa-aaaa-aaaa&#39; does not exist or one of its queried reference-property objects are not present.
+</span></span></code></pre></div>
 		</section>
 
 		<div class="post-tags">

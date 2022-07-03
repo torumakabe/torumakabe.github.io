@@ -72,76 +72,75 @@
 <h2 id="いい感じのカスタムロールを作る">いい感じのカスタムロールを作る</h2>
 <p>Azureのカスタムロールは、個別リソースレベルで粒度の細かい権限設定ができます。ですが、やり過ぎると破綻するため、シンプルなロールを最小限作る、がおすすめです。</p>
 <p>シンプルに行きましょう。まずはカスタムロールの定義を作ります。role.jsonとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-    &#34;Name&#34;: &#34;Resource Group Contributor&#34;,
-    &#34;IsCustom&#34;: true,
-    &#34;Description&#34;: &#34;Lets you manage everything except access to resources, but can not delete Resouce Group&#34;,
-    &#34;Actions&#34;: [
-        &#34;*&#34;
-    ],
-    &#34;NotActions&#34;: [
-        &#34;Microsoft.Authorization/*/Delete&#34;,
-        &#34;Microsoft.Authorization/*/Write&#34;,
-        &#34;Microsoft.Authorization/elevateAccess/Action&#34;,
-        &#34;Microsoft.Resources/subscriptions/resourceGroups/Delete&#34;
-    ],
-    &#34;AssignableScopes&#34;: [
-        &#34;/subscriptions/your-subscriotion-id&#34;
-    ]
-}
-</code></pre></div><p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    &#34;Name&#34;: &#34;Resource Group Contributor&#34;,
+</span></span><span style="display:flex;"><span>    &#34;IsCustom&#34;: true,
+</span></span><span style="display:flex;"><span>    &#34;Description&#34;: &#34;Lets you manage everything except access to resources, but can not delete Resouce Group&#34;,
+</span></span><span style="display:flex;"><span>    &#34;Actions&#34;: [
+</span></span><span style="display:flex;"><span>        &#34;*&#34;
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    &#34;NotActions&#34;: [
+</span></span><span style="display:flex;"><span>        &#34;Microsoft.Authorization/*/Delete&#34;,
+</span></span><span style="display:flex;"><span>        &#34;Microsoft.Authorization/*/Write&#34;,
+</span></span><span style="display:flex;"><span>        &#34;Microsoft.Authorization/elevateAccess/Action&#34;,
+</span></span><span style="display:flex;"><span>        &#34;Microsoft.Resources/subscriptions/resourceGroups/Delete&#34;
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    &#34;AssignableScopes&#34;: [
+</span></span><span style="display:flex;"><span>        &#34;/subscriptions/your-subscriotion-id&#34;
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>組み込みロールの共同作成者をテンプレに、NotActionsでリソースグループの削除権限を除外しました。AssignableScopesでリソースグループを限定してもいいですが、リソースグループの数だけロールを作るのはつらいので、ここでは指定しません。後からロールを割り当てる時にスコープを指定します。</p>
 <p>では、カスタムロールを作成します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az role definition create --role-definition ./role.json
-</code></pre></div><p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">&#34;id&#34;: &#34;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&#34;
-</code></pre></div><h2 id="カスタムロールをユーザーグループサービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zed" data-lang="zed"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> az role <span style="color:#66d9ef">definition</span> create <span style="color:#f92672">--</span>role<span style="color:#f92672">-</span><span style="color:#66d9ef">definition</span> .<span style="color:#f92672">/</span>role.json
+</span></span></code></pre></div><p>出力にカスタムロールのIDが入っていますので、控えておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>&#34;id&#34;: &#34;/subscriptions/your-subscriotion-id/providers/Microsoft.Authorization/roleDefinitions/your-customrole-id&#34;
+</span></span></code></pre></div><h2 id="カスタムロールをユーザーグループサービスプリンシパルに割り当てる">カスタムロールをユーザー、グループ、サービスプリンシパルに割り当てる</h2>
 <p>次に、ユーザー/グループに先ほど作ったカスタムロールを割り当てます。スコープはリソースグループに限定します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &#34;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&#34;
-</code></pre></div><p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az ad sp create-for-rbac -n &#34;rgcontributor&#34; -p &#34;your-password&#34; --role your-customrole-id --scopes &#34;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&#34;
-</code></pre></div><p>余談ですが、&ldquo;az ad sp create-for-rbac&quot;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az role assignment create --assignee-object-id your-user-or-group-object-id --role your-customrole-id --scope &#34;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&#34;
+</span></span></code></pre></div><p>サービスプリンシパル作成時に割り当てる場合は、以下のように。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az ad sp create-for-rbac -n &#34;rgcontributor&#34; -p &#34;your-password&#34; --role your-customrole-id --scopes &#34;/subscriptions/your-subscriotion-id/resourceGroups/sample-dev-rg&#34;
+</span></span></code></pre></div><p>余談ですが、&ldquo;az ad sp create-for-rbac&quot;コマンドはAzure ADアプリケーションを同時に作るため、別途アプリを作ってサービスプリンシパルと紐づける、という作業が要りません。</p>
 <h2 id="試してみる">試してみる</h2>
 <p>ログインして試してみましょう。サービスプリンシパルの例です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az login --service-principal -u &#34;http://rgcontributor&#34; -p &#34;your-password&#34; -t &#34;your-tenant-id&#34;
-</code></pre></div><p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre></div><p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az vm list -o table
-Name              ResourceGroup     Location
-----------------  ----------------  ----------
-sampledevvm01     sample-dev-rg  japaneast
-</code></pre></div><p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group create -n rgc-poc-rg -l japaneast
-The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
-</code></pre></div><p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group delete -n sample-dev-rg
-Are you sure you want to perform this operation? (y/n): y
-The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
-</code></pre></div><h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az login --service-principal -u &#34;http://rgcontributor&#34; -p &#34;your-password&#34; -t &#34;your-tenant-id&#34;
+</span></span></code></pre></div><p>検証したサブスクリプションには多数のリソースグループがあるのですが、スコープで指定したものだけが見えます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az group list -o table
+</span></span><span style="display:flex;"><span>Name              Location    Status
+</span></span><span style="display:flex;"><span>----------------  ----------  ---------
+</span></span><span style="display:flex;"><span>sample-dev-rg  japaneast   Succeeded
+</span></span></code></pre></div><p>このリソースグループに、VMを作っておきました。リストはしませんが、ストレージやネットワークなど関連リソースもこのグループにあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az vm list -o table
+</span></span><span style="display:flex;"><span>Name              ResourceGroup     Location
+</span></span><span style="display:flex;"><span>----------------  ----------------  ----------
+</span></span><span style="display:flex;"><span>sampledevvm01     sample-dev-rg  japaneast
+</span></span></code></pre></div><p>試しにリソースグループを作ってみます。サブスクリプションスコープの権限がないため怒られます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az group create -n rgc-poc-rg -l japaneast
+</span></span><span style="display:flex;"><span>The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/write&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/rgc-poc-rg&#39;.
+</span></span></code></pre></div><p>リソースグループを消してみます。消すかい？ -&gt; y -&gt; ダメ、という、持ち上げて落とす怒り方です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az group delete -n sample-dev-rg
+</span></span><span style="display:flex;"><span>Are you sure you want to perform this operation? (y/n): y
+</span></span><span style="display:flex;"><span>The client &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; with object id &#39;aaaaa-bbbbb-ccccc-ddddd-eeeee&#39; does not have authorization to perform action &#39;Microsoft.Resources/subscriptions/resourcegroups/delete&#39; over scope &#39;/subscriptions/your-subscriotion-id/resourcegroups/sample-dev-rg&#39;.
+</span></span></code></pre></div><h2 id="でもリソースグループのリソースを一括削除したい">でもリソースグループのリソースを一括削除したい</h2>
 <p>でも、リソースグループは消せなくても、リソースをバッサリ消す手段は欲しいですよね。そんな時には空のリソースマネージャーテンプレートを、completeモードでデプロイすると、消せます。</p>
 <p>空テンプレートを、empty.jsonとしましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-    &#34;$schema&#34;: &#34;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&#34;,
-    &#34;contentVersion&#34;: &#34;1.0.0.0&#34;,
-    &#34;parameters&#34;: {},
-    &#34;variables&#34;: {},
-    &#34;resources&#34;: [],
-    &#34;outputs&#34;: {}
-}
-</code></pre></div><p>破壊的空砲を打ちます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
-</code></pre></div><p>リソースグループは残ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az group list -o table
-Name              Location    Status
-----------------  ----------  ---------
-sample-dev-rg  japaneast   Succeeded
-</code></pre></div><p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az vm list -o table
-
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    &#34;$schema&#34;: &#34;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&#34;,
+</span></span><span style="display:flex;"><span>    &#34;contentVersion&#34;: &#34;1.0.0.0&#34;,
+</span></span><span style="display:flex;"><span>    &#34;parameters&#34;: {},
+</span></span><span style="display:flex;"><span>    &#34;variables&#34;: {},
+</span></span><span style="display:flex;"><span>    &#34;resources&#34;: [],
+</span></span><span style="display:flex;"><span>    &#34;outputs&#34;: {}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>破壊的空砲を打ちます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az group deployment create --mode complete -g sample-dev-rg --template-file ./empty.json
+</span></span></code></pre></div><p>リソースグループは残ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az group list -o table
+</span></span><span style="display:flex;"><span>Name              Location    Status
+</span></span><span style="display:flex;"><span>----------------  ----------  ---------
+</span></span><span style="display:flex;"><span>sample-dev-rg  japaneast   Succeeded
+</span></span></code></pre></div><p>VMは消えました。リストしませんが、他の関連リソースもバッサリ消えています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az vm list -o table
+</span></span></code></pre></div>
 		</section>
 
 		<div class="post-tags">

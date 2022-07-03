@@ -92,49 +92,49 @@
 <p>Terraformはリソースを&quot;API Management Resource(resource)&ldquo;として定義すると、作成から廃棄まで、ライフサイクル全体の面倒をみます。つまりresourceとして定義したものをapplyすれば作成し、destroyすれば廃棄します。いっぽうでData Source(data)は参照用ですので、定義したリソースに、変更を加えません。</p>
 <p>CLIやポータルで作った、すでにあるリソースに対して追いプロビジョニングをするのに、Data Sourceは有用です。周辺リソースを作るのに必要な情報を取得できるからです。</p>
 <p>たとえば、AKSマスターコンポーネントのログをLog Analyticsへ転送するために、Azure Diagnoticsリソースを作成するとしましょう。作成には、対象となる既存AKSクラスターのIDとLog AnalyticsのWorkspace IDが要ります。IDとは、</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
-</code></pre></div><p>とかいうやつです。いちいち調べるの、めんどくさい。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/subscriptions/hogehoge/resourcegroups/fugafuga/providers/Microsoft.ContainerService/managedClusters/hogefuga
+</span></span></code></pre></div><p>とかいうやつです。いちいち調べるの、めんどくさい。</p>
 <p>そこで、AKSクラスターとLog AnalyticsのWorkspaceをdataとして定義します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">data &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; {
-  name                = &#34;${var.aks_cluster_name}&#34;
-  resource_group_name = &#34;${var.aks_cluster_rg}&#34;
-}
-
-data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; {
-  name                = &#34;${var.la_workspace_name_for_aks}&#34;
-  resource_group_name = &#34;${var.la_workspace_rg_for_aks}&#34;
-}
-</code></pre></div><p>それを次のように、resource作成時に参照できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_monitor_diagnostic_setting&#34; &#34;aks&#34; {
-  name                       = &#34;diag_aks&#34;
-  target_resource_id         = &#34;${data.azurerm_kubernetes_cluster.aks.id}&#34;
-  log_analytics_workspace_id = &#34;${data.azurerm_log_analytics_workspace.aks.id}&#34;
-
-  log {
-    category = &#34;kube-apiserver&#34;
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
-  }
-}
-</code></pre></div><p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">provider &#34;kubernetes&#34; {
-  load_config_file       = false
-  host                   = &#34;${data.azurerm_kubernetes_cluster.aks.kube_config.0.host}&#34;
-  client_certificate     = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&#34;
-  client_key             = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&#34;
-  cluster_ca_certificate = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&#34;
-}
-</code></pre></div><p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;kubernetes_service_account&#34; &#34;kured&#34; {
-  metadata {
-    name      = &#34;kured&#34;
-    namespace = &#34;kube-system&#34;
-  }
-}
-</code></pre></div><p>なお、Terraform実行ホスト上のKubernetes configファイルを使って対象のクラスターを<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">指定、認証する</a>こともできます。要件に合わせて選択しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>data &#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;${var.aks_cluster_name}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${var.aks_cluster_rg}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data &#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;${var.la_workspace_name_for_aks}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${var.la_workspace_rg_for_aks}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>それを次のように、resource作成時に参照できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_monitor_diagnostic_setting&#34; &#34;aks&#34; {
+</span></span><span style="display:flex;"><span>  name                       = &#34;diag_aks&#34;
+</span></span><span style="display:flex;"><span>  target_resource_id         = &#34;${data.azurerm_kubernetes_cluster.aks.id}&#34;
+</span></span><span style="display:flex;"><span>  log_analytics_workspace_id = &#34;${data.azurerm_log_analytics_workspace.aks.id}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  log {
+</span></span><span style="display:flex;"><span>    category = &#34;kube-apiserver&#34;
+</span></span><span style="display:flex;"><span>    enabled  = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    retention_policy {
+</span></span><span style="display:flex;"><span>      enabled = false
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>また、Kubernetesを操作するProvider登録時に、認証情報を渡すこともできます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>provider &#34;kubernetes&#34; {
+</span></span><span style="display:flex;"><span>  load_config_file       = false
+</span></span><span style="display:flex;"><span>  host                   = &#34;${data.azurerm_kubernetes_cluster.aks.kube_config.0.host}&#34;
+</span></span><span style="display:flex;"><span>  client_certificate     = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_certificate)}&#34;
+</span></span><span style="display:flex;"><span>  client_key             = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.client_key)}&#34;
+</span></span><span style="display:flex;"><span>  cluster_ca_certificate = &#34;${base64decode(data.azurerm_kubernetes_cluster.aks.kube_config.0.cluster_ca_certificate)}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>こうしておけば、TerraformがKubernetesを操作できます。以下はkured用のサービスアカウントを定義する例です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;kubernetes_service_account&#34; &#34;kured&#34; {
+</span></span><span style="display:flex;"><span>  metadata {
+</span></span><span style="display:flex;"><span>    name      = &#34;kured&#34;
+</span></span><span style="display:flex;"><span>    namespace = &#34;kube-system&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>なお、Terraform実行ホスト上のKubernetes configファイルを使って対象のクラスターを<a href="https://www.terraform.io/docs/providers/kubernetes/guides/getting-started.html">指定、認証する</a>こともできます。要件に合わせて選択しましょう。</p>
 <p>ここまでを、まとめます。Azure CLIやポータルを使って作ったAKSクラスターに対し、TerraformのData SourceやKubenetesのconfigファイルを使って属性、認証情報を取得し、追加プロビジョニングを一括で、楽にできる、という話でした。</p>
 <h2 id="サンプル">サンプル</h2>
 <p>ではどんなことができるのか、サンプルをGistに置いておきました。</p>

@@ -77,33 +77,33 @@
 <p>GitHub上のNVIDIAのドキュメント通りに導入します。</p>
 <p><a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Docker</a></p>
 <p>ここまでの作業に問題がないか、確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
-Using default tag: latest
-latest: Pulling from nvidia/cuda
-8aec416115fd: Pull complete
-[...]
-Status: Downloaded newer image for nvidia/cuda:latest
-Fri Feb  3 06:43:18 2017
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
-| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID  Type  Process name                               Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
-</code></pre></div><h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo nvidia-docker run --rm nvidia/cuda nvidia-smi
+</span></span><span style="display:flex;"><span>Using default tag: latest
+</span></span><span style="display:flex;"><span>latest: Pulling from nvidia/cuda
+</span></span><span style="display:flex;"><span>8aec416115fd: Pull complete
+</span></span><span style="display:flex;"><span>[...]
+</span></span><span style="display:flex;"><span>Status: Downloaded newer image for nvidia/cuda:latest
+</span></span><span style="display:flex;"><span>Fri Feb  3 06:43:18 2017
+</span></span><span style="display:flex;"><span>+-----------------------------------------------------------------------------+
+</span></span><span style="display:flex;"><span>| NVIDIA-SMI 367.48                 Driver Version: 367.48                    |
+</span></span><span style="display:flex;"><span>|-------------------------------+----------------------+----------------------+
+</span></span><span style="display:flex;"><span>| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+</span></span><span style="display:flex;"><span>| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+</span></span><span style="display:flex;"><span>|===============================+======================+======================|
+</span></span><span style="display:flex;"><span>|   0  Tesla K80           Off  | 86BF:00:00.0     Off |                    0 |
+</span></span><span style="display:flex;"><span>| N/A   34C    P8    33W / 149W |      0MiB / 11439MiB |      0%      Default |
+</span></span><span style="display:flex;"><span>+-------------------------------+----------------------+----------------------+
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>+-----------------------------------------------------------------------------+
+</span></span><span style="display:flex;"><span>| Processes:                                                       GPU Memory |
+</span></span><span style="display:flex;"><span>|  GPU       PID  Type  Process name                               Usage      |
+</span></span><span style="display:flex;"><span>|=============================================================================|
+</span></span><span style="display:flex;"><span>|  No running processes found                                                 |
+</span></span><span style="display:flex;"><span>+-----------------------------------------------------------------------------+
+</span></span></code></pre></div><h3 id="paintschainer-dockerのインストール">PaintsChainer-Dockerのインストール</h3>
 <p>Liam Jones氏が公開している<a href="https://github.com/liamjones/PaintsChainer-Docker">PaintsChainer-Docker</a>を使って、PaintsChanierコンテナーを起動します。ポートマッピングはコンテナーホストの80番とコンテナーの8000番です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
-</code></pre></div><h2 id="paintschainerを使ってみる">PaintsChainerを使ってみる</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ sudo nvidia-docker run -p 80:8000 liamjones/paintschainer-docker
+</span></span></code></pre></div><h2 id="paintschainerを使ってみる">PaintsChainerを使ってみる</h2>
 <p>VMのパブリックIP、ポート80番にアクセスすると、先ほどコンテナーで起動したPaintsChainerのページが開きます。クラウディアさんの白黒画像ファイルで試してみましょう。</p>
 <p><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/paintschainer_cloudia.png" alt="結果" title="Cloudia"></p>
 <p>PaintsChainer、すごいなぁ。

@@ -92,12 +92,12 @@
 <h2 id="powershellのfunctionを作る">PowerShellのfunctionを作る</h2>
 <p>ここが作業のハイライト。</p>
 <p>PowerShellのプロファイルを編集します。ところでエディタはなんでもいいのですが、AzureやDockerをがっつり触る人にはVS Codeがおすすめです。<a href="https://marketplace.visualstudio.com/items?itemName=msazurermtools.azurerm-vscode-tools">Azure Resource Manager Template</a>や<a href="https://marketplace.visualstudio.com/items?itemName=PeterJausovec.vscode-docker">Docker</a>むけextensionがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\Workspace\ARM&gt; code $profile
-</code></pre></div><p>こんなfunctionを作ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">function az_cli {
-   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
-}
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Workspace\ARM&gt; code $profile
+</span></span></code></pre></div><p>こんなfunctionを作ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>function az_cli {
+</span></span><span style="display:flex;"><span>   C:\PROGRA~1\Docker\Docker\Resources\bin\docker.exe run -it --rm -v ${HOME}/.azure:/root/.azure -v ${PWD}:/data -w /data azuresdk/azure-cli-python
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
 <li>エイリアスでなくfunctionにした理由は、引数です。エイリアスだと引数を渡せないので</li>
 <li>コンテナが溜まるのがいやなので、&ndash;rmで都度消します</li>
 <li>毎度 az login しなくていいよう、トークンが保管されるコンテナの/root/azureディレクトリをホストの${HOME}/.azureと-v オプションで共有します</li>
@@ -105,62 +105,62 @@
 <li>コンテナはdocker hubのazuresdk/azure-cli-pythonリポジトリ、latestを引っ張ります。latestで不具合あればバージョン指定してください</li>
 </ul>
 <p>ではテスト。まずはホスト側のファイルを確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\Workspace\ARM&gt; ls
-
-
-    ディレクトリ: C:\Workspace\ARM
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2017/02/28      8:29           4515 azuredeploy.json
--a----       2017/02/28      8:30            374 azuredeploy.parameters.json
-</code></pre></div><p>いくつかのファイルがあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Workspace\ARM&gt; ls
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Workspace\ARM
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-a----       2017/02/28      8:29           4515 azuredeploy.json
+</span></span><span style="display:flex;"><span>-a----       2017/02/28      8:30            374 azuredeploy.parameters.json
+</span></span></code></pre></div><p>いくつかのファイルがあります。</p>
 <p>コンテナを起動してみましょう。az_cli functionを呼びます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\Workspace\ARM&gt; az_cli
-bash-4.3#
-</code></pre></div><p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Workspace\ARM&gt; az_cli
+</span></span><span style="display:flex;"><span>bash-4.3#
+</span></span></code></pre></div><p>コンテナを起動し、入出力をつなぎました。ここからは頭と手をLinuxに切り替えてください。Azure CLI 2.0コンテナは<a href="https://hub.docker.com/r/azuresdk/azure-cli-python/~/dockerfile/">alpine linux</a>ベースです。</p>
 <p>カレントディレクトリを確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bash-4.3# pwd
-/data
-</code></pre></div><p>ファイル共有できているか確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bash-4.3# ls
-azuredeploy.json             azuredeploy.parameters.json
-</code></pre></div><p>できてますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>bash-4.3# pwd
+</span></span><span style="display:flex;"><span>/data
+</span></span></code></pre></div><p>ファイル共有できているか確認。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>bash-4.3# ls
+</span></span><span style="display:flex;"><span>azuredeploy.json             azuredeploy.parameters.json
+</span></span></code></pre></div><p>できてますね。</p>
 <p>azコマンドが打てるか確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bash-4.3# az --version
-azure-cli (2.0.0+dev)
-
-acr (0.1.1b4+dev)
-acs (2.0.0+dev)
-appservice (0.1.1b5+dev)
-batch (0.1.1b4+dev)
-cloud (2.0.0+dev)
-component (2.0.0+dev)
-configure (2.0.0+dev)
-container (0.1.1b4+dev)
-core (2.0.0+dev)
-documentdb (0.1.1b2+dev)
-feedback (2.0.0+dev)
-iot (0.1.1b3+dev)
-keyvault (0.1.1b5+dev)
-network (2.0.0+dev)
-nspkg (2.0.0+dev)
-profile (2.0.0+dev)
-redis (0.1.1b3+dev)
-resource (2.0.0+dev)
-role (2.0.0+dev)
-sql (0.1.1b5+dev)
-storage (2.0.0+dev)
-taskhelp (0.1.1b3+dev)
-vm (2.0.0+dev)
-
-Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
-[GCC 5.3.0]
-</code></pre></div><p>タブで補完も効きます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">bash-4.3# az a
-account     acr         acs         ad          appservice
-</code></pre></div><p>しあわせ。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>bash-4.3# az --version
+</span></span><span style="display:flex;"><span>azure-cli (2.0.0+dev)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>acr (0.1.1b4+dev)
+</span></span><span style="display:flex;"><span>acs (2.0.0+dev)
+</span></span><span style="display:flex;"><span>appservice (0.1.1b5+dev)
+</span></span><span style="display:flex;"><span>batch (0.1.1b4+dev)
+</span></span><span style="display:flex;"><span>cloud (2.0.0+dev)
+</span></span><span style="display:flex;"><span>component (2.0.0+dev)
+</span></span><span style="display:flex;"><span>configure (2.0.0+dev)
+</span></span><span style="display:flex;"><span>container (0.1.1b4+dev)
+</span></span><span style="display:flex;"><span>core (2.0.0+dev)
+</span></span><span style="display:flex;"><span>documentdb (0.1.1b2+dev)
+</span></span><span style="display:flex;"><span>feedback (2.0.0+dev)
+</span></span><span style="display:flex;"><span>iot (0.1.1b3+dev)
+</span></span><span style="display:flex;"><span>keyvault (0.1.1b5+dev)
+</span></span><span style="display:flex;"><span>network (2.0.0+dev)
+</span></span><span style="display:flex;"><span>nspkg (2.0.0+dev)
+</span></span><span style="display:flex;"><span>profile (2.0.0+dev)
+</span></span><span style="display:flex;"><span>redis (0.1.1b3+dev)
+</span></span><span style="display:flex;"><span>resource (2.0.0+dev)
+</span></span><span style="display:flex;"><span>role (2.0.0+dev)
+</span></span><span style="display:flex;"><span>sql (0.1.1b5+dev)
+</span></span><span style="display:flex;"><span>storage (2.0.0+dev)
+</span></span><span style="display:flex;"><span>taskhelp (0.1.1b3+dev)
+</span></span><span style="display:flex;"><span>vm (2.0.0+dev)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Python (Linux) 3.5.2 (default, Dec 27 2016, 21:33:11)
+</span></span><span style="display:flex;"><span>[GCC 5.3.0]
+</span></span></code></pre></div><p>タブで補完も効きます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>bash-4.3# az a
+</span></span><span style="display:flex;"><span>account     acr         acs         ad          appservice
+</span></span></code></pre></div><p>しあわせ。</p>
 
 		</section>
 

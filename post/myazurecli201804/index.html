@@ -81,58 +81,58 @@
 <p>$AZURE_CONFIG_DIR/configファイルで構成設定ができます。$AZURE_CONFIG_DIR の既定値は、Linux/macOS の場合$HOME/.azure、Windowsは%USERPROFILE%.azure。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-configuration?view=azure-cli-latest">Azure CLI 2.0 の構成</a></p>
 <p>まず変えたいところは、コマンドの出力形式。デフォルトはJSON。わたしのお気持ちは、普段はTable形式、掘りたい時だけJSON。なのでデフォルトをtableに変えます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[core]
-output = table
-</code></pre></div><p><del>そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。</del>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[core]
+</span></span><span style="display:flex;"><span>output = table
+</span></span></code></pre></div><p><del>そしてデフォルトのリソースグループを設定します。以前は「デフォルト設定すると、気づかないところで事故るから、やらない」という主義だったのですが、Kubernetesのdefault namespaceの扱いを見て「ああ、これもありかなぁ」と改宗したところ。</del>
 軽く事故ったので、リソースグループのデフォルト設定をいまはやめています。デフォルトのご利用は計画的に。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[defaults]
-group = default-ejp-rg
-</code></pre></div><p>他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[defaults]
+</span></span><span style="display:flex;"><span>group = default-ejp-rg
+</span></span></code></pre></div><p>他にもロケーションやストレージアカウントなどを設定できます。ロケーションはリソースグループの属性を継承させたい、もしくは明示したい場合が多いので、設定していません。</p>
 <p>ということで、急ぎUbuntuの仮想マシンが欲しいぜという場合、az vm createコマンドの必須パラメーター、-gと-lを省略できるようになったので、さくっと以下のコマンドでできるようになりました。</p>
 <p>デフォルト指定したリソースグループを、任意のロケーションに作ってある前提です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az vm create -n yoursmplvm01 --image UbuntuLTS
-</code></pre></div><h2 id="エイリアス">エイリアス</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az vm create -n yoursmplvm01 --image UbuntuLTS
+</span></span></code></pre></div><h2 id="エイリアス">エイリアス</h2>
 <p>$AZURE_CONFIG_DIR/aliasにエイリアスを書けます。</p>
 <p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest">Azure CLI 2.0 のエイリアス拡張機能</a></p>
 <p>前提はAzure CLI v2.0.28以降です。以下のコマンドでエイリアス拡張を導入できます。現時点ではプレビュー扱いなのでご注意を。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az extension add --name alias
-</code></pre></div><p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az extension add --name alias
+</span></span></code></pre></div><p>ひとまずわたしは以下3カテゴリのエイリアスを登録しました。</p>
 <h3 id="頻繁に打つからできる限り短くしたい系">頻繁に打つからできる限り短くしたい系</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[ls]
-command = list
-
-[nw]
-command = network
-
-[pip]
-command = public-ip
-
-[fa]
-command = functionapp
-</code></pre></div><p>例えばデフォルトリソースグループでパブリックIP公開してるか確認したいな、と思った時は、az network public-ip listじゃなくて、こう打てます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az nw pip ls
-Name                  ResourceGroup    Location    Zones    AddressVersion    AllocationMethod      IdleTimeoutInMinutes
-ProvisioningState
---------------------  ---------------  ----------  -------  ----------------  ------------------  ----------------------
--------------------
-yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
-Succeeded
-</code></pre></div><h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[ls]
+</span></span><span style="display:flex;"><span>command = list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[nw]
+</span></span><span style="display:flex;"><span>command = network
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[pip]
+</span></span><span style="display:flex;"><span>command = public-ip
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[fa]
+</span></span><span style="display:flex;"><span>command = functionapp
+</span></span></code></pre></div><p>例えばデフォルトリソースグループでパブリックIP公開してるか確認したいな、と思った時は、az network public-ip listじゃなくて、こう打てます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az nw pip ls
+</span></span><span style="display:flex;"><span>Name                  ResourceGroup    Location    Zones    AddressVersion    AllocationMethod      IdleTimeoutInMinutes
+</span></span><span style="display:flex;"><span>ProvisioningState
+</span></span><span style="display:flex;"><span>--------------------  ---------------  ----------  -------  ----------------  ------------------  ----------------------
+</span></span><span style="display:flex;"><span>-------------------
+</span></span><span style="display:flex;"><span>yoursmplvm01PublicIP  default-ejp-rg   japaneast            IPv4              Dynamic                                  4
+</span></span><span style="display:flex;"><span>Succeeded
+</span></span></code></pre></div><h3 id="クエリー打つのがめんどくさい系">クエリー打つのがめんどくさい系</h3>
 <p>VMに紐づいてるパブリックIPを確認したいときは、こんなエイリアス。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[get-vm-pip]
-command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddresses[].ipAddress
-</code></pre></div><p>実行すると。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az get-vm-pip -n yoursmplvm01
-Result
--------------
-52.185.133.68
-</code></pre></div><h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[get-vm-pip]
+</span></span><span style="display:flex;"><span>command = vm list-ip-addresses --query [].virtualMachine.network.publicIpAddresses[].ipAddress
+</span></span></code></pre></div><p>実行すると。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az get-vm-pip -n yoursmplvm01
+</span></span><span style="display:flex;"><span>Result
+</span></span><span style="display:flex;"><span>-------------
+</span></span><span style="display:flex;"><span>52.185.133.68
+</span></span></code></pre></div><h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
 <p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[empty-rg]
-command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
-</code></pre></div><p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az empty-rg
-</code></pre></div><p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[empty-rg]
+</span></span><span style="display:flex;"><span>command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
+</span></span></code></pre></div><p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az empty-rg
+</span></span></code></pre></div><p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
 <h2 id="vs-code-プラグイン-azure-cli-tools-">VS Code プラグイン (Azure CLI Tools )</h2>
 <p>Azure CLIのVS Code向けプラグインがあります。コードアシストと編集画面からの実行が2大機能。紹介ページのGifアニメを見るのが分かりやすいです。</p>
 <p><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.azurecli">Azure CLI Tools</a></p>

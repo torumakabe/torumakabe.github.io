@@ -66,64 +66,64 @@
 <li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
 </ul>
 <p>ではhelmでNGINX Ingress Controllerを導入します。helmを使っていなければ、<a href="https://github.com/kubernetes/helm#install">入れておいてください</a>。デプロイはこれだけ。Chartは<a href="https://github.com/kubernetes/charts/tree/master/stable/nginx-ingress">ここ</a>。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ helm install stable/nginx-ingress --name my-nginx
-</code></pre></div><p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl run nginx --image nginx --port 80
-$ kubectl run apache --image httpd --port 80
-</code></pre></div><p>サービスとしてexposeします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl expose deployment nginx --type NodePort
-$ kubectl expose deployment apache --type NodePort
-</code></pre></div><p>現時点のサービスたちを確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get svc
-NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
-apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
-kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
-my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
-my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
-nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
-</code></pre></div><p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ helm install stable/nginx-ingress --name my-nginx
+</span></span></code></pre></div><p>バックエンドへのつなぎが機能するか、Webアプリを作ってテストします。NGINXとApacheを選びました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl run nginx --image nginx --port 80
+</span></span><span style="display:flex;"><span>$ kubectl run apache --image httpd --port 80
+</span></span></code></pre></div><p>サービスとしてexposeします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl expose deployment nginx --type NodePort
+</span></span><span style="display:flex;"><span>$ kubectl expose deployment apache --type NodePort
+</span></span></code></pre></div><p>現時点のサービスたちを確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get svc
+</span></span><span style="display:flex;"><span>NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                  AGE
+</span></span><span style="display:flex;"><span>apache                                   NodePort       10.0.244.167   &lt;none&gt;          80:30928/TCP                 14h
+</span></span><span style="display:flex;"><span>kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;          443/TCP                  79d
+</span></span><span style="display:flex;"><span>my-nginx-nginx-ingress-controller        LoadBalancer   10.0.91.78     13.72.108.187   80:32448/TCP,443:31991/TCP   14h
+</span></span><span style="display:flex;"><span>my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.74.104    &lt;none&gt;          80/TCP                  14h
+</span></span><span style="display:flex;"><span>nginx                                    NodePort       10.0.191.16    &lt;none&gt;          80:30752/TCP                 14h
+</span></span></code></pre></div><p>AKSの場合はパブリックIPがNGINX Ingress Controllerに割り当てられます。EXTERNAL-IPがpendingの場合は割り当て中なので、しばし待ちます。</p>
 <p>割り当てられたら、EXTERNAL-IPをAzure DNSで名前解決できるようにしましょう。Azure CLIを使います。dev.example.comの例です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
-</code></pre></div><p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
-</code></pre></div><p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  name: ingress-nginx-sample
-spec:
-  rules:
-    - host: dev.example.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: nginx
-              servicePort: 80
-          - path: /apache
-            backend:
-              serviceName: apache
-              servicePort: 80
-  tls:
-    - hosts:
-      - dev.example.com
-      secretName: example-tls
-</code></pre></div><p>あとは反映するだけ。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre></div><p>curlで確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://dev.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre></div><p>/apacheへのパスも確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://dev.example.com/apache
-&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
-</code></pre></div><p>簡単ですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n dev -a 13.72.108.187
+</span></span></code></pre></div><p>TLSが終端できるかも検証したいので、Secretを作ります。証明書とキーはLet&rsquo;s Encryptで作っておきました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create secret tls example-tls --key privkey.pem --cert fullchain.pem
+</span></span></code></pre></div><p>ではIngressを構成しましょう。以下をファイル名ingress-nginx-sample.yamlとして保存します。IngressでTLSを終端し、/へのアクセスは先ほどexposeしたNGINXのサービスへ、/apacheへのアクセスはApacheへ流します。rewrite-targetをannotaionsで指定するのを、忘れずに。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: extensions/v1beta1
+</span></span><span style="display:flex;"><span>kind: Ingress
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  annotations:
+</span></span><span style="display:flex;"><span>    kubernetes.io/ingress.class: nginx
+</span></span><span style="display:flex;"><span>    nginx.ingress.kubernetes.io/rewrite-target: /
+</span></span><span style="display:flex;"><span>  name: ingress-nginx-sample
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  rules:
+</span></span><span style="display:flex;"><span>    - host: dev.example.com
+</span></span><span style="display:flex;"><span>      http:
+</span></span><span style="display:flex;"><span>        paths:
+</span></span><span style="display:flex;"><span>          - path: /
+</span></span><span style="display:flex;"><span>            backend:
+</span></span><span style="display:flex;"><span>              serviceName: nginx
+</span></span><span style="display:flex;"><span>              servicePort: 80
+</span></span><span style="display:flex;"><span>          - path: /apache
+</span></span><span style="display:flex;"><span>            backend:
+</span></span><span style="display:flex;"><span>              serviceName: apache
+</span></span><span style="display:flex;"><span>              servicePort: 80
+</span></span><span style="display:flex;"><span>  tls:
+</span></span><span style="display:flex;"><span>    - hosts:
+</span></span><span style="display:flex;"><span>      - dev.example.com
+</span></span><span style="display:flex;"><span>      secretName: example-tls
+</span></span></code></pre></div><p>あとは反映するだけ。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f ingress-nginx-sample.yaml
+</span></span></code></pre></div><p>curlで確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl https://dev.example.com
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><p>/apacheへのパスも確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl https://dev.example.com/apache
+</span></span><span style="display:flex;"><span>&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</span></span></code></pre></div><p>簡単ですね。</p>
 
 		</section>
 

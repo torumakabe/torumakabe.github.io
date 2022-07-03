@@ -65,23 +65,23 @@
 <li>Bash on Ubuntu on Windowsを起動します</li>
 <li>build-essentialとlibssl-devを入れます</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">sudo apt-get install build-essential checkinstall
-sudo apt-get install libssl-dev
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>sudo apt-get install build-essential checkinstall
+</span></span><span style="display:flex;"><span>sudo apt-get install libssl-dev
+</span></span></code></pre></div><ul>
 <li>インストールスクリプトを流します</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
-</code></pre></div><p>バージョンアップを考慮し、インストールのつど<a href="https://github.com/creationix/nvm">公式ページ</a>を確認してください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.7/install.sh | bash
+</span></span></code></pre></div><p>バージョンアップを考慮し、インストールのつど<a href="https://github.com/creationix/nvm">公式ページ</a>を確認してください。</p>
 <p>以上。</p>
 <h2 id="nvmの使い方">NVMの使い方</h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">nvm install 6.4.0
-</code></pre></div><p>指定のバージョンをインストールします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">nvm use 6.4.0
-</code></pre></div><p>使うバージョンを指定します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>nvm install 6.4.0
+</span></span></code></pre></div><p>指定のバージョンをインストールします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>nvm use 6.4.0
+</span></span></code></pre></div><p>使うバージョンを指定します。</p>
 <p>簡単ですね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">cd /mnt/c/your_work_directory
-node ./index.js
-</code></pre></div><p>なんて感じで、書いたコードをテストしちゃってください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd /mnt/c/your_work_directory
+</span></span><span style="display:flex;"><span>node ./index.js
+</span></span></code></pre></div><p>なんて感じで、書いたコードをテストしちゃってください。</p>
 <p>なお、Visual Studio Code使いの人は<a href="https://blogs.msdn.microsoft.com/ayatokura/2016/08/06/vsc_windows_bash/">統合ターミナルをBashにしておく</a>と、さらに幸せになれます。</p>
 
 		</section>

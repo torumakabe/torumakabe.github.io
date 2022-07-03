@@ -83,56 +83,56 @@
 <p>kubectlを制限したい、証明書を配るのめんどくさい、なのでGitHubにPushされたらActionsでデプロイ、ってシナリオです。がっつり使うにはまだ検証足らずですが、ひとまずできることは確認しました。</p>
 <p>コードは <a href="https://github.com/ToruMakabe/actions-playground">ここ</a> に。</p>
 <p>ディレクトリ構造は、こうです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">.
-├── .git
-│   └── (省略)
-├── .github
-│   └── main.workflow
-├── LICENSE
-├── README.md
-├── azure-cli
-│   ├── Dockerfile
-│   └── entrypoint.sh
-└── sampleapp.yaml
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── .git
+</span></span><span style="display:flex;"><span>│   └── (省略)
+</span></span><span style="display:flex;"><span>├── .github
+</span></span><span style="display:flex;"><span>│   └── main.workflow
+</span></span><span style="display:flex;"><span>├── LICENSE
+</span></span><span style="display:flex;"><span>├── README.md
+</span></span><span style="display:flex;"><span>├── azure-cli
+</span></span><span style="display:flex;"><span>│   ├── Dockerfile
+</span></span><span style="display:flex;"><span>│   └── entrypoint.sh
+</span></span><span style="display:flex;"><span>└── sampleapp.yaml
+</span></span></code></pre></div><ul>
 <li>.github の下にWorkflowを書きます</li>
 <li>azure-cli の下に自作Actionを置きました</li>
 <li>sampleapp.yaml がkubernetesのマニフェストです</li>
 </ul>
 <h3 id="workflow">Workflow</h3>
 <p>まず、 .github/main.workflow を見てみましょう</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">workflow &#34;Deploy app to AKS&#34; {
-  on = &#34;push&#34;
-  resolves = [&#34;Deploy to AKS&#34;]
-}
-
-action &#34;Load AKS credential&#34; {
-  uses = &#34;./azure-cli/&#34;
-  secrets = [&#34;AZURE_SERVICE_APP_ID&#34;, &#34;AZURE_SERVICE_PASSWORD&#34;, &#34;AZURE_SERVICE_TENANT&#34;]
-  args = &#34;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&#34;
-  env = {
-    AZ_OUTPUT_FORMAT = &#34;table&#34;
-    AKS_RG_NAME = &#34;your-aks-rg&#34;
-    AKS_CLUSTER_NAME = &#34;youraks&#34;
-  }
-}
-
-action &#34;Deploy branch filter&#34; {
-  uses = &#34;actions/bin/filter@master&#34;
-  args = &#34;branch master&#34;
-}
-
-action &#34;Deploy to AKS&#34; {
-  needs = [&#34;Load AKS credential&#34;, &#34;Deploy branch filter&#34;]
-  uses = &#34;docker://gcr.io/cloud-builders/kubectl&#34;
-  runs = &#34;sh -l -c&#34;
-  args = [&#34;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e &#39;s/YOUR_VALUE/&#39;\&#34;$YOUR_VALUE\&#34;&#39;/&#39; -e &#39;s/YOUR_DNS_LABEL_NAME/&#39;$YOUR_DNS_LABEL_NAME&#39;/&#39; | kubectl apply -f - &#34;]
-  env = {
-    YOUR_VALUE = &#34;Ale&#34;
-    YOUR_DNS_LABEL_NAME = &#34;yournamedispvar&#34;
-  }
-}
-</code></pre></div><p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>workflow &#34;Deploy app to AKS&#34; {
+</span></span><span style="display:flex;"><span>  on = &#34;push&#34;
+</span></span><span style="display:flex;"><span>  resolves = [&#34;Deploy to AKS&#34;]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>action &#34;Load AKS credential&#34; {
+</span></span><span style="display:flex;"><span>  uses = &#34;./azure-cli/&#34;
+</span></span><span style="display:flex;"><span>  secrets = [&#34;AZURE_SERVICE_APP_ID&#34;, &#34;AZURE_SERVICE_PASSWORD&#34;, &#34;AZURE_SERVICE_TENANT&#34;]
+</span></span><span style="display:flex;"><span>  args = &#34;aks get-credentials -g $AKS_RG_NAME -n $AKS_CLUSTER_NAME -a&#34;
+</span></span><span style="display:flex;"><span>  env = {
+</span></span><span style="display:flex;"><span>    AZ_OUTPUT_FORMAT = &#34;table&#34;
+</span></span><span style="display:flex;"><span>    AKS_RG_NAME = &#34;your-aks-rg&#34;
+</span></span><span style="display:flex;"><span>    AKS_CLUSTER_NAME = &#34;youraks&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>action &#34;Deploy branch filter&#34; {
+</span></span><span style="display:flex;"><span>  uses = &#34;actions/bin/filter@master&#34;
+</span></span><span style="display:flex;"><span>  args = &#34;branch master&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>action &#34;Deploy to AKS&#34; {
+</span></span><span style="display:flex;"><span>  needs = [&#34;Load AKS credential&#34;, &#34;Deploy branch filter&#34;]
+</span></span><span style="display:flex;"><span>  uses = &#34;docker://gcr.io/cloud-builders/kubectl&#34;
+</span></span><span style="display:flex;"><span>  runs = &#34;sh -l -c&#34;
+</span></span><span style="display:flex;"><span>  args = [&#34;cat $GITHUB_WORKSPACE/sampleapp.yaml |  sed -e &#39;s/YOUR_VALUE/&#39;\&#34;$YOUR_VALUE\&#34;&#39;/&#39; -e &#39;s/YOUR_DNS_LABEL_NAME/&#39;$YOUR_DNS_LABEL_NAME&#39;/&#39; | kubectl apply -f - &#34;]
+</span></span><span style="display:flex;"><span>  env = {
+</span></span><span style="display:flex;"><span>    YOUR_VALUE = &#34;Ale&#34;
+</span></span><span style="display:flex;"><span>    YOUR_DNS_LABEL_NAME = &#34;yournamedispvar&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>シンプルですね。全体を定義するworkflowブロックと、それぞれのActionを書くactionブロックがあります。記法やオプションは<a href="https://developer.github.com/actions/creating-workflows/">ドキュメント</a>を読めばだいたい分かります。依存関係はneedsで書ける。</p>
 <p>それぞれのactionブロックでDockerコンテナーを呼び出します。usesで指定したディレクトリにDockerファイルをおいておけばビルドされ、そのactionで使えます。&ldquo;Load AKS credential&quot;ブロックがその例です。&rdquo;./azure-cli/&ldquo;にDockerfileとエントリーポイントとなるbashスクリプトを置きます。</p>
 <p>&ldquo;Deploy branch filter&quot;ブロックは<a href="https://github.com/actions">GitHub Actionsが提供している</a>コンテナーの、&ldquo;Deploy to AKS&quot;は外部Dockerレジストリーを利用した例です。詳しくは後ほど。</p>
 <p>リポジトリでPushイベントが発生すると、Workflowが実行されます。リポジトリの&quot;Actions&quot;タブで実行結果を確認できます。</p>
@@ -149,9 +149,9 @@ action &#34;Deploy to AKS&#34; {
 <p>gcr.ioからkubectlコンテナーを取得し、実行しています。マニフェストの一部を動的に変えたいことは多いので、sedでマニフェストの一部を置換する例にしました。</p>
 <p>このactionが実行されると、envの&quot;YOUR_VALUE&quot;にセットした文字列を表示する<a href="https://github.com/ToruMakabe/container-simpledemo/blob/master/displayEnvVar/main.go">Golang Webアプリ</a>のDeploymentと公開用のServiceができます。&ldquo;YOUR_DNS_LABEL_NAME&quot;にはDNSラベル名を指定でき、FQDNはAKSクラスターの配置リージョンに応じて決定されます。東日本リージョンの場合、YOUR_DNS_LABEL_NAME.japaneast.cloudapp.azure.com となります。</p>
 <p>アプリのパスは /dispvar です。curlしてみると。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
-Hello. You set &#34;Ale&#34;
-</code></pre></div><h2 id="まとめ">まとめ</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl http://yournamedispvar.japaneast.cloudapp.azure.com/dispvar
+</span></span><span style="display:flex;"><span>Hello. You set &#34;Ale&#34;
+</span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>Dockerに慣れていれば便利に使えるかな、という印象です。Terraformのfmt/validate/plan用Actionなども<a href="https://www.terraform.io/docs/github-actions/index.html">公開されています</a>。がっつりパイプラインを作らないとしても、コードのフォーマットや構文チェックに良さそうです。</p>
 
 		</section>

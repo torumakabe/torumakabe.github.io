@@ -93,71 +93,71 @@
 <p>もしWindowsでうまく動かない時は、Hyper-Vが有効になっていないか確認しましょう。Virtualboxと共存できません。</p>
 <h2 id="サンプル解説">サンプル解説</h2>
 <p>OSSなAzurerである、わたしのVagrantfileです。日々環境に合わせて変えてますが、以下は現時点でのスナップショット。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback"># -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
-VAGRANTFILE_API_VERSION = &#34;2&#34;
-
-$bootstrap=&lt;&lt;SCRIPT
-
-#Common tools
-sudo apt-get update
-sudo apt-get -y install wget unzip jq
-
-#Docker Engine
-sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install linux-image-extra-$(uname -r)
-sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-sudo sh -c &#34;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &gt; /etc/apt/sources.list.d/docker.list&#34;
-sudo apt-get update
-sudo apt-get -y purge lxc-docker
-sudo apt-cache policy docker-engine
-sudo apt-get -y install docker-engine=1.11.1-0~trusty
-sudo gpasswd -a vagrant docker
-sudo service docker restart
-
-#Docker Machine
-sudo sh -c &#34;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &gt;/usr/local/bin/docker-machine &amp;&amp; chmod +x /usr/local/bin/docker-machine&#34;
-
-#Azure CLI
-echo &#34;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&#34; &gt;&gt; $HOME/.bashrc
-
-#Terraform
-echo &#34;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&#34; &gt;&gt; $HOME/.bashrc
-
-#Packer
-echo &#34;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&#34; &gt;&gt; $HOME/.bashrc
-
-#nodebrew
-curl -L git.io/nodebrew | perl - setup
-echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &gt;&gt; $HOME/.bashrc
-$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
-$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
-
-#Python3
-wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
-
-SCRIPT
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # Every Vagrant virtual environment requires a box to build off of.
-
-  config.vm.box = &#34;ubuntu/trusty64&#34;
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-
-  config.vm.network &#34;private_network&#34;, ip: &#34;192.168.33.10&#34;
-
-  config.vm.provider &#34;virtualbox&#34; do |vb|
-     vb.customize [&#34;modifyvm&#34;, :id, &#34;--memory&#34;, &#34;2048&#34;]
-  end
-
-  config.vm.provision :shell, inline: $bootstrap, privileged: false
-
-end
-</code></pre></div><p>$bootstrap=&laquo;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># -*- mode: ruby -*-
+</span></span><span style="display:flex;"><span># vi: set ft=ruby :
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Vagrantfile API/syntax version. Don&#39;t touch unless you know what you&#39;re doing!
+</span></span><span style="display:flex;"><span>VAGRANTFILE_API_VERSION = &#34;2&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$bootstrap=&lt;&lt;SCRIPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Common tools
+</span></span><span style="display:flex;"><span>sudo apt-get update
+</span></span><span style="display:flex;"><span>sudo apt-get -y install wget unzip jq
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Docker Engine
+</span></span><span style="display:flex;"><span>sudo apt-get -y install apt-transport-https ca-certificates
+</span></span><span style="display:flex;"><span>sudo apt-get -y install linux-image-extra-$(uname -r)
+</span></span><span style="display:flex;"><span>sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+</span></span><span style="display:flex;"><span>sudo sh -c &#34;echo deb https://apt.dockerproject.org/repo ubuntu-trusty main &gt; /etc/apt/sources.list.d/docker.list&#34;
+</span></span><span style="display:flex;"><span>sudo apt-get update
+</span></span><span style="display:flex;"><span>sudo apt-get -y purge lxc-docker
+</span></span><span style="display:flex;"><span>sudo apt-cache policy docker-engine
+</span></span><span style="display:flex;"><span>sudo apt-get -y install docker-engine=1.11.1-0~trusty
+</span></span><span style="display:flex;"><span>sudo gpasswd -a vagrant docker
+</span></span><span style="display:flex;"><span>sudo service docker restart
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Docker Machine
+</span></span><span style="display:flex;"><span>sudo sh -c &#34;curl -L https://github.com/docker/machine/releases/download/v0.7.0/docker-machine-`uname -s`-`uname -m` &gt;/usr/local/bin/docker-machine &amp;&amp; chmod +x /usr/local/bin/docker-machine&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Azure CLI
+</span></span><span style="display:flex;"><span>echo &#34;alias azure=&#39;docker run -it --rm -v \\\$HOME/.azure:/root/.azure -v \\\$PWD:/data -w /data microsoft/azure-cli:latest azure&#39;&#34; &gt;&gt; $HOME/.bashrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Terraform
+</span></span><span style="display:flex;"><span>echo &#34;alias terraform=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/terraform:0.6.14&#39;&#34; &gt;&gt; $HOME/.bashrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Packer
+</span></span><span style="display:flex;"><span>echo &#34;alias packer=&#39;docker run -it --rm -v \\\$PWD:/data -w /data hashicorp/packer:latest&#39;&#34; &gt;&gt; $HOME/.bashrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#nodebrew
+</span></span><span style="display:flex;"><span>curl -L git.io/nodebrew | perl - setup
+</span></span><span style="display:flex;"><span>echo &#39;export PATH=$HOME/.nodebrew/current/bin:$PATH&#39; &gt;&gt; $HOME/.bashrc
+</span></span><span style="display:flex;"><span>$HOME/.nodebrew/current/bin/nodebrew install-binary 5.9.1
+</span></span><span style="display:flex;"><span>$HOME/.nodebrew/current/bin/nodebrew use 5.9.1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Python3
+</span></span><span style="display:flex;"><span>wget -qO- https://bootstrap.pypa.io/get-pip.py | sudo -H python3.4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SCRIPT
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+</span></span><span style="display:flex;"><span>  # Every Vagrant virtual environment requires a box to build off of.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  config.vm.box = &#34;ubuntu/trusty64&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  # Create a private network, which allows host-only access to the machine
+</span></span><span style="display:flex;"><span>  # using a specific IP.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  config.vm.network &#34;private_network&#34;, ip: &#34;192.168.33.10&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  config.vm.provider &#34;virtualbox&#34; do |vb|
+</span></span><span style="display:flex;"><span>     vb.customize [&#34;modifyvm&#34;, :id, &#34;--memory&#34;, &#34;2048&#34;]
+</span></span><span style="display:flex;"><span>  end
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  config.vm.provision :shell, inline: $bootstrap, privileged: false
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>end
+</span></span></code></pre></div><p>$bootstrap=&laquo;SCRIPT から SCRIPT が、プロビジョニングシェルです。初回のvagrant up時とvagrant provision時に実行されます。</p>
 <h3 id="common-tools">Common tools</h3>
 <p>一般的なツールをaptでインストールします。wgetとかjqとか。</p>
 <h3 id="docker-engine--machine">Docker Engine &amp; Machine</h3>
@@ -179,14 +179,14 @@ end
 <p>さて、ここまでがプロビジョニング時の処理です。以降の&quot;Vagrant.configure～&quot;は仮想マシンの定義で、難しくありません。ubuntu/trusty64(14.04)をboxイメージとし、IPやメモリを指定し、先ほど定義したプロビジョニング処理を指しているだけです。</p>
 <h2 id="どれだけ楽か">どれだけ楽か</h2>
 <p>では、環境を作ってみましょう。Vagrantfileがあるフォルダで</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">vagrant up
-</code></pre></div><p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>vagrant up
+</span></span></code></pre></div><p>仮想マシンが作成されます。初回はプロビジョニング処理も走ります。</p>
 <p>できましたか。できたら、</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">vagrant putty
-</code></pre></div><p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>vagrant putty
+</span></span></code></pre></div><p>はい。Puttyが起動し、ID/Passを入れなくてもsshログインします。破壊力抜群。わたしはこの魅力だけでTeraterm(Terraformではない)からPuttyに乗り換えました。ちなみにMacでは、vagrant sshで済みます。</p>
 <p>あとはプロビジョニングされたLinuxを使って楽しんでください。そして、必要なくなったら or 作り直したくなったら</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">vagrant destroy
-</code></pre></div><p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>vagrant destroy
+</span></span></code></pre></div><p>綺麗さっぱりです。仮想マシンごと消します。消さずにまた使う時は、vagrant haltを。</p>
 <p>なお、vagrant upしたフォルダにあるファイルは、Virtualboxの共有フォルダ機能で仮想マシンと共有されます。shareとかいう名のフォルダを作って、必要なファイルを放り込んでおきましょう。その場合、仮想マシンのUbuntuからは/vagrant/shareと見えます。双方向で同期されます。</p>
 <p>わたしは長いコードを書くときは、Windows/Mac側のIDEなりエディタを使って、実行は仮想マシンのLinux側、という流れで作業しています。</p>
 <p>ちなみに、改行コードの違いやパーミッションには気を付けてください。改行コードはLFにする癖をつけておくと幸せになれます。パーミッションは全開、かつ共有領域では変えられないので、問題になるときは仮想マシン側で/vagrant外にコピーして使ってください。パーミッション全開だと怒られる認証鍵など置かないよう、注意。</p>

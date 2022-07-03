@@ -100,85 +100,85 @@
 <li>サーバ数は1台とする - jobSpecification/poolInfo/autoPoolSpecification/pool/targetDedicated</li>
 <li>サーバプール作成時にstarttask.shを呼び出す - jobSpecification/poolInfo/autoPoolSpecification/pool/startTask</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">  {
-  &#34;odata.metadata&#34;:&#34;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&#34;,
-  &#34;id&#34;:&#34;myjobschedule1&#34;,
-  &#34;schedule&#34;: {
-    &#34;doNotRunUntil&#34;:&#34;2016-04-29T05:30:00.000Z&#34;,
-    &#34;recurrenceInterval&#34;:&#34;PT4H&#34;
-  },
-  &#34;jobSpecification&#34;: {
-    &#34;priority&#34;:100,
-    &#34;constraints&#34;: {
-      &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
-      &#34;maxTaskRetryCount&#34;:-1
-    },
-    &#34;jobManagerTask&#34;: {
-      &#34;id&#34;:&#34;mytask1&#34;,
-      &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&#34;,
-      &#34;resourceFiles&#34;: [ {
-        &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
-        &#34;filePath&#34;:&#34;task.sh&#34;
-      }], 
-      &#34;environmentSettings&#34;: [ {
-        &#34;name&#34;:&#34;VAR1&#34;,
-        &#34;value&#34;:&#34;hello&#34;
-      } ],
-      &#34;constraints&#34;: {
-        &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
-        &#34;maxTaskRetryCount&#34;:0,
-        &#34;retentionTime&#34;:&#34;PT1H&#34;
-      },
-      &#34;killJobOnCompletion&#34;:false,
-      &#34;runElevated&#34;:true,
-      &#34;runExclusive&#34;:true
-      },
-      &#34;poolInfo&#34;: {
-        &#34;autoPoolSpecification&#34;: {
-          &#34;autoPoolIdPrefix&#34;:&#34;mypool&#34;,
-          &#34;poolLifetimeOption&#34;:&#34;job&#34;,
-          &#34;pool&#34;: {
-            &#34;vmSize&#34;:&#34;STANDARD_D1&#34;,
-            &#34;virtualMachineConfiguration&#34;: {
-              &#34;imageReference&#34;: {
-                &#34;publisher&#34;:&#34;Canonical&#34;,
-                &#34;offer&#34;:&#34;UbuntuServer&#34;,
-                &#34;sku&#34;:&#34;14.04.4-LTS&#34;,
-                &#34;version&#34;:&#34;latest&#34;
-              },
-              &#34;nodeAgentSKUId&#34;:&#34;batch.node.ubuntu 14.04&#34;
-            },
-            &#34;resizeTimeout&#34;:&#34;PT15M&#34;,
-            &#34;targetDedicated&#34;:1,
-            &#34;maxTasksPerNode&#34;:1,
-            &#34;taskSchedulingPolicy&#34;: {
-              &#34;nodeFillType&#34;:&#34;Spread&#34;
-            },
-            &#34;enableAutoScale&#34;:false,
-            &#34;enableInterNodeCommunication&#34;:false,
-            &#34;startTask&#34;: {
-              &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&#34;,
-              &#34;resourceFiles&#34;: [ {
-                &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
-                &#34;filePath&#34;:&#34;starttask.sh&#34;
-              } ],
-              &#34;environmentSettings&#34;: [ {
-                &#34;name&#34;:&#34;VAR2&#34;,
-                &#34;value&#34;:&#34;Chao&#34;
-              } ],
-              &#34;runElevated&#34;:true,
-              &#34;waitForSuccess&#34;:true
-            },
-            &#34;metadata&#34;: [ {
-              &#34;name&#34;:&#34;myproperty&#34;,
-              &#34;value&#34;:&#34;myvalue&#34;
-            } ]
-          }
-        }
-      }
-    }
-  }
-</code></pre></div><p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>  &#34;odata.metadata&#34;:&#34;https://myaccount.myregion.batch.azure.com/$metadata#jobschedules/@Element&#34;,
+</span></span><span style="display:flex;"><span>  &#34;id&#34;:&#34;myjobschedule1&#34;,
+</span></span><span style="display:flex;"><span>  &#34;schedule&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;doNotRunUntil&#34;:&#34;2016-04-29T05:30:00.000Z&#34;,
+</span></span><span style="display:flex;"><span>    &#34;recurrenceInterval&#34;:&#34;PT4H&#34;
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;jobSpecification&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;priority&#34;:100,
+</span></span><span style="display:flex;"><span>    &#34;constraints&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
+</span></span><span style="display:flex;"><span>      &#34;maxTaskRetryCount&#34;:-1
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    &#34;jobManagerTask&#34;: {
+</span></span><span style="display:flex;"><span>      &#34;id&#34;:&#34;mytask1&#34;,
+</span></span><span style="display:flex;"><span>      &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./task.sh&#39;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;resourceFiles&#34;: [ {
+</span></span><span style="display:flex;"><span>        &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
+</span></span><span style="display:flex;"><span>        &#34;filePath&#34;:&#34;task.sh&#34;
+</span></span><span style="display:flex;"><span>      }], 
+</span></span><span style="display:flex;"><span>      &#34;environmentSettings&#34;: [ {
+</span></span><span style="display:flex;"><span>        &#34;name&#34;:&#34;VAR1&#34;,
+</span></span><span style="display:flex;"><span>        &#34;value&#34;:&#34;hello&#34;
+</span></span><span style="display:flex;"><span>      } ],
+</span></span><span style="display:flex;"><span>      &#34;constraints&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;maxWallClockTime&#34;:&#34;PT1H&#34;,
+</span></span><span style="display:flex;"><span>        &#34;maxTaskRetryCount&#34;:0,
+</span></span><span style="display:flex;"><span>        &#34;retentionTime&#34;:&#34;PT1H&#34;
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;killJobOnCompletion&#34;:false,
+</span></span><span style="display:flex;"><span>      &#34;runElevated&#34;:true,
+</span></span><span style="display:flex;"><span>      &#34;runExclusive&#34;:true
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      &#34;poolInfo&#34;: {
+</span></span><span style="display:flex;"><span>        &#34;autoPoolSpecification&#34;: {
+</span></span><span style="display:flex;"><span>          &#34;autoPoolIdPrefix&#34;:&#34;mypool&#34;,
+</span></span><span style="display:flex;"><span>          &#34;poolLifetimeOption&#34;:&#34;job&#34;,
+</span></span><span style="display:flex;"><span>          &#34;pool&#34;: {
+</span></span><span style="display:flex;"><span>            &#34;vmSize&#34;:&#34;STANDARD_D1&#34;,
+</span></span><span style="display:flex;"><span>            &#34;virtualMachineConfiguration&#34;: {
+</span></span><span style="display:flex;"><span>              &#34;imageReference&#34;: {
+</span></span><span style="display:flex;"><span>                &#34;publisher&#34;:&#34;Canonical&#34;,
+</span></span><span style="display:flex;"><span>                &#34;offer&#34;:&#34;UbuntuServer&#34;,
+</span></span><span style="display:flex;"><span>                &#34;sku&#34;:&#34;14.04.4-LTS&#34;,
+</span></span><span style="display:flex;"><span>                &#34;version&#34;:&#34;latest&#34;
+</span></span><span style="display:flex;"><span>              },
+</span></span><span style="display:flex;"><span>              &#34;nodeAgentSKUId&#34;:&#34;batch.node.ubuntu 14.04&#34;
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;resizeTimeout&#34;:&#34;PT15M&#34;,
+</span></span><span style="display:flex;"><span>            &#34;targetDedicated&#34;:1,
+</span></span><span style="display:flex;"><span>            &#34;maxTasksPerNode&#34;:1,
+</span></span><span style="display:flex;"><span>            &#34;taskSchedulingPolicy&#34;: {
+</span></span><span style="display:flex;"><span>              &#34;nodeFillType&#34;:&#34;Spread&#34;
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;enableAutoScale&#34;:false,
+</span></span><span style="display:flex;"><span>            &#34;enableInterNodeCommunication&#34;:false,
+</span></span><span style="display:flex;"><span>            &#34;startTask&#34;: {
+</span></span><span style="display:flex;"><span>              &#34;commandLine&#34;:&#34;/bin/bash -c &#39;export LC_ALL=en_US.UTF-8; ./starttask.sh&#39;&#34;,
+</span></span><span style="display:flex;"><span>              &#34;resourceFiles&#34;: [ {
+</span></span><span style="display:flex;"><span>                &#34;blobSource&#34;:&#34;yourbloburi&amp;sas&#34;,
+</span></span><span style="display:flex;"><span>                &#34;filePath&#34;:&#34;starttask.sh&#34;
+</span></span><span style="display:flex;"><span>              } ],
+</span></span><span style="display:flex;"><span>              &#34;environmentSettings&#34;: [ {
+</span></span><span style="display:flex;"><span>                &#34;name&#34;:&#34;VAR2&#34;,
+</span></span><span style="display:flex;"><span>                &#34;value&#34;:&#34;Chao&#34;
+</span></span><span style="display:flex;"><span>              } ],
+</span></span><span style="display:flex;"><span>              &#34;runElevated&#34;:true,
+</span></span><span style="display:flex;"><span>              &#34;waitForSuccess&#34;:true
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            &#34;metadata&#34;: [ {
+</span></span><span style="display:flex;"><span>              &#34;name&#34;:&#34;myproperty&#34;,
+</span></span><span style="display:flex;"><span>              &#34;value&#34;:&#34;myvalue&#34;
+</span></span><span style="display:flex;"><span>            } ]
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>そろそろ人類はJSONに変わるやり口を発明すべきですが、XMLよりはいいですね。</p>
 <p>それはさておき、面白そうなパラメータたち。並列バッチやジョブリリース時のタスクなど、今回使っていないものもまだまだあります。応用版はまたの機会に。</p>
 <p>ではスケジュールジョブをAzure BatchにCLIで送り込みます。</p>
 <pre><code>azure batch job-schedule create -f ./create_jobsched.json -u https://yourendpoint.location.batch.azure.com -a yourbatchaccount -k yourbatchaccountkey

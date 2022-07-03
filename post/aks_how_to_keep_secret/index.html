@@ -79,89 +79,89 @@
 <p>よって以降で紹介する方法は、アプリケーションにシークレットをハードコーディングせず、何かしらの手段で外部から渡します。</p>
 <h2 id="マニフェストに書く">マニフェストに書く</h2>
 <p>Kubernetesではアプリケーションの実行時に、環境変数を渡すことができます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-[snip]
-    spec:
-      containers:
-      - name: getsecret
-        image: torumakabe/getsecret:from-env
-        env:
-        - name: SECRET_JOKE
-          value: &#34;Selfish sell fish.&#34;
-</code></pre></div><p>これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: getsecret
+</span></span><span style="display:flex;"><span>        image: torumakabe/getsecret:from-env
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: SECRET_JOKE
+</span></span><span style="display:flex;"><span>          value: &#34;Selfish sell fish.&#34;
+</span></span></code></pre></div><p>これはコンテナーの実行(Deployment作成)時に、環境変数 SECRET_JOKE を渡すマニフェストの例です。ジョークも人によっては立派なシークレットです。値(value)はマニフェストに直書きしています。</p>
 <p>この環境変数をアプリケーションで読み込みます。Goでジョークを披露するWebアプリを書くと、こんな感じです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;io&#34;</span>
-	<span style="color:#e6db74">&#34;net/http&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">secret</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;SECRET_JOKE&#34;</span>)
-
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, <span style="color:#a6e22e">secret</span>))
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getSecret</span>)
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
-}
-</code></pre></div><p>Goの場合は os.Getenv で環境変数を取得します。これで、とっておきのジョークを、チームメンバーにデプロイ時まで知られることなくアプリを開発できます。また、ジョークの反応がいまいちだった場合や、飽きられた場合はマニフェストを変更して再デプロイすれば済みます。アプリケーションを変更、再ビルドする必要はありません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;io&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">secret</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;SECRET_JOKE&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, <span style="color:#a6e22e">secret</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getSecret</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Goの場合は os.Getenv で環境変数を取得します。これで、とっておきのジョークを、チームメンバーにデプロイ時まで知られることなくアプリを開発できます。また、ジョークの反応がいまいちだった場合や、飽きられた場合はマニフェストを変更して再デプロイすれば済みます。アプリケーションを変更、再ビルドする必要はありません。</p>
 <p>ですが、マニフェストもアプリケーションのソースコードと同様に共有するでしょうから、直書きされたシークレットがチームメンバーの目に触れる可能性は、あります。</p>
 <p>マニフェストを置くリポジトリのアクセス制御は、マニフェストを誰が作り、デプロイするかによります。深いテーマなので踏み込みませんが、少なくともマニフェストにシークレットの値を平文で書くなら、マニフェストにアクセスできる人を限定すべきでしょう。これは開発、運用の大きな制約条件になり得ます。</p>
 <p>なお、シークレットだけを暗号化してソースコードを管理し、デプロイ時に復号化する、という方法もあります。Helmのラッパーで、Helmの実行時に暗号化されたシークレットファイルを復号化する<a href="https://github.com/futuresimple/helm-secrets">helm-secrets</a>がその例です。<a href="https://github.com/mozilla/sops">SOPS</a>を活用しています。</p>
 <p>ただしKubernetesには復号化されて単なる環境変数として送られますので、Podの参照権限があれば値は読めてしまいます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get po getsecret-hoge -o yaml
-[snip]
-spec:
-  containers:
-  - env:
-    - name: SECRET_JOKE
-      value: Selfish sell fish.
-</code></pre></div><p>なので次からは、マニフェストに直接書かずに済む方法を紹介します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get po getsecret-hoge -o yaml
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - env:
+</span></span><span style="display:flex;"><span>    - name: SECRET_JOKE
+</span></span><span style="display:flex;"><span>      value: Selfish sell fish.
+</span></span></code></pre></div><p>なので次からは、マニフェストに直接書かずに済む方法を紹介します。</p>
 <h2 id="kubernetesのsecretにする">KubernetesのSecretにする</h2>
 <p>KubernetesのリソースにSecretという、ズバリな名前のリソースがあります。Secretは平文ではなくBase64で符号化のうえ、etcd内に保管されます。そしてKubernetesとetcdのバージョンと設定によっては、etcdは暗号化できます。AKSのetcdは <a href="https://github.com/Azure/kubernetes-kms">&ldquo;AKS does encrypt secrets-at-rest&rdquo; つまり暗号化されています</a>。</p>
 <p>Secretはそれを受け取るPodの実行サーバー上では永続化されず、tmpfs(揮発ファイルシステム)に書き込まれます。</p>
 <p>Secretは以下のようなマニフェストで作成します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: v1
-kind: Secret
-metadata:
-  name: joke
-type: Opaque
-data:
-  joke: U2VsZmlzaCBzZWxsIGZpc2gu
-</code></pre></div><p>値はBase64符号化した結果を書きます。当然ながらBase64デコードできるので、マニフェストの管理はご注意を。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Secret
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: joke
+</span></span><span style="display:flex;"><span>type: Opaque
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  joke: U2VsZmlzaCBzZWxsIGZpc2gu
+</span></span></code></pre></div><p>値はBase64符号化した結果を書きます。当然ながらBase64デコードできるので、マニフェストの管理はご注意を。</p>
 <p>このSecretをアプリケーションに環境変数として渡すマニフェストの書き方は、先ほどの環境変数を直接書く方法とあまり変わりません。envのvalueFrom以下でSecretを指定します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-[snip]
-    spec:
-      containers:
-      - name: getsecret
-        image: torumakabe/getsecret:from-env
-        env:
-        - name: SECRET_JOKE
-          valueFrom:
-            secretKeyRef:
-              name: joke
-              key: joke
-</code></pre></div><p>これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、Secretは符号化されていますが、アプリケーションはデコードされた結果を受け取ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: getsecret
+</span></span><span style="display:flex;"><span>        image: torumakabe/getsecret:from-env
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: SECRET_JOKE
+</span></span><span style="display:flex;"><span>          valueFrom:
+</span></span><span style="display:flex;"><span>            secretKeyRef:
+</span></span><span style="display:flex;"><span>              name: joke
+</span></span><span style="display:flex;"><span>              key: joke
+</span></span></code></pre></div><p>これでOKです。アプリケーションは環境変数を読むのに変わりがないため、そのままで構いません。なお、Secretは符号化されていますが、アプリケーションはデコードされた結果を受け取ります。</p>
 <p>もちろんPodの参照権限だけでは、中身をKubernetes API経由で見ることはできません。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get po getsecret-fuga -o yaml
-[snip]
-spec:
-  containers:
-  - env:
-    - name: SECRET_JOKE
-      valueFrom:
-        secretKeyRef:
-          key: joke
-          name: joke
-</code></pre></div><p>また、マニフェストに値を書かないため、シークレットの変更時、影響を受けるマニフェストを変更する必要がないのもメリットです。Secretを更新して<a href="https://qiita.com/sonots/items/8ddda98ffed3763d96fe">Podをリスタート</a>すれば済みます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get po getsecret-fuga -o yaml
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  containers:
+</span></span><span style="display:flex;"><span>  - env:
+</span></span><span style="display:flex;"><span>    - name: SECRET_JOKE
+</span></span><span style="display:flex;"><span>      valueFrom:
+</span></span><span style="display:flex;"><span>        secretKeyRef:
+</span></span><span style="display:flex;"><span>          key: joke
+</span></span><span style="display:flex;"><span>          name: joke
+</span></span></code></pre></div><p>また、マニフェストに値を書かないため、シークレットの変更時、影響を受けるマニフェストを変更する必要がないのもメリットです。Secretを更新して<a href="https://qiita.com/sonots/items/8ddda98ffed3763d96fe">Podをリスタート</a>すれば済みます。</p>
 <p>さて、これでかなり楽になったのですが、まだ改善の余地があります。こんな悩みが残ります。</p>
 <ul>
 <li>シークレットの管理者がKubernetesの管理者とは別で、Kubernetesの操作権限を渡したくない
@@ -176,48 +176,48 @@ spec:
 <h2 id="key-vaultで管理しその認証情報をkubernetesのsecretにする">Key Vaultで管理し、その認証情報をKubernetesのSecretにする</h2>
 <p>Key VaultはシークレットをHSMで保護し、かつきめ細かいアクセスポリシー制御ができる、シークレット管理に特化したサービスです。暗号化キーや証明書の管理もできます。ここへKuberentesで動くアプリケーションのシークレットを入れてみましょう。</p>
 <p>まずはアプリケーションのサンプルです。先ほどのGoで書いたWebアプリを、Azure SDK for Goを使って、Key Vaultからシークレットが読めるように書き換えます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;context&#34;</span>
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;io&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;net/http&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
-
-	<span style="color:#e6db74">&#34;github.com/Azure/azure-sdk-for-go/services/keyvault/auth&#34;</span>
-	<span style="color:#e6db74">&#34;github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getKeyvaultSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">authorizer</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">NewAuthorizerFromEnvironment</span>()
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to get your authorizer object: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-		<span style="color:#66d9ef">return</span>
-	}
-
-	<span style="color:#a6e22e">keyClient</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">keyvault</span>.<span style="color:#a6e22e">New</span>()
-	<span style="color:#a6e22e">keyClient</span>.<span style="color:#a6e22e">Authorizer</span> = <span style="color:#a6e22e">authorizer</span>
-
-	<span style="color:#a6e22e">keyvaultName</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_NAME&#34;</span>)
-	<span style="color:#a6e22e">keyvaultSecretName</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_SECRET_NAME&#34;</span>)
-	<span style="color:#a6e22e">keyvaultSecretVersion</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_SECRET_VERSION&#34;</span>)
-
-	<span style="color:#a6e22e">secret</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">keyClient</span>.<span style="color:#a6e22e">GetSecret</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;https://%s.vault.azure.net&#34;</span>, <span style="color:#a6e22e">keyvaultName</span>), <span style="color:#a6e22e">keyvaultSecretName</span>, <span style="color:#a6e22e">keyvaultSecretVersion</span>)
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to get your Keyvault secret: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-		<span style="color:#66d9ef">return</span>
-	}
-
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">secret</span>.<span style="color:#a6e22e">Value</span>))
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getKeyvaultSecret</span>)
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
-}
-</code></pre></div><p>ポイントは2つです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;io&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;github.com/Azure/azure-sdk-for-go/services/keyvault/auth&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getKeyvaultSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">authorizer</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">auth</span>.<span style="color:#a6e22e">NewAuthorizerFromEnvironment</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to get your authorizer object: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyClient</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">keyvault</span>.<span style="color:#a6e22e">New</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyClient</span>.<span style="color:#a6e22e">Authorizer</span> = <span style="color:#a6e22e">authorizer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyvaultName</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_NAME&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyvaultSecretName</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_SECRET_NAME&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyvaultSecretVersion</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Getenv</span>(<span style="color:#e6db74">&#34;AZURE_KEYVAULT_SECRET_VERSION&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">secret</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">keyClient</span>.<span style="color:#a6e22e">GetSecret</span>(<span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>(), <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;https://%s.vault.azure.net&#34;</span>, <span style="color:#a6e22e">keyvaultName</span>), <span style="color:#a6e22e">keyvaultSecretName</span>, <span style="color:#a6e22e">keyvaultSecretVersion</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to get your Keyvault secret: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">secret</span>.<span style="color:#a6e22e">Value</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getKeyvaultSecret</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ポイントは2つです。</p>
 <h3 id="key-vaultを読めるように認証する">Key Vaultを読めるように認証する</h3>
 <p><a href="https://github.com/Azure/azure-sdk-for-go/blob/master/services/keyvault/auth/auth.go">auth.NewAuthorizerFromEnvironment()</a> は環境変数を確認し、以下の順番で認証を試みます。</p>
 <ul>
@@ -232,36 +232,36 @@ spec:
 <p>これは見ての通りですね。シークレットが格納されているKey Vaultを指定するため、 AZURE_KEYVAULT_NAME などを環境変数から読み込みます。</p>
 <p>他の言語でどう書くかは、それぞれSDKのドキュメントを参考にしてください。</p>
 <p>では、マニフェストを見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-[snip]
-    spec:
-      containers:
-      - name: getsecret
-        image: torumakabe/getsecret:keyvault
-        env:
-        - name: AZURE_KEYVAULT_NAME
-          value: your-keyvault-name
-        - name: AZURE_KEYVAULT_SECRET_NAME
-          value: joke
-#       - name: AZURE_KEYVAULT_SECRET_VERSION
-#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
-        - name: AZURE_TENANT_ID
-          valueFrom:
-            secretKeyRef:
-              name: joke-sp
-              key: tenantId
-        - name: AZURE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: joke-sp
-              key: clientId
-        - name: AZURE_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: joke-sp
-              key: clientSecret
-</code></pre></div><p>クライアント資格情報であるサービスプリンシパルは直接書かず、KubernetesのSecretにして環境変数に渡しましょう。なお、サービスプリンシパルには対象のKey Vaultを参照(Get)のみできるKey Vaultポリシーを設定し、かつRBACもスコープを対象のKey Veultに限定したReaderにしておくと、リスクを限定できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: getsecret
+</span></span><span style="display:flex;"><span>        image: torumakabe/getsecret:keyvault
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: AZURE_KEYVAULT_NAME
+</span></span><span style="display:flex;"><span>          value: your-keyvault-name
+</span></span><span style="display:flex;"><span>        - name: AZURE_KEYVAULT_SECRET_NAME
+</span></span><span style="display:flex;"><span>          value: joke
+</span></span><span style="display:flex;"><span>#       - name: AZURE_KEYVAULT_SECRET_VERSION
+</span></span><span style="display:flex;"><span>#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
+</span></span><span style="display:flex;"><span>        - name: AZURE_TENANT_ID
+</span></span><span style="display:flex;"><span>          valueFrom:
+</span></span><span style="display:flex;"><span>            secretKeyRef:
+</span></span><span style="display:flex;"><span>              name: joke-sp
+</span></span><span style="display:flex;"><span>              key: tenantId
+</span></span><span style="display:flex;"><span>        - name: AZURE_CLIENT_ID
+</span></span><span style="display:flex;"><span>          valueFrom:
+</span></span><span style="display:flex;"><span>            secretKeyRef:
+</span></span><span style="display:flex;"><span>              name: joke-sp
+</span></span><span style="display:flex;"><span>              key: clientId
+</span></span><span style="display:flex;"><span>        - name: AZURE_CLIENT_SECRET
+</span></span><span style="display:flex;"><span>          valueFrom:
+</span></span><span style="display:flex;"><span>            secretKeyRef:
+</span></span><span style="display:flex;"><span>              name: joke-sp
+</span></span><span style="display:flex;"><span>              key: clientSecret
+</span></span></code></pre></div><p>クライアント資格情報であるサービスプリンシパルは直接書かず、KubernetesのSecretにして環境変数に渡しましょう。なお、サービスプリンシパルには対象のKey Vaultを参照(Get)のみできるKey Vaultポリシーを設定し、かつRBACもスコープを対象のKey Veultに限定したReaderにしておくと、リスクを限定できます。</p>
 <p>これでKey Vaultのjokeというシークレットにジョークを入れておけば、読み込めます。</p>
 <p>さて、Key Vaultにシークレットを入れてグッと堅くなったわけですが、もう少し追求してみましょう。そう、サービスプリンシパルのクライアントIDとクライアントシークレットをSecretに入れる面倒さが残っています。ここを無くせないものか。</p>
 <h2 id="key-vaultで管理しpodにそのアクセス権を付与する-pod-identity">Key Vaultで管理し、Podにそのアクセス権を付与する (Pod Identity)</h2>
@@ -272,31 +272,31 @@ kind: Deployment
 </blockquote>
 <p>でも、これだけだとピンとこないと思います。導入して何が嬉しいかを理解してから、再度読んでみて下さい。理解が深まると思います。</p>
 <p>Pod Identitiyを導入した環境では、マニフェストはこうなります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: getsecret
-    aadpodidbinding: joke
-[snip]
-  template:
-    metadata:
-      labels:
-        app: getsecret
-        aadpodidbinding: joke
-[snip]
-    spec:
-      containers:
-      - name: getsecret
-        image: torumakabe/getsecret:keyvault
-        env:
-        - name: AZURE_KEYVAULT_NAME
-          value: your-keyvault-name
-        - name: AZURE_KEYVAULT_SECRET_NAME
-          value: joke
-#       - name: AZURE_KEYVAULT_SECRET_VERSION
-#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
-</code></pre></div><p>識別子 aadpodidbinding を指定する必要はありますが、Key Vaultの資格情報をマニフェストへ書く必要がありません。素晴らしい。Goの auth.NewAuthorizerFromEnvironment() は他の認証に使われる環境変数が全てセットされていない時、Managed Identity認証を選択します。そしてPod Identityの基盤であるNMIを通じ、Azure ADから認証トークンを得るわけです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: getsecret
+</span></span><span style="display:flex;"><span>    aadpodidbinding: joke
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: getsecret
+</span></span><span style="display:flex;"><span>        aadpodidbinding: joke
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: getsecret
+</span></span><span style="display:flex;"><span>        image: torumakabe/getsecret:keyvault
+</span></span><span style="display:flex;"><span>        env:
+</span></span><span style="display:flex;"><span>        - name: AZURE_KEYVAULT_NAME
+</span></span><span style="display:flex;"><span>          value: your-keyvault-name
+</span></span><span style="display:flex;"><span>        - name: AZURE_KEYVAULT_SECRET_NAME
+</span></span><span style="display:flex;"><span>          value: joke
+</span></span><span style="display:flex;"><span>#       - name: AZURE_KEYVAULT_SECRET_VERSION
+</span></span><span style="display:flex;"><span>#         value: your-keyvault-secret-version  #[OPTIONAL] will get latest if commented out
+</span></span></code></pre></div><p>識別子 aadpodidbinding を指定する必要はありますが、Key Vaultの資格情報をマニフェストへ書く必要がありません。素晴らしい。Goの auth.NewAuthorizerFromEnvironment() は他の認証に使われる環境変数が全てセットされていない時、Managed Identity認証を選択します。そしてPod Identityの基盤であるNMIを通じ、Azure ADから認証トークンを得るわけです。</p>
 <p>なお、このPod Identitiyはオープンソースプロジェクトとして開発されています。試してみたい、詳細な実装を知りたい人はこちらを。</p>
 <blockquote>
 <p><a href="https://github.com/azure/aad-pod-identity">AAD Pod Identity</a></p>
@@ -311,66 +311,66 @@ metadata:
 </blockquote>
 <p>これも使い方から理解したほうがいいでしょう。FlexVolumeはKey Vaultのシークレット、暗号化キー、証明書をPodへVolumeとしてマウントできる仕組みです。つまりアプリケーションがシークレットを、あたかもファイルシステム上のファイルであるかのように読むことができます。</p>
 <p>これまでのサンプルアプリケーションを、こう変えられます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;io&#34;</span>
-	<span style="color:#e6db74">&#34;io/ioutil&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;net/http&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
-	<span style="color:#a6e22e">secret</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#e6db74">&#34;/kvmnt/joke&#34;</span>)
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to read your secret file: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-		<span style="color:#66d9ef">return</span>
-	}
-
-	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, string(<span style="color:#a6e22e">secret</span>)))
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getSecret</span>)
-	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
-}
-</code></pre></div><p>シークレットはKey Vaultにあるのですが、アプリ的にはファイルを読んでるだけです。ではマニフェストはどうでしょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: getsecret
-    aadpodidbinding: joke
-[snip]
-  template:
-    metadata:
-      labels:
-        app: getsecret
-        aadpodidbinding: joke
-[snip]
-    spec:
-      containers:
-      - name: getsecret
-        image: torumakabe/getsecret:flexvol
-        volumeMounts:
-        - name: joke
-          mountPath: /kvmnt
-          readOnly: true
-      volumes:
-      - name: joke
-        flexVolume:
-          driver: &#34;azure/kv&#34;
-          options: 
-            usepodidentity: &#34;true&#34;
-            keyvaultname: &#34;your-keyvault-name&#34;
-            keyvaultobjectnames: joke
-            keyvaultobjecttypes: secret
-            keyvaultobjectversions: &#34;&#34;  #[OPTIONAL] will get latest if empty
-            resourcegroup: &#34;your-keyvault-rg&#34;
-            subscriptionid: &#34;your-subscription-id&#34;
-            tenantid: &#34;your-tenant-id&#34;
-</code></pre></div><p>Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。もちろん資格情報を書く必要はありません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;io&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;io/ioutil&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">getSecret</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">secret</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#e6db74">&#34;/kvmnt/joke&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;unable to read your secret file: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">WriteString</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;Can I tell you my awesome dad joke?: %v&#34;</span>, string(<span style="color:#a6e22e">secret</span>)))
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#a6e22e">getSecret</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ListenAndServe</span>(<span style="color:#e6db74">&#34;:8080&#34;</span>, <span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>シークレットはKey Vaultにあるのですが、アプリ的にはファイルを読んでるだけです。ではマニフェストはどうでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: getsecret
+</span></span><span style="display:flex;"><span>    aadpodidbinding: joke
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: getsecret
+</span></span><span style="display:flex;"><span>        aadpodidbinding: joke
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: getsecret
+</span></span><span style="display:flex;"><span>        image: torumakabe/getsecret:flexvol
+</span></span><span style="display:flex;"><span>        volumeMounts:
+</span></span><span style="display:flex;"><span>        - name: joke
+</span></span><span style="display:flex;"><span>          mountPath: /kvmnt
+</span></span><span style="display:flex;"><span>          readOnly: true
+</span></span><span style="display:flex;"><span>      volumes:
+</span></span><span style="display:flex;"><span>      - name: joke
+</span></span><span style="display:flex;"><span>        flexVolume:
+</span></span><span style="display:flex;"><span>          driver: &#34;azure/kv&#34;
+</span></span><span style="display:flex;"><span>          options: 
+</span></span><span style="display:flex;"><span>            usepodidentity: &#34;true&#34;
+</span></span><span style="display:flex;"><span>            keyvaultname: &#34;your-keyvault-name&#34;
+</span></span><span style="display:flex;"><span>            keyvaultobjectnames: joke
+</span></span><span style="display:flex;"><span>            keyvaultobjecttypes: secret
+</span></span><span style="display:flex;"><span>            keyvaultobjectversions: &#34;&#34;  #[OPTIONAL] will get latest if empty
+</span></span><span style="display:flex;"><span>            resourcegroup: &#34;your-keyvault-rg&#34;
+</span></span><span style="display:flex;"><span>            subscriptionid: &#34;your-subscription-id&#34;
+</span></span><span style="display:flex;"><span>            tenantid: &#34;your-tenant-id&#34;
+</span></span></code></pre></div><p>Key VaultをVolumeとしてマウントしていることが、分かるでしょうか。もちろん資格情報を書く必要はありません。</p>
 <p>Flex VolumeはPod Identitiyと同様にオープンソースプロジェクトとして開発されています。試してみたい場合は、こちらを。</p>
 <blockquote>
 <p><a href="https://github.com/Azure/kubernetes-keyvault-flexvol">Kubernetes-KeyVault-FlexVolume</a></p>

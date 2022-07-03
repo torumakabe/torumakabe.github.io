@@ -78,8 +78,8 @@
 <p>AzureのリソースをプロビジョニングするTerraformコードの多くは、Azureのリソースグループを管理下に入れている印象です。すなわちdestroyするとリソースグループごとバッサリ消える。わかりやすいけど破壊的。</p>
 <p>TerraformはApp ServiceやACIなどPaaS、アプリ寄りのリソースも作成できるようになってきたので、アプリ開発者にTerraformを開放したいケースが増えてきています。dev環境をアプリ開発者とインフラ技術者がコラボして育て、そのコードをstageやprodにデプロイする、など。</p>
 <p>ところで。TerraformのWorkspaceは、こんな感じで簡単に切り替えられます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform workspace select prod
-</code></pre></div><p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform workspace select prod
+</span></span></code></pre></div><p>みなまで言わなくても分かりますね。悲劇はプラットフォーム側で回避しましょう。今回のサンプルではリソースグループをTerraform管理下に置かず、別途作成します。Terraformからはdata resourcesとしてRead Onlyで参照する実装です。環境別のリソースグループを作成し、dev環境のみアプリ開発者へ権限を付与します。</p>
 <h2 id="サンプル解説">サンプル解説</h2>
 <p>サンプルは<a href="https://github.com/ToruMakabe/Terraform_Azure_Sample_201801">GitHub</a>に置きました。合わせてご確認ください。</p>
 <p>このコードをapplyすると、以下のリソースが出来上がります。</p>
@@ -91,34 +91,34 @@
 </ul>
 <h3 id="リポジトリ構造">リポジトリ構造</h3>
 <p>サンプルのリポジトリ構造です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">├── modules
-│   ├── computegroup
-│   │   ├── main.tf
-│   │   ├── os
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
-│   │   ├── outputs.tf
-│   │   └── variables.tf
-│   ├── loadbalancer
-│   │   ├── main.tf
-│   │   ├── outputs.tf
-│   │   └── variables.tf
-│   └── network
-│       ├── main.tf
-│       ├── outputs.tf
-│       └── variables.tf
-└── projects
-    ├── project_a
-    │   ├── backend.tf
-    │   ├── main.tf
-    │   ├── outputs.tf
-    │   └── variables.tf
-    └── shared
-        ├── backend.tf
-        ├── main.tf
-        ├── outputs.tf
-        └── variables.tf
-</code></pre></div><p>/modulesには<a href="https://registry.terraform.io/browse?provider=azurerm">Terraform Module Registry</a>でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>├── modules
+</span></span><span style="display:flex;"><span>│   ├── computegroup
+</span></span><span style="display:flex;"><span>│   │   ├── main.tf
+</span></span><span style="display:flex;"><span>│   │   ├── os
+</span></span><span style="display:flex;"><span>│   │   │   ├── outputs.tf
+</span></span><span style="display:flex;"><span>│   │   │   └── variables.tf
+</span></span><span style="display:flex;"><span>│   │   ├── outputs.tf
+</span></span><span style="display:flex;"><span>│   │   └── variables.tf
+</span></span><span style="display:flex;"><span>│   ├── loadbalancer
+</span></span><span style="display:flex;"><span>│   │   ├── main.tf
+</span></span><span style="display:flex;"><span>│   │   ├── outputs.tf
+</span></span><span style="display:flex;"><span>│   │   └── variables.tf
+</span></span><span style="display:flex;"><span>│   └── network
+</span></span><span style="display:flex;"><span>│       ├── main.tf
+</span></span><span style="display:flex;"><span>│       ├── outputs.tf
+</span></span><span style="display:flex;"><span>│       └── variables.tf
+</span></span><span style="display:flex;"><span>└── projects
+</span></span><span style="display:flex;"><span>    ├── project_a
+</span></span><span style="display:flex;"><span>    │   ├── backend.tf
+</span></span><span style="display:flex;"><span>    │   ├── main.tf
+</span></span><span style="display:flex;"><span>    │   ├── outputs.tf
+</span></span><span style="display:flex;"><span>    │   └── variables.tf
+</span></span><span style="display:flex;"><span>    └── shared
+</span></span><span style="display:flex;"><span>        ├── backend.tf
+</span></span><span style="display:flex;"><span>        ├── main.tf
+</span></span><span style="display:flex;"><span>        ├── outputs.tf
+</span></span><span style="display:flex;"><span>        └── variables.tf
+</span></span></code></pre></div><p>/modulesには<a href="https://registry.terraform.io/browse?provider=azurerm">Terraform Module Registry</a>でVerifiedされているモジュールをフォークしたコードを入れました。フォークした理由は、リソースグループをdata resource化して参照のみにしたかったためです。</p>
 <p>そして、/projectsに2つのプロジェクトを作りました。プロジェクトでリソースとTerraformの実行単位、stateを分割します。sharedで土台となる仮想ネットワークと踏み台サーバー関連リソース、project_aでVMスケールセットとロードバランサーを管理します。</p>
 <p>このボリュームだとプロジェクトを分割する必然性は低いのですが、以下のケースにも対応できるように分けました。</p>
 <ul>
@@ -136,46 +136,46 @@
 <h3 id="管理者向けのサービスプリンシパルを用意する">管理者向けのサービスプリンシパルを用意する</h3>
 <p>インフラのプロビジョニングの主体者、管理者向けのサービスプリンシパルを用意します。リソースグループを作成できる権限が必要です。</p>
 <p>もしなければ作成します。組み込みロールでは、サブスクリプションに対するContributorが妥当でしょう。<a href="https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html">Terraformのドキュメント</a>も参考に。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes=&#34;/subscriptions/SUBSCRIPTION_ID&#34;
-</code></pre></div><p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes=&#34;/subscriptions/SUBSCRIPTION_ID&#34;
+</span></span></code></pre></div><p>出力されるappId、password、tenantを控えます。既存のサービスプリンシパルを使うのであれば、同情報を確認してください。</p>
 <p>なお参考までに。Azure Cloud ShellなどAzure CLIが導入されている環境では、特に認証情報の指定なしでterraform planやapply時にAzureのリソースにアクセスできます。TerraformがCLIの認証トークンを<a href="https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/azurerm/helpers/authentication/config.go">使う</a>からです。</p>
 <p>そしてBackendをAzure Blobとする場合、Blobにアクセスするためのキーが別途必要です。ですが、残念ながらBackendロジックでキーを得る際に、このトークンが<a href="https://github.com/hashicorp/terraform/blob/master/backend/remote-state/azure/backend.go">使われません</a>。キーを明示することもできますが、Blobのアクセスキーは漏洩時のリカバリーが大変です。できれば直に扱いたくありません。</p>
 <p>サービスプリンシパル認証であれば、Azureリソースへのプロビジョニング、Backendアクセスどちらも<a href="https://www.terraform.io/docs/backends/types/azurerm.html">対応できます</a>。これがこのサンプルでサービスプリンシパル認証を選んだ理由です。</p>
 <h3 id="管理者の環境変数を設定する">管理者の環境変数を設定する</h3>
 <p>Terraformが認証関連で必要な情報を環境変数で設定します。先ほど控えた情報を使います。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">export ARM_SUBSCRIPTION_ID=&#34;&lt;your subscription id&gt;&#34;
-export ARM_CLIENT_ID=&#34;&lt;your servicce principal appid&gt;&#34;
-export ARM_CLIENT_SECRET=&#34;&lt;your service principal password&gt;&#34;
-export ARM_TENANT_ID=&#34;&lt;your service principal tenant&gt;&#34;
-</code></pre></div><h3 id="workspaceを作る">Workspaceを作る</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>export ARM_SUBSCRIPTION_ID=&#34;&lt;your subscription id&gt;&#34;
+</span></span><span style="display:flex;"><span>export ARM_CLIENT_ID=&#34;&lt;your servicce principal appid&gt;&#34;
+</span></span><span style="display:flex;"><span>export ARM_CLIENT_SECRET=&#34;&lt;your service principal password&gt;&#34;
+</span></span><span style="display:flex;"><span>export ARM_TENANT_ID=&#34;&lt;your service principal tenant&gt;&#34;
+</span></span></code></pre></div><h3 id="workspaceを作る">Workspaceを作る</h3>
 <p>開発(dev)/ステージング(stage)/本番(prod)、3つのWorkspaceを作る例です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform workspace new dev
-terraform workspace new stage
-terraform workspace new prod
-</code></pre></div><h3 id="リソースグループを作る">リソースグループを作る</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform workspace new dev
+</span></span><span style="display:flex;"><span>terraform workspace new stage
+</span></span><span style="display:flex;"><span>terraform workspace new prod
+</span></span></code></pre></div><h3 id="リソースグループを作る">リソースグループを作る</h3>
 <p>まずWorkspace別にリソースグループを作ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az group create -n tf-sample-dev-rg -l japaneast
-az group create -n tf-sample-stage-rg -l japaneast
-az group create -n tf-sample-prod-rg -l japaneast
-</code></pre></div><p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">data &#34;azurerm_resource_group&#34; &#34;resource_group&#34; {
-  name = &#34;${var.resource_group_name}-${terraform.workspace}-rg&#34;
-}
-</code></pre></div><p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&quot;tf-sample&quot;と指定しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az group create -n tf-sample-dev-rg -l japaneast
+</span></span><span style="display:flex;"><span>az group create -n tf-sample-stage-rg -l japaneast
+</span></span><span style="display:flex;"><span>az group create -n tf-sample-prod-rg -l japaneast
+</span></span></code></pre></div><p>リソースグループ名にはルールがあります。Workspace別にリソースグループを分離するため、Terraformのコードで ${terraform.workspace} 変数を使っているためです。この変数は実行時に評価されます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>data &#34;azurerm_resource_group&#34; &#34;resource_group&#34; {
+</span></span><span style="display:flex;"><span>  name = &#34;${var.resource_group_name}-${terraform.workspace}-rg&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>${var.resource_group_name} は接頭辞です。サンプルではvariables.tfで&quot;tf-sample&quot;と指定しています。</p>
 <p>次にBackend、state共有向けリソースグループを作ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az group create -n tf-sample-state-rg -l japaneast
-</code></pre></div><p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform {
-  backend &#34;azurerm&#34; {
-    resource_group_name  = &#34;tf-sample-state-rg&#34;
-    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
-    container_name       = &#34;tfstate-project-a&#34;
-    key                  = &#34;terraform.tfstate&#34;
-  }
-}
-</code></pre></div><p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes &#34;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&#34; &#34;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&#34;
-</code></pre></div><p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az group create -n tf-sample-state-rg -l japaneast
+</span></span></code></pre></div><p>このリソースグループは、各projectのbackend.tfで指定しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform {
+</span></span><span style="display:flex;"><span>  backend &#34;azurerm&#34; {
+</span></span><span style="display:flex;"><span>    resource_group_name  = &#34;tf-sample-state-rg&#34;
+</span></span><span style="display:flex;"><span>    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
+</span></span><span style="display:flex;"><span>    container_name       = &#34;tfstate-project-a&#34;
+</span></span><span style="display:flex;"><span>    key                  = &#34;terraform.tfstate&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最後にアプリ開発者がリソースグループtf-sample-dev-rg、tf-sample-state-rgへアクセスできるよう、アプリ開発者向けサービスプリンシパルを作成します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes &#34;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-dev-rg&#34; &#34;/subscriptions/&lt;your subscription id&gt;/resourceGroups/tf-sample-state-rg&#34;
+</span></span></code></pre></div><p>出力されるappId、password、tenantは、アプリ開発者向けに控えておきます。</p>
 <h3 id="backendを準備する">Backendを準備する</h3>
 <p>project別にストレージアカウントとコンテナーを作ります。tf-sample-state-rgに</p>
 <ul>
@@ -184,44 +184,44 @@ az group create -n tf-sample-prod-rg -l japaneast
 </ul>
 <p>を作ってください。GUIでもCLIでも、お好きなやり方で。</p>
 <p>その後、project_a/backend.tf.sample、shared/backend.tf.sampleをそれぞれbackend.tfにリネームし、先ほど作ったストレージアカウント名を指定します。以下はproject_a/backend.tf.sampleの例。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform {
-  backend &#34;azurerm&#34; {
-    resource_group_name  = &#34;tf-sample-state-rg&#34;
-    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
-    container_name       = &#34;tfstate-project-a&#34;
-    key                  = &#34;terraform.tfstate&#34;
-  }
-}
-
-data &#34;terraform_remote_state&#34; &#34;shared&#34; {
-  backend = &#34;azurerm&#34;
-
-  config {
-    resource_group_name  = &#34;tf-sample-state-rg&#34;
-    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
-    container_name       = &#34;tfstate-shared&#34;
-    key                  = &#34;terraform.tfstateenv:${terraform.workspace}&#34;
-  }
-}
-</code></pre></div><p>これで準備完了です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform {
+</span></span><span style="display:flex;"><span>  backend &#34;azurerm&#34; {
+</span></span><span style="display:flex;"><span>    resource_group_name  = &#34;tf-sample-state-rg&#34;
+</span></span><span style="display:flex;"><span>    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
+</span></span><span style="display:flex;"><span>    container_name       = &#34;tfstate-project-a&#34;
+</span></span><span style="display:flex;"><span>    key                  = &#34;terraform.tfstate&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data &#34;terraform_remote_state&#34; &#34;shared&#34; {
+</span></span><span style="display:flex;"><span>  backend = &#34;azurerm&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  config {
+</span></span><span style="display:flex;"><span>    resource_group_name  = &#34;tf-sample-state-rg&#34;
+</span></span><span style="display:flex;"><span>    storage_account_name = &#34;&lt;your storage account name&gt;&#34;
+</span></span><span style="display:flex;"><span>    container_name       = &#34;tfstate-shared&#34;
+</span></span><span style="display:flex;"><span>    key                  = &#34;terraform.tfstateenv:${terraform.workspace}&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>これで準備完了です。</p>
 <h3 id="実行">実行</h3>
 <p>Workspaceをdevに切り替えます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform workspace select dev
-</code></pre></div><p>まずは土台となるリソースを作成するsharedから。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">cd shared
-terraform init
-terraform plan
-terraform apply
-</code></pre></div><p>土台となるリソースが作成されたら、次はproject_aを。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">cd ../project_a
-terraform init
-terraform plan
-terraform apply
-</code></pre></div><p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform workspace select dev
+</span></span></code></pre></div><p>まずは土台となるリソースを作成するsharedから。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd shared
+</span></span><span style="display:flex;"><span>terraform init
+</span></span><span style="display:flex;"><span>terraform plan
+</span></span><span style="display:flex;"><span>terraform apply
+</span></span></code></pre></div><p>土台となるリソースが作成されたら、次はproject_aを。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd ../project_a
+</span></span><span style="display:flex;"><span>terraform init
+</span></span><span style="display:flex;"><span>terraform plan
+</span></span><span style="display:flex;"><span>terraform apply
+</span></span></code></pre></div><p>ここでは割愛しますが、dev向けサービスプリンシパルで認証しても、dev Workspaceではplan、apply可能です。</p>
 <p>dev Workspaceでコードが育ったら、stage/prod Workspaceに切り替えて実行します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">terraform workspace select stage
-[以下devと同様の操作]
-</code></pre></div><p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>terraform workspace select stage
+</span></span><span style="display:flex;"><span>[以下devと同様の操作]
+</span></span></code></pre></div><p>当然、dev向けサービスプリンシパルで認証している場合は、stage/prodでのplan、apply、もちろんdestroyも失敗します。stage/prod リソースグループにアクセスする権限がないからです。</p>
 <h2 id="参考情報">参考情報</h2>
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/">Terraform on Azure のドキュメント</a></li>

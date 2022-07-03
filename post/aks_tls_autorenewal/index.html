@@ -77,169 +77,169 @@
 <li><a href="https://docs.microsoft.com/ja-jp/azure/dns/dns-getstarted-cli">Azure CLI 2.0 で Azure DNS の使用を開始する</a></li>
 </ul>
 <p>まずAKSにNGINX Ingress Controllerを導入します。helmで入れるのが楽でしょう。<a href="http://torumakabe.github.io/post/aks_ingress_quickdeploy/">この記事</a>も参考に。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ helm install stable/nginx-ingress --name my-nginx
-</code></pre></div><p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get svc
-NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
-kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
-my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
-my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
-</code></pre></div><p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
-</code></pre></div><p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&quot;&ndash;set rbac.create=false&quot;オプションを指定しています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/jetstack/cert-manager
-$ cd cert-manager/
-$ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
-</code></pre></div><p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
-kind: Issuer
-metadata:
-  name: letsencrypt-staging
-  namespace: default
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-staging.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: hoge@example.com
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
-    http01: {}
-</code></pre></div><p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ helm install stable/nginx-ingress --name my-nginx
+</span></span></code></pre></div><p>サービスの状況を確認します。NGINX Ingress ControllerにEXTERNAL-IPが割り当てられるまで、待ちます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get svc
+</span></span><span style="display:flex;"><span>NAME                                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                     AGE
+</span></span><span style="display:flex;"><span>kubernetes                               ClusterIP      10.0.0.1       &lt;none&gt;           443/TCP                     79d
+</span></span><span style="display:flex;"><span>my-nginx-nginx-ingress-controller        LoadBalancer   10.0.2.105     52.234.148.138   80:30613/TCP,443:30186/TCP   6m
+</span></span><span style="display:flex;"><span>my-nginx-nginx-ingress-default-backend   ClusterIP      10.0.102.246   &lt;none&gt;           80/TCP                     6m
+</span></span></code></pre></div><p>EXTERNAL-IPが割り当てられたら、Azure DNSで名前解決できるようにします。Azure CLIを使います。Ingressのホスト名をwww.example.comとする例です。このホスト名で、後ほどLet&rsquo;s Encryptから証明書を取得します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az network dns record-set a add-record -z example.com -g your-dnszone-rg -n www -a 52.234.148.138
+</span></span></code></pre></div><p>cert-managerのソースをGitHubから取得し、contribからhelm installします。いずれstableを使えるようになるでしょう。なお、このAKSクラスターはまだRBACを使っていないので、&quot;&ndash;set rbac.create=false&quot;オプションを指定しています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ git clone https://github.com/jetstack/cert-manager
+</span></span><span style="display:flex;"><span>$ cd cert-manager/
+</span></span><span style="display:flex;"><span>$ helm install --name cert-manager --namespace kube-system contrib/charts/cert-manager --set rbac.create=false
+</span></span></code></pre></div><p>では任意の作業ディレクトリに移動し、以下の内容でマニフェストを作ります。cm-issuer-le-staging-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: certmanager.k8s.io/v1alpha1
+</span></span><span style="display:flex;"><span>kind: Issuer
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: letsencrypt-staging
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  acme:
+</span></span><span style="display:flex;"><span>    # The ACME server URL
+</span></span><span style="display:flex;"><span>    server: https://acme-staging.api.letsencrypt.org/directory
+</span></span><span style="display:flex;"><span>    # Email address used for ACME registration
+</span></span><span style="display:flex;"><span>    email: hoge@example.com
+</span></span><span style="display:flex;"><span>    # Name of a secret used to store the ACME account private key
+</span></span><span style="display:flex;"><span>    privateKeySecretRef:
+</span></span><span style="display:flex;"><span>      name: letsencrypt-staging
+</span></span><span style="display:flex;"><span>    # Enable the HTTP-01 challenge provider
+</span></span><span style="display:flex;"><span>    http01: {}
+</span></span></code></pre></div><p>証明書を発行してもらうLet&rsquo;s EncryptをIssuerとして登録するわけですが、まずはステージングのAPIエンドポイントを指定しています。Let&rsquo;s Encryptには<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limit</a>があり、失敗した時に痛いからです。Let&rsquo;s EncryptのステージングAPIを使うとフェイクな証明書(Fake LE Intermediate X1)が発行されますが、流れの確認やマニフェストの検証は、できます。</p>
 <p>なお、Let&rsquo;s Encryptとのチャレンジには今回、HTTPを使います。DNSチャレンジも<a href="https://github.com/jetstack/cert-manager/pull/246">いずれ対応する見込み</a>です。</p>
 <p>では、Issuerを登録します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-issuer-le-staging-sample.yaml
-</code></pre></div><p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: example-com
-  namespace: default
-spec:
-  secretName: example-com-tls
-  issuerRef:
-    name: letsencrypt-staging
-  commonName: www.example.com
-  dnsNames:
-  - www.example.com
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - www.example.com
-</code></pre></div><p>証明書設定をデプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-cert-le-staging-sample.yaml
-</code></pre></div><p>証明書の発行状況を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe certificate example-com
-Name:         example-com
-Namespace:    default
-[snip]
-Events:
-  Type     Reason                 Age              From                     Message
-  ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &#34;example-com-tls&#34; not found
-  Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
-  Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
-  Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
-  Normal   ObtainAuthorization    7m               cert-manager-controller  Obtained authorization for domain www.example.com
-  Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
-  Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
-  Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
-</code></pre></div><p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f cm-issuer-le-staging-sample.yaml
+</span></span></code></pre></div><p>次は証明書の設定です。マニフェストはcm-cert-le-staging-sample.yamlとします。acme節にACME構成を書きます。チャレンジはHTTP、ingressClassはnginxです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: certmanager.k8s.io/v1alpha1
+</span></span><span style="display:flex;"><span>kind: Certificate
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: example-com
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  secretName: example-com-tls
+</span></span><span style="display:flex;"><span>  issuerRef:
+</span></span><span style="display:flex;"><span>    name: letsencrypt-staging
+</span></span><span style="display:flex;"><span>  commonName: www.example.com
+</span></span><span style="display:flex;"><span>  dnsNames:
+</span></span><span style="display:flex;"><span>  - www.example.com
+</span></span><span style="display:flex;"><span>  acme:
+</span></span><span style="display:flex;"><span>    config:
+</span></span><span style="display:flex;"><span>    - http01:
+</span></span><span style="display:flex;"><span>        ingressClass: nginx
+</span></span><span style="display:flex;"><span>      domains:
+</span></span><span style="display:flex;"><span>      - www.example.com
+</span></span></code></pre></div><p>証明書設定をデプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f cm-cert-le-staging-sample.yaml
+</span></span></code></pre></div><p>証明書の発行状況を確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl describe certificate example-com
+</span></span><span style="display:flex;"><span>Name:         example-com
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason                 Age              From                     Message
+</span></span><span style="display:flex;"><span>  ----     ------                 ----             ----                     -------
+</span></span><span style="display:flex;"><span>  Warning  ErrorCheckCertificate  8m               cert-manager-controller  Error checking existing TLS certificate: secret &#34;example-com-tls&#34; not found
+</span></span><span style="display:flex;"><span>  Normal   PrepareCertificate     8m               cert-manager-controller  Preparing certificate with issuer
+</span></span><span style="display:flex;"><span>  Normal   PresentChallenge       8m               cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   SelfCheck              8m               cert-manager-controller  Performing self-check for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   ObtainAuthorization    7m               cert-manager-controller  Obtained authorization for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   IssueCertificate       7m               cert-manager-controller  Issuing certificate...
+</span></span><span style="display:flex;"><span>  Normal   CeritifcateIssued      7m               cert-manager-controller  Certificated issuedsuccessfully
+</span></span><span style="display:flex;"><span>  Normal   RenewalScheduled       7m (x2 over 7m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+</span></span></code></pre></div><p>無事に証明書が発行され、更新もスケジュールされました。手順やマニフェストの書きっぷりは問題なさそうです。これをもってステージング完了としましょう。</p>
 <p>ではLet&rsquo;s EncryptのAPIエンドポイントをProduction向けに変更し、新たにIssuer登録します。cm-issuer-le-prod-sample.yamlとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
-kind: Issuer
-metadata:
-  name: letsencrypt-prod
-  namespace: default
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-v01.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: hoge@example.com
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    # Enable the HTTP-01 challenge provider
-    http01: {}
-</code></pre></div><p>デプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-issuer-le-prod-sample.yaml
-</code></pre></div><p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: prod-example-com
-  namespace: default
-spec:
-  secretName: prod-example-com-tls
-  issuerRef:
-    name: letsencrypt-prod
-  commonName: www.example.com
-  dnsNames:
-  - www.example.com
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - www.example.com
-</code></pre></div><p>デプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f cm-cert-le-prod-sample.yaml
-</code></pre></div><p>発行状況を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl describe certificate prod-example-com
-Name:         prod-example-com
-Namespace:    default
-[snip]
-Events:
-  Type     Reason                 Age              From                     Message
-  ----     ------                 ----             ----                     -------
-  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &#34;prod-example-com-tls&#34; not found
-  Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
-  Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
-  Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
-  Normal   IssueCertificate       7s               cert-manager-controller  Issuing certificate...
-  Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
-  Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
-  Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
-</code></pre></div><p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: certmanager.k8s.io/v1alpha1
+</span></span><span style="display:flex;"><span>kind: Issuer
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: letsencrypt-prod
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  acme:
+</span></span><span style="display:flex;"><span>    # The ACME server URL
+</span></span><span style="display:flex;"><span>    server: https://acme-v01.api.letsencrypt.org/directory
+</span></span><span style="display:flex;"><span>    # Email address used for ACME registration
+</span></span><span style="display:flex;"><span>    email: hoge@example.com
+</span></span><span style="display:flex;"><span>    # Name of a secret used to store the ACME account private key
+</span></span><span style="display:flex;"><span>    privateKeySecretRef:
+</span></span><span style="display:flex;"><span>      name: letsencrypt-prod
+</span></span><span style="display:flex;"><span>    # Enable the HTTP-01 challenge provider
+</span></span><span style="display:flex;"><span>    http01: {}
+</span></span></code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f cm-issuer-le-prod-sample.yaml
+</span></span></code></pre></div><p>同様に、Production向けの証明書設定をします。cm-cert-le-prod-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: certmanager.k8s.io/v1alpha1
+</span></span><span style="display:flex;"><span>kind: Certificate
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: prod-example-com
+</span></span><span style="display:flex;"><span>  namespace: default
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  secretName: prod-example-com-tls
+</span></span><span style="display:flex;"><span>  issuerRef:
+</span></span><span style="display:flex;"><span>    name: letsencrypt-prod
+</span></span><span style="display:flex;"><span>  commonName: www.example.com
+</span></span><span style="display:flex;"><span>  dnsNames:
+</span></span><span style="display:flex;"><span>  - www.example.com
+</span></span><span style="display:flex;"><span>  acme:
+</span></span><span style="display:flex;"><span>    config:
+</span></span><span style="display:flex;"><span>    - http01:
+</span></span><span style="display:flex;"><span>        ingressClass: nginx
+</span></span><span style="display:flex;"><span>      domains:
+</span></span><span style="display:flex;"><span>      - www.example.com
+</span></span></code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f cm-cert-le-prod-sample.yaml
+</span></span></code></pre></div><p>発行状況を確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl describe certificate prod-example-com
+</span></span><span style="display:flex;"><span>Name:         prod-example-com
+</span></span><span style="display:flex;"><span>Namespace:    default
+</span></span><span style="display:flex;"><span>[snip]
+</span></span><span style="display:flex;"><span>Events:
+</span></span><span style="display:flex;"><span>  Type     Reason                 Age              From                     Message
+</span></span><span style="display:flex;"><span>  ----     ------                 ----             ----                     -------
+</span></span><span style="display:flex;"><span>  Warning  ErrorCheckCertificate  27s              cert-manager-controller  Error checking existing TLS certificate: secret &#34;prod-example-com-tls&#34; not found
+</span></span><span style="display:flex;"><span>  Normal   PrepareCertificate     27s              cert-manager-controller  Preparing certificate with issuer
+</span></span><span style="display:flex;"><span>  Normal   PresentChallenge       26s              cert-manager-controller  Presenting http-01 challenge for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   SelfCheck              26s              cert-manager-controller  Performing self-check for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   IssueCertificate       7s               cert-manager-controller  Issuing certificate...
+</span></span><span style="display:flex;"><span>  Normal   ObtainAuthorization    7s               cert-manager-controller  Obtained authorization for domain www.example.com
+</span></span><span style="display:flex;"><span>  Normal   RenewalScheduled       6s (x3 over 5m)  cert-manager-controller  Certificate scheduled for renewal in 1438 hours
+</span></span><span style="display:flex;"><span>  Normal   CeritifcateIssued      6s               cert-manager-controller  Certificated issuedsuccessfully
+</span></span></code></pre></div><p>証明書が発行され、1438時間(約60日)内の更新がスケジュールされました。</p>
 <p>ではバックエンドを設定して確認してみましょう。バックエンドにNGINXを立て、exposeします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl run nginx --image nginx --port 80
-$ kubectl expose deployment nginx --type NodePort
-</code></pre></div><p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  name: ingress-nginx-sample
-spec:
-  rules:
-    - host: www.example.com
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: nginx
-              servicePort: 80
-  tls:
-    - hosts:
-      - www.example.com
-      secretName: prod-example-com-tls
-</code></pre></div><p>デプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f ingress-nginx-sample.yaml
-</code></pre></div><p>いざ確認。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl https://www.example.com/
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre></div><p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl run nginx --image nginx --port 80
+</span></span><span style="display:flex;"><span>$ kubectl expose deployment nginx --type NodePort
+</span></span></code></pre></div><p>Ingressを設定します。ファイル名はingress-nginx-sample.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: extensions/v1beta1
+</span></span><span style="display:flex;"><span>kind: Ingress
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  annotations:
+</span></span><span style="display:flex;"><span>    kubernetes.io/ingress.class: nginx
+</span></span><span style="display:flex;"><span>    nginx.ingress.kubernetes.io/rewrite-target: /
+</span></span><span style="display:flex;"><span>  name: ingress-nginx-sample
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  rules:
+</span></span><span style="display:flex;"><span>    - host: www.example.com
+</span></span><span style="display:flex;"><span>      http:
+</span></span><span style="display:flex;"><span>        paths:
+</span></span><span style="display:flex;"><span>          - path: /
+</span></span><span style="display:flex;"><span>            backend:
+</span></span><span style="display:flex;"><span>              serviceName: nginx
+</span></span><span style="display:flex;"><span>              servicePort: 80
+</span></span><span style="display:flex;"><span>  tls:
+</span></span><span style="display:flex;"><span>    - hosts:
+</span></span><span style="display:flex;"><span>      - www.example.com
+</span></span><span style="display:flex;"><span>      secretName: prod-example-com-tls
+</span></span></code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f ingress-nginx-sample.yaml
+</span></span></code></pre></div><p>いざ確認。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl https://www.example.com/
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><p>便利ですね。Let&rsquo;s Encryptをはじめ、関連プロジェクトに感謝です。</p>
 
 		</section>
 

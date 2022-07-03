@@ -154,32 +154,32 @@
 <p><a href="https://github.com/coreos/prometheus-operator">Prometheus Operator</a></p>
 </blockquote>
 <p>メトリクスバックエンドとしてPrometeusを、メトリクス可視化のためにGrafanaを導入し、Kubernetes向けの基本的な設定は済ませています。まずは分かりやすく、Grafanaでメトリクスを見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubectl port-forward -n monitoring svc/prometheus-operator-grafana 3000:80
-</code></pre></div><p>ブラウザでlocalhost:3000にアクセスすると、ポート転送されてGrafanaのログイン画面が出ます。ユーザー名はadmin、パスワードは先ほどTerraformのapply時に出力されたものを使ってください。忘れた場合はterraform outputで再出力できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kubectl port-forward -n monitoring svc/prometheus-operator-grafana 3000:80
+</span></span></code></pre></div><p>ブラウザでlocalhost:3000にアクセスすると、ポート転送されてGrafanaのログイン画面が出ます。ユーザー名はadmin、パスワードは先ほどTerraformのapply時に出力されたものを使ってください。忘れた場合はterraform outputで再出力できます。</p>
 <p>サンプルのKubernetes向けダッシュボードをGrafanaコミュニティサイトからインポートしています。画面左のメニュー &ldquo;Dashboards&quot;から、 &gt; Manage &gt; smaple と辿って表示してください。</p>
 <blockquote>
 <p><a href="https://grafana.com/dashboards/6417">Kubernetes Cluster (Prometheus)</a></p>
 </blockquote>
 <p><img src="https://grafana.com/api/dashboards/6417/images/4128/image" alt="Grafana" title="Grafana"></p>
 <p>また、Prometheus Operatorは導入時に一般的なアラートルールを<a href="https://github.com/helm/charts/tree/master/stable/prometheus-operator#developing-prometheus-rules-and-grafana-dashboards">設定します</a>。Prometheus上で確認してみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubectl port-forward -n monitoring svc/prometheus-operator-prometheus 9090:9090
-</code></pre></div><p>localhost:9090からPrometheusのWeb UIを開き、メニューの Alerts で設定済みのルールや状態を見ることができます。ルールにマッチしたアラートは、赤くなっています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kubectl port-forward -n monitoring svc/prometheus-operator-prometheus 9090:9090
+</span></span></code></pre></div><p>localhost:9090からPrometheusのWeb UIを開き、メニューの Alerts で設定済みのルールや状態を見ることができます。ルールにマッチしたアラートは、赤くなっています。</p>
 <p>試しにアラートを発生させてみましょう。みんな大嫌いなポッドのCrashLoopBackoffを意図的に起こします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubectl run --generator=run-pod/v1 phoenix --image=busybox --restart=Always -- /bin/sh -c &#39;exit 1&#39;
-</code></pre></div><p>すると、以下のルール KubePodCrashLooping にマッチし、アラートがPending状態になります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">alert: KubePodCrashLooping
-expr: rate(kube_pod_container_status_restarts_total{job=&#34;kube-state-metrics&#34;}[15m])
-  * 60 * 5 &gt; 0
-for: 1h
-labels:
-  severity: critical
-annotations:
-  message: Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }})
-    is restarting {{ printf &#34;%.2f&#34; $value }} times / 5 minutes.
-  runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping
-</code></pre></div><p>for、つまり持続時間が1hなので、このルールに1時間マッチし続けると、アラートとして扱われます。Prometheusはアラートの通知機能を分離しており、通知はAlertmanagerが行います。AlertmanagerにもWeb UIがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kubectl port-forward -n monitoring svc/prometheus-operator-alertmanager 9093:9093
-</code></pre></div><p>AzureはVMからのメール送信を<a href="https://docs.microsoft.com/ja-jp/azure/virtual-network/troubleshoot-outbound-smtp-connectivity">制限している</a>ため、お試しキットではPrometheusからの通知設定をしていません。もしWebhook通知などを試してみたい場合は、<a href="https://prometheus.io/docs/alerting/overview/">こちら</a>を参考にConfigを書いてみてください。Configの投入は環境作成時に使ったTerraforrm HCLに追記してapplyすると楽です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kubectl run --generator=run-pod/v1 phoenix --image=busybox --restart=Always -- /bin/sh -c &#39;exit 1&#39;
+</span></span></code></pre></div><p>すると、以下のルール KubePodCrashLooping にマッチし、アラートがPending状態になります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>alert: KubePodCrashLooping
+</span></span><span style="display:flex;"><span>expr: rate(kube_pod_container_status_restarts_total{job=&#34;kube-state-metrics&#34;}[15m])
+</span></span><span style="display:flex;"><span>  * 60 * 5 &gt; 0
+</span></span><span style="display:flex;"><span>for: 1h
+</span></span><span style="display:flex;"><span>labels:
+</span></span><span style="display:flex;"><span>  severity: critical
+</span></span><span style="display:flex;"><span>annotations:
+</span></span><span style="display:flex;"><span>  message: Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }})
+</span></span><span style="display:flex;"><span>    is restarting {{ printf &#34;%.2f&#34; $value }} times / 5 minutes.
+</span></span><span style="display:flex;"><span>  runbook_url: https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubepodcrashlooping
+</span></span></code></pre></div><p>for、つまり持続時間が1hなので、このルールに1時間マッチし続けると、アラートとして扱われます。Prometheusはアラートの通知機能を分離しており、通知はAlertmanagerが行います。AlertmanagerにもWeb UIがあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kubectl port-forward -n monitoring svc/prometheus-operator-alertmanager 9093:9093
+</span></span></code></pre></div><p>AzureはVMからのメール送信を<a href="https://docs.microsoft.com/ja-jp/azure/virtual-network/troubleshoot-outbound-smtp-connectivity">制限している</a>ため、お試しキットではPrometheusからの通知設定をしていません。もしWebhook通知などを試してみたい場合は、<a href="https://prometheus.io/docs/alerting/overview/">こちら</a>を参考にConfigを書いてみてください。Configの投入は環境作成時に使ったTerraforrm HCLに追記してapplyすると楽です。</p>
 <p>PrometheusはKubernetesと同じCNCFプロジェクトということもあり、親和性は大きな利点です。エコシステムも魅力で、試す価値はあります。いっぽうでKubernetesクラスター上に導入する場合は、監視主体と対象が同居するため独立性、客観性が懸念です。これは利点とのトレードオフなので、Azure Monitorなど外部からの監視をうまく組み合わせましょう。</p>
 <h3 id="ロギング">ロギング</h3>
 <h4 id="azure-monitor-for-containers-コンテナー分析">Azure Monitor for Containers (コンテナー分析)</h4>

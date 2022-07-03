@@ -80,193 +80,193 @@
 <li>クロスゾーン負荷分散、冗長化するため、Load BalancerとパブリックIPのSKUをStandardにします。</li>
 </ul>
 <p>[main.tf]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_resource_group&#34; &#34;poc&#34; {
-  name     = &#34;${var.resource_group_name}&#34;
-  location = &#34;East US 2&#34;
-}
-
-resource &#34;azurerm_virtual_network&#34; &#34;poc&#34; {
-  name                = &#34;vnet01&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  location            = &#34;${azurerm_resource_group.poc.location}&#34;
-  address_space       = [&#34;10.0.0.0/16&#34;]
-}
-
-resource &#34;azurerm_subnet&#34; &#34;poc&#34; {
-  name                      = &#34;subnet01&#34;
-  resource_group_name       = &#34;${azurerm_resource_group.poc.name}&#34;
-  virtual_network_name      = &#34;${azurerm_virtual_network.poc.name}&#34;
-  address_prefix            = &#34;10.0.2.0/24&#34;
-  network_security_group_id = &#34;${azurerm_network_security_group.poc.id}&#34;
-}
-
-resource &#34;azurerm_network_security_group&#34; &#34;poc&#34; {
-  name                = &#34;nsg01&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  location            = &#34;${azurerm_resource_group.poc.location}&#34;
-
-  security_rule = [
-    {
-      name                       = &#34;allow_http&#34;
-      priority                   = 100
-      direction                  = &#34;Inbound&#34;
-      access                     = &#34;Allow&#34;
-      protocol                   = &#34;Tcp&#34;
-      source_port_range          = &#34;*&#34;
-      destination_port_range     = &#34;80&#34;
-      source_address_prefix      = &#34;*&#34;
-      destination_address_prefix = &#34;*&#34;
-    },
-    {
-      name                       = &#34;allow_ssh&#34;
-      priority                   = 101
-      direction                  = &#34;Inbound&#34;
-      access                     = &#34;Allow&#34;
-      protocol                   = &#34;Tcp&#34;
-      source_port_range          = &#34;*&#34;
-      destination_port_range     = &#34;22&#34;
-      source_address_prefix      = &#34;*&#34;
-      destination_address_prefix = &#34;*&#34;
-    },
-  ]
-}
-
-resource &#34;azurerm_public_ip&#34; &#34;poc&#34; {
-  name                         = &#34;pip01&#34;
-  resource_group_name          = &#34;${azurerm_resource_group.poc.name}&#34;
-  location                     = &#34;${azurerm_resource_group.poc.location}&#34;
-  public_ip_address_allocation = &#34;static&#34;
-  domain_name_label            = &#34;${var.scaleset_name}&#34;
-
-  sku = &#34;Standard&#34;
-}
-
-resource &#34;azurerm_lb&#34; &#34;poc&#34; {
-  name                = &#34;lb01&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  location            = &#34;${azurerm_resource_group.poc.location}&#34;
-
-  frontend_ip_configuration {
-    name                 = &#34;fipConf01&#34;
-    public_ip_address_id = &#34;${azurerm_public_ip.poc.id}&#34;
-  }
-
-  sku = &#34;Standard&#34;
-}
-
-resource &#34;azurerm_lb_backend_address_pool&#34; &#34;poc&#34; {
-  name                = &#34;bePool01&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  loadbalancer_id     = &#34;${azurerm_lb.poc.id}&#34;
-}
-
-resource &#34;azurerm_lb_rule&#34; &#34;poc&#34; {
-  name                           = &#34;lbRule&#34;
-  resource_group_name            = &#34;${azurerm_resource_group.poc.name}&#34;
-  loadbalancer_id                = &#34;${azurerm_lb.poc.id}&#34;
-  protocol                       = &#34;Tcp&#34;
-  frontend_port                  = 80
-  backend_port                   = 80
-  frontend_ip_configuration_name = &#34;fipConf01&#34;
-  backend_address_pool_id        = &#34;${azurerm_lb_backend_address_pool.poc.id}&#34;
-  probe_id                       = &#34;${azurerm_lb_probe.poc.id}&#34;
-}
-
-resource &#34;azurerm_lb_probe&#34; &#34;poc&#34; {
-  name                = &#34;http-probe&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  loadbalancer_id     = &#34;${azurerm_lb.poc.id}&#34;
-  port                = 80
-}
-
-resource &#34;azurerm_lb_nat_pool&#34; &#34;poc&#34; {
-  count                          = 3
-  name                           = &#34;ssh&#34;
-  resource_group_name            = &#34;${azurerm_resource_group.poc.name}&#34;
-  loadbalancer_id                = &#34;${azurerm_lb.poc.id}&#34;
-  protocol                       = &#34;Tcp&#34;
-  frontend_port_start            = 50000
-  frontend_port_end              = 50119
-  backend_port                   = 22
-  frontend_ip_configuration_name = &#34;fipConf01&#34;
-}
-
-data &#34;template_cloudinit_config&#34; &#34;poc&#34; {
-  gzip          = true
-  base64_encode = true
-
-  part {
-    content_type = &#34;text/cloud-config&#34;
-    content      = &#34;${file(&#34;${path.module}/cloud-config.yaml&#34;)}&#34;
-  }
-}
-
-resource &#34;azurerm_virtual_machine_scale_set&#34; &#34;poc&#34; {
-  name                = &#34;${var.scaleset_name}&#34;
-  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
-  location            = &#34;${azurerm_resource_group.poc.location}&#34;
-  upgrade_policy_mode = &#34;Manual&#34;
-
-  sku {
-    name     = &#34;Standard_B1s&#34;
-    tier     = &#34;Standard&#34;
-    capacity = 3
-  }
-
-  storage_profile_image_reference {
-    publisher = &#34;Canonical&#34;
-    offer     = &#34;UbuntuServer&#34;
-    sku       = &#34;16.04-LTS&#34;
-    version   = &#34;latest&#34;
-  }
-
-  storage_profile_os_disk {
-    name              = &#34;&#34;
-    caching           = &#34;ReadWrite&#34;
-    create_option     = &#34;FromImage&#34;
-    managed_disk_type = &#34;Standard_LRS&#34;
-  }
-
-  os_profile {
-    computer_name_prefix = &#34;pocvmss&#34;
-    admin_username       = &#34;${var.admin_username}&#34;
-    admin_password       = &#34;&#34;
-    custom_data          = &#34;${data.template_cloudinit_config.poc.rendered}&#34;
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = true
-
-    ssh_keys {
-      path     = &#34;/home/${var.admin_username}/.ssh/authorized_keys&#34;
-      key_data = &#34;${file(&#34;~/.ssh/id_rsa.pub&#34;)}&#34;
-    }
-  }
-
-  network_profile {
-    name    = &#34;terraformnetworkprofile&#34;
-    primary = true
-
-    ip_configuration {
-      name                                   = &#34;PoCIPConfiguration&#34;
-      subnet_id                              = &#34;${azurerm_subnet.poc.id}&#34;
-      load_balancer_backend_address_pool_ids = [&#34;${azurerm_lb_backend_address_pool.poc.id}&#34;]
-      load_balancer_inbound_nat_rules_ids    = [&#34;${element(azurerm_lb_nat_pool.poc.*.id, count.index)}&#34;]
-    }
-  }
-
-  zones = [1, 2, 3]
-}
-</code></pre></div><h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_resource_group&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name     = &#34;${var.resource_group_name}&#34;
+</span></span><span style="display:flex;"><span>  location = &#34;East US 2&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_virtual_network&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;vnet01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.poc.location}&#34;
+</span></span><span style="display:flex;"><span>  address_space       = [&#34;10.0.0.0/16&#34;]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_subnet&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                      = &#34;subnet01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name       = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  virtual_network_name      = &#34;${azurerm_virtual_network.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  address_prefix            = &#34;10.0.2.0/24&#34;
+</span></span><span style="display:flex;"><span>  network_security_group_id = &#34;${azurerm_network_security_group.poc.id}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_network_security_group&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;nsg01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.poc.location}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  security_rule = [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      name                       = &#34;allow_http&#34;
+</span></span><span style="display:flex;"><span>      priority                   = 100
+</span></span><span style="display:flex;"><span>      direction                  = &#34;Inbound&#34;
+</span></span><span style="display:flex;"><span>      access                     = &#34;Allow&#34;
+</span></span><span style="display:flex;"><span>      protocol                   = &#34;Tcp&#34;
+</span></span><span style="display:flex;"><span>      source_port_range          = &#34;*&#34;
+</span></span><span style="display:flex;"><span>      destination_port_range     = &#34;80&#34;
+</span></span><span style="display:flex;"><span>      source_address_prefix      = &#34;*&#34;
+</span></span><span style="display:flex;"><span>      destination_address_prefix = &#34;*&#34;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      name                       = &#34;allow_ssh&#34;
+</span></span><span style="display:flex;"><span>      priority                   = 101
+</span></span><span style="display:flex;"><span>      direction                  = &#34;Inbound&#34;
+</span></span><span style="display:flex;"><span>      access                     = &#34;Allow&#34;
+</span></span><span style="display:flex;"><span>      protocol                   = &#34;Tcp&#34;
+</span></span><span style="display:flex;"><span>      source_port_range          = &#34;*&#34;
+</span></span><span style="display:flex;"><span>      destination_port_range     = &#34;22&#34;
+</span></span><span style="display:flex;"><span>      source_address_prefix      = &#34;*&#34;
+</span></span><span style="display:flex;"><span>      destination_address_prefix = &#34;*&#34;
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_public_ip&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                         = &#34;pip01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name          = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  location                     = &#34;${azurerm_resource_group.poc.location}&#34;
+</span></span><span style="display:flex;"><span>  public_ip_address_allocation = &#34;static&#34;
+</span></span><span style="display:flex;"><span>  domain_name_label            = &#34;${var.scaleset_name}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  sku = &#34;Standard&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_lb&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;lb01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.poc.location}&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  frontend_ip_configuration {
+</span></span><span style="display:flex;"><span>    name                 = &#34;fipConf01&#34;
+</span></span><span style="display:flex;"><span>    public_ip_address_id = &#34;${azurerm_public_ip.poc.id}&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  sku = &#34;Standard&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_lb_backend_address_pool&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;bePool01&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  loadbalancer_id     = &#34;${azurerm_lb.poc.id}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_lb_rule&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                           = &#34;lbRule&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name            = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  loadbalancer_id                = &#34;${azurerm_lb.poc.id}&#34;
+</span></span><span style="display:flex;"><span>  protocol                       = &#34;Tcp&#34;
+</span></span><span style="display:flex;"><span>  frontend_port                  = 80
+</span></span><span style="display:flex;"><span>  backend_port                   = 80
+</span></span><span style="display:flex;"><span>  frontend_ip_configuration_name = &#34;fipConf01&#34;
+</span></span><span style="display:flex;"><span>  backend_address_pool_id        = &#34;${azurerm_lb_backend_address_pool.poc.id}&#34;
+</span></span><span style="display:flex;"><span>  probe_id                       = &#34;${azurerm_lb_probe.poc.id}&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_lb_probe&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;http-probe&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  loadbalancer_id     = &#34;${azurerm_lb.poc.id}&#34;
+</span></span><span style="display:flex;"><span>  port                = 80
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_lb_nat_pool&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  count                          = 3
+</span></span><span style="display:flex;"><span>  name                           = &#34;ssh&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name            = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  loadbalancer_id                = &#34;${azurerm_lb.poc.id}&#34;
+</span></span><span style="display:flex;"><span>  protocol                       = &#34;Tcp&#34;
+</span></span><span style="display:flex;"><span>  frontend_port_start            = 50000
+</span></span><span style="display:flex;"><span>  frontend_port_end              = 50119
+</span></span><span style="display:flex;"><span>  backend_port                   = 22
+</span></span><span style="display:flex;"><span>  frontend_ip_configuration_name = &#34;fipConf01&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data &#34;template_cloudinit_config&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  gzip          = true
+</span></span><span style="display:flex;"><span>  base64_encode = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  part {
+</span></span><span style="display:flex;"><span>    content_type = &#34;text/cloud-config&#34;
+</span></span><span style="display:flex;"><span>    content      = &#34;${file(&#34;${path.module}/cloud-config.yaml&#34;)}&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>resource &#34;azurerm_virtual_machine_scale_set&#34; &#34;poc&#34; {
+</span></span><span style="display:flex;"><span>  name                = &#34;${var.scaleset_name}&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = &#34;${azurerm_resource_group.poc.name}&#34;
+</span></span><span style="display:flex;"><span>  location            = &#34;${azurerm_resource_group.poc.location}&#34;
+</span></span><span style="display:flex;"><span>  upgrade_policy_mode = &#34;Manual&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  sku {
+</span></span><span style="display:flex;"><span>    name     = &#34;Standard_B1s&#34;
+</span></span><span style="display:flex;"><span>    tier     = &#34;Standard&#34;
+</span></span><span style="display:flex;"><span>    capacity = 3
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  storage_profile_image_reference {
+</span></span><span style="display:flex;"><span>    publisher = &#34;Canonical&#34;
+</span></span><span style="display:flex;"><span>    offer     = &#34;UbuntuServer&#34;
+</span></span><span style="display:flex;"><span>    sku       = &#34;16.04-LTS&#34;
+</span></span><span style="display:flex;"><span>    version   = &#34;latest&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  storage_profile_os_disk {
+</span></span><span style="display:flex;"><span>    name              = &#34;&#34;
+</span></span><span style="display:flex;"><span>    caching           = &#34;ReadWrite&#34;
+</span></span><span style="display:flex;"><span>    create_option     = &#34;FromImage&#34;
+</span></span><span style="display:flex;"><span>    managed_disk_type = &#34;Standard_LRS&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  os_profile {
+</span></span><span style="display:flex;"><span>    computer_name_prefix = &#34;pocvmss&#34;
+</span></span><span style="display:flex;"><span>    admin_username       = &#34;${var.admin_username}&#34;
+</span></span><span style="display:flex;"><span>    admin_password       = &#34;&#34;
+</span></span><span style="display:flex;"><span>    custom_data          = &#34;${data.template_cloudinit_config.poc.rendered}&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  os_profile_linux_config {
+</span></span><span style="display:flex;"><span>    disable_password_authentication = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ssh_keys {
+</span></span><span style="display:flex;"><span>      path     = &#34;/home/${var.admin_username}/.ssh/authorized_keys&#34;
+</span></span><span style="display:flex;"><span>      key_data = &#34;${file(&#34;~/.ssh/id_rsa.pub&#34;)}&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  network_profile {
+</span></span><span style="display:flex;"><span>    name    = &#34;terraformnetworkprofile&#34;
+</span></span><span style="display:flex;"><span>    primary = true
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ip_configuration {
+</span></span><span style="display:flex;"><span>      name                                   = &#34;PoCIPConfiguration&#34;
+</span></span><span style="display:flex;"><span>      subnet_id                              = &#34;${azurerm_subnet.poc.id}&#34;
+</span></span><span style="display:flex;"><span>      load_balancer_backend_address_pool_ids = [&#34;${azurerm_lb_backend_address_pool.poc.id}&#34;]
+</span></span><span style="display:flex;"><span>      load_balancer_inbound_nat_rules_ids    = [&#34;${element(azurerm_lb_nat_pool.poc.*.id, count.index)}&#34;]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  zones = [1, 2, 3]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="cloud-init-configファイル">cloud-init configファイル</h3>
 <p>各インスタンスがどのゾーンで動いているか確認したいので、インスタンス作成時にcloud-initでWebサーバーを仕込みます。メタデータからインスタンス名と実行ゾーンを引っ張り、nginxのドキュメントルートに書きます。</p>
 <p>[cloud-config.yaml]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#cloud-config
-package_upgrade: true
-packages:
-  - nginx
-runcmd:
-  - &#39;echo &#34;[Instance Name]: `curl -H Metadata:true &#34;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;format=text&#34;`    [Zone]: `curl -H Metadata:true &#34;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;format=text&#34;`&#34; &gt; /var/www/html/index.nginx-debian.html&#39;
-</code></pre></div><p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>#cloud-config
+</span></span><span style="display:flex;"><span>package_upgrade: true
+</span></span><span style="display:flex;"><span>packages:
+</span></span><span style="display:flex;"><span>  - nginx
+</span></span><span style="display:flex;"><span>runcmd:
+</span></span><span style="display:flex;"><span>  - &#39;echo &#34;[Instance Name]: `curl -H Metadata:true &#34;http://169.254.169.254/metadata/instance/compute/name?api-version=2017-12-01&amp;format=text&#34;`    [Zone]: `curl -H Metadata:true &#34;http://169.254.169.254/metadata/instance/compute/zone?api-version=2017-12-01&amp;format=text&#34;`&#34; &gt; /var/www/html/index.nginx-debian.html&#39;
+</span></span></code></pre></div><p>インスタンス作成時、パッケージの導入やアップデートに時間をかけたくない場合は、Packerなどで前もってカスタムイメージを作っておくのも手です。</p>
 <ul>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/virtual-machines/linux/build-image-with-packer">Packer を使用して Azure に Linux 仮想マシンのイメージを作成する方法</a></li>
 <li><a href="https://docs.microsoft.com/ja-jp/azure/terraform/terraform-create-vm-scaleset-network-disks-using-packer-hcl">Terraform を使用して Packer カスタム イメージから Azure 仮想マシン スケール セットを作成する</a></li>
@@ -274,41 +274,41 @@ runcmd:
 <h3 id="terraform-変数ファイル">Terraform 変数ファイル</h3>
 <p>変数は別ファイルへ。</p>
 <p>[variables.tf]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">variable &#34;resource_group_name&#34; {
-  default = &#34;your-rg&#34;
-}
-
-variable &#34;scaleset_name&#34; {
-  default = &#34;yourvmss01&#34;
-}
-
-variable &#34;admin_username&#34; {
-  default = &#34;yourname&#34;
-}
-</code></pre></div><h2 id="実行">実行</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>variable &#34;resource_group_name&#34; {
+</span></span><span style="display:flex;"><span>  default = &#34;your-rg&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>variable &#34;scaleset_name&#34; {
+</span></span><span style="display:flex;"><span>  default = &#34;yourvmss01&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>variable &#34;admin_username&#34; {
+</span></span><span style="display:flex;"><span>  default = &#34;yourname&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="実行">実行</h2>
 <p>では実行。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ terraform init
-$ terraform plan
-$ terraform apply
-</code></pre></div><p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ terraform init
+</span></span><span style="display:flex;"><span>$ terraform plan
+</span></span><span style="display:flex;"><span>$ terraform apply
+</span></span></code></pre></div><p>5分くらいで完了しました。このサンプルでは、この後のcloud-initのパッケージ処理に時間がかかります。待てない場合は前述の通り、カスタムイメージを使いましょう。</p>
 <p>インスタンスへのsshを通すよう、Load BalancerにNATを設定していますので、cloud-initの進捗は確認できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
-$ tail -f /var/log/cloud-init-output.log
-Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
-</code></pre></div><p>ではWebサーバーにアクセスしてみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
-[Instance Name]: yourvmss01_2    [Zone]: 3
-[Instance Name]: yourvmss01_0    [Zone]: 1
-[Instance Name]: yourvmss01_2    [Zone]: 3
-[Instance Name]: yourvmss01_1    [Zone]: 2
-</code></pre></div><p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ ssh -p 50000 yourname@yourvmss01.eastus2.cloudapp.azure.com
+</span></span><span style="display:flex;"><span>$ tail -f /var/log/cloud-init-output.log
+</span></span><span style="display:flex;"><span>Cloud-init v. 17.1 finished at Sun, 25 Mar 2018 10:41:40 +0000. Datasource DataSourceAzure [seed=/dev/sr0].  Up 611.51 seconds
+</span></span></code></pre></div><p>ではWebサーバーにアクセスしてみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ while true; do curl yourvmss01.eastus2.cloudapp.azure.com; sleep 1; done;
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_2    [Zone]: 3
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_0    [Zone]: 1
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_2    [Zone]: 3
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_1    [Zone]: 2
+</span></span></code></pre></div><p>VMSSのインスタンスがゾーンに分散されたことが分かります。</p>
 <p>では、このままスケールアウトしてみましょう。main.tfのazurerm_virtual_machine_scale_set.poc.sku.capacityを3から4にし、再度applyします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">[Instance Name]: yourvmss01_1    [Zone]: 2
-[Instance Name]: yourvmss01_3    [Zone]: 1
-[Instance Name]: yourvmss01_3    [Zone]: 1
-[Instance Name]: yourvmss01_1    [Zone]: 2
-[Instance Name]: yourvmss01_3    [Zone]: 1
-</code></pre></div><p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[Instance Name]: yourvmss01_1    [Zone]: 2
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_3    [Zone]: 1
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_3    [Zone]: 1
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_1    [Zone]: 2
+</span></span><span style="display:flex;"><span>[Instance Name]: yourvmss01_3    [Zone]: 1
+</span></span></code></pre></div><p>ダウンタイムなしに、yourvmss01_3が追加されました。すこぶる簡単。</p>
 
 		</section>
 

@@ -67,95 +67,95 @@
 <li>Parallelism オプションを追加</li>
 <li>ヘルパー関数 handleErrors を追加</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;context&#34;</span>
-	<span style="color:#e6db74">&#34;flag&#34;</span>
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;net/url&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
-
-	<span style="color:#e6db74">&#34;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&#34;</span>
-)
-
-<span style="color:#66d9ef">var</span> (
-	<span style="color:#a6e22e">accountName</span>    <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">accountKey</span>     <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">containerName</span>  <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">fileName</span>       <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">blockSize</span>      <span style="color:#66d9ef">int64</span>
-	<span style="color:#a6e22e">blockSizeBytes</span> <span style="color:#66d9ef">int64</span>
-	<span style="color:#a6e22e">parallelism</span>    <span style="color:#66d9ef">int64</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountName</span>, <span style="color:#e6db74">&#34;account-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Name&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountKey</span>, <span style="color:#e6db74">&#34;account-key&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Key&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;c&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Blob Container Name&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;container-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Blob Container Name&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;f&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Upload filename&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;file&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Upload filename&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;b&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;blocksize&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;p&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional - short option) Parallelism - From 0 to 32. Default 5.&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;parallelism&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional) Parallelism - From 0 to 32. Default 5.&#34;</span>)
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
-
-	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blockSize</span> &lt; <span style="color:#ae81ff">1</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">blockSize</span> &gt; <span style="color:#ae81ff">100</span>) {
-		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Blocksize must be from 1MB to 100MB&#34;</span>)
-		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
-	}
-	<span style="color:#a6e22e">blockSizeBytes</span> = <span style="color:#a6e22e">blockSize</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
-
-	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">parallelism</span> &lt; <span style="color:#ae81ff">0</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">parallelism</span> &gt; <span style="color:#ae81ff">32</span>) {
-		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Parallelism must be from 0 to 32&#34;</span>)
-		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
-	}
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">serr</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">err</span>.(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">StorageError</span>); <span style="color:#a6e22e">ok</span> { <span style="color:#75715e">// This error is a Service-specific
-</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">serr</span>.<span style="color:#a6e22e">ServiceCode</span>() { <span style="color:#75715e">// Compare serviceCode to ServiceCodeXxx constants
-</span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">ServiceCodeContainerAlreadyExists</span>:
-				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Received 409. Container already exists&#34;</span>)
-				<span style="color:#66d9ef">return</span>
-			}
-		}
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
-	}
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#a6e22e">fileName</span>)
-	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
-	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
-
-	<span style="color:#a6e22e">fileSize</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Stat</span>()
-	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
-
-	<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;https://%s.blob.core.windows.net/%s/%s&#34;</span>, <span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">containerName</span>, <span style="color:#a6e22e">fileName</span>))
-	<span style="color:#a6e22e">blockBlobURL</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewBlockBlobURL</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewPipeline</span>(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewSharedKeyCredential</span>(<span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">accountKey</span>), <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">PipelineOptions</span>{}))
-
-	<span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Uploading block blob...&#34;</span>)
-	<span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadFileToBlockBlob</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">blockBlobURL</span>,
-		<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadToBlockBlobOptions</span>{
-			<span style="color:#a6e22e">BlockSize</span>: <span style="color:#a6e22e">blockSizeBytes</span>,
-			<span style="color:#a6e22e">Progress</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">bytesTransferred</span> <span style="color:#66d9ef">int64</span>) {
-				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Uploaded %d of %d bytes.\n&#34;</span>, <span style="color:#a6e22e">bytesTransferred</span>, <span style="color:#a6e22e">fileSize</span>.<span style="color:#a6e22e">Size</span>())
-			},
-			<span style="color:#a6e22e">Parallelism</span>: uint16(<span style="color:#a6e22e">parallelism</span>),
-		})
-	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
-	<span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">response</span> <span style="color:#75715e">// Avoid compiler&#39;s &#34;declared and not used&#34; error
-</span><span style="color:#75715e"></span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Done&#34;</span>)
-}
-</code></pre></div><p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/url&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;github.com/Azure/azure-storage-blob-go/2017-07-29/azblob&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">accountName</span>    <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">accountKey</span>     <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">containerName</span>  <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fileName</span>       <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">blockSize</span>      <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">blockSizeBytes</span> <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">parallelism</span>    <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">init</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountName</span>, <span style="color:#e6db74">&#34;account-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Name&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">accountKey</span>, <span style="color:#e6db74">&#34;account-key&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Storage Account Key&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;c&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Blob Container Name&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">containerName</span>, <span style="color:#e6db74">&#34;container-name&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Blob Container Name&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;f&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required - short option) Upload filename&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">StringVar</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">fileName</span>, <span style="color:#e6db74">&#34;file&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, <span style="color:#e6db74">&#34;(Required) Upload filename&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;b&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional - short option) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">blockSize</span>, <span style="color:#e6db74">&#34;blocksize&#34;</span>, <span style="color:#ae81ff">4</span>, <span style="color:#e6db74">&#34;(Optional) Blob Blocksize (MB) - From 1 to 100. Max filesize depends on this value. Max filesize = Blocksize * 50,000 blocks&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;p&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional - short option) Parallelism - From 0 to 32. Default 5.&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int64Var</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">parallelism</span>, <span style="color:#e6db74">&#34;parallelism&#34;</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#34;(Optional) Parallelism - From 0 to 32. Default 5.&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">blockSize</span> &lt; <span style="color:#ae81ff">1</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">blockSize</span> &gt; <span style="color:#ae81ff">100</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Blocksize must be from 1MB to 100MB&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">blockSizeBytes</span> = <span style="color:#a6e22e">blockSize</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">1024</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">parallelism</span> &lt; <span style="color:#ae81ff">0</span>) <span style="color:#f92672">||</span> (<span style="color:#a6e22e">parallelism</span> &gt; <span style="color:#ae81ff">32</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Parallelism must be from 0 to 32&#34;</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Exit</span>(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">serr</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">err</span>.(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">StorageError</span>); <span style="color:#a6e22e">ok</span> { <span style="color:#75715e">// This error is a Service-specific
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">serr</span>.<span style="color:#a6e22e">ServiceCode</span>() { <span style="color:#75715e">// Compare serviceCode to ServiceCodeXxx constants
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#66d9ef">case</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">ServiceCodeContainerAlreadyExists</span>:
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Received 409. Container already exists&#34;</span>)
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#a6e22e">fileName</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Close</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fileSize</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">file</span>.<span style="color:#a6e22e">Stat</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;https://%s.blob.core.windows.net/%s/%s&#34;</span>, <span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">containerName</span>, <span style="color:#a6e22e">fileName</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">blockBlobURL</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewBlockBlobURL</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewPipeline</span>(<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">NewSharedKeyCredential</span>(<span style="color:#a6e22e">accountName</span>, <span style="color:#a6e22e">accountKey</span>), <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">PipelineOptions</span>{}))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Background</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Uploading block blob...&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">response</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadFileToBlockBlob</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">blockBlobURL</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">azblob</span>.<span style="color:#a6e22e">UploadToBlockBlobOptions</span>{
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">BlockSize</span>: <span style="color:#a6e22e">blockSizeBytes</span>,
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Progress</span>: <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">bytesTransferred</span> <span style="color:#66d9ef">int64</span>) {
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Uploaded %d of %d bytes.\n&#34;</span>, <span style="color:#a6e22e">bytesTransferred</span>, <span style="color:#a6e22e">fileSize</span>.<span style="color:#a6e22e">Size</span>())
+</span></span><span style="display:flex;"><span>			},
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">Parallelism</span>: uint16(<span style="color:#a6e22e">parallelism</span>),
+</span></span><span style="display:flex;"><span>		})
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">handleErrors</span>(<span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">response</span> <span style="color:#75715e">// Avoid compiler&#39;s &#34;declared and not used&#34; error
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Done&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>以前のSDKと比較し、スッキリ書けるようになりました。進行状況もPipelineパッケージを使って、楽に取れるようになっています。ブロック分割のロジックを書く必要もなくなりました。ブロックサイズを指定すればOK。</p>
 <p>ちなみにファイルサイズがブロックサイズで割り切れると最終ブロックの転送がエラーになるバグを見つけたのですが、<a href="https://github.com/Azure/azure-storage-blob-go/issues/8">修正してもらった</a>ので、次のリリースでは解決していると思います。</p>
 <h2 id="ふたつめの理由-レガシー対応">ふたつめの理由: レガシー対応</h2>
 <p>Blobのアップロードが目的であれば、Azure CLIをインストールすればOK。以上。なのですが、残念ながらそれができないケースがあります。</p>

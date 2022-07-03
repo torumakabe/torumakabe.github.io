@@ -87,241 +87,241 @@
 </ul>
 <h2 id="メインとなるhclの概説">メインとなるHCLの概説</h2>
 <p>ちょっと長いのですが、AKSに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hcl" data-lang="hcl"><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
-  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
-  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34;</span> {
-  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
-  kubernetes_version  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.18.2&#34;</span>
-  location            <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_location</span>
-  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_rg</span>
-  dns_prefix          <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
-
-  <span style="color:#66d9ef">default_node_pool</span> {
-    name                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;default&#34;</span>
-    type                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;VirtualMachineScaleSets&#34;</span>
-    enable_auto_scaling <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-    vnet_subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
-    availability_zones  <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
-    node_count          <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
-    min_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
-    max_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
-    vm_size             <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_D2s_v3&#34;</span>
-  }
-
-  <span style="color:#66d9ef">identity</span> {
-    type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SystemAssigned&#34;</span>
-  }
-
-  <span style="color:#66d9ef">role_based_access_control</span> {
-    enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-  }
-
-  <span style="color:#66d9ef">network_profile</span> {
-    network_plugin    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
-    network_policy    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
-    load_balancer_sku <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;standard&#34;</span>
-    <span style="color:#66d9ef">load_balancer_profile</span> {
-      managed_outbound_ip_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
-    }
-  }
-
-  <span style="color:#66d9ef">addon_profile</span> {
-    <span style="color:#66d9ef">oms_agent</span> {
-      enabled                    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-      log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
-    }
-    <span style="color:#66d9ef">azure_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-    }
-  }
-
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster_node_pool&#34; &#34;system&#34;</span> {
-  name                  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;system&#34;</span>
-  kubernetes_cluster_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
-  vnet_subnet_id        <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
-  availability_zones    <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
-  node_count            <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
-  vm_size               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_F2s_v2&#34;</span>
-  node_taints           <span style="color:#f92672">=</span> [&#34;CriticalAddonsOnly<span style="color:#f92672">=</span><span style="color:#66d9ef">true</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#66d9ef">NoSchedule</span><span style="color:#960050;background-color:#1e0010">&#34;</span>]
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_monitor_diagnostic_setting&#34; &#34;aks&#34;</span> {
-  name                       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;aks-diag&#34;</span>
-  target_resource_id         <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
-  log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
-
-  <span style="color:#66d9ef">log</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-apiserver&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-
-  <span style="color:#66d9ef">log</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-controller-manager&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-
-  <span style="color:#66d9ef">log</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-scheduler&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-
-  <span style="color:#66d9ef">log</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-audit&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-
-  <span style="color:#66d9ef">log</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cluster-autoscaler&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-
-  <span style="color:#66d9ef">metric</span> {
-    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AllMetrics&#34;</span>
-    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-
-    <span style="color:#66d9ef">retention_policy</span> {
-      days    <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
-      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    }
-  }
-}
-
-<span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;kubernetes&#34;</span> {
-  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.11&#34;</span>
-
-  load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-  host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
-  client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
-  client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
-  cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_storage_class&#34; &#34;managed_premium_bind_wait&#34;</span> {
-  <span style="color:#66d9ef">metadata</span> {
-    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;managed-premium-bind-wait&#34;</span>
-  }
-  storage_provisioner <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kubernetes.io/azure-disk&#34;</span>
-  volume_binding_mode <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;WaitForFirstConsumer&#34;</span>
-  parameters <span style="color:#f92672">=</span> {
-    storageaccounttype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Premium_LRS&#34;</span>
-    kind               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Managed&#34;</span>
-  }
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role&#34; &#34;log_reader&#34;</span> {
-  <span style="color:#66d9ef">metadata</span> {
-    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
-  }
-
-  <span style="color:#66d9ef">rule</span> {
-    api_groups <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;&#34;</span>]
-    resources  <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;pods/log&#34;, &#34;events&#34;</span>]
-    verbs      <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;get&#34;, &#34;list&#34;</span>]
-  }
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role_binding&#34; &#34;log_reader&#34;</span> {
-  <span style="color:#66d9ef">metadata</span> {
-    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-read-logs-global&#34;</span>
-  }
-
-  <span style="color:#66d9ef">role_ref</span> {
-    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ClusterRole&#34;</span>
-    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
-    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
-  }
-
-  <span style="color:#66d9ef">subject</span> {
-    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;User&#34;</span>
-    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;clusterUser&#34;</span>
-    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
-  }
-}
-
-<span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;helm&#34;</span> {
-  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.2&#34;</span>
-
-  <span style="color:#66d9ef">kubernetes</span> {
-    load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
-    host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
-    client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
-    client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
-    cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
-  }
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_namespace&#34; &#34;flux&#34;</span> {
-  count <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
-  <span style="color:#66d9ef">metadata</span> {
-    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
-  }
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;flux&#34;</span> {
-  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
-  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
-  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
-  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
-  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
-  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.3.0&#34;</span>
-
-  <span style="color:#66d9ef">set</span> {
-    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
-    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
-  }
-
-  <span style="color:#66d9ef">set</span> {
-    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.url&#34;</span>
-    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git@github.com:${var.git_authuser}/${var.git_fluxrepo}&#34;</span>
-  }
-
-}
-
-<span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;helm_operator&#34;</span> {
-  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
-  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
-  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
-  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
-  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
-  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0.2&#34;</span>
-
-  <span style="color:#66d9ef">set</span> {
-    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
-    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
-  }
-
-  <span style="color:#66d9ef">set</span> {
-    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.ssh.secretName&#34;</span>
-    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux-git-deploy&#34;</span>
-  }
-
-}
-</code></pre></div><p>以下は特記すべきリソースと設定、その背景などです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
+</span></span><span style="display:flex;"><span>  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
+</span></span><span style="display:flex;"><span>  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster&#34; &#34;aks&#34;</span> {
+</span></span><span style="display:flex;"><span>  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
+</span></span><span style="display:flex;"><span>  kubernetes_version  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.18.2&#34;</span>
+</span></span><span style="display:flex;"><span>  location            <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_location</span>
+</span></span><span style="display:flex;"><span>  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_rg</span>
+</span></span><span style="display:flex;"><span>  dns_prefix          <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_cluster_name</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">default_node_pool</span> {
+</span></span><span style="display:flex;"><span>    name                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;default&#34;</span>
+</span></span><span style="display:flex;"><span>    type                <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;VirtualMachineScaleSets&#34;</span>
+</span></span><span style="display:flex;"><span>    enable_auto_scaling <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    vnet_subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
+</span></span><span style="display:flex;"><span>    availability_zones  <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>    node_count          <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    min_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    max_count           <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>    vm_size             <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_D2s_v3&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">identity</span> {
+</span></span><span style="display:flex;"><span>    type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SystemAssigned&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">role_based_access_control</span> {
+</span></span><span style="display:flex;"><span>    enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">network_profile</span> {
+</span></span><span style="display:flex;"><span>    network_plugin    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
+</span></span><span style="display:flex;"><span>    network_policy    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;azure&#34;</span>
+</span></span><span style="display:flex;"><span>    load_balancer_sku <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;standard&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">load_balancer_profile</span> {
+</span></span><span style="display:flex;"><span>      managed_outbound_ip_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">addon_profile</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">oms_agent</span> {
+</span></span><span style="display:flex;"><span>      enabled                    <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>      log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">azure_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_kubernetes_cluster_node_pool&#34; &#34;system&#34;</span> {
+</span></span><span style="display:flex;"><span>  name                  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;system&#34;</span>
+</span></span><span style="display:flex;"><span>  kubernetes_cluster_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  vnet_subnet_id        <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">aks_subnet_id</span>
+</span></span><span style="display:flex;"><span>  availability_zones    <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>]
+</span></span><span style="display:flex;"><span>  node_count            <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>  vm_size               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Standard_F2s_v2&#34;</span>
+</span></span><span style="display:flex;"><span>  node_taints           <span style="color:#f92672">=</span> [&#34;CriticalAddonsOnly<span style="color:#f92672">=</span><span style="color:#66d9ef">true</span><span style="color:#960050;background-color:#1e0010">:</span><span style="color:#66d9ef">NoSchedule</span><span style="color:#960050;background-color:#1e0010">&#34;</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;azurerm_monitor_diagnostic_setting&#34; &#34;aks&#34;</span> {
+</span></span><span style="display:flex;"><span>  name                       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;aks-diag&#34;</span>
+</span></span><span style="display:flex;"><span>  target_resource_id         <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  log_analytics_workspace_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">data</span>.<span style="color:#66d9ef">azurerm_log_analytics_workspace</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">log</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-apiserver&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">log</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-controller-manager&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">log</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-scheduler&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">log</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kube-audit&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">log</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cluster-autoscaler&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">metric</span> {
+</span></span><span style="display:flex;"><span>    category <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;AllMetrics&#34;</span>
+</span></span><span style="display:flex;"><span>    enabled  <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">retention_policy</span> {
+</span></span><span style="display:flex;"><span>      days    <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>      enabled <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;kubernetes&#34;</span> {
+</span></span><span style="display:flex;"><span>  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.11&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
+</span></span><span style="display:flex;"><span>  client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
+</span></span><span style="display:flex;"><span>  client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
+</span></span><span style="display:flex;"><span>  cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_storage_class&#34; &#34;managed_premium_bind_wait&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">metadata</span> {
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;managed-premium-bind-wait&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  storage_provisioner <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kubernetes.io/azure-disk&#34;</span>
+</span></span><span style="display:flex;"><span>  volume_binding_mode <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;WaitForFirstConsumer&#34;</span>
+</span></span><span style="display:flex;"><span>  parameters <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    storageaccounttype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Premium_LRS&#34;</span>
+</span></span><span style="display:flex;"><span>    kind               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Managed&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role&#34; &#34;log_reader&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">metadata</span> {
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">rule</span> {
+</span></span><span style="display:flex;"><span>    api_groups <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;&#34;</span>]
+</span></span><span style="display:flex;"><span>    resources  <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;pods/log&#34;, &#34;events&#34;</span>]
+</span></span><span style="display:flex;"><span>    verbs      <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;get&#34;, &#34;list&#34;</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_cluster_role_binding&#34; &#34;log_reader&#34;</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">metadata</span> {
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-read-logs-global&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">role_ref</span> {
+</span></span><span style="display:flex;"><span>    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ClusterRole&#34;</span>
+</span></span><span style="display:flex;"><span>    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;containerhealth-log-reader&#34;</span>
+</span></span><span style="display:flex;"><span>    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">subject</span> {
+</span></span><span style="display:flex;"><span>    kind      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;User&#34;</span>
+</span></span><span style="display:flex;"><span>    name      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;clusterUser&#34;</span>
+</span></span><span style="display:flex;"><span>    api_group <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rbac.authorization.k8s.io&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;helm&#34;</span> {
+</span></span><span style="display:flex;"><span>  version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;1.2&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">kubernetes</span> {
+</span></span><span style="display:flex;"><span>    load_config_file       <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    host                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">host</span>
+</span></span><span style="display:flex;"><span>    client_certificate     <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_certificate</span>)
+</span></span><span style="display:flex;"><span>    client_key             <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">client_key</span>)
+</span></span><span style="display:flex;"><span>    cluster_ca_certificate <span style="color:#f92672">=</span> <span style="color:#66d9ef">base64decode</span>(<span style="color:#66d9ef">azurerm_kubernetes_cluster</span>.<span style="color:#66d9ef">aks</span>.<span style="color:#66d9ef">kube_config</span>.<span style="color:#ae81ff">0</span>.<span style="color:#66d9ef">cluster_ca_certificate</span>)
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;kubernetes_namespace&#34; &#34;flux&#34;</span> {
+</span></span><span style="display:flex;"><span>  count <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">metadata</span> {
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;flux&#34;</span> {
+</span></span><span style="display:flex;"><span>  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+</span></span><span style="display:flex;"><span>  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+</span></span><span style="display:flex;"><span>  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
+</span></span><span style="display:flex;"><span>  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+</span></span><span style="display:flex;"><span>  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.3.0&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">set</span> {
+</span></span><span style="display:flex;"><span>    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
+</span></span><span style="display:flex;"><span>    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">set</span> {
+</span></span><span style="display:flex;"><span>    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.url&#34;</span>
+</span></span><span style="display:flex;"><span>    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git@github.com:${var.git_authuser}/${var.git_fluxrepo}&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;helm_release&#34; &#34;helm_operator&#34;</span> {
+</span></span><span style="display:flex;"><span>  count      <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">enable_flux</span> <span style="color:#960050;background-color:#1e0010">?</span> <span style="color:#ae81ff">1</span> <span style="color:#960050;background-color:#1e0010">:</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>  name       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
+</span></span><span style="display:flex;"><span>  namespace  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux&#34;</span>
+</span></span><span style="display:flex;"><span>  repository <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://charts.fluxcd.io/&#34;</span>
+</span></span><span style="display:flex;"><span>  chart      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm-operator&#34;</span>
+</span></span><span style="display:flex;"><span>  version    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0.2&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">set</span> {
+</span></span><span style="display:flex;"><span>    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;helm.versions&#34;</span>
+</span></span><span style="display:flex;"><span>    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;v3&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">set</span> {
+</span></span><span style="display:flex;"><span>    name  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;git.ssh.secretName&#34;</span>
+</span></span><span style="display:flex;"><span>    value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flux-git-deploy&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>以下は特記すべきリソースと設定、その背景などです。</p>
 <ul>
 <li>(data).azurerm_log_analytics_workspace.aks
 <ul>

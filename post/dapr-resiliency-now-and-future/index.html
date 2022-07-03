@@ -130,78 +130,78 @@
 <p>おそらくフェーズ1のリリース後に、多くのフィードバックがあるでしょう。それを見越し、フェーズ1では基本的な機能にフォーカスしています。</p>
 <h3 id="フェーズ1">フェーズ1</h3>
 <p>フェーズ1では、以下のようなカスタムリソースが提案されています。代表的な部分を抜き出します。コメントは削っていますが参考になるため、ぜひ<a href="https://github.com/dapr/dapr/issues/3586">原文</a>もご覧ください。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">dapr.io/v1alpha1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Resiliency</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">daprResiliency</span>
-<span style="color:#f92672">scopes</span>:
-  - <span style="color:#ae81ff">app1</span>
-  - <span style="color:#ae81ff">app2</span>
-...
-  <span style="color:#f92672">policies</span>:
-    <span style="color:#f92672">timeouts</span>:
-      <span style="color:#f92672">general</span>: <span style="color:#ae81ff">5s</span>
-      <span style="color:#f92672">important</span>: <span style="color:#ae81ff">60s</span>
-      <span style="color:#f92672">largeResponse</span>: <span style="color:#ae81ff">10s</span>
-
-    <span style="color:#f92672">retries</span>:
-      <span style="color:#f92672">general</span>: {}
-
-      <span style="color:#f92672">pubsubRetry</span>:
-        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">constant</span>
-        <span style="color:#f92672">duration</span>: <span style="color:#ae81ff">5s</span>
-        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">10</span>
-
-      <span style="color:#f92672">retryForever</span>:
-        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">exponential</span>
-        <span style="color:#f92672">maxInterval</span>: <span style="color:#ae81ff">15s</span>
-        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">0</span>
-...
-    <span style="color:#f92672">circuitBreakers</span>:
-      <span style="color:#f92672">general</span>: {}
-
-      <span style="color:#f92672">pubsubCB</span>:
-        <span style="color:#f92672">maxRequests</span>: <span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">interval</span>: <span style="color:#ae81ff">8s</span>
-        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">45s</span>
-        <span style="color:#f92672">trip</span>: <span style="color:#ae81ff">consecutiveFailures &gt; 8</span>
-
-  <span style="color:#f92672">buildingBlocks</span>:
-    <span style="color:#f92672">services</span>:
-      <span style="color:#f92672">appB</span>:
-        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
-        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
-        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
-...
-    <span style="color:#f92672">components</span>:
-      <span style="color:#f92672">statestore1</span>:
-        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
-        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
-        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
-
-      <span style="color:#f92672">pubsub1</span>:
-        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">pubsubRetry</span>
-        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">pubsubCB</span>
-...
-</code></pre></div><p>タイムアウト、リトライ、サーキットブレイカーのポリシーをそれぞれ定義し、ビルディングブロックを構成するサービスやコンポーネントに割り当てます。タイムアウトを判断するまでの時間や、リトライ間隔を固定にする/指数的に増やすなど、目的に応じたポリシーを作れます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">dapr.io/v1alpha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Resiliency</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">daprResiliency</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">scopes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">app1</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">app2</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">policies</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">timeouts</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">general</span>: <span style="color:#ae81ff">5s</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">important</span>: <span style="color:#ae81ff">60s</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">largeResponse</span>: <span style="color:#ae81ff">10s</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">retries</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">general</span>: {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">pubsubRetry</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">constant</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">duration</span>: <span style="color:#ae81ff">5s</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">retryForever</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">policy</span>: <span style="color:#ae81ff">exponential</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">maxInterval</span>: <span style="color:#ae81ff">15s</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">maxRetries</span>: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">circuitBreakers</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">general</span>: {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">pubsubCB</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">maxRequests</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">interval</span>: <span style="color:#ae81ff">8s</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">45s</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">trip</span>: <span style="color:#ae81ff">consecutiveFailures &gt; 8</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">buildingBlocks</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">appB</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">components</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">statestore1</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">general</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">pubsub1</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">pubsubRetry</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">circuitBreaker</span>: <span style="color:#ae81ff">pubsubCB</span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>タイムアウト、リトライ、サーキットブレイカーのポリシーをそれぞれ定義し、ビルディングブロックを構成するサービスやコンポーネントに割り当てます。タイムアウトを判断するまでの時間や、リトライ間隔を固定にする/指数的に増やすなど、目的に応じたポリシーを作れます。</p>
 <p>現時点でフェーズ1は、2022/1に予定されているDapr v1.6でのリリースを<a href="https://github.com/dapr/dapr/milestone/12">目指しています</a>。もちろんこのカスタムリソースを使うように、各コンポーネント向けパッケージでも対応しなければいけませんが、まずは重要な一歩目です。</p>
 <h3 id="フェーズ2">フェーズ2</h3>
 <p>フェーズ1のフィードバックによりますが、現時点ではAPI固有のポリシー定義による上書き機能が予定されています。代表例を抜き出します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">...
-  <span style="color:#f92672">apis</span>:
-    <span style="color:#f92672">invoke</span>:
-      - <span style="color:#f92672">match</span>: <span style="color:#ae81ff">appId == &#34;appB&#34;</span>
-        <span style="color:#f92672">rules</span>:
-          - <span style="color:#f92672">match</span>:
-              <span style="color:#ae81ff">request.method == &#34;GET&#34; &amp;&amp;</span>
-              <span style="color:#ae81ff">request.metadata.count &gt; 1000</span>
-            <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">largeResponse</span>
-            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">largeResponse</span>
-          - <span style="color:#f92672">match</span>:
-              <span style="color:#ae81ff">request.path == &#34;/someOperation&#34;</span>
-            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">someOperation</span>
-...
-</code></pre></div><p>サービス呼び出しのポリシーを、リクエストのメソッドやパスに合わせて個別のポリシーで上書きする、という使い方は分かりやすい例ですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">apis</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">invoke</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">match</span>: <span style="color:#ae81ff">appId == &#34;appB&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">rules</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#ae81ff">request.method == &#34;GET&#34; &amp;&amp;</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#ae81ff">request.metadata.count &gt; 1000</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">timeout</span>: <span style="color:#ae81ff">largeResponse</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">largeResponse</span>
+</span></span><span style="display:flex;"><span>          - <span style="color:#f92672">match</span>:
+</span></span><span style="display:flex;"><span>              <span style="color:#ae81ff">request.path == &#34;/someOperation&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">retry</span>: <span style="color:#ae81ff">someOperation</span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>サービス呼び出しのポリシーを、リクエストのメソッドやパスに合わせて個別のポリシーで上書きする、という使い方は分かりやすい例ですね。</p>
 <h2 id="いま意識したいこと">いま意識したいこと</h2>
 <p>以上、Daprの回復性を支える仕組みについて、現状と展望をざっと整理しました。それを踏まえ、いまDaprを使うなら、以下を意識するといいかな、と思います。</p>
 <ul>

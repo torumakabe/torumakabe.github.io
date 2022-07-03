@@ -67,171 +67,171 @@
 <p>この流れで、設定の効果を見ていきましょう。</p>
 <h2 id="vnet統合なし">VNet統合なし</h2>
 <p>まずは、IPアドレスとインターフェースの設定を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@96d38124b1f4:~/site/wwwroot# ip a
-1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-34: eth0@if35: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
-    link/ether 02:42:ac:10:02:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 172.16.2.2/24 brd 172.16.2.255 scope global eth0
-       valid_lft forever preferred_lft forever
-</code></pre></div><p>ループバックの他に、1つのインターフェース(eth0)があります。では、ルートはどうでしょうか。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@96d38124b1f4:~/site/wwwroot# ip r
-default via 172.16.2.1 dev eth0
-172.16.2.0/24 dev eth0 proto kernel scope link src 172.16.2.2
-</code></pre></div><p>すべての送信トラフィックは、eth0から送出されます。その先には、App Serviceのマルチテナントネットワークがあります。Azure内のネットワークはオーバレイされているので、コンテナーのインターフェイスに割り当てられたアドレスの意味はあまり気にせず、識別子としてとらえてください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@96d38124b1f4:~/site/wwwroot# ip a
+</span></span><span style="display:flex;"><span>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+</span></span><span style="display:flex;"><span>    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span style="display:flex;"><span>    inet 127.0.0.1/8 scope host lo
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>34: eth0@if35: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+</span></span><span style="display:flex;"><span>    link/ether 02:42:ac:10:02:02 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+</span></span><span style="display:flex;"><span>    inet 172.16.2.2/24 brd 172.16.2.255 scope global eth0
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span></code></pre></div><p>ループバックの他に、1つのインターフェース(eth0)があります。では、ルートはどうでしょうか。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@96d38124b1f4:~/site/wwwroot# ip r
+</span></span><span style="display:flex;"><span>default via 172.16.2.1 dev eth0
+</span></span><span style="display:flex;"><span>172.16.2.0/24 dev eth0 proto kernel scope link src 172.16.2.2
+</span></span></code></pre></div><p>すべての送信トラフィックは、eth0から送出されます。その先には、App Serviceのマルチテナントネットワークがあります。Azure内のネットワークはオーバレイされているので、コンテナーのインターフェイスに割り当てられたアドレスの意味はあまり気にせず、識別子としてとらえてください。</p>
 <h2 id="vnet統合あり">VNet統合あり</h2>
 <p>VNet&quot;vnet-default&quot;をApp Serviceと統合します。以降、azコマンドはApp Serviceアプリコンテナーの中ではなく、別途Azure管理APIに接続できる環境で実行しています。</p>
 <p>VNetのアドレス空間を確認しておきます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% az network vnet show --ids &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Network/virtualNetworks/vnet-default&#34; -o json --query addressSpace
-{
-  &#34;addressPrefixes&#34;: [
-    &#34;10.0.0.0/16&#34;
-  ]
-}
-</code></pre></div><p>次にVNet &ldquo;vnet-default&quot;にあるサブネット&quot;snet-appservice-integration&quot;をApp Serviceと統合します。サービスエンドポイントを使うとルーティングに影響するため、サンプルとしてAzure SQL Databaseをサービス登録しておきます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% az network vnet show --ids &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Network/virtualNetworks/vnet-default&#34; -o json --query addressSpace
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;addressPrefixes&#34;: [
+</span></span><span style="display:flex;"><span>    &#34;10.0.0.0/16&#34;
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>次にVNet &ldquo;vnet-default&quot;にあるサブネット&quot;snet-appservice-integration&quot;をApp Serviceと統合します。サービスエンドポイントを使うとルーティングに影響するため、サンプルとしてAzure SQL Databaseをサービス登録しておきます。</p>
 <p>以下は統合後のサブネットの、関連パラメータの状態です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% az network vnet subnet show -g rg-test --vnet-name vnet-default -n snet-appservice-integration -o json --query &#34;{service
-AssociationLinks:serviceAssociationLinks, serviceEndpoints:serviceEndpoints}&#34;
-{
-  &#34;serviceAssociationLinks&#34;: [
-    {
-      &#34;allowDelete&#34;: false,
-      &#34;etag&#34;: &#34;W/\&#34;hoge-hoge-fuga-fuga\&#34;&#34;,
-      &#34;id&#34;: &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Network/virtualNetworks/vnet-default/subnets/snet-appservice-integration/serviceAssociationLinks/AppServiceLink&#34;,
-      &#34;link&#34;: &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Web/serverfarms/plan-test&#34;,
-      &#34;linkedResourceType&#34;: &#34;Microsoft.Web/serverfarms&#34;,
-      &#34;locations&#34;: [],
-      &#34;name&#34;: &#34;AppServiceLink&#34;,
-      &#34;provisioningState&#34;: &#34;Succeeded&#34;,
-      &#34;resourceGroup&#34;: &#34;rg-test&#34;,
-      &#34;type&#34;: &#34;Microsoft.Network/virtualNetworks/subnets/serviceAssociationLinks&#34;
-    }
-  ],
-  &#34;serviceEndpoints&#34;: [
-    {
-      &#34;locations&#34;: [
-        &#34;japaneast&#34;
-      ],
-      &#34;provisioningState&#34;: &#34;Succeeded&#34;,
-      &#34;service&#34;: &#34;Microsoft.Sql&#34;
-    }
-  ]
-}
-</code></pre></div><p>ではコンテナを再起動し、アプリコンテナーの中からネットワーク設定を確認してみましょう。まずはIPアドレスとインターフェースから。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@59e822064224:~/site/wwwroot# ip a
-1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-3: eth0@if51: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
-    link/ether 1e:60:39:43:eb:4a brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 169.254.129.2/24 brd 169.254.129.255 scope global eth0
-       valid_lft forever preferred_lft forever
-5: vnet0g85jrhr4@if4: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
-    link/ether d6:26:fe:de:c1:01 brd ff:ff:ff:ff:ff:ff link-netnsid 1
-    inet 169.254.254.2/24 brd 169.254.254.255 scope global vnet0g85jrhr4
-       valid_lft forever preferred_lft forever
-</code></pre></div><p>eth0に加え、VNet向けのインターフェース(vnet0g85jrhr4)が生えました。では、ルートはどうでしょうか。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@59e822064224:~/site/wwwroot# ip r
-default via 169.254.129.1 dev eth0 mtu 1500
-10.0.0.0/16 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-10.0.0.0/8 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-13.78.61.196 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-13.78.104.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-13.78.104.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-13.78.105.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-13.78.121.203 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-20.191.165.160/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-20.191.165.192/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-20.191.166.0/26 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-23.102.69.95 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-23.102.71.13 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-23.102.74.190 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.184.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.184.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.185.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.192.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.192.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-40.79.193.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-52.185.152.149 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-52.243.32.19 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-52.243.43.186 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-104.41.168.103 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-104.41.169.34 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-169.254.129.0/24 dev eth0 proto kernel scope link src 169.254.129.2
-169.254.254.0/24 dev vnet0g85jrhr4 proto kernel scope link src 169.254.254.2
-172.16.0.0/12 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-191.237.240.43 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-191.237.240.44 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-191.237.240.46 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-192.168.0.0/16 via 169.254.254.1 dev vnet0g85jrhr4 proto static
-</code></pre></div><p>ガツンと増えました。デフォルトルートはeth0側ですが、統合したVNet(10.0.0.0/16)と、RFC 1918プライベートアドレス(10.0.0.0/8、172.16.0.0/12、192.168.0.0/16)向けのルートが、VNet向けのインターフェースから出ていくように設定されています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% az network vnet subnet show -g rg-test --vnet-name vnet-default -n snet-appservice-integration -o json --query &#34;{service
+</span></span><span style="display:flex;"><span>AssociationLinks:serviceAssociationLinks, serviceEndpoints:serviceEndpoints}&#34;
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;serviceAssociationLinks&#34;: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;allowDelete&#34;: false,
+</span></span><span style="display:flex;"><span>      &#34;etag&#34;: &#34;W/\&#34;hoge-hoge-fuga-fuga\&#34;&#34;,
+</span></span><span style="display:flex;"><span>      &#34;id&#34;: &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Network/virtualNetworks/vnet-default/subnets/snet-appservice-integration/serviceAssociationLinks/AppServiceLink&#34;,
+</span></span><span style="display:flex;"><span>      &#34;link&#34;: &#34;/subscriptions/mysubscription/resourceGroups/rg-test/providers/Microsoft.Web/serverfarms/plan-test&#34;,
+</span></span><span style="display:flex;"><span>      &#34;linkedResourceType&#34;: &#34;Microsoft.Web/serverfarms&#34;,
+</span></span><span style="display:flex;"><span>      &#34;locations&#34;: [],
+</span></span><span style="display:flex;"><span>      &#34;name&#34;: &#34;AppServiceLink&#34;,
+</span></span><span style="display:flex;"><span>      &#34;provisioningState&#34;: &#34;Succeeded&#34;,
+</span></span><span style="display:flex;"><span>      &#34;resourceGroup&#34;: &#34;rg-test&#34;,
+</span></span><span style="display:flex;"><span>      &#34;type&#34;: &#34;Microsoft.Network/virtualNetworks/subnets/serviceAssociationLinks&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  &#34;serviceEndpoints&#34;: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      &#34;locations&#34;: [
+</span></span><span style="display:flex;"><span>        &#34;japaneast&#34;
+</span></span><span style="display:flex;"><span>      ],
+</span></span><span style="display:flex;"><span>      &#34;provisioningState&#34;: &#34;Succeeded&#34;,
+</span></span><span style="display:flex;"><span>      &#34;service&#34;: &#34;Microsoft.Sql&#34;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ではコンテナを再起動し、アプリコンテナーの中からネットワーク設定を確認してみましょう。まずはIPアドレスとインターフェースから。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@59e822064224:~/site/wwwroot# ip a
+</span></span><span style="display:flex;"><span>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+</span></span><span style="display:flex;"><span>    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span style="display:flex;"><span>    inet 127.0.0.1/8 scope host lo
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>3: eth0@if51: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+</span></span><span style="display:flex;"><span>    link/ether 1e:60:39:43:eb:4a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+</span></span><span style="display:flex;"><span>    inet 169.254.129.2/24 brd 169.254.129.255 scope global eth0
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>5: vnet0g85jrhr4@if4: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+</span></span><span style="display:flex;"><span>    link/ether d6:26:fe:de:c1:01 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+</span></span><span style="display:flex;"><span>    inet 169.254.254.2/24 brd 169.254.254.255 scope global vnet0g85jrhr4
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span></code></pre></div><p>eth0に加え、VNet向けのインターフェース(vnet0g85jrhr4)が生えました。では、ルートはどうでしょうか。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@59e822064224:~/site/wwwroot# ip r
+</span></span><span style="display:flex;"><span>default via 169.254.129.1 dev eth0 mtu 1500
+</span></span><span style="display:flex;"><span>10.0.0.0/16 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>10.0.0.0/8 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>13.78.61.196 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>13.78.104.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>13.78.104.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>13.78.105.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>13.78.121.203 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>20.191.165.160/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>20.191.165.192/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>20.191.166.0/26 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>23.102.69.95 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>23.102.71.13 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>23.102.74.190 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.184.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.184.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.185.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.192.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.192.32/29 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>40.79.193.0/27 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>52.185.152.149 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>52.243.32.19 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>52.243.43.186 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>104.41.168.103 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>104.41.169.34 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>169.254.129.0/24 dev eth0 proto kernel scope link src 169.254.129.2
+</span></span><span style="display:flex;"><span>169.254.254.0/24 dev vnet0g85jrhr4 proto kernel scope link src 169.254.254.2
+</span></span><span style="display:flex;"><span>172.16.0.0/12 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>191.237.240.43 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>191.237.240.44 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>191.237.240.46 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span><span style="display:flex;"><span>192.168.0.0/16 via 169.254.254.1 dev vnet0g85jrhr4 proto static
+</span></span></code></pre></div><p>ガツンと増えました。デフォルトルートはeth0側ですが、統合したVNet(10.0.0.0/16)と、RFC 1918プライベートアドレス(10.0.0.0/8、172.16.0.0/12、192.168.0.0/16)向けのルートが、VNet向けのインターフェースから出ていくように設定されています。</p>
 <p>また、他にも多くのアドレスレンジが追加されていますね。これは、サービスエンドポイントへ登録したサービスが使っているアドレスレンジです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">% az network list-service-tags -l japaneast -o json --query &#34;values[].{id:id, addressPrefixes:properties.addressPrefixes}[?contains(id, &#39;Sql.JapanEast&#39;)]&#34;
-[
-  {
-    &#34;addressPrefixes&#34;: [
-      &#34;13.78.61.196/32&#34;,
-      &#34;13.78.104.0/27&#34;,
-      &#34;13.78.104.32/29&#34;,
-      &#34;13.78.105.0/27&#34;,
-      &#34;13.78.121.203/32&#34;,
-      &#34;20.191.165.160/27&#34;,
-      &#34;20.191.165.192/27&#34;,
-      &#34;20.191.166.0/26&#34;,
-      &#34;23.102.69.95/32&#34;,
-      &#34;23.102.71.13/32&#34;,
-      &#34;23.102.74.190/32&#34;,
-      &#34;40.79.184.0/27&#34;,
-      &#34;40.79.184.32/29&#34;,
-      &#34;40.79.185.0/27&#34;,
-      &#34;40.79.192.0/27&#34;,
-      &#34;40.79.192.32/29&#34;,
-      &#34;40.79.193.0/27&#34;,
-      &#34;52.185.152.149/32&#34;,
-      &#34;52.243.32.19/32&#34;,
-      &#34;52.243.43.186/32&#34;,
-      &#34;104.41.168.103/32&#34;,
-      &#34;104.41.169.34/32&#34;,
-      &#34;191.237.240.43/32&#34;,
-      &#34;191.237.240.44/32&#34;,
-      &#34;191.237.240.46/32&#34;,
-      &#34;2603:1040:407::320/123&#34;,
-      &#34;2603:1040:407::380/121&#34;,
-      &#34;2603:1040:407:400::/123&#34;,
-      &#34;2603:1040:407:401::/123&#34;,
-      &#34;2603:1040:407:800::/123&#34;,
-      &#34;2603:1040:407:801::/123&#34;,
-      &#34;2603:1040:407:c00::/123&#34;,
-      &#34;2603:1040:407:c01::/123&#34;
-    ],
-    &#34;id&#34;: &#34;Sql.JapanEast&#34;
-  }
-]
-</code></pre></div><p>VNetが配置されているのと同じリージョン(東日本)のAzure SQL DatabaseのサービスIPv4タグと一致します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>% az network list-service-tags -l japaneast -o json --query &#34;values[].{id:id, addressPrefixes:properties.addressPrefixes}[?contains(id, &#39;Sql.JapanEast&#39;)]&#34;
+</span></span><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    &#34;addressPrefixes&#34;: [
+</span></span><span style="display:flex;"><span>      &#34;13.78.61.196/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;13.78.104.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;13.78.104.32/29&#34;,
+</span></span><span style="display:flex;"><span>      &#34;13.78.105.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;13.78.121.203/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;20.191.165.160/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;20.191.165.192/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;20.191.166.0/26&#34;,
+</span></span><span style="display:flex;"><span>      &#34;23.102.69.95/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;23.102.71.13/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;23.102.74.190/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.184.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.184.32/29&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.185.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.192.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.192.32/29&#34;,
+</span></span><span style="display:flex;"><span>      &#34;40.79.193.0/27&#34;,
+</span></span><span style="display:flex;"><span>      &#34;52.185.152.149/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;52.243.32.19/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;52.243.43.186/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;104.41.168.103/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;104.41.169.34/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;191.237.240.43/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;191.237.240.44/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;191.237.240.46/32&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407::320/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407::380/121&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:400::/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:401::/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:800::/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:801::/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:c00::/123&#34;,
+</span></span><span style="display:flex;"><span>      &#34;2603:1040:407:c01::/123&#34;
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    &#34;id&#34;: &#34;Sql.JapanEast&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><p>VNetが配置されているのと同じリージョン(東日本)のAzure SQL DatabaseのサービスIPv4タグと一致します。</p>
 <h2 id="vnet統合ありwebsite_vnet_route_all--1">VNet統合あり(WEBSITE_VNET_ROUTE_ALL = 1)</h2>
 <p>では最後に、WEBSITE_VNET_ROUTE_ALL = 1をアプリケーション設定に追加し、コンテナーを再起動します。これまで同様、コンテナーの中でネットワーク設定を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@63b571dc31c3:~/site/wwwroot# ip a
-1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-3: vnet00e5jrhr4@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
-    link/ether 5a:d6:31:fa:ab:91 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 169.254.254.5/24 brd 169.254.254.255 scope global vnet00e5jrhr4
-       valid_lft forever preferred_lft forever
-5: eth0@if56: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
-    link/ether 0a:c0:56:65:b6:ad brd ff:ff:ff:ff:ff:ff link-netnsid 1
-    inet 169.254.129.5/24 brd 169.254.129.255 scope global eth0
-       valid_lft forever preferred_lft forever
-</code></pre></div><p>再作成されていますが、WEBSITE_VNET_ROUTE_ALL = 1を設定する前と、インターフェースの数と役割は変わりません。では、ルートはどうでしょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">root@63b571dc31c3:~/site/wwwroot# ip r
-default via 169.254.254.1 dev vnet00e5jrhr4
-169.254.129.0/24 dev eth0 proto static mtu 1500
-169.254.254.0/24 dev vnet00e5jrhr4 proto kernel scope link src 169.254.254.5
-</code></pre></div><p>ルートは大きく変わり、デフォルトルートがVNet側インターフェースに向きます。WEBSITE_VNET_ROUTE_ALL = 1を設定する前は、VNetやサービスエンドポイントのアドレスレンジが個別に登録されましたが、設定後はそれらのネットワークがデフォルト側にあるため、ルート数がすっきりします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@63b571dc31c3:~/site/wwwroot# ip a
+</span></span><span style="display:flex;"><span>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+</span></span><span style="display:flex;"><span>    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+</span></span><span style="display:flex;"><span>    inet 127.0.0.1/8 scope host lo
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>3: vnet00e5jrhr4@if7: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+</span></span><span style="display:flex;"><span>    link/ether 5a:d6:31:fa:ab:91 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+</span></span><span style="display:flex;"><span>    inet 169.254.254.5/24 brd 169.254.254.255 scope global vnet00e5jrhr4
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span><span style="display:flex;"><span>5: eth0@if56: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+</span></span><span style="display:flex;"><span>    link/ether 0a:c0:56:65:b6:ad brd ff:ff:ff:ff:ff:ff link-netnsid 1
+</span></span><span style="display:flex;"><span>    inet 169.254.129.5/24 brd 169.254.129.255 scope global eth0
+</span></span><span style="display:flex;"><span>       valid_lft forever preferred_lft forever
+</span></span></code></pre></div><p>再作成されていますが、WEBSITE_VNET_ROUTE_ALL = 1を設定する前と、インターフェースの数と役割は変わりません。では、ルートはどうでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>root@63b571dc31c3:~/site/wwwroot# ip r
+</span></span><span style="display:flex;"><span>default via 169.254.254.1 dev vnet00e5jrhr4
+</span></span><span style="display:flex;"><span>169.254.129.0/24 dev eth0 proto static mtu 1500
+</span></span><span style="display:flex;"><span>169.254.254.0/24 dev vnet00e5jrhr4 proto kernel scope link src 169.254.254.5
+</span></span></code></pre></div><p>ルートは大きく変わり、デフォルトルートがVNet側インターフェースに向きます。WEBSITE_VNET_ROUTE_ALL = 1を設定する前は、VNetやサービスエンドポイントのアドレスレンジが個別に登録されましたが、設定後はそれらのネットワークがデフォルト側にあるため、ルート数がすっきりします。</p>
 
 		</section>
 

@@ -79,63 +79,63 @@
 <h3 id="ポリシー定義ファイルを作る">ポリシー定義ファイルを作る</h3>
 <p>CLIでインラインに書けるようですが、人類には早すぎる気がします。ここではファイルに。</p>
 <p>例として、作成できるVMのサイズを限定してみましょう。開発環境などでよくあるパターンと思います。VM作成時、Standard_D1～5_v2に当てはまらないVMサイズが指定されると、拒否します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-  &#34;if&#34;: {
-    &#34;allOf&#34;: [
-      {
-        &#34;field&#34;: &#34;type&#34;,
-        &#34;equals&#34;: &#34;Microsoft.Compute/virtualMachines&#34;
-      },
-      {
-        &#34;not&#34;: {
-          &#34;field&#34;: &#34;Microsoft.Compute/virtualMachines/sku.name&#34;,
-          &#34;in&#34;: [ &#34;Standard_D1_v2&#34;, &#34;Standard_D2_v2&#34;,&#34;Standard_D3_v2&#34;, &#34;Standard_D4_v2&#34;, &#34;Standard_D5_v2&#34; ]
-        }
-      }
-    ]
-  },
-  &#34;then&#34;: {
-    &#34;effect&#34;: &#34;deny&#34;
-  }
-}
-</code></pre></div><p>policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ azure policy definition create -n deny_vmsize -p ./policy_deny_vmsize.json
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">info:    Executing command policy definition create
-+ Creating policy definition deny_vmsize
-data:    PolicyName:             deny_vmsize
-data:    PolicyDefinitionId:     /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
-data:    PolicyType:             Custom
-data:    DisplayName:
-data:    Description:
-data:    PolicyRule:             allOf=[field=type, equals=Microsoft.Compute/virtualMachines, field=Microsoft.Compute/virtualMachines/sku.name, in=[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect=deny
-info:    policy definition create command OK
-</code></pre></div><p>できたみたいです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  &#34;if&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;allOf&#34;: [
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        &#34;field&#34;: &#34;type&#34;,
+</span></span><span style="display:flex;"><span>        &#34;equals&#34;: &#34;Microsoft.Compute/virtualMachines&#34;
+</span></span><span style="display:flex;"><span>      },
+</span></span><span style="display:flex;"><span>      {
+</span></span><span style="display:flex;"><span>        &#34;not&#34;: {
+</span></span><span style="display:flex;"><span>          &#34;field&#34;: &#34;Microsoft.Compute/virtualMachines/sku.name&#34;,
+</span></span><span style="display:flex;"><span>          &#34;in&#34;: [ &#34;Standard_D1_v2&#34;, &#34;Standard_D2_v2&#34;,&#34;Standard_D3_v2&#34;, &#34;Standard_D4_v2&#34;, &#34;Standard_D5_v2&#34; ]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  &#34;then&#34;: {
+</span></span><span style="display:flex;"><span>    &#34;effect&#34;: &#34;deny&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>policy_deny_vmsize.json というファイル名にしました。では投入。ポリシー名は deny_vmsize とします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zed" data-lang="zed"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> azure policy <span style="color:#66d9ef">definition</span> create <span style="color:#f92672">-</span>n deny_vmsize <span style="color:#f92672">-</span>p .<span style="color:#f92672">/</span>policy_deny_vmsize.json
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zed" data-lang="zed"><span style="display:flex;"><span>info<span style="color:#f92672">:</span>    Executing command policy <span style="color:#66d9ef">definition</span> create
+</span></span><span style="display:flex;"><span><span style="color:#f92672">+</span> Creating policy <span style="color:#66d9ef">definition</span> deny_vmsize
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    PolicyName<span style="color:#f92672">:</span>             deny_vmsize
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    PolicyDefinitionId<span style="color:#f92672">:</span>     <span style="color:#f92672">/</span>subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    PolicyType<span style="color:#f92672">:</span>             Custom
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    DisplayName<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    Description<span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">:</span>    PolicyRule<span style="color:#f92672">:</span>             allOf<span style="color:#f92672">=</span>[field<span style="color:#f92672">=</span>type, equals<span style="color:#f92672">=</span>Microsoft.Compute/virtualMachines, field<span style="color:#f92672">=</span>Microsoft.Compute/virtualMachines/sku.name, in<span style="color:#f92672">=</span>[Standard_D1_v2, Standard_D2_v2, Standard_D3_v2, Standard_D4_v2, Standard_D5_v2]], effect<span style="color:#f92672">=</span>deny
+</span></span><span style="display:flex;"><span>info<span style="color:#f92672">:</span>    policy <span style="color:#66d9ef">definition</span> create command OK
+</span></span></code></pre></div><p>できたみたいです。</p>
 <h3 id="ポリシーをアサインする">ポリシーをアサインする</h3>
 <p>では、このポリシーを割り当てます。割り当ての範囲(スコープ)はサブスクリプションとします。リソースグループなど、より細かいスコープも<a href="https://msdn.microsoft.com/ja-jp/library/azure/mt588464.aspx">指定可能</a>です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">info:    Executing command policy assignment create
-+ Creating policy assignment deny_vmsize_assignment
-data:    PolicyAssignmentName:     deny_vmsize_assignment
-data:    Type:                     Microsoft.Authorization/policyAssignments
-data:    DisplayName:
-data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
-data:    Scope:                    /subscriptions/mysubscription
-info:    policy assignment create command OK
-</code></pre></div><p>割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &#34;canonical:ubuntuserver:14.04.4-LTS:latest&#34; -u &#34;adminname&#34; -p &#34;adminpass&#34; -z Standard_G5
-info:    Executing command vm quick-create
-[...snip]
-+ Creating VM &#34;rppocvm&#34;
-error:   The resource action &#39;Microsoft.Compute/virtualMachines/write&#39; is disallowed by one or more policies. Policy identifier(s): &#39;/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize&#39;.
-info:    Error information has been recorded to /root/.azure/azure.err
-error:   vm quick-create command failed
-</code></pre></div><p>拒否られました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ azure policy assignment create -n deny_vmsize_assignment -p /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize -s /subscriptions/mysubscription
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>info:    Executing command policy assignment create
+</span></span><span style="display:flex;"><span>+ Creating policy assignment deny_vmsize_assignment
+</span></span><span style="display:flex;"><span>data:    PolicyAssignmentName:     deny_vmsize_assignment
+</span></span><span style="display:flex;"><span>data:    Type:                     Microsoft.Authorization/policyAssignments
+</span></span><span style="display:flex;"><span>data:    DisplayName:
+</span></span><span style="display:flex;"><span>data:    PolicyDefinitionId:       /subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize
+</span></span><span style="display:flex;"><span>data:    Scope:                    /subscriptions/mysubscription
+</span></span><span style="display:flex;"><span>info:    policy assignment create command OK
+</span></span></code></pre></div><p>割り当て完了。では試しに、このサブスクリプションに属するユーザで、Gシリーズのゴジラ級インスタンスを所望してみます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &#34;canonical:ubuntuserver:14.04.4-LTS:latest&#34; -u &#34;adminname&#34; -p &#34;adminpass&#34; -z Standard_G5
+</span></span><span style="display:flex;"><span>info:    Executing command vm quick-create
+</span></span><span style="display:flex;"><span>[...snip]
+</span></span><span style="display:flex;"><span>+ Creating VM &#34;rppocvm&#34;
+</span></span><span style="display:flex;"><span>error:   The resource action &#39;Microsoft.Compute/virtualMachines/write&#39; is disallowed by one or more policies. Policy identifier(s): &#39;/subscriptions/mysubscription/providers/Microsoft.Authorization/policyDefinitions/deny_vmsize&#39;.
+</span></span><span style="display:flex;"><span>info:    Error information has been recorded to /root/.azure/azure.err
+</span></span><span style="display:flex;"><span>error:   vm quick-create command failed
+</span></span></code></pre></div><p>拒否られました。</p>
 <p>許可されているVMサイズだと。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &#34;canonical:ubuntuserver:14.04.4-LTS:latest&#34; -u &#34;adminname&#34; -p &#34;adminpass&#34; -z Standard_D1_v2
-info:    Executing command vm quick-create
-[...snip]
-info:    vm quick-create command OK
-</code></pre></div><p>成功。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ azure vm quick-create -g RPPoC -n rppocvm westus -y Linux -Q &#34;canonical:ubuntuserver:14.04.4-LTS:latest&#34; -u &#34;adminname&#34; -p &#34;adminpass&#34; -z Standard_D1_v2
+</span></span><span style="display:flex;"><span>info:    Executing command vm quick-create
+</span></span><span style="display:flex;"><span>[...snip]
+</span></span><span style="display:flex;"><span>info:    vm quick-create command OK
+</span></span></code></pre></div><p>成功。</p>
 
 		</section>
 

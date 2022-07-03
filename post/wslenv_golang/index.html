@@ -96,115 +96,114 @@
 <h3 id="そぞろ歩き-その1windowsでのgo開発">そぞろ歩き その1(WindowsでのGo開発)</h3>
 <p>では、何が課題で、WSLがどのようにそれを解決するか、見ていきましょう。</p>
 <p>まず、Windowsで環境変数GOPATHを確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
-
-Name                           Value
-----                           -----
-GOPATH                         C:\Users\tomakabe\go
-</code></pre></div><p>GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
-PS C:\Users\tomakabe\go&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
-d-----       2018/05/02     11:10                bin
-d-----       2018/05/02     11:06                src
-
-PS C:\Users\tomakabe\go&gt; ls .\bin\
-
-
-    ディレクトリ: C:\Users\tomakabe\go\bin
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:10       14835200 dlv.exe
--a----       2018/05/02     11:09        4239360 go-outline.exe
--a----       2018/05/02     11:09        4045824 go-symbols.exe
--a----       2018/05/02     11:08       11094528 gocode.exe
--a----       2018/05/02     11:09        5708288 godef.exe
-[snip]
-</code></pre></div><p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span>&gt; <span style="color:#a6e22e">cd</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>\
-<span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>&gt; <span style="color:#a6e22e">cat</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">hello</span>.<span style="color:#66d9ef">go</span>
-<span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello Go on the new WSL&#34;</span>)
-}
-</code></pre></div><p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
-
-
-    ディレクトリ: C:\Users\tomakabe\go\src\github.com\ToruMakabe\work
-
-
-Mode                LastWriteTime         Length Name
-----                -------------         ------ ----
--a----       2018/05/02     11:54        2049536 hello.exe
--a----       2018/05/02     11:10             91 hello.go
-
-
-PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; .\hello.exe
-Hello Go on the new WSL
-</code></pre></div><p>ここまでは従来のWindowsにおけるGo開発環境です。ではWSLに話を移しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\WINDOWS\system32&gt; Get-ChildItem env:GOPATH
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Name                           Value
+</span></span><span style="display:flex;"><span>----                           -----
+</span></span><span style="display:flex;"><span>GOPATH                         C:\Users\tomakabe\go
+</span></span></code></pre></div><p>GOPATHに移動し、ディレクトリ構造を確認します。この環境にはすでにディレクトリbinとsrcがあり、binにはいくつかexeが入っています。VS CodeのGo拡張を入れると導入を促されるツール群は、ここに格納され、構文チェックや補完でVS Codeと連動します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\WINDOWS\system32&gt; cd C:\Users\tomakabe\go
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go&gt; ls
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Users\tomakabe\go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>d-----       2018/05/02     11:10                bin
+</span></span><span style="display:flex;"><span>d-----       2018/05/02     11:06                src
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go&gt; ls .\bin\
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Users\tomakabe\go\bin
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:10       14835200 dlv.exe
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:09        4239360 go-outline.exe
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:09        4045824 go-symbols.exe
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:08       11094528 gocode.exe
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:09        5708288 godef.exe
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span>&gt; <span style="color:#a6e22e">cd</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>\
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>&gt; <span style="color:#a6e22e">cat</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">hello</span>.<span style="color:#66d9ef">go</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello Go on the new WSL&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Users\tomakabe\go\src\github.com\ToruMakabe\work
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
+</span></span><span style="display:flex;"><span>----                -------------         ------ ----
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:54        2049536 hello.exe
+</span></span><span style="display:flex;"><span>-a----       2018/05/02     11:10             91 hello.go
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; .\hello.exe
+</span></span><span style="display:flex;"><span>Hello Go on the new WSL
+</span></span></code></pre></div><p>ここまでは従来のWindowsにおけるGo開発環境です。ではWSLに話を移しましょう。</p>
 <h3 id="そぞろ歩き-その2wslでのgo開発">そぞろ歩き その2(WSLでのGo開発)</h3>
 <p>WSLにつなぎます。ターミナルは任意ですが、わたしはVS Codeの統合ターミナルが好きです。コードを書きながら操作できるので。</p>
 <p>GOPATHを確認します。空っぽです。WSLは既定でWindowsから環境変数PATHを受け取ります。PATHは特別扱いです。ですが、他の環境変数は、指定しないと渡されません。よってWindowsで設定していても、WSLから見るとGOPATHは空っぽです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">~ $ echo $GOPATH
-
-</code></pre></div><p>$HOMEもきれいな状態です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">~ $ ls
-~ $
-</code></pre></div><p>ではGOPATHに指定したい、先ほどWindowsで確認したディレクトリへ移動します。ちなみにWindowsのCドライブはWSLで/mnt/c/に変換されます。先ほど確認したbin、srcが見えています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">~ $ cd /mnt/c/Users/tomakabe/go/
-/mnt/c/Users/tomakabe/go $ ls
-bin  src
-</code></pre></div><p>ではここで実験。試しにパッケージをインポートしてみましょう。定番の<a href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>をインポートしてみます。わざとらしいですが、なんだか嫌な予感がします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
-Fetching https://golang.org/x/tools/cmd/goimports?go-get=1
-Parsing meta tags from https://golang.org/x/tools/cmd/goimports?go-get=1 (status code 200)
-get &#34;golang.org/x/tools/cmd/goimports&#34;: found meta tag get.metaImport{Prefix:&#34;golang.org/x/tools&#34;, VCS:&#34;git&#34;, RepoRoot:&#34;https://go.googlesource.com/tools&#34;} at https://golang.org/x/tools/cmd/goimports?go-get=1
-get &#34;golang.org/x/tools/cmd/goimports&#34;: verifying non-authoritative meta tag
-Fetching https://golang.org/x/tools?go-get=1
-Parsing meta tags from https://golang.org/x/tools?go-get=1 (status code 200)
-golang.org/x/tools (download)
-created GOPATH=/home/tomakabe/go; see &#39;go help gopath&#39;
-</code></pre></div><p>嫌な予感は予定調和で的中します。GOPATHがいらっしゃらないので、/home/tomakabe/go とみなしてしまいました。先ほど確認した際、$HOMEはきれいな状態でした、が。新たにお作りになられたようです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/mnt/c/Users/tomakabe/go $ ls ~/
-go
-/mnt/c/Users/tomakabe/go $ ls ~/go
-bin  src
-</code></pre></div><p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>~ $ echo $GOPATH
+</span></span></code></pre></div><p>$HOMEもきれいな状態です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>~ $ ls
+</span></span><span style="display:flex;"><span>~ $
+</span></span></code></pre></div><p>ではGOPATHに指定したい、先ほどWindowsで確認したディレクトリへ移動します。ちなみにWindowsのCドライブはWSLで/mnt/c/に変換されます。先ほど確認したbin、srcが見えています。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>~ $ cd /mnt/c/Users/tomakabe/go/
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ ls
+</span></span><span style="display:flex;"><span>bin  src
+</span></span></code></pre></div><p>ではここで実験。試しにパッケージをインポートしてみましょう。定番の<a href="https://godoc.org/golang.org/x/tools/cmd/goimports">goimports</a>をインポートしてみます。わざとらしいですが、なんだか嫌な予感がします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ go get -v golang.org/x/tools/cmd/goimports
+</span></span><span style="display:flex;"><span>Fetching https://golang.org/x/tools/cmd/goimports?go-get=1
+</span></span><span style="display:flex;"><span>Parsing meta tags from https://golang.org/x/tools/cmd/goimports?go-get=1 (status code 200)
+</span></span><span style="display:flex;"><span>get &#34;golang.org/x/tools/cmd/goimports&#34;: found meta tag get.metaImport{Prefix:&#34;golang.org/x/tools&#34;, VCS:&#34;git&#34;, RepoRoot:&#34;https://go.googlesource.com/tools&#34;} at https://golang.org/x/tools/cmd/goimports?go-get=1
+</span></span><span style="display:flex;"><span>get &#34;golang.org/x/tools/cmd/goimports&#34;: verifying non-authoritative meta tag
+</span></span><span style="display:flex;"><span>Fetching https://golang.org/x/tools?go-get=1
+</span></span><span style="display:flex;"><span>Parsing meta tags from https://golang.org/x/tools?go-get=1 (status code 200)
+</span></span><span style="display:flex;"><span>golang.org/x/tools (download)
+</span></span><span style="display:flex;"><span>created GOPATH=/home/tomakabe/go; see &#39;go help gopath&#39;
+</span></span></code></pre></div><p>嫌な予感は予定調和で的中します。GOPATHがいらっしゃらないので、/home/tomakabe/go とみなしてしまいました。先ほど確認した際、$HOMEはきれいな状態でした、が。新たにお作りになられたようです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ ls ~/
+</span></span><span style="display:flex;"><span>go
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ ls ~/go
+</span></span><span style="display:flex;"><span>bin  src
+</span></span></code></pre></div><p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
 <h3 id="そぞろ歩き-その3解決編">そぞろ歩き その3(解決編)</h3>
 <p>そこで登場するのが、WSLENVです。Windowsで作業します。Windowsの環境変数GOPATHを、環境変数WSLENVへスイッチとともに設定します。/pスイッチは、「この環境変数はパスを格納しているから、いい感じにして」という指定です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &#34;$env:WSLENV`:GOPATH/p&#34;
-
-成功: 指定した値は保存されました。
-</code></pre></div><p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/mnt/c/Users/tomakabe/go $ echo $GOPATH
-/mnt/c/Users/tomakabe/go
-</code></pre></div><p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &#34;$env:WSLENV`:GOPATH/p&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>成功: 指定した値は保存されました。
+</span></span></code></pre></div><p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ echo $GOPATH
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go
+</span></span></code></pre></div><p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
 <p>ではWSLでサンプルコードを触ってみましょう。ソースのあるディレクトリへ移動します。ソースと先ほどビルドしたexeがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello.exe  hello.go
-</code></pre></div><p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
-hello  hello.exe  hello.go
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello
-./hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, not stripped
-/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ./hello
-Hello Go on the new WSL
-</code></pre></div><h2 id="まとめ">まとめ</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
+</span></span><span style="display:flex;"><span>hello.exe  hello.go
+</span></span></code></pre></div><p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
+</span></span><span style="display:flex;"><span>hello  hello.exe  hello.go
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello
+</span></span><span style="display:flex;"><span>./hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, not stripped
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ./hello
+</span></span><span style="display:flex;"><span>Hello Go on the new WSL
+</span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>代表例としてGoの開発環境で説明しましたが、WSLENVは他の用途でも応用できるでしょう。スイッチの説明など、詳細は先ほど紹介した、<a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">こちら</a>を。</p>
 
 		</section>

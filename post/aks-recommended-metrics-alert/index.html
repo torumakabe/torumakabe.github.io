@@ -97,84 +97,84 @@
 <p>このような背景があり、Azure Monitor for containerのOMS Agentから、メトリックデータをLog Analyticsワークスペースだけでなく、Azure MonitorメトリックストアへAKSカスタムメトリックとして送れるようになりました。</p>
 <p>そこで、アラート設定のためにまずカスタムメトリックを有効化しましょう。Azure Monitorのメトリックは各リソース単位で管理されており、書き込み権限の設定が必要です。つまりAKSクラスターリソースに対し、OMS Agentからメトリックを発行できるようにロールを付与しなければいけません。</p>
 <p>サンプルではAKSクラスターをマネージドIDを使うよう設定しているので、OMS Agetアドオン向けに作成されるマネージドIDに対し、Monitoring Metrics Publisherロールを付与しています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_role_assignment&#34; &#34;aks_metrics&#34; {
-  scope                = azurerm_kubernetes_cluster.sample.id
-  role_definition_name = &#34;Monitoring Metrics Publisher&#34;
-  principal_id         = azurerm_kubernetes_cluster.sample.addon_profile.0.oms_agent.0.oms_agent_identity.0.object_id
-}
-</code></pre></div><p>なおAzure Monitor for containersのOMS Agentのコードは<a href="https://github.com/microsoft/Docker-Provider">公開</a>されています。お楽しみください。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_role_assignment&#34; &#34;aks_metrics&#34; {
+</span></span><span style="display:flex;"><span>  scope                = azurerm_kubernetes_cluster.sample.id
+</span></span><span style="display:flex;"><span>  role_definition_name = &#34;Monitoring Metrics Publisher&#34;
+</span></span><span style="display:flex;"><span>  principal_id         = azurerm_kubernetes_cluster.sample.addon_profile.0.oms_agent.0.oms_agent_identity.0.object_id
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>なおAzure Monitor for containersのOMS Agentのコードは<a href="https://github.com/microsoft/Docker-Provider">公開</a>されています。お楽しみください。</p>
 <h3 id="メトリック発行閾値の設定">メトリック発行閾値の設定</h3>
 <p>Azure Monitor for containersで設定されるメトリックの中には、OMS Agentがメトリック送信の要否を閾値によって<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts#alert-rules-overview">判断するもの</a>があります。つまり閾値を超えない場合には、Azure Monitorへメトリックが送られません。</p>
 <p>よって、アラートだけでなく分析にもメトリックを使いたいケースでは、Azure Monitorで設定したアラート閾値よりも、OMS Agentの送信閾値を低くします。</p>
 <p>現在、コンテナーのcpuExceededPercentage、memoryRssExceededPercentage、memoryWorkingSetExceededPercentageの送信閾値を<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-metric-alerts#configure-alertable-metrics-in-configmaps">変更可能</a>です。OMS AgentはConfigMapを読み込み、既定値を上書きします。</p>
 <p>下記はmemoryWorkingSetExceededPercentageを既定値の95%から80%に変更する例です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;kubernetes_config_map&#34; &#34;oms_agent&#34; {
-  depends_on = [azurerm_role_assignment.aks_metrics]
-  metadata {
-    name      = &#34;container-azm-ms-agentconfig&#34;
-    namespace = &#34;kube-system&#34;
-  }
-
-  data = {
-    schema-version                           = &#34;v1&#34;
-    config-version                           = &#34;ver1&#34;
-    alertable-metrics-configuration-settings = &lt;&lt;EOT
-[alertable_metrics_configuration_settings.container_resource_utilization_thresholds]
-    container_memory_working_set_threshold_percentage = 80.0
-EOT
-  }
-
-  // Waiting for omsagent restart &amp; custom metrics preparation
-  provisioner &#34;local-exec&#34; {
-    command = &#34;sleep 180&#34;
-  }
-}
-</code></pre></div><p>サンプルコードではHCLのheredocに設定を埋め込みました。ComfigMapの元ネタは<a href="https://github.com/microsoft/Docker-Provider/blob/ci_prod/kubernetes/container-azm-ms-agentconfig.yaml">GitHub上</a>にあります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;kubernetes_config_map&#34; &#34;oms_agent&#34; {
+</span></span><span style="display:flex;"><span>  depends_on = [azurerm_role_assignment.aks_metrics]
+</span></span><span style="display:flex;"><span>  metadata {
+</span></span><span style="display:flex;"><span>    name      = &#34;container-azm-ms-agentconfig&#34;
+</span></span><span style="display:flex;"><span>    namespace = &#34;kube-system&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  data = {
+</span></span><span style="display:flex;"><span>    schema-version                           = &#34;v1&#34;
+</span></span><span style="display:flex;"><span>    config-version                           = &#34;ver1&#34;
+</span></span><span style="display:flex;"><span>    alertable-metrics-configuration-settings = &lt;&lt;EOT
+</span></span><span style="display:flex;"><span>[alertable_metrics_configuration_settings.container_resource_utilization_thresholds]
+</span></span><span style="display:flex;"><span>    container_memory_working_set_threshold_percentage = 80.0
+</span></span><span style="display:flex;"><span>EOT
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  // Waiting for omsagent restart &amp; custom metrics preparation
+</span></span><span style="display:flex;"><span>  provisioner &#34;local-exec&#34; {
+</span></span><span style="display:flex;"><span>    command = &#34;sleep 180&#34;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>サンプルコードではHCLのheredocに設定を埋め込みました。ComfigMapの元ネタは<a href="https://github.com/microsoft/Docker-Provider/blob/ci_prod/kubernetes/container-azm-ms-agentconfig.yaml">GitHub上</a>にあります。</p>
 <p>ちなみに、このComfigMapではログ収集の除外Namespaceを設定したり、Prometheusメトリックの<a href="https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-prometheus-integration">スクレーピング設定</a>などもできるので、合わせて活用しましょう。</p>
 <p>なおConfigMap作成後に、やや長めですが180秒スリープさせています。カスタムメトリックが有効になるのを待つためです。カスタムメトリックがまだ有効になっていない状態で後述のアラート設定を行うと、「カスタムメトリックが見つからない」とエラーになるため、それを回避します。</p>
 <h3 id="アラート設定">アラート設定</h3>
 <p>アラートのアクショングループはクラスター作成とライフサイクルが違うケースが多いと思いますので、既存のものを読み込みます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">data &#34;azurerm_monitor_action_group&#34; &#34;sample&#34; {
-  resource_group_name = var.alert_actiongroup_rg_name
-  name                = var.alert_actiongroup_name
-}
-</code></pre></div><p>そしてアラートの設定です。以下はOOM Killed Containersの数を頻度1分、ウインドウ5分の平均で評価し、0より大きければアラートアクションを呼び出すサンプルです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">resource &#34;azurerm_monitor_metric_alert&#34; &#34;aks_oom_killed_container_count&#34; {
-  depends_on          = [kubernetes_config_map.oms_agent]
-  name                = &#34;oomKilledContainerCount&#34;
-  resource_group_name = azurerm_resource_group.sample.name
-  scopes              = [azurerm_kubernetes_cluster.sample.id]
-  severity            = 3
-  frequency           = &#34;PT1M&#34;
-  window_size         = &#34;PT5M&#34;
-
-  criteria {
-    metric_namespace = &#34;Insights.Container/pods&#34;
-    metric_name      = &#34;oomKilledContainerCount&#34;
-    aggregation      = &#34;Average&#34;
-    operator         = &#34;GreaterThan&#34;
-    threshold        = 0
-
-
-    dimension {
-      name     = &#34;kubernetes namespace&#34;
-      operator = &#34;Include&#34;
-      values   = [&#34;*&#34;]
-    }
-
-    dimension {
-      name     = &#34;controllerName&#34;
-      operator = &#34;Include&#34;
-      values   = [&#34;*&#34;]
-    }
-
-  }
-
-  action {
-    action_group_id = data.azurerm_monitor_action_group.sample.id
-  }
-}
-</code></pre></div><p>コード化するにあたってアラート設定値の元ネタが欲しくなりますが、<a href="https://github.com/microsoft/Docker-Provider/tree/ci_prod/alerts/recommended_alerts_ARM">GitHub</a>上にあります。Azure Resource ManagerテンプレートのJSON形式ですので、そこから属性と値を拾ってHCLに書き換えましょう。閾値や頻度、評価ウインドウを好みに変えてもいいでしょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>data &#34;azurerm_monitor_action_group&#34; &#34;sample&#34; {
+</span></span><span style="display:flex;"><span>  resource_group_name = var.alert_actiongroup_rg_name
+</span></span><span style="display:flex;"><span>  name                = var.alert_actiongroup_name
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>そしてアラートの設定です。以下はOOM Killed Containersの数を頻度1分、ウインドウ5分の平均で評価し、0より大きければアラートアクションを呼び出すサンプルです。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>resource &#34;azurerm_monitor_metric_alert&#34; &#34;aks_oom_killed_container_count&#34; {
+</span></span><span style="display:flex;"><span>  depends_on          = [kubernetes_config_map.oms_agent]
+</span></span><span style="display:flex;"><span>  name                = &#34;oomKilledContainerCount&#34;
+</span></span><span style="display:flex;"><span>  resource_group_name = azurerm_resource_group.sample.name
+</span></span><span style="display:flex;"><span>  scopes              = [azurerm_kubernetes_cluster.sample.id]
+</span></span><span style="display:flex;"><span>  severity            = 3
+</span></span><span style="display:flex;"><span>  frequency           = &#34;PT1M&#34;
+</span></span><span style="display:flex;"><span>  window_size         = &#34;PT5M&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  criteria {
+</span></span><span style="display:flex;"><span>    metric_namespace = &#34;Insights.Container/pods&#34;
+</span></span><span style="display:flex;"><span>    metric_name      = &#34;oomKilledContainerCount&#34;
+</span></span><span style="display:flex;"><span>    aggregation      = &#34;Average&#34;
+</span></span><span style="display:flex;"><span>    operator         = &#34;GreaterThan&#34;
+</span></span><span style="display:flex;"><span>    threshold        = 0
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    dimension {
+</span></span><span style="display:flex;"><span>      name     = &#34;kubernetes namespace&#34;
+</span></span><span style="display:flex;"><span>      operator = &#34;Include&#34;
+</span></span><span style="display:flex;"><span>      values   = [&#34;*&#34;]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    dimension {
+</span></span><span style="display:flex;"><span>      name     = &#34;controllerName&#34;
+</span></span><span style="display:flex;"><span>      operator = &#34;Include&#34;
+</span></span><span style="display:flex;"><span>      values   = [&#34;*&#34;]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>  action {
+</span></span><span style="display:flex;"><span>    action_group_id = data.azurerm_monitor_action_group.sample.id
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>コード化するにあたってアラート設定値の元ネタが欲しくなりますが、<a href="https://github.com/microsoft/Docker-Provider/tree/ci_prod/alerts/recommended_alerts_ARM">GitHub</a>上にあります。Azure Resource ManagerテンプレートのJSON形式ですので、そこから属性と値を拾ってHCLに書き換えましょう。閾値や頻度、評価ウインドウを好みに変えてもいいでしょう。</p>
 <p>サンプルコードには2つのみ書きましたが、他にも9つの推奨アラートがあります。ぜひ必要なものを加えてみて下さい。</p>
 
 		</section>

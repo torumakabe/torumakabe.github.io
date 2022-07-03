@@ -66,143 +66,143 @@
 <h2 id="dnsラベル名付与機能">DNSラベル名付与機能</h2>
 <p>簡単です。Serviceのannotationsに定義するだけ。試しにnginxをServiceとして公開し、確認してみましょう。</p>
 <p>[nginx-label.yaml]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx
-  annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
-spec:
-  selector:
-    app: nginx
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre></div><p>デプロイ。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create -f nginx-label.yaml
-</code></pre></div><p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl hogeginx.eastus.cloudapp.azure.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre></div><p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1beta1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        name: nginx
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: 80
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: hogeginx
+</span></span><span style="display:flex;"><span>  annotations:
+</span></span><span style="display:flex;"><span>    service.beta.kubernetes.io/azure-dns-label-name: hogeginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>  type: LoadBalancer
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>    - protocol: TCP
+</span></span><span style="display:flex;"><span>      port: 80
+</span></span><span style="display:flex;"><span>      targetPort: 80
+</span></span></code></pre></div><p>デプロイ。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create -f nginx-label.yaml
+</span></span></code></pre></div><p>パブリックIP(EXTERNAL-IP)が割り当てられた後、ラベル名が使えます。ルールは [ラベル名].[リージョン].cloudapp.azure.com です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl hogeginx.eastus.cloudapp.azure.com
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><p>ドメイン名は指定しなくていいから、Service毎にホスト名を固定したいんじゃ、という場合にはこれでOK。</p>
 <h2 id="kubenetes-externaldns">Kubenetes ExternalDNS</h2>
 <p>任意のドメイン名を使いたい場合は、Incubatorプロジェクトのひとつ、Kubenetes ExternalDNSを使ってAzure DNSへAレコードを追加する手があります。本家の説明は<a href="https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/azure.md">こちら</a>。</p>
 <p>Kubenetes ExternalDNSは、Azure DNSなどAPIを持つDNSサービスを操作するアプリです。k8sのDeploymentとして動かせます。Route 53などにも対応。</p>
 <p>さて動かしてみましょう。前提として、すでにAzure DNSにゾーンがあるものとします。</p>
 <p>ExternalDNSがDNSゾーンを操作できるよう、サービスプリンシパルを作成しましょう。スコープはDNSゾーンが置かれているリソースグループ、ロールはContributorとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes=&#34;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&#34; -n hogeExtDnsSp
-</code></pre></div><p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az ad sp create-for-rbac --role=&#34;Contributor&#34; --scopes=&#34;/subscriptions/your-subscription-id/resourceGroups/hoge-dns-rg&#34; -n hogeExtDnsSp
+</span></span></code></pre></div><p>appId、password、tenantを控えておいてください。次でsecretに使います。</p>
 <p>ではExteralDNSに渡すsecretを作ります。まずJSONファイルに書きます。</p>
 <p>[azure.json]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">{
-    &#34;tenantId&#34;: &#34;your-tenant&#34;,
-    &#34;subscriptionId&#34;: &#34;your-subscription-id&#34;,
-    &#34;aadClientId&#34;: &#34;your-appId&#34;,
-    &#34;aadClientSecret&#34;: &#34;your-password&#34;,
-    &#34;resourceGroup&#34;: &#34;hoge-dns-rg&#34;
-}
-</code></pre></div><p>JSONファイルを元に、secretを作ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create secret generic azure-config-file --from-file=azure.json
-</code></pre></div><p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    &#34;tenantId&#34;: &#34;your-tenant&#34;,
+</span></span><span style="display:flex;"><span>    &#34;subscriptionId&#34;: &#34;your-subscription-id&#34;,
+</span></span><span style="display:flex;"><span>    &#34;aadClientId&#34;: &#34;your-appId&#34;,
+</span></span><span style="display:flex;"><span>    &#34;aadClientSecret&#34;: &#34;your-password&#34;,
+</span></span><span style="display:flex;"><span>    &#34;resourceGroup&#34;: &#34;hoge-dns-rg&#34;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>JSONファイルを元に、secretを作ります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create secret generic azure-config-file --from-file=azure.json
+</span></span></code></pre></div><p>ExteralDNSのマニフェストを作ります。ドメイン名はexmaple.comとしていますが、使うDNSゾーンに合わせてください。以下はRBACを使っていない環境での書き方です。</p>
 <p>[extdns.yaml]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: external-dns
-spec:
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: external-dns
-    spec:
-      containers:
-      - name: external-dns
-        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
-        args:
-        - --source=service
-        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
-        - --provider=azure
-        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial&#39;s resource group
-        volumeMounts:
-        - name: azure-config-file
-          mountPath: /etc/kubernetes
-          readOnly: true
-      volumes:
-      - name: azure-config-file
-        secret:
-          secretName: azure-config-file
-</code></pre></div><p>ExternalDNSをデプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create -f extdns.yaml
-</code></pre></div><p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: extensions/v1beta1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: external-dns
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  strategy:
+</span></span><span style="display:flex;"><span>    type: Recreate
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: external-dns
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: external-dns
+</span></span><span style="display:flex;"><span>        image: registry.opensource.zalan.do/teapot/external-dns:v0.4.8
+</span></span><span style="display:flex;"><span>        args:
+</span></span><span style="display:flex;"><span>        - --source=service
+</span></span><span style="display:flex;"><span>        - --domain-filter=example.com # (optional) limit to only example.com domains; change to match the zone created above.
+</span></span><span style="display:flex;"><span>        - --provider=azure
+</span></span><span style="display:flex;"><span>        - --azure-resource-group=hoge-dns-rg # (optional) use the DNS zones from the tutorial&#39;s resource group
+</span></span><span style="display:flex;"><span>        volumeMounts:
+</span></span><span style="display:flex;"><span>        - name: azure-config-file
+</span></span><span style="display:flex;"><span>          mountPath: /etc/kubernetes
+</span></span><span style="display:flex;"><span>          readOnly: true
+</span></span><span style="display:flex;"><span>      volumes:
+</span></span><span style="display:flex;"><span>      - name: azure-config-file
+</span></span><span style="display:flex;"><span>        secret:
+</span></span><span style="display:flex;"><span>          secretName: azure-config-file
+</span></span></code></pre></div><p>ExternalDNSをデプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create -f extdns.yaml
+</span></span></code></pre></div><p>ではホスト名を付与するServiceのマニフェストを作りましょう。先ほどのDNSラベル名付与機能と同様、annotationsへ定義します。</p>
 <p>[nginx-extdns.yaml]</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: nginx-extdns
-spec:
-  template:
-    metadata:
-      labels:
-        app: nginx-extdns
-    spec:
-      containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: hogeginx-extdns
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
-spec:
-  selector:
-    app: nginx-extdns
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-</code></pre></div><p>デプローイ。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl create -f nginx-extdns.yaml
-</code></pre></div><p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
-Name      ResourceGroup       Ttl  Type    Metadata
---------  ----------------  -----  ------  ----------
-hogeginx  hoge-dns-rg         300  A
-</code></pre></div><p>ゲッツ。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ curl hogeginx.example.com
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;Welcome to nginx!&lt;/title&gt;
-[snip]
-</code></pre></div><p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1beta1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx-extdns
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx-extdns
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - image: nginx
+</span></span><span style="display:flex;"><span>        name: nginx
+</span></span><span style="display:flex;"><span>        ports:
+</span></span><span style="display:flex;"><span>        - containerPort: 80
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: Service
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: hogeginx-extdns
+</span></span><span style="display:flex;"><span>  annotations:
+</span></span><span style="display:flex;"><span>    external-dns.alpha.kubernetes.io/hostname: hogeginx.example.com
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    app: nginx-extdns
+</span></span><span style="display:flex;"><span>  type: LoadBalancer
+</span></span><span style="display:flex;"><span>  ports:
+</span></span><span style="display:flex;"><span>    - protocol: TCP
+</span></span><span style="display:flex;"><span>      port: 80
+</span></span><span style="display:flex;"><span>      targetPort: 80
+</span></span></code></pre></div><p>デプローイ。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl create -f nginx-extdns.yaml
+</span></span></code></pre></div><p>パブリックIP(EXTERNAL-IP)が割り当てられた後、Aレコードが登録されます。確認してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az network dns record-set a list -g hoge-dns-rg -z example.com -o table
+</span></span><span style="display:flex;"><span>Name      ResourceGroup       Ttl  Type    Metadata
+</span></span><span style="display:flex;"><span>--------  ----------------  -----  ------  ----------
+</span></span><span style="display:flex;"><span>hogeginx  hoge-dns-rg         300  A
+</span></span></code></pre></div><p>ゲッツ。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ curl hogeginx.example.com
+</span></span><span style="display:flex;"><span>&lt;!DOCTYPE html&gt;
+</span></span><span style="display:flex;"><span>&lt;html&gt;
+</span></span><span style="display:flex;"><span>&lt;head&gt;
+</span></span><span style="display:flex;"><span>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+</span></span><span style="display:flex;"><span>[snip]
+</span></span></code></pre></div><p>Incubatorプロジェクトなので今後大きく変化する可能性がありますが、ご参考になれば。</p>
 
 		</section>
 

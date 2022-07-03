@@ -88,165 +88,165 @@
 <p>DeschedulerをKubernetesのJobとして動かしてみます。Deschedulerはプロジェクト公式のイメージを提供していないようなので、<a href="https://github.com/kubernetes-incubator/descheduler#running-descheduler-as-a-job-inside-of-a-pod">プロジェクトのREADME</a>を参考に、イメージをビルドしてレジストリにプッシュしておきます。以降はAzure Container Registryにプッシュしたとして手順を進めます。</p>
 <h3 id="nodeにpodを寄せる">NodeにPodを寄せる</h3>
 <p>はじめのNode数は2です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get nodes
-NAME                            STATUS   ROLES   AGE   VERSION
-aks-pool1-27450415-vmss000000   Ready    agent   34m   v1.13.5
-aks-pool1-27450415-vmss000001   Ready    agent   34m   v1.13.5
-</code></pre></div><p>レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-  labels:
-    app: nginx
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        resources:
-          requests:
-            cpu: 500m
-</code></pre></div><p>デプロイします。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f nginx.yaml
-</code></pre></div><p>aks-pool1-27450415-vmss000000に寄ってますね。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get po -o wide
-NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                            NOMINATED NODE   READINESS GATES
-nginx-6d4df4db7b-cqrkl   1/1     Running   0          12s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-dg267   1/1     Running   0          12s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-kxmml   1/1     Running   0          12s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-</code></pre></div><h3 id="nodeを追加する">Nodeを追加する</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get nodes
+</span></span><span style="display:flex;"><span>NAME                            STATUS   ROLES   AGE   VERSION
+</span></span><span style="display:flex;"><span>aks-pool1-27450415-vmss000000   Ready    agent   34m   v1.13.5
+</span></span><span style="display:flex;"><span>aks-pool1-27450415-vmss000001   Ready    agent   34m   v1.13.5
+</span></span></code></pre></div><p>レプリカ数3で、NGINXのDeploymentを作ります。nginx.yamlとします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: apps/v1
+</span></span><span style="display:flex;"><span>kind: Deployment
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: nginx
+</span></span><span style="display:flex;"><span>  labels:
+</span></span><span style="display:flex;"><span>    app: nginx
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  replicas: 3
+</span></span><span style="display:flex;"><span>  selector:
+</span></span><span style="display:flex;"><span>    matchLabels:
+</span></span><span style="display:flex;"><span>      app: nginx
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      labels:
+</span></span><span style="display:flex;"><span>        app: nginx
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>      containers:
+</span></span><span style="display:flex;"><span>      - name: nginx
+</span></span><span style="display:flex;"><span>        image: nginx
+</span></span><span style="display:flex;"><span>        resources:
+</span></span><span style="display:flex;"><span>          requests:
+</span></span><span style="display:flex;"><span>            cpu: 500m
+</span></span></code></pre></div><p>デプロイします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f nginx.yaml
+</span></span></code></pre></div><p>aks-pool1-27450415-vmss000000に寄ってますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get po -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE                            NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-cqrkl   1/1     Running   0          12s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-dg267   1/1     Running   0          12s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-kxmml   1/1     Running   0          12s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><h3 id="nodeを追加する">Nodeを追加する</h3>
 <p>Nodeを追加し、3Nodeにします。以下はマルチノードプール構成クラスター向けのコマンドです。シングルノードプール構成のクラスターでは、<a href="https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-scale">こちら</a>を参考に。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
-
-$ kubectl get nodes
-NAME                            STATUS   ROLES   AGE   VERSION
-aks-pool1-27450415-vmss000000   Ready    agent   38m   v1.13.5
-aks-pool1-27450415-vmss000001   Ready    agent   38m   v1.13.5
-aks-pool1-27450415-vmss000003   Ready    agent   68s   v1.13.5
-</code></pre></div><p>aks-pool1-27450415-vmss000003が追加されました。余談ですが、この検証の前にNodeを増やしたり減らしたりしてるので000002が飛んで採番されています。気にせず。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az aks nodepool scale -g oreno-rg --cluster-name oreno-cls -n pool1 --node-count 3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$ kubectl get nodes
+</span></span><span style="display:flex;"><span>NAME                            STATUS   ROLES   AGE   VERSION
+</span></span><span style="display:flex;"><span>aks-pool1-27450415-vmss000000   Ready    agent   38m   v1.13.5
+</span></span><span style="display:flex;"><span>aks-pool1-27450415-vmss000001   Ready    agent   38m   v1.13.5
+</span></span><span style="display:flex;"><span>aks-pool1-27450415-vmss000003   Ready    agent   68s   v1.13.5
+</span></span></code></pre></div><p>aks-pool1-27450415-vmss000003が追加されました。余談ですが、この検証の前にNodeを増やしたり減らしたりしてるので000002が飛んで採番されています。気にせず。</p>
 <p>ではPodの様子を見てみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get po -o wide
-NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
-nginx-6d4df4db7b-cqrkl   1/1     Running   0          5m39s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-dg267   1/1     Running   0          5m39s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-kxmml   1/1     Running   0          5m39s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-</code></pre></div><p>Nodeを増やしたのに、寄りっぱなしですね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get po -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-cqrkl   1/1     Running   0          5m39s   10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-dg267   1/1     Running   0          5m39s   10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-kxmml   1/1     Running   0          5m39s   10.240.0.11   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><p>Nodeを増やしたのに、寄りっぱなしですね。</p>
 <h3 id="descheduler用のリソースを作る">Descheduler用のリソースを作る</h3>
 <p>それではDeschedulerを作る準備を。手順は今後変化すると思うので、試す場合は都度<a href="https://github.com/kubernetes-incubator/descheduler/tree/master">プロジェクトのREADME</a>を確認してください。</p>
 <p>わたしはDescheduler動かすのに必要なリソースを、descheduler.yamlにまとめています。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: descheduler-cluster-role
-rules:
-- apiGroups: [&#34;&#34;]
-  resources: [&#34;nodes&#34;]
-  verbs: [&#34;get&#34;, &#34;watch&#34;, &#34;list&#34;]
-- apiGroups: [&#34;&#34;]
-  resources: [&#34;pods&#34;]
-  verbs: [&#34;get&#34;, &#34;watch&#34;, &#34;list&#34;, &#34;delete&#34;]
-- apiGroups: [&#34;&#34;]
-  resources: [&#34;pods/eviction&#34;]
-  verbs: [&#34;create&#34;]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: descheduler-sa
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: descheduler-cluster-role-binding
-subjects:
-- kind: ServiceAccount
-  name: descheduler-sa
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: descheduler-cluster-role
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: v1
-data:
-  policy.yaml: |
-    apiVersion: &#34;descheduler/v1alpha1&#34;
-    kind: &#34;DeschedulerPolicy&#34;
-    strategies:
-      &#34;RemoveDuplicates&#34;:
-         enabled: true
-      &#34;RemovePodsViolatingInterPodAntiAffinity&#34;:
-         enabled: true
-      &#34;LowNodeUtilization&#34;:
-         enabled: true
-         params:
-           nodeResourceUtilizationThresholds:
-             thresholds:
-               &#34;cpu&#34; : 20
-               &#34;memory&#34;: 20
-               &#34;pods&#34;: 20
-             targetThresholds:
-               &#34;cpu&#34; : 50
-               &#34;memory&#34;: 50
-               &#34;pods&#34;: 50
-kind: ConfigMap
-metadata:
-  name: descheduler-policy-configmap
-  namespace: kube-system
-</code></pre></div><p>Dechedulerのポリシーは、プロジェクトページのexamplesに<a href="https://github.com/kubernetes-incubator/descheduler/blob/master/examples/policy.yaml">あるもののまま</a>としました。先ほど用意したクラスターでは、aks-pool1-27450415-vmss000000にレプリカが2つ寄っているので、RemoveDuplicatesが適用されると期待できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kind: ClusterRole
+</span></span><span style="display:flex;"><span>apiVersion: rbac.authorization.k8s.io/v1beta1
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: descheduler-cluster-role
+</span></span><span style="display:flex;"><span>rules:
+</span></span><span style="display:flex;"><span>- apiGroups: [&#34;&#34;]
+</span></span><span style="display:flex;"><span>  resources: [&#34;nodes&#34;]
+</span></span><span style="display:flex;"><span>  verbs: [&#34;get&#34;, &#34;watch&#34;, &#34;list&#34;]
+</span></span><span style="display:flex;"><span>- apiGroups: [&#34;&#34;]
+</span></span><span style="display:flex;"><span>  resources: [&#34;pods&#34;]
+</span></span><span style="display:flex;"><span>  verbs: [&#34;get&#34;, &#34;watch&#34;, &#34;list&#34;, &#34;delete&#34;]
+</span></span><span style="display:flex;"><span>- apiGroups: [&#34;&#34;]
+</span></span><span style="display:flex;"><span>  resources: [&#34;pods/eviction&#34;]
+</span></span><span style="display:flex;"><span>  verbs: [&#34;create&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>kind: ServiceAccount
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: descheduler-sa
+</span></span><span style="display:flex;"><span>  namespace: kube-system
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: rbac.authorization.k8s.io/v1
+</span></span><span style="display:flex;"><span>kind: ClusterRoleBinding
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: descheduler-cluster-role-binding
+</span></span><span style="display:flex;"><span>subjects:
+</span></span><span style="display:flex;"><span>- kind: ServiceAccount
+</span></span><span style="display:flex;"><span>  name: descheduler-sa
+</span></span><span style="display:flex;"><span>  namespace: kube-system
+</span></span><span style="display:flex;"><span>roleRef:
+</span></span><span style="display:flex;"><span>  kind: ClusterRole
+</span></span><span style="display:flex;"><span>  name: descheduler-cluster-role
+</span></span><span style="display:flex;"><span>  apiGroup: rbac.authorization.k8s.io
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>apiVersion: v1
+</span></span><span style="display:flex;"><span>data:
+</span></span><span style="display:flex;"><span>  policy.yaml: |
+</span></span><span style="display:flex;"><span>    apiVersion: &#34;descheduler/v1alpha1&#34;
+</span></span><span style="display:flex;"><span>    kind: &#34;DeschedulerPolicy&#34;
+</span></span><span style="display:flex;"><span>    strategies:
+</span></span><span style="display:flex;"><span>      &#34;RemoveDuplicates&#34;:
+</span></span><span style="display:flex;"><span>         enabled: true
+</span></span><span style="display:flex;"><span>      &#34;RemovePodsViolatingInterPodAntiAffinity&#34;:
+</span></span><span style="display:flex;"><span>         enabled: true
+</span></span><span style="display:flex;"><span>      &#34;LowNodeUtilization&#34;:
+</span></span><span style="display:flex;"><span>         enabled: true
+</span></span><span style="display:flex;"><span>         params:
+</span></span><span style="display:flex;"><span>           nodeResourceUtilizationThresholds:
+</span></span><span style="display:flex;"><span>             thresholds:
+</span></span><span style="display:flex;"><span>               &#34;cpu&#34; : 20
+</span></span><span style="display:flex;"><span>               &#34;memory&#34;: 20
+</span></span><span style="display:flex;"><span>               &#34;pods&#34;: 20
+</span></span><span style="display:flex;"><span>             targetThresholds:
+</span></span><span style="display:flex;"><span>               &#34;cpu&#34; : 50
+</span></span><span style="display:flex;"><span>               &#34;memory&#34;: 50
+</span></span><span style="display:flex;"><span>               &#34;pods&#34;: 50
+</span></span><span style="display:flex;"><span>kind: ConfigMap
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: descheduler-policy-configmap
+</span></span><span style="display:flex;"><span>  namespace: kube-system
+</span></span></code></pre></div><p>Dechedulerのポリシーは、プロジェクトページのexamplesに<a href="https://github.com/kubernetes-incubator/descheduler/blob/master/examples/policy.yaml">あるもののまま</a>としました。先ほど用意したクラスターでは、aks-pool1-27450415-vmss000000にレプリカが2つ寄っているので、RemoveDuplicatesが適用されると期待できます。</p>
 <p>では作ります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f descheduler.yaml
-</code></pre></div><h3 id="descheduler-jobを実行">Descheduler Jobを実行</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f descheduler.yaml
+</span></span></code></pre></div><h3 id="descheduler-jobを実行">Descheduler Jobを実行</h3>
 <p>descheduler-job.yamlとします。imageの確認をお忘れなく。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">apiVersion: batch/v1
-kind: Job
-metadata:
-  name: descheduler-job
-  namespace: kube-system
-spec:
-  parallelism: 1
-  completions: 1
-  template:
-    metadata:
-      name: descheduler-pod
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: &#34;&#34;
-    spec:
-        containers:
-        - name: descheduler
-          image: oreno.azurecr.io/descheduler:0.9.0
-          volumeMounts:
-          - mountPath: /policy-dir
-            name: policy-volume
-          command: [&#34;/bin/descheduler&#34;,  &#34;--policy-config-file&#34;, &#34;/policy-dir/policy.yaml&#34;]
-        restartPolicy: &#34;Never&#34;
-        serviceAccountName: descheduler-sa
-        volumes:
-        - name: policy-volume
-          configMap:
-            name: descheduler-policy-configmap
-</code></pre></div><p>いざ実行。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl apply -f descheduler-job.yaml
-$ kubectl get jobs.batch -n kube-system
-NAME              COMPLETIONS   DURATION   AGE
-descheduler-job   1/1           9s         11s
-</code></pre></div><p>さて、偏りは解消したでしょうか。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">$ kubectl get po -o wide
-NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
-nginx-6d4df4db7b-cqrkl   1/1     Running   0          15m     10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-dg267   1/1     Running   0          15m     10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
-nginx-6d4df4db7b-w7mb6   1/1     Running   0          7m33s   10.240.0.87   aks-pool1-27450415-vmss000003   &lt;none&gt;           &lt;none&gt;
-</code></pre></div><p>aks-pool1-27450415-vmss000000にあった1つのPodが退出され、新たにaks-pool1-27450415-vmss000003で作成されたことがわかります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>apiVersion: batch/v1
+</span></span><span style="display:flex;"><span>kind: Job
+</span></span><span style="display:flex;"><span>metadata:
+</span></span><span style="display:flex;"><span>  name: descheduler-job
+</span></span><span style="display:flex;"><span>  namespace: kube-system
+</span></span><span style="display:flex;"><span>spec:
+</span></span><span style="display:flex;"><span>  parallelism: 1
+</span></span><span style="display:flex;"><span>  completions: 1
+</span></span><span style="display:flex;"><span>  template:
+</span></span><span style="display:flex;"><span>    metadata:
+</span></span><span style="display:flex;"><span>      name: descheduler-pod
+</span></span><span style="display:flex;"><span>      annotations:
+</span></span><span style="display:flex;"><span>        scheduler.alpha.kubernetes.io/critical-pod: &#34;&#34;
+</span></span><span style="display:flex;"><span>    spec:
+</span></span><span style="display:flex;"><span>        containers:
+</span></span><span style="display:flex;"><span>        - name: descheduler
+</span></span><span style="display:flex;"><span>          image: oreno.azurecr.io/descheduler:0.9.0
+</span></span><span style="display:flex;"><span>          volumeMounts:
+</span></span><span style="display:flex;"><span>          - mountPath: /policy-dir
+</span></span><span style="display:flex;"><span>            name: policy-volume
+</span></span><span style="display:flex;"><span>          command: [&#34;/bin/descheduler&#34;,  &#34;--policy-config-file&#34;, &#34;/policy-dir/policy.yaml&#34;]
+</span></span><span style="display:flex;"><span>        restartPolicy: &#34;Never&#34;
+</span></span><span style="display:flex;"><span>        serviceAccountName: descheduler-sa
+</span></span><span style="display:flex;"><span>        volumes:
+</span></span><span style="display:flex;"><span>        - name: policy-volume
+</span></span><span style="display:flex;"><span>          configMap:
+</span></span><span style="display:flex;"><span>            name: descheduler-policy-configmap
+</span></span></code></pre></div><p>いざ実行。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl apply -f descheduler-job.yaml
+</span></span><span style="display:flex;"><span>$ kubectl get jobs.batch -n kube-system
+</span></span><span style="display:flex;"><span>NAME              COMPLETIONS   DURATION   AGE
+</span></span><span style="display:flex;"><span>descheduler-job   1/1           9s         11s
+</span></span></code></pre></div><p>さて、偏りは解消したでしょうか。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ kubectl get po -o wide
+</span></span><span style="display:flex;"><span>NAME                     READY   STATUS    RESTARTS   AGE     IP            NODE                            NOMINATED NODE   READINESS GATES
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-cqrkl   1/1     Running   0          15m     10.240.0.42   aks-pool1-27450415-vmss000001   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-dg267   1/1     Running   0          15m     10.240.0.22   aks-pool1-27450415-vmss000000   &lt;none&gt;           &lt;none&gt;
+</span></span><span style="display:flex;"><span>nginx-6d4df4db7b-w7mb6   1/1     Running   0          7m33s   10.240.0.87   aks-pool1-27450415-vmss000003   &lt;none&gt;           &lt;none&gt;
+</span></span></code></pre></div><p>aks-pool1-27450415-vmss000000にあった1つのPodが退出され、新たにaks-pool1-27450415-vmss000003で作成されたことがわかります。</p>
 <h2 id="deschedulerプロジェクトの現状">Deschedulerプロジェクトの現状</h2>
 <p>このようにDeschedulerは、特に少ないNode數で偏りが大きくなりがちなクラスターでとても有用です。ですが、アクティブなメンテナーの数が少なく、現時点では積極的にKubernetesのコア機能を目指す感じではなさそうです。</p>
 <blockquote>

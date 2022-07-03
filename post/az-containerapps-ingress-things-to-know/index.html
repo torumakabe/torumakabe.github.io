@@ -75,64 +75,64 @@
 <h2 id="grpc使える">gRPC使える？</h2>
 <p>使えます。</p>
 <p>では試してみましょう。<a href="https://github.com/grpc/grpc-go/tree/master/examples">grpc/grpc-go のhelloworldサンプル</a>をベースに、負荷分散が効くか確認するため、応答メッセージにホスト名を加えたサーバアプリを作ります。また、gRPCリフレクションも設定します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;context&#34;</span>
-	<span style="color:#e6db74">&#34;flag&#34;</span>
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;net&#34;</span>
-	<span style="color:#e6db74">&#34;os&#34;</span>
-
-	<span style="color:#e6db74">&#34;google.golang.org/grpc&#34;</span>
-	<span style="color:#a6e22e">pb</span> <span style="color:#e6db74">&#34;google.golang.org/grpc/examples/helloworld/helloworld&#34;</span>
-	<span style="color:#e6db74">&#34;google.golang.org/grpc/reflection&#34;</span>
-)
-
-<span style="color:#66d9ef">var</span> (
-	<span style="color:#a6e22e">port</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;port&#34;</span>, <span style="color:#ae81ff">50051</span>, <span style="color:#e6db74">&#34;The server port&#34;</span>)
-)
-
-<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">server</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">UnimplementedGreeterServer</span>
-}
-
-<span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">server</span>) <span style="color:#a6e22e">SayHello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">in</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloReply</span>, <span style="color:#66d9ef">error</span>) {
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Received: %v&#34;</span>, <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">GetName</span>())
-	<span style="color:#a6e22e">hostname</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Hostname</span>()
-	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloReply</span>{<span style="color:#a6e22e">Message</span>: <span style="color:#e6db74">&#34;Hello &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">GetName</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, this is &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hostname</span>}, <span style="color:#66d9ef">nil</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
-	<span style="color:#a6e22e">lis</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">Listen</span>(<span style="color:#e6db74">&#34;tcp&#34;</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;:%d&#34;</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">port</span>))
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;failed to listen: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-	}
-	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">NewServer</span>()
-	<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">RegisterGreeterServer</span>(<span style="color:#a6e22e">s</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">server</span>{})
-	<span style="color:#a6e22e">reflection</span>.<span style="color:#a6e22e">Register</span>(<span style="color:#a6e22e">s</span>)
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;server listening at %v&#34;</span>, <span style="color:#a6e22e">lis</span>.<span style="color:#a6e22e">Addr</span>())
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Serve</span>(<span style="color:#a6e22e">lis</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;failed to serve: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
-	}
-}
-</code></pre></div><p>このgRPCサーバアプリケーション(grpc-greeter)をContainer Appsにデプロイします。負荷分散を確認したいので、レプリカ数は2です。また、Ingressは&quot;external&quot;で公開します。transportは&quot;http2&quot;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>、targetPortは&quot;50051&quot;です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;flag&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;google.golang.org/grpc&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">pb</span> <span style="color:#e6db74">&#34;google.golang.org/grpc/examples/helloworld/helloworld&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;google.golang.org/grpc/reflection&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">port</span> = <span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Int</span>(<span style="color:#e6db74">&#34;port&#34;</span>, <span style="color:#ae81ff">50051</span>, <span style="color:#e6db74">&#34;The server port&#34;</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">server</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">UnimplementedGreeterServer</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">server</span>) <span style="color:#a6e22e">SayHello</span>(<span style="color:#a6e22e">ctx</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">Context</span>, <span style="color:#a6e22e">in</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloRequest</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloReply</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;Received: %v&#34;</span>, <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">GetName</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hostname</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Hostname</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">HelloReply</span>{<span style="color:#a6e22e">Message</span>: <span style="color:#e6db74">&#34;Hello &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">in</span>.<span style="color:#a6e22e">GetName</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, this is &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">hostname</span>}, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">flag</span>.<span style="color:#a6e22e">Parse</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">lis</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">Listen</span>(<span style="color:#e6db74">&#34;tcp&#34;</span>, <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;:%d&#34;</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">port</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;failed to listen: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">grpc</span>.<span style="color:#a6e22e">NewServer</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">pb</span>.<span style="color:#a6e22e">RegisterGreeterServer</span>(<span style="color:#a6e22e">s</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">server</span>{})
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">reflection</span>.<span style="color:#a6e22e">Register</span>(<span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;server listening at %v&#34;</span>, <span style="color:#a6e22e">lis</span>.<span style="color:#a6e22e">Addr</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">Serve</span>(<span style="color:#a6e22e">lis</span>); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;failed to serve: %v&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>このgRPCサーバアプリケーション(grpc-greeter)をContainer Appsにデプロイします。負荷分散を確認したいので、レプリカ数は2です。また、Ingressは&quot;external&quot;で公開します。transportは&quot;http2&quot;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>、targetPortは&quot;50051&quot;です。</p>
 <p>では、gRPCurlでサービスをリストしてみましょう。接続先はIngressエンドポイントです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ grpcurl grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 list
-grpc.reflection.v1alpha.ServerReflection
-helloworld.Greeter
-</code></pre></div><p>リストできていますね。では、helloworld.Greeter/SayHelloを呼び出してみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#39;</span> grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 helloworld.Greeter/SayHello
-<span style="color:#f92672">{</span>
-  <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Hello Toru, this is grpc-greeter--bd346ys-679c6454bc-kctf9&#34;</span>
-<span style="color:#f92672">}</span>
-$ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#39;</span> grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 helloworld.Greeter/SayHello
-<span style="color:#f92672">{</span>
-  <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Hello Toru, this is grpc-greeter--bd346ys-679c6454bc-6452x&#34;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><p>呼び出せました。また、複数回呼び出すと、応答のホスト名が変わり、負荷分散できていることがわかります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ grpcurl grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 list
+</span></span><span style="display:flex;"><span>grpc.reflection.v1alpha.ServerReflection
+</span></span><span style="display:flex;"><span>helloworld.Greeter
+</span></span></code></pre></div><p>リストできていますね。では、helloworld.Greeter/SayHelloを呼び出してみましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#39;</span> grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 helloworld.Greeter/SayHello
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Hello Toru, this is grpc-greeter--bd346ys-679c6454bc-kctf9&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>$ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#39;</span> grpc-greeter.makabecchi-123456.canadacentral.azurecontainerapps.io:443 helloworld.Greeter/SayHello
+</span></span><span style="display:flex;"><span><span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#e6db74">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Hello Toru, this is grpc-greeter--bd346ys-679c6454bc-6452x&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><p>呼び出せました。また、複数回呼び出すと、応答のホスト名が変わり、負荷分散できていることがわかります。</p>
 <h2 id="名前解決やサービスディスカバリってどうなってる">名前解決やサービスディスカバリってどうなってる？</h2>
 <p>Ingressには、FQDNが付与されます。</p>
 <blockquote>
@@ -150,68 +150,68 @@ $ grpcurl -d <span style="color:#e6db74">&#39;{&#34;name&#34;: &#34;Toru&#34;}&#
 <li><code>nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io</code></li>
 </ul>
 <p>では、Container Apps環境外部、インターネットから名前解決してみます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ dig +noall +answer nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io
-nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3556</span> IN A 20.151.223.25
-$ dig +noall +answer nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io
-nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
-$ dig +noall +answer nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io
-nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
-</code></pre></div><p>すべて同じパブリックIPアドレス(20.151.223.25)が返ってきました。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ dig +noall +answer nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io
+</span></span><span style="display:flex;"><span>nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3556</span> IN A 20.151.223.25
+</span></span><span style="display:flex;"><span>$ dig +noall +answer nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io
+</span></span><span style="display:flex;"><span>nginx-internal.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
+</span></span><span style="display:flex;"><span>$ dig +noall +answer nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io
+</span></span><span style="display:flex;"><span>nginx-internal-2.makabecchi-123456.canadacentral.azurecontainerapps.io. <span style="color:#ae81ff">3600</span> IN A 20.151.223.25
+</span></span></code></pre></div><p>すべて同じパブリックIPアドレス(20.151.223.25)が返ってきました。</p>
 <p>external向けには、意図通りインターネット経由でアクセスできます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ curl -sv https://nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io
-*   Trying 20.151.223.25:443...
-* TCP_NODELAY set
-* Connected to nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io <span style="color:#f92672">(</span>20.151.223.25<span style="color:#f92672">)</span> port <span style="color:#ae81ff">443</span> <span style="color:#f92672">(</span><span style="color:#75715e">#0)</span>
-* ALPN, offering h2
-* ALPN, offering http/1.1
-...
-&lt; HTTP/2 <span style="color:#ae81ff">200</span>
-&lt; server: nginx/1.21.3
-...
-</code></pre></div><p>internal向けには、できません。internal向けに2つ作りましたが、結果は同様です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ curl -sv https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io
-*   Trying 20.151.223.25:443...
-* TCP_NODELAY set
-* Connected to nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io <span style="color:#f92672">(</span>20.151.223.25<span style="color:#f92672">)</span> port <span style="color:#ae81ff">443</span> <span style="color:#f92672">(</span><span style="color:#75715e">#0)</span>
-* ALPN, offering h2
-* ALPN, offering http/1.1
-...
-&lt; HTTP/2 <span style="color:#ae81ff">404</span>
-...
-</code></pre></div><p>以上から、同じ環境にあるIngressのエンドポイントは、アプリケーション間で共有されることがわかります。そして、internal Ingressは、環境外部からのトラフィックを転送しません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -sv https://nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io
+</span></span><span style="display:flex;"><span>*   Trying 20.151.223.25:443...
+</span></span><span style="display:flex;"><span>* TCP_NODELAY set
+</span></span><span style="display:flex;"><span>* Connected to nginx-external.makabecchi-123456.canadacentral.azurecontainerapps.io <span style="color:#f92672">(</span>20.151.223.25<span style="color:#f92672">)</span> port <span style="color:#ae81ff">443</span> <span style="color:#f92672">(</span><span style="color:#75715e">#0)</span>
+</span></span><span style="display:flex;"><span>* ALPN, offering h2
+</span></span><span style="display:flex;"><span>* ALPN, offering http/1.1
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>&lt; HTTP/2 <span style="color:#ae81ff">200</span>
+</span></span><span style="display:flex;"><span>&lt; server: nginx/1.21.3
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>internal向けには、できません。internal向けに2つ作りましたが、結果は同様です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ curl -sv https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io
+</span></span><span style="display:flex;"><span>*   Trying 20.151.223.25:443...
+</span></span><span style="display:flex;"><span>* TCP_NODELAY set
+</span></span><span style="display:flex;"><span>* Connected to nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io <span style="color:#f92672">(</span>20.151.223.25<span style="color:#f92672">)</span> port <span style="color:#ae81ff">443</span> <span style="color:#f92672">(</span><span style="color:#75715e">#0)</span>
+</span></span><span style="display:flex;"><span>* ALPN, offering h2
+</span></span><span style="display:flex;"><span>* ALPN, offering http/1.1
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>&lt; HTTP/2 <span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>以上から、同じ環境にあるIngressのエンドポイントは、アプリケーション間で共有されることがわかります。そして、internal Ingressは、環境外部からのトラフィックを転送しません。</p>
 <p>では、Container Apps環境内部からの名前解決は、どうでしょうか。確認用のコンテナを作って確かめましょう。digやcurlが含まれるコンテナイメージ <a href="https://github.com/giantswarm/tiny-tools">giantswarm/tiny-tools</a> を使います。ところでデバッグコンテナ的な何かがほしいですね。のびしろです。</p>
 <p>digで名前解決を確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az containerapp create -n tiny-tools -g rg-containerapp-poc --environment containerapps-env --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span> --revisions-mode single --cpu 0.25 --memory 0.5Gi
-</code></pre></div><p>標準出力は、Container Appsに接続したLog Analyticsで確認できます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">k8se-envoy-internal.k8se-system.svc.cluster.local. 5 IN	A 10.0.183.11
-</code></pre></div><p>環境内部からの名前解決要求に対しては、プライベートアドレスが返ってくることがわかります。もうひとつのIngress internalエンドポイントについても、確認しましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az containerapp update -n tiny-tools -g rg-containerapp-poc --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal-2.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span>
-</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">k8se-envoy-internal.k8se-system.svc.cluster.local. 5 IN	A 10.0.183.11
-</code></pre></div><p>同じIPアドレスが返ってきました。internal Ingressではプライベートな共有エンドポイントが作られ、環境内部からはそのIPで解決されることがわかります。ホスト名からも、想像ができますね。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ az containerapp create -n tiny-tools -g rg-containerapp-poc --environment containerapps-env --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span> --revisions-mode single --cpu 0.25 --memory 0.5Gi
+</span></span></code></pre></div><p>標準出力は、Container Appsに接続したLog Analyticsで確認できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>k8se-envoy-internal.k8se-system.svc.cluster.local. 5 IN	A 10.0.183.11
+</span></span></code></pre></div><p>環境内部からの名前解決要求に対しては、プライベートアドレスが返ってくることがわかります。もうひとつのIngress internalエンドポイントについても、確認しましょう。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ az containerapp update -n tiny-tools -g rg-containerapp-poc --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;dig, +noall, +answer, nginx-internal-2.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>k8se-envoy-internal.k8se-system.svc.cluster.local. 5 IN	A 10.0.183.11
+</span></span></code></pre></div><p>同じIPアドレスが返ってきました。internal Ingressではプライベートな共有エンドポイントが作られ、環境内部からはそのIPで解決されることがわかります。ホスト名からも、想像ができますね。</p>
 <p>ここでKubernetes経験者は、同じNamespaceのServiceであればサービス名的な何かだけで解決できるのでは、と思うでしょう。わたしもそうでした。ただし、現在のContainer AppsはNamespaceとServiceが非可視、またIngressがFQDNでフィルタ処理をしているため、現状ではできません。</p>
 <p>なお、Ingressを使わず、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/connect-apps?tabs=bash#dapr-location">Daprを使ってもアプリケーション、サービス呼び出しができます</a>。こちらの指定はシンプルです。環境識別子やリージョン名を指定せずにサービスディスカバリできます。例えば以下のように。</p>
 <p><strong><code>http://localhost:3500/v1.0/invoke/myapp</code></strong></p>
 <h2 id="同じ環境内のingress経由トラフィックをプライベートネットワークに閉じ込められる">同じ環境内のIngress経由トラフィックをプライベートネットワークに閉じ込められる？</h2>
 <p>これまでの流れでわかりますね。できます。</p>
 <p>では、internal Ingress経由でcurlしてみましょう。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ az containerapp update -n tiny-tools -g rg-containerapp-poc --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;curl, -sv, https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span>
-</code></pre></div><p>Log Analyticsで確認します。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">*   Trying 10.0.183.11:443...
-* Connected to nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io (10.0.183.11) port 443 (#0)
-* ALPN, offering h2
-* ALPN, offering http/1.1
-...
-&lt; HTTP/2 200 
-&lt; server: nginx/1.21.3
-...
-</code></pre></div><section class="footnotes" role="doc-endnotes">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ az containerapp update -n tiny-tools -g rg-containerapp-poc --image giantswarm/tiny-tools --command <span style="color:#e6db74">&#39;curl, -sv, https://nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io&#39;</span>
+</span></span></code></pre></div><p>Log Analyticsで確認します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*   Trying 10.0.183.11:443...
+</span></span><span style="display:flex;"><span>* Connected to nginx-internal.internal.makabecchi-123456.canadacentral.azurecontainerapps.io (10.0.183.11) port 443 (#0)
+</span></span><span style="display:flex;"><span>* ALPN, offering h2
+</span></span><span style="display:flex;"><span>* ALPN, offering http/1.1
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>&lt; HTTP/2 200 
+</span></span><span style="display:flex;"><span>&lt; server: nginx/1.21.3
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn:1" role="doc-endnote">
+<li id="fn:1">
 <p>はじめに&quot;http2&quot;にしてから&quot;auto&quot;に変えたリビジョンを作ってもOKだったので&quot;auto&quot;でよし、と思っていたのですが、変更値を反映しない<a href="https://github.com/microsoft/azure-container-apps/issues/38">バグ</a>があって、結果オーライだったらしい。&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
-</section>
+</div>
 
 		</section>
 
