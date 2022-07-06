@@ -182,7 +182,7 @@
 <p>カスタムVNetの代表的なユースケースは、他マネージドサービスへのプライベートネットワーク経由でのアクセスです。図をシンプルにするために省略しましたが、<a href="https://gist.github.com/ToruMakabe/d81680ab13db82ffa2b0cf0094eddf04">Container Apps環境のアプリケーションから、プライベートエンドポイントを使ってストレージアカウントへアクセスしたい</a>、というケースが分かりやすいでしょう。マネージドVNetと違い、VNetをユーザが識別、操作できるため、可能となる構成です。</p>
 <p>Container Apps環境が参加するVNetをユーザが操作できる他は、マネージドVNetの構成と大きく変わりません。ですが1点、意識すべきことがあります。同じVNet内の要素、たとえば仮想マシンからContainer Apps環境内のアプリケーションにアクセスする場合の名前解決です。</p>
 <p>カスタムVNet構成でContainer Apps環境を作る際、既定で外部からのアクセスは許可されます。この場合、Container Apps環境の内外をつなぐロードバランサには、パブリックIPが割り当てられます。よって、同じVNet内にある仮想マシンであっても、Container Apps環境内のアプリケーションには、パブリックIP経由でアクセスする必要があります。</p>
-<p>なお、公式ドキュメントには<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/vnet-custom?tabs=bash&amp;pivots=azure-cli#optional-configuration">プライベートDNSゾーンを使った名前解決方法</a>が紹介されています。Container App環境は属性として、ドメイン名(defaultDomain)と外部かアクセス向けIPアドレス(staticIp)を持ちます。これらの情報を組み合わせ、ワイルドカード DNS Aレコードを作成することで名前解決ができます。</p>
+<p>なお、公式ドキュメントには<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/vnet-custom?tabs=bash&amp;pivots=azure-cli#optional-configuration">プライベートDNSゾーンを使った名前解決方法</a>が紹介されています。Container App環境は属性として、ドメイン名(defaultDomain)と外部アクセス向けIPアドレス(staticIp)を持ちます。これらの情報を組み合わせ、環境内すべてのアプリケーションの名前解決ができるワイルドカード DNS Aレコードを作れます。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*.&lt;defaultDomain&gt; IN A &lt;staticIp&gt;
 </span></span></code></pre></div><p>繰り返しになりますが、アプリケーションへの振り分けはIngressが行うので、複数のアプリケーションやFQDNがあっても、Aレコードはロードバランサに割り当てたIP向けに、1つのみです。</p>
 <p>アクセスパターンを以下にまとめます。</p>
