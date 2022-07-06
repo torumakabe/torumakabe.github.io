@@ -106,7 +106,7 @@
 </ul>
 </li>
 </ul>
-<p>既定で内部向けFQDNが作成され、externalフラグをtrueにすると、追加で外部向けも作られます。存在しないFQDNに対するアクセスに対しては、HTTPステータスコード404(Not Found)が返ります。</p>
+<p>既定で内部向けFQDNが作成され、externalフラグをtrueにすると、追加で外部向けも作られます。存在しないFQDNに対するアクセスには、HTTPステータスコード404(Not Found)が返ります。</p>
 <p>externalフラグを有効にすると、Container Apps環境の一部として作られるAzure Load Balancer経由で、環境外部からのアクセスができます。KubernetesのLoadBalancerタイプのServiceと同じ位置づけです。</p>
 <p>マネージドVNet構成において、環境の外部とはインターネットを意味します。ロードバランサにパブリックIPが付与され、AzureのパブリックDNSでFQDNを名前解決します。そしてロードバランサは、バックエンドにあるIngressにトラフィックを送ります。Ingressの実体はEnvoyで、複数のレプリカで構成されています。</p>
 <p>ところで、複数のアプリケーションとFQDNがあっても、Container Apps環境が外部向けに割り当てるIPアドレスは1つです。アプリケーションへの振り分けはIngressが行います。</p>
