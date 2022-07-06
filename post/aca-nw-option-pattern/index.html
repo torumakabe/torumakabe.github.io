@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure Container Appsのネットワークオプションとアクセス可能なパターン - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps" />
+	<meta property="og:image" content=""/>
+	<meta property="og:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン" />
+<meta property="og:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ToruMakabe.github.io/post/aca-nw-option-pattern/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-07-06T14:00:00+09:00" />
+<meta property="article:modified_time" content="2022-07-06T14:00:00+09:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン"/>
+<meta name="twitter:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps"/>
+<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+	
+	
+        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+	
+
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	
+	
+	
+</head>
+<body>
+        <div class="content"><header>
+	<div class="main">
+		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+	</div>
+	<nav>
+		
+		<a href="/">Home</a>
+		
+		<a href="/post">All posts</a>
+		
+		<a href="/tags">Tags</a>
+		
+		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
+		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		
+	</nav>
+</header>
+
+<main>
+	<article>
+		<div class="title">
+			<h1 class="title">Azure Container Appsのネットワークオプションとアクセス可能なパターン</h1>
+			<div class="meta">Posted on Jul 6, 2022</div>
+		</div>
+		
+
+		<section class="body">
+			<h2 id="何の話か">何の話か</h2>
+<p>Azure Container Appsには、以下のネットワークオプションがあります。</p>
+<ul>
+<li>VNet: マネージド or カスタム</li>
+<li>アプリケーション
+<ul>
+<li>Ingress: 有効 or 無効
+<ul>
+<li>External: 有効 or 無効</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Azure Container Appsはマネージドサービスなので、詳細な内部構造は明らかにされていません。もちろん、それぞれのオプションについて、ドキュメントで説明はされています。しかし、内部構造や構成要素が見えないので、オプションを選択し、組み合わせた場合の効果やふるまいがピンとこない人も多いでしょう。</p>
+<p>そこでこのエントリでは、公開されている、もしくは取得可能な情報をベースに、構成要素やオプションの効果を整理します。まずはAzure Container Appsのネットワークオプション別に、その構成要素と関わりを図にまとめます。加えて、アプリケーションをユーザや他アプリケーションから利用する際の基本となるFQDNでアクセス可能なパターンのリストを作ります。</p>
+<p>なおAzure Container Appsは進化著しいサービスであるため、本日(2022/7/6〉時点での整理であることをお断りしておきます。</p>
+<h2 id="マネージドvnet">マネージドVNet</h2>
+<div class="mermaid">graph TB
+    subgraph VNet-Invisible
+        subgraph ContainerApps-Env
+            LB-External --> Ingress
+            Ingress --> Rule-Target-FQDN
+            Rule-Target-FQDN --> FQDN-External
+            Rule-Target-FQDN --> FQDN-Internal
+            FQDN-External --> External-True([Is Ingress External true?])
+            FQDN-Internal --> From-Env([From the same Contaner Apps Env?])
+            External-True --> App-with-Ingress
+            From-Env --> App-with-Ingress
+            App --> Ingress
+            App --> DNS-ACA-Internal
+            DNS-ACA-Internal
+        end
+    end
+    Public-IP --> LB-External
+    Client-Public --> Public-IP
+    Client-Public --> DNS-Azure-Public
+</div>
+
+<p>VNetを指定せずにContainer Apps環境を作ると、VNetはAzureによって管理され、その中は非可視になります。利用者からVNetを識別できる情報がないため、他のVNetやVPN、ExpressRouteを経由したプライベートネットワークとは接続できません。つまりマネージドVNet構成のContainer Apps環境に作ったアプリケーションには、環境内部、もしくはパブリック(インターネット)からアクセスします。</p>
+<p>Container Appsでは、環境内外、VNet、パブリックを問わず、アプリケーションのIngress設定をを有効にすることで、アプリケーションにFQDNでアクセスできるようになります。Ingress無効で作成したアプリケーションには、FQDNでのアクセスはできません。なお、コンソールインターフェイスとDapr経由でのアクセスは可能です。</p>
+<p>加えて、Ingressには<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/ingress?tabs=bash#configuration">externalフラグ</a>があります。trueにすると、環境外部からアクセスできるようになります。いっぽうfalseの場合は、環境内部からのアクセスに限定されます。</p>
+<p>Ingressを有効にしたアプリケーション向けには、ルールに従って<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/ingress?tabs=bash#ip-addresses-and-domain-names">FQDNが生成されます</a>。</p>
+<ul>
+<li>Ingressのexternalフラグ
+<ul>
+<li>true: &lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</li>
+<li>false: &lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</li>
+</ul>
+</li>
+</ul>
+<p>既定で内部向けFQDNが作成され、externalフラグをtrueにすると、追加で外部向けも作られます。存在しないFQDNに対するアクセスに対しては、HTTPステータスコード404(Not Found)が返ります。</p>
+<p>externalフラグを有効にすると、Container Apps環境の一部として作られるAzure Load Balancer経由で、環境外部からのアクセスができます。KubernetesのLoadBalancerタイプのServiceと同じ位置づけです。</p>
+<p>マネージドVNet構成において、環境の外部とはインターネットを意味します。ロードバランサにパブリックIPが付与され、AzureのパブリックDNSでFQDNを名前解決します。そしてロードバランサは、バックエンドにあるIngressにトラフィックを送ります。Ingressの実体はEnvoyで、複数のレプリカで構成されています。</p>
+<p>ところで、複数のアプリケーションとFQDNがあっても、Container Apps環境が外部向けに割り当てるIPアドレスは1つです。アプリケーションへの振り分けはIngressが行います。</p>
+<p>なお、環境内部からFQDNを名前解決すると、外部向けFQDNであってもパブリックIPではなくプライベートIPが返ってきます。Container Apps環境が持つDNSに問い合わせるためです。解決したIPアドレスは、Kubernetesで言えばClusterIPです。ドキュメントに</p>
+<blockquote>
+<p><a href="https://docs.microsoft.com/ja-jp/azure/container-apps/connect-apps?tabs=bash">FQDN を使用して同じ環境で別のコンテナーを呼び出す場合、ネットワーク トラフィックが環境から出ることはありません</a></p>
+</blockquote>
+<p>とありますが、この仕組みが背景にあります。</p>
+<p>ところで、環境内部でのふるまいを確認するには、シェルが使えてツールの導入も容易な、<a href="https://github.com/ToruMakabe/aca-fqdn-access-pattern-list/blob/6386ca2f8a994f3a4cb4dcd9b0679e1b291050b8/managed-vnet/main.tf#L155">Ubuntuなどのコンテナを環境に作成</a>し、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/observability?tabs=bash#container-console">コンソールアクセス</a>してみてください。curlやdigなどで、環境内からアクセス可能か、どのように名前解決されるのか、体験できます。</p>
+<p>では、マネージドVNetの場合のFQDNアクセスパターンをまとめてみましょう。</p>
+<table>
+<thead>
+<tr>
+<th>Ingress external</th>
+<th>Source</th>
+<th>Target FQDN</th>
+<th>Resolved Target IP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>true</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td>Public</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Public</td>
+</tr>
+<tr>
+<td>false</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="カスタムvnet---外部からのアクセスを許可">カスタムVNet - 外部からのアクセスを許可</h2>
+<p>VNetを指定してContainer Apps環境を作るとどうなるでしょうか。外部からのアクセスを許可するか、内部に閉じるかの選択肢があります。まずは許可する場合です。</p>
+<div class="mermaid">graph TB
+    subgraph VNet-Custom
+        subgraph ContainerApps-Env
+            LB-External --> Ingress
+            Ingress --> Rule-Target-FQDN
+            Rule-Target-FQDN --> FQDN-External
+            Rule-Target-FQDN --> FQDN-Internal
+            FQDN-External --> External-True([Is Ingress External true?])
+            FQDN-Internal --> From-Env([From the same Contaner Apps Env?])
+            External-True --> App-with-Ingress
+            From-Env --> App-with-Ingress
+            App --> Ingress
+            App --> DNS-ACA-Internal
+            DNS-ACA-Internal
+        end
+        Client-Private
+    end
+    Client-Private --> DNS-Azure-Private
+    Client-Private --> Public-IP
+    Public-IP --> LB-External
+    Client-Public --> Public-IP
+    Client-Public --> DNS-Azure-Public
+</div>
+
+<p>カスタムVNetの代表的なユースケースは、他マネージドサービスへのプライベートネットワーク経由でのアクセスです。図をシンプルにするために省略しましたが、<a href="https://gist.github.com/ToruMakabe/d81680ab13db82ffa2b0cf0094eddf04">Container Apps環境のアプリケーションから、プライベートエンドポイントを使ってストレージアカウントへアクセスしたい</a>、というケースが分かりやすいでしょう。マネージドVNetと違い、VNetをユーザが識別、操作できるため、可能となる構成です。</p>
+<p>Container Apps環境が参加するVNetをユーザが操作できる他は、マネージドVNetの構成と大きく変わりません。ですが1点、意識すべきことがあります。同じVNet内の要素、たとえば仮想マシンからContainer Apps環境内のアプリケーションにアクセスする場合の名前解決です。</p>
+<p>カスタムVNet構成でContainer Apps環境を作る際、既定で外部からのアクセスは許可されます。この場合、Container Apps環境の内外をつなぐロードバランサには、パブリックIPが割り当てられます。よって、同じVNet内にある仮想マシンであっても、Container Apps環境内のアプリケーションには、パブリックIP経由でアクセスする必要があります。</p>
+<p>なお、公式ドキュメントには<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/vnet-custom?tabs=bash&amp;pivots=azure-cli#optional-configuration">プライベートDNSゾーンを使った名前解決方法</a>が紹介されています。Container App環境は属性として、ドメイン名(defaultDomain)と外部かアクセス向けIPアドレス(staticIp)を持ちます。これらの情報を組み合わせ、ワイルドカード DNS Aレコードを作成することで名前解決ができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*.&lt;defaultDomain&gt; IN A &lt;staticIp&gt;
+</span></span></code></pre></div><p>繰り返しになりますが、アプリケーションへの振り分けはIngressが行うので、複数のアプリケーションやFQDNがあっても、Aレコードはロードバランサに割り当てたIP向けに、1つのみです。</p>
+<p>アクセスパターンを以下にまとめます。</p>
+<table>
+<thead>
+<tr>
+<th>Ingress external</th>
+<th>Source</th>
+<th>Target FQDN</th>
+<th>Resolved Target IP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>true</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td>Same VNet</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Public</td>
+</tr>
+<tr>
+<td></td>
+<td>Public</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Public</td>
+</tr>
+<tr>
+<td>false</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="カスタムvnet---内部">カスタムVNet - 内部</h2>
+<p>では最後のVNet構成、カスタムVNetでインターネットからのアクセスを拒否するオプションです。<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/vnet-custom-internal?tabs=bash&amp;pivots=azure-cli#create-an-environment">&ldquo;internal-only&rdquo;</a>オプションを付けてContainer Apps環境を作成します。</p>
+<div class="mermaid">graph TB
+    subgraph VNet-Custom
+        subgraph ContainerApps-Env
+            LB-Internal --> Ingress
+            LB-External
+            Ingress --> Rule-Target-FQDN
+            Rule-Target-FQDN --> FQDN-External
+            Rule-Target-FQDN --> FQDN-Internal
+            FQDN-External --> External-True([Is Ingress External true?])
+            FQDN-Internal --> From-Env([From the same Contaner Apps Env?])
+            External-True --> App-with-Ingress
+            From-Env --> App-with-Ingress
+            App --> Ingress
+            App --> DNS-ACA-Internal
+            DNS-ACA-Internal
+            Outbound([Outbound Traffic]) --> LB-External
+        end
+        Private-Link-Service --> LB-Internal
+        Client-Private --> LB-Internal
+    end
+    subgraph VNet-Other
+        Client-Private-Other --> Private-Endpoint
+        Private-Endpoint --> Private-Link-Service
+    end
+    Client-Private --> DNS-Azure-Private
+    Client-Private-Other --> DNS-Azure-Private-Other
+    LB-External --> Internet((Internet))
+</div>
+
+<p>これまでの構成との大きな違いは、Container Apps環境の入口となるロードバランサに割り当てるIPアドレスが、VNetのプライベートIPになることです。ロードバランサも、内部向けの専用ロードバランサが追加されます。他構成で使われていたロードバランサは残りますが、Container Apps環境からのアウトバウンド通信のみを担当します。なお、カスタムVNet構成ではロードバランサなど関連するマネージドリソースが<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/networking#managed-resources">&ldquo;MC_&ldquo;プレフィックスを持つリソースグループ内に作られ</a>、見ることができます。関心があれば覗いてみてください。</p>
+<p>この構成ではContainer Apps環境への入口がプライベートネットワークなので、プライベートネットワークからインターネットに出ることなくアプリケーションへのアクセスが可能です。図の通り、同じVNetにあるクライアント、たとえば仮想マシンからのトラフィックは、VNetに閉じます。</p>
+<p>なお、別のVNet、VPNやExpressRouteを用いたリモートネットワークからもアクセスが可能です。VNetをピアリングする、もしくはプライベートリンクサービスで実現できます。図はプライベートリンクサービスを使った例です。</p>
+<p>では最後に、この構成のアクセスパターンをまとめます。</p>
+<table>
+<thead>
+<tr>
+<th>Ingress external</th>
+<th>Source</th>
+<th>Target FQDN</th>
+<th>Resolved Target IP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>true</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+<tr>
+<td></td>
+<td>Same VNet</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Private (Same VNet)</td>
+</tr>
+<tr>
+<td></td>
+<td>Other VNet</td>
+<td>&lt;APP_NAME&gt;.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Private (Same/Other VNet)</td>
+</tr>
+<tr>
+<td>false</td>
+<td>Same Container App Env</td>
+<td>&lt;APP_NAME&gt;.internal.&lt;UNIQUE_IDENTIFIER&gt;.&lt;REGION_NAME&gt;.azurecontainerapps.io</td>
+<td>Container App Env Internal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="おまけ">おまけ</h2>
+<p>各オプション別に環境構築用のTerraform HCLコードを<a href="https://github.com/ToruMakabe/aca-fqdn-access-pattern-list">GitHubに置いています</a>ので、合わせて参考にしてください。</p>
+
+			
+			<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+			<script>
+				mermaid.initialize({ startOnLoad: true });
+			</script>
+			
+		</section>
+
+		<div class="post-tags">
+			
+			
+			<nav class="nav tags">
+				<ul class="tags">
+					
+					<li><a href="/tags/azure">Azure</a></li>
+					
+					<li><a href="/tags/container-apps">Container Apps</a></li>
+					
+					<li><a href="/tags/kubernetes">Kubernetes</a></li>
+					
+				</ul>
+			</nav>
+			
+			
+		</div>
+	</article>
+</main>
+<footer>
+  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+    <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
+    <a class="border"></a></div>
+  <div class="footer-info">
+    2022  Copyright Toru Makabe |  <a
+      href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
+  </div>
+</footer>
+
+
+<script>
+  feather.replace()
+</script></div>
+    </body>
+</html>

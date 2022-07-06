@@ -7,13 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure</title>
       <link>https://ToruMakabe.github.io/categories/azure/</link>
-      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/categories/azure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Container Apps</title>
+      <link>https://ToruMakabe.github.io/categories/container-apps/</link>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/categories/container-apps/</guid>
       <description></description>
     </item>
     

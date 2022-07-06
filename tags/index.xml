@@ -7,31 +7,40 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>AKS</title>
-      <link>https://ToruMakabe.github.io/tags/aks/</link>
-      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
-      
-      <guid>https://ToruMakabe.github.io/tags/aks/</guid>
-      <description></description>
-    </item>
-    
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure</title>
       <link>https://ToruMakabe.github.io/tags/azure/</link>
-      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/azure/</guid>
       <description></description>
     </item>
     
     <item>
+      <title>Container Apps</title>
+      <link>https://ToruMakabe.github.io/tags/container-apps/</link>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/container-apps/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Kubernetes</title>
       <link>https://ToruMakabe.github.io/tags/kubernetes/</link>
-      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/tags/kubernetes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>AKS</title>
+      <link>https://ToruMakabe.github.io/tags/aks/</link>
+      <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/tags/aks/</guid>
       <description></description>
     </item>
     

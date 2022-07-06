@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Azure Container Appsのネットワークオプションとアクセス可能なパターン</title>
+      <link>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</link>
+      <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
+      
+      <guid>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</guid>
+      <description>何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps</description>
+    </item>
+    
     <item>
       <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>
       <link>https://ToruMakabe.github.io/post/aks-disable-local-account/</link>
