@@ -2,10 +2,10 @@
 <html><head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Azure Container Appsのネットワークオプションとアクセス可能なパターン - re-imagine</title><meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps" />
+	<meta name="description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無" />
 	<meta property="og:image" content=""/>
 	<meta property="og:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン" />
-<meta property="og:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps" />
+<meta property="og:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ToruMakabe.github.io/post/aca-nw-option-pattern/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2022-07-06T14:00:00+09:00" />
@@ -13,7 +13,7 @@
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン"/>
-<meta name="twitter:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps"/>
+<meta name="twitter:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無"/>
 <script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
 	
 	
@@ -58,7 +58,17 @@
 			<h2 id="何の話か">何の話か</h2>
 <p>Azure Container Appsには、以下のネットワークオプションがあります。</p>
 <ul>
-<li>VNet: マネージド or カスタム</li>
+<li>VNet:
+<ul>
+<li>マネージド</li>
+<li>カスタム
+<ul>
+<li>外部からのアクセスを許可</li>
+<li>内部</li>
+</ul>
+</li>
+</ul>
+</li>
 <li>アプリケーション
 <ul>
 <li>Ingress: 有効 or 無効
@@ -154,7 +164,9 @@
 </tbody>
 </table>
 <h2 id="カスタムvnet---外部からのアクセスを許可">カスタムVNet - 外部からのアクセスを許可</h2>
-<p>VNetを指定してContainer Apps環境を作るとどうなるでしょうか。外部からのアクセスを許可するか、内部に閉じるかの選択肢があります。まずは許可する場合です。</p>
+<p>VNetを指定してContainer Apps環境を作るとどうなるでしょうか。</p>
+<p>外部からのアクセスを許可するか、内部に閉じるかの選択肢があります。ここでいう外部とは、Container Apps環境の外部ではなく、インターネットのことです。ちょっとややこしいですが、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/networking">ドキュメントでの表現</a>に従います。</p>
+<p>まずは外部からのアクセスを許可する場合です。</p>
 <div class="mermaid">graph TB
     subgraph VNet-Custom
         subgraph ContainerApps-Env
@@ -259,7 +271,7 @@
     LB-External --> Internet((Internet))
 </div>
 
-<p>これまでの構成との大きな違いは、Container Apps環境の入口となるロードバランサに割り当てるIPアドレスが、VNetのプライベートIPになることです。ロードバランサも、内部向けの専用ロードバランサが追加されます。他構成で使われていたロードバランサは残りますが、Container Apps環境からのアウトバウンド通信のみを担当します。なお、カスタムVNet構成ではロードバランサなど関連するマネージドリソースが<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/networking#managed-resources">&ldquo;MC_&ldquo;プレフィックスを持つリソースグループ内に作られ</a>、見ることができます。関心があれば覗いてみてください。</p>
+<p>これまでの構成との大きな違いは、Container Apps環境の入口となるロードバランサに割り当てるIPアドレスが、VNetのプライベートIPになることです。ロードバランサも、内部向けの専用ロードバランサが追加されます。他構成で使われていた外部向けロードバランサは残りますが、Container Apps環境からのアウトバウンド通信のみを担当します。なお、カスタムVNet構成ではロードバランサなど関連するマネージドリソースが<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/networking#managed-resources">&ldquo;MC_&ldquo;プレフィックスを持つリソースグループ内に作られ</a>、見ることができます。関心があれば覗いてみてください。</p>
 <p>この構成ではContainer Apps環境への入口がプライベートネットワークなので、プライベートネットワークからインターネットに出ることなくアプリケーションへのアクセスが可能です。図の通り、同じVNetにあるクライアント、たとえば仮想マシンからのトラフィックは、VNetに閉じます。</p>
 <p>なお、別のVNet、VPNやExpressRouteを用いたリモートネットワークからもアクセスが可能です。VNetをピアリングする、ゲートウェイを置く、もしくはプライベートリンクサービスで実現できます。図はプライベートリンクサービスを使った例です。</p>
 <p>では最後に、この構成のアクセスパターンをまとめます。</p>

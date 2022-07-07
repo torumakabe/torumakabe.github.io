@@ -14,7 +14,7 @@
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
       <guid>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</guid>
-      <description>何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド or カスタム アプリケーション Ingress: 有効 or 無効 External: 有効 or 無効 Azure Container Apps</description>
+      <description>何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無</description>
     </item>
     
   </channel>
