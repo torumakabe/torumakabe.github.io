@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Node on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/node/</link>
+    <link>https://torumakabe.github.io/tags/node/</link>
     <description>Recent content in Node on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 14 Sep 2016 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/node/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 14 Sep 2016 15:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/node/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Bash on WindowsでNode開発環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/bashonwindows_nvm/</link>
+      <link>https://torumakabe.github.io/post/bashonwindows_nvm/</link>
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/bashonwindows_nvm/</guid>
+      <guid>https://torumakabe.github.io/post/bashonwindows_nvm/</guid>
       <description>Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータ</description>
     </item>
     

@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Blob on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/blob/</link>
+    <link>https://torumakabe.github.io/tags/blob/</link>
     <description>Recent content in Blob on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/blob/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/blob/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
+      <link>https://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://torumakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手</description>
     </item>
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
-      <link>https://ToruMakabe.github.io/post/azureblobcopy_perf/</link>
+      <link>https://torumakabe.github.io/post/azureblobcopy_perf/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azureblobcopy_perf/</guid>
+      <guid>https://torumakabe.github.io/post/azureblobcopy_perf/</guid>
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョ</description>
     </item>
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <link>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <guid>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを</description>
     </item>
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>https://ToruMakabe.github.io/post/azureblobupload_perf/</link>
+      <link>https://torumakabe.github.io/post/azureblobupload_perf/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azureblobupload_perf/</guid>
+      <guid>https://torumakabe.github.io/post/azureblobupload_perf/</guid>
       <description>同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。 端</description>
     </item>
     

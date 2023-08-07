@@ -2,648 +2,648 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/</link>
+    <link>https://torumakabe.github.io/tags/</link>
     <description>Recent content in Tags on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure</title>
-      <link>https://ToruMakabe.github.io/tags/azure/</link>
+      <link>https://torumakabe.github.io/tags/azure/</link>
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/azure/</guid>
+      <guid>https://torumakabe.github.io/tags/azure/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Container Apps</title>
-      <link>https://ToruMakabe.github.io/tags/container-apps/</link>
+      <link>https://torumakabe.github.io/tags/container-apps/</link>
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/container-apps/</guid>
+      <guid>https://torumakabe.github.io/tags/container-apps/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Kubernetes</title>
-      <link>https://ToruMakabe.github.io/tags/kubernetes/</link>
+      <link>https://torumakabe.github.io/tags/kubernetes/</link>
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/kubernetes/</guid>
+      <guid>https://torumakabe.github.io/tags/kubernetes/</guid>
       <description></description>
     </item>
     
     <item>
       <title>AKS</title>
-      <link>https://ToruMakabe.github.io/tags/aks/</link>
+      <link>https://torumakabe.github.io/tags/aks/</link>
       <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/aks/</guid>
+      <guid>https://torumakabe.github.io/tags/aks/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Dapr</title>
-      <link>https://ToruMakabe.github.io/tags/dapr/</link>
+      <link>https://torumakabe.github.io/tags/dapr/</link>
       <pubDate>Sat, 11 Dec 2021 00:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/dapr/</guid>
+      <guid>https://torumakabe.github.io/tags/dapr/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Container</title>
-      <link>https://ToruMakabe.github.io/tags/container/</link>
+      <link>https://torumakabe.github.io/tags/container/</link>
       <pubDate>Tue, 16 Nov 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/container/</guid>
+      <guid>https://torumakabe.github.io/tags/container/</guid>
       <description></description>
     </item>
     
     <item>
       <title>ACI</title>
-      <link>https://ToruMakabe.github.io/tags/aci/</link>
+      <link>https://torumakabe.github.io/tags/aci/</link>
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/aci/</guid>
+      <guid>https://torumakabe.github.io/tags/aci/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Functions</title>
-      <link>https://ToruMakabe.github.io/tags/functions/</link>
+      <link>https://torumakabe.github.io/tags/functions/</link>
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/functions/</guid>
+      <guid>https://torumakabe.github.io/tags/functions/</guid>
       <description></description>
     </item>
     
     <item>
       <title>App Service</title>
-      <link>https://ToruMakabe.github.io/tags/app-service/</link>
+      <link>https://torumakabe.github.io/tags/app-service/</link>
       <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/app-service/</guid>
+      <guid>https://torumakabe.github.io/tags/app-service/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Network</title>
-      <link>https://ToruMakabe.github.io/tags/network/</link>
+      <link>https://torumakabe.github.io/tags/network/</link>
       <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/network/</guid>
+      <guid>https://torumakabe.github.io/tags/network/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GitHub</title>
-      <link>https://ToruMakabe.github.io/tags/github/</link>
+      <link>https://torumakabe.github.io/tags/github/</link>
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/github/</guid>
+      <guid>https://torumakabe.github.io/tags/github/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Go</title>
-      <link>https://ToruMakabe.github.io/tags/go/</link>
+      <link>https://torumakabe.github.io/tags/go/</link>
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/go/</guid>
+      <guid>https://torumakabe.github.io/tags/go/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Terraform</title>
-      <link>https://ToruMakabe.github.io/tags/terraform/</link>
+      <link>https://torumakabe.github.io/tags/terraform/</link>
       <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/terraform/</guid>
+      <guid>https://torumakabe.github.io/tags/terraform/</guid>
       <description></description>
     </item>
     
     <item>
       <title>WebApp</title>
-      <link>https://ToruMakabe.github.io/tags/webapp/</link>
+      <link>https://torumakabe.github.io/tags/webapp/</link>
       <pubDate>Tue, 01 Sep 2020 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/webapp/</guid>
+      <guid>https://torumakabe.github.io/tags/webapp/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Aqua</title>
-      <link>https://ToruMakabe.github.io/tags/aqua/</link>
+      <link>https://torumakabe.github.io/tags/aqua/</link>
       <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/aqua/</guid>
+      <guid>https://torumakabe.github.io/tags/aqua/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Golang</title>
-      <link>https://ToruMakabe.github.io/tags/golang/</link>
+      <link>https://torumakabe.github.io/tags/golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/golang/</guid>
+      <guid>https://torumakabe.github.io/tags/golang/</guid>
       <description></description>
     </item>
     
     <item>
       <title>WSL</title>
-      <link>https://ToruMakabe.github.io/tags/wsl/</link>
+      <link>https://torumakabe.github.io/tags/wsl/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/wsl/</guid>
+      <guid>https://torumakabe.github.io/tags/wsl/</guid>
       <description></description>
     </item>
     
     <item>
       <title>MSI</title>
-      <link>https://ToruMakabe.github.io/tags/msi/</link>
+      <link>https://torumakabe.github.io/tags/msi/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/msi/</guid>
+      <guid>https://torumakabe.github.io/tags/msi/</guid>
       <description></description>
     </item>
     
     <item>
       <title>DNS</title>
-      <link>https://ToruMakabe.github.io/tags/dns/</link>
+      <link>https://torumakabe.github.io/tags/dns/</link>
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/dns/</guid>
+      <guid>https://torumakabe.github.io/tags/dns/</guid>
       <description></description>
     </item>
     
     <item>
       <title>AZ</title>
-      <link>https://ToruMakabe.github.io/tags/az/</link>
+      <link>https://torumakabe.github.io/tags/az/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/az/</guid>
+      <guid>https://torumakabe.github.io/tags/az/</guid>
       <description></description>
     </item>
     
     <item>
       <title>VMSS</title>
-      <link>https://ToruMakabe.github.io/tags/vmss/</link>
+      <link>https://torumakabe.github.io/tags/vmss/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/vmss/</guid>
+      <guid>https://torumakabe.github.io/tags/vmss/</guid>
       <description></description>
     </item>
     
     <item>
       <title>RBAC</title>
-      <link>https://ToruMakabe.github.io/tags/rbac/</link>
+      <link>https://torumakabe.github.io/tags/rbac/</link>
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/rbac/</guid>
+      <guid>https://torumakabe.github.io/tags/rbac/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docker</title>
-      <link>https://ToruMakabe.github.io/tags/docker/</link>
+      <link>https://torumakabe.github.io/tags/docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/docker/</guid>
+      <guid>https://torumakabe.github.io/tags/docker/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Windows</title>
-      <link>https://ToruMakabe.github.io/tags/windows/</link>
+      <link>https://torumakabe.github.io/tags/windows/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/windows/</guid>
+      <guid>https://torumakabe.github.io/tags/windows/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Storage</title>
-      <link>https://ToruMakabe.github.io/tags/storage/</link>
+      <link>https://torumakabe.github.io/tags/storage/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/storage/</guid>
+      <guid>https://torumakabe.github.io/tags/storage/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Automation</title>
-      <link>https://ToruMakabe.github.io/tags/automation/</link>
+      <link>https://torumakabe.github.io/tags/automation/</link>
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/automation/</guid>
+      <guid>https://torumakabe.github.io/tags/automation/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Boxstarter</title>
-      <link>https://ToruMakabe.github.io/tags/boxstarter/</link>
+      <link>https://torumakabe.github.io/tags/boxstarter/</link>
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/boxstarter/</guid>
+      <guid>https://torumakabe.github.io/tags/boxstarter/</guid>
       <description></description>
     </item>
     
     <item>
       <title>VPN Gateway</title>
-      <link>https://ToruMakabe.github.io/tags/vpn-gateway/</link>
+      <link>https://torumakabe.github.io/tags/vpn-gateway/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/vpn-gateway/</guid>
+      <guid>https://torumakabe.github.io/tags/vpn-gateway/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Blob</title>
-      <link>https://ToruMakabe.github.io/tags/blob/</link>
+      <link>https://torumakabe.github.io/tags/blob/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/blob/</guid>
+      <guid>https://torumakabe.github.io/tags/blob/</guid>
       <description></description>
     </item>
     
     <item>
       <title>EventGrid</title>
-      <link>https://ToruMakabe.github.io/tags/eventgrid/</link>
+      <link>https://torumakabe.github.io/tags/eventgrid/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/eventgrid/</guid>
+      <guid>https://torumakabe.github.io/tags/eventgrid/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Copy</title>
-      <link>https://ToruMakabe.github.io/tags/copy/</link>
+      <link>https://torumakabe.github.io/tags/copy/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/copy/</guid>
+      <guid>https://torumakabe.github.io/tags/copy/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Latency</title>
-      <link>https://ToruMakabe.github.io/tags/latency/</link>
+      <link>https://torumakabe.github.io/tags/latency/</link>
       <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/latency/</guid>
+      <guid>https://torumakabe.github.io/tags/latency/</guid>
       <description></description>
     </item>
     
     <item>
       <title>ARM Template</title>
-      <link>https://ToruMakabe.github.io/tags/arm-template/</link>
+      <link>https://torumakabe.github.io/tags/arm-template/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/arm-template/</guid>
+      <guid>https://torumakabe.github.io/tags/arm-template/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Managed Disk</title>
-      <link>https://ToruMakabe.github.io/tags/managed-disk/</link>
+      <link>https://torumakabe.github.io/tags/managed-disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/managed-disk/</guid>
+      <guid>https://torumakabe.github.io/tags/managed-disk/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Azure CLI</title>
-      <link>https://ToruMakabe.github.io/tags/azure-cli/</link>
+      <link>https://torumakabe.github.io/tags/azure-cli/</link>
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/azure-cli/</guid>
+      <guid>https://torumakabe.github.io/tags/azure-cli/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Docker for Windows</title>
-      <link>https://ToruMakabe.github.io/tags/docker-for-windows/</link>
+      <link>https://torumakabe.github.io/tags/docker-for-windows/</link>
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/docker-for-windows/</guid>
+      <guid>https://torumakabe.github.io/tags/docker-for-windows/</guid>
       <description></description>
     </item>
     
     <item>
       <title>NVIDIA</title>
-      <link>https://ToruMakabe.github.io/tags/nvidia/</link>
+      <link>https://torumakabe.github.io/tags/nvidia/</link>
       <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/nvidia/</guid>
+      <guid>https://torumakabe.github.io/tags/nvidia/</guid>
       <description></description>
     </item>
     
     <item>
       <title>PaintsChainer</title>
-      <link>https://ToruMakabe.github.io/tags/paintschainer/</link>
+      <link>https://torumakabe.github.io/tags/paintschainer/</link>
       <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/paintschainer/</guid>
+      <guid>https://torumakabe.github.io/tags/paintschainer/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Linux</title>
-      <link>https://ToruMakabe.github.io/tags/linux/</link>
+      <link>https://torumakabe.github.io/tags/linux/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/linux/</guid>
+      <guid>https://torumakabe.github.io/tags/linux/</guid>
       <description></description>
     </item>
     
     <item>
       <title>ChatOps</title>
-      <link>https://ToruMakabe.github.io/tags/chatops/</link>
+      <link>https://torumakabe.github.io/tags/chatops/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/chatops/</guid>
+      <guid>https://torumakabe.github.io/tags/chatops/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Slack</title>
-      <link>https://ToruMakabe.github.io/tags/slack/</link>
+      <link>https://torumakabe.github.io/tags/slack/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/slack/</guid>
+      <guid>https://torumakabe.github.io/tags/slack/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Bash</title>
-      <link>https://ToruMakabe.github.io/tags/bash/</link>
+      <link>https://torumakabe.github.io/tags/bash/</link>
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/bash/</guid>
+      <guid>https://torumakabe.github.io/tags/bash/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Node</title>
-      <link>https://ToruMakabe.github.io/tags/node/</link>
+      <link>https://torumakabe.github.io/tags/node/</link>
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/node/</guid>
+      <guid>https://torumakabe.github.io/tags/node/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OMS</title>
-      <link>https://ToruMakabe.github.io/tags/oms/</link>
+      <link>https://torumakabe.github.io/tags/oms/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/oms/</guid>
+      <guid>https://torumakabe.github.io/tags/oms/</guid>
       <description></description>
     </item>
     
     <item>
       <title>CLI</title>
-      <link>https://ToruMakabe.github.io/tags/cli/</link>
+      <link>https://torumakabe.github.io/tags/cli/</link>
       <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/cli/</guid>
+      <guid>https://torumakabe.github.io/tags/cli/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Resource Policy</title>
-      <link>https://ToruMakabe.github.io/tags/resource-policy/</link>
+      <link>https://torumakabe.github.io/tags/resource-policy/</link>
       <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/resource-policy/</guid>
+      <guid>https://torumakabe.github.io/tags/resource-policy/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Vagrant</title>
-      <link>https://ToruMakabe.github.io/tags/vagrant/</link>
+      <link>https://torumakabe.github.io/tags/vagrant/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/vagrant/</guid>
+      <guid>https://torumakabe.github.io/tags/vagrant/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Bot</title>
-      <link>https://ToruMakabe.github.io/tags/bot/</link>
+      <link>https://torumakabe.github.io/tags/bot/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/bot/</guid>
+      <guid>https://torumakabe.github.io/tags/bot/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Facebook</title>
-      <link>https://ToruMakabe.github.io/tags/facebook/</link>
+      <link>https://torumakabe.github.io/tags/facebook/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/facebook/</guid>
+      <guid>https://torumakabe.github.io/tags/facebook/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Batch</title>
-      <link>https://ToruMakabe.github.io/tags/batch/</link>
+      <link>https://torumakabe.github.io/tags/batch/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/batch/</guid>
+      <guid>https://torumakabe.github.io/tags/batch/</guid>
       <description></description>
     </item>
     
     <item>
       <title>CNTK</title>
-      <link>https://ToruMakabe.github.io/tags/cntk/</link>
+      <link>https://torumakabe.github.io/tags/cntk/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/cntk/</guid>
+      <guid>https://torumakabe.github.io/tags/cntk/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Deep Learning</title>
-      <link>https://ToruMakabe.github.io/tags/deep-learning/</link>
+      <link>https://torumakabe.github.io/tags/deep-learning/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/deep-learning/</guid>
+      <guid>https://torumakabe.github.io/tags/deep-learning/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Book</title>
-      <link>https://ToruMakabe.github.io/tags/book/</link>
+      <link>https://torumakabe.github.io/tags/book/</link>
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/book/</guid>
+      <guid>https://torumakabe.github.io/tags/book/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Google</title>
-      <link>https://ToruMakabe.github.io/tags/google/</link>
+      <link>https://torumakabe.github.io/tags/google/</link>
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/google/</guid>
+      <guid>https://torumakabe.github.io/tags/google/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Ops</title>
-      <link>https://ToruMakabe.github.io/tags/ops/</link>
+      <link>https://torumakabe.github.io/tags/ops/</link>
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/ops/</guid>
+      <guid>https://torumakabe.github.io/tags/ops/</guid>
       <description></description>
     </item>
     
     <item>
       <title>ARM</title>
-      <link>https://ToruMakabe.github.io/tags/arm/</link>
+      <link>https://torumakabe.github.io/tags/arm/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/arm/</guid>
+      <guid>https://torumakabe.github.io/tags/arm/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Packer</title>
-      <link>https://ToruMakabe.github.io/tags/packer/</link>
+      <link>https://torumakabe.github.io/tags/packer/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/packer/</guid>
+      <guid>https://torumakabe.github.io/tags/packer/</guid>
       <description></description>
     </item>
     
     <item>
       <title>DDoS</title>
-      <link>https://ToruMakabe.github.io/tags/ddos/</link>
+      <link>https://torumakabe.github.io/tags/ddos/</link>
       <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/ddos/</guid>
+      <guid>https://torumakabe.github.io/tags/ddos/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Securty</title>
-      <link>https://ToruMakabe.github.io/tags/securty/</link>
+      <link>https://torumakabe.github.io/tags/securty/</link>
       <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/securty/</guid>
+      <guid>https://torumakabe.github.io/tags/securty/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Upload</title>
-      <link>https://ToruMakabe.github.io/tags/upload/</link>
+      <link>https://torumakabe.github.io/tags/upload/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/upload/</guid>
+      <guid>https://torumakabe.github.io/tags/upload/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Fileshare</title>
-      <link>https://ToruMakabe.github.io/tags/fileshare/</link>
+      <link>https://torumakabe.github.io/tags/fileshare/</link>
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/fileshare/</guid>
+      <guid>https://torumakabe.github.io/tags/fileshare/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Disk</title>
-      <link>https://ToruMakabe.github.io/tags/disk/</link>
+      <link>https://torumakabe.github.io/tags/disk/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/disk/</guid>
+      <guid>https://torumakabe.github.io/tags/disk/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Performance</title>
-      <link>https://ToruMakabe.github.io/tags/performance/</link>
+      <link>https://torumakabe.github.io/tags/performance/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/performance/</guid>
+      <guid>https://torumakabe.github.io/tags/performance/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Cloud</title>
-      <link>https://ToruMakabe.github.io/tags/cloud/</link>
+      <link>https://torumakabe.github.io/tags/cloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/cloud/</guid>
+      <guid>https://torumakabe.github.io/tags/cloud/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OpenStack</title>
-      <link>https://ToruMakabe.github.io/tags/openstack/</link>
+      <link>https://torumakabe.github.io/tags/openstack/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/openstack/</guid>
+      <guid>https://torumakabe.github.io/tags/openstack/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Hugo</title>
-      <link>https://ToruMakabe.github.io/tags/hugo/</link>
+      <link>https://torumakabe.github.io/tags/hugo/</link>
       <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/hugo/</guid>
+      <guid>https://torumakabe.github.io/tags/hugo/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Ansible</title>
-      <link>https://ToruMakabe.github.io/tags/ansible/</link>
+      <link>https://torumakabe.github.io/tags/ansible/</link>
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/ansible/</guid>
+      <guid>https://torumakabe.github.io/tags/ansible/</guid>
       <description></description>
     </item>
     
     <item>
       <title>HP Public Cloud</title>
-      <link>https://ToruMakabe.github.io/tags/hp-public-cloud/</link>
+      <link>https://torumakabe.github.io/tags/hp-public-cloud/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/hp-public-cloud/</guid>
+      <guid>https://torumakabe.github.io/tags/hp-public-cloud/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Icehouse</title>
-      <link>https://ToruMakabe.github.io/tags/icehouse/</link>
+      <link>https://torumakabe.github.io/tags/icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/icehouse/</guid>
+      <guid>https://torumakabe.github.io/tags/icehouse/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Swift</title>
-      <link>https://ToruMakabe.github.io/tags/swift/</link>
+      <link>https://torumakabe.github.io/tags/swift/</link>
       <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/swift/</guid>
+      <guid>https://torumakabe.github.io/tags/swift/</guid>
       <description></description>
     </item>
     
     <item>
       <title>OpenSource</title>
-      <link>https://ToruMakabe.github.io/tags/opensource/</link>
+      <link>https://torumakabe.github.io/tags/opensource/</link>
       <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/tags/opensource/</guid>
+      <guid>https://torumakabe.github.io/tags/opensource/</guid>
       <description></description>
     </item>
     

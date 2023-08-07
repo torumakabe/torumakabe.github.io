@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ARM Template on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/arm-template/</link>
+    <link>https://torumakabe.github.io/tags/arm-template/</link>
     <description>Recent content in ARM Template on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Thu, 23 Mar 2017 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/arm-template/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 23 Mar 2017 15:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/arm-template/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
-      <link>https://ToruMakabe.github.io/post/arm_template_managed_disk/</link>
+      <link>https://torumakabe.github.io/post/arm_template_managed_disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/arm_template_managed_disk/</guid>
+      <guid>https://torumakabe.github.io/post/arm_template_managed_disk/</guid>
       <description>お伝えしたいこと ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでMana</description>
     </item>
     

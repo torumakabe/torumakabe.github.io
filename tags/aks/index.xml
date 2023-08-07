@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>AKS on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/aks/</link>
+    <link>https://torumakabe.github.io/tags/aks/</link>
     <description>Recent content in AKS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/aks/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 26 Dec 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/aks/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>
-      <link>https://ToruMakabe.github.io/post/aks-disable-local-account/</link>
+      <link>https://torumakabe.github.io/post/aks-disable-local-account/</link>
       <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-disable-local-account/</guid>
+      <guid>https://torumakabe.github.io/post/aks-disable-local-account/</guid>
       <description>何の話か Azure Kubernetes Service(AKS)でローカルアカウントを無効化できるようになり、GAしました。ローカルアカウントを無効にすると、AKSをセ</description>
     </item>
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
+      <link>https://torumakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
+      <guid>https://torumakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時</description>
     </item>
     
     <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
-      <link>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</link>
+      <link>https://torumakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <guid>https://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり</description>
     </item>
     
     <item>
       <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
-      <link>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <link>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <guid>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
       <description>楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ</description>
     </item>
     

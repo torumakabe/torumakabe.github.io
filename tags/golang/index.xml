@@ -2,36 +2,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Golang on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/golang/</link>
+    <link>https://torumakabe.github.io/tags/golang/</link>
     <description>Recent content in Golang on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</title>
-      <link>https://ToruMakabe.github.io/post/wslenv_golang/</link>
+      <link>https://torumakabe.github.io/post/wslenv_golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/wslenv_golang/</guid>
+      <guid>https://torumakabe.github.io/post/wslenv_golang/</guid>
       <description>見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支</description>
     </item>
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
-      <link>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <link>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <guid>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
       <description>小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要りま</description>
     </item>
     
     <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
-      <link>https://ToruMakabe.github.io/post/azblob_golang/</link>
+      <link>https://torumakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azblob_golang/</guid>
+      <guid>https://torumakabe.github.io/post/azblob_golang/</guid>
       <description>Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:</description>
     </item>
     

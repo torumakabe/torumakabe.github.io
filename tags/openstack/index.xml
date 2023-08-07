@@ -2,117 +2,117 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OpenStack on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/openstack/</link>
+    <link>https://torumakabe.github.io/tags/openstack/</link>
     <description>Recent content in OpenStack on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sat, 19 Dec 2015 00:01:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/openstack/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 19 Dec 2015 00:01:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/openstack/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://torumakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://torumakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。 OpenStackの最前線から離れて3か月がたちました。OpenStackつ</description>
     </item>
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
-      <link>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</link>
+      <link>https://torumakabe.github.io/post/terraform-openstack-minimum/</link>
       <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <guid>https://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされま</description>
     </item>
     
     <item>
       <title>君はOpenStack Monascaを知っているか</title>
-      <link>https://ToruMakabe.github.io/post/monasca/</link>
+      <link>https://torumakabe.github.io/post/monasca/</link>
       <pubDate>Fri, 12 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/monasca/</guid>
+      <guid>https://torumakabe.github.io/post/monasca/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の12夜目担当作品です。 Monitoring as a Service 監視をサービスとして提供するって、どういうことでし</description>
     </item>
     
     <item>
       <title>OpenStackと長期バージョン固定</title>
-      <link>https://ToruMakabe.github.io/post/longtermsupport/</link>
+      <link>https://torumakabe.github.io/post/longtermsupport/</link>
       <pubDate>Tue, 09 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/longtermsupport/</guid>
+      <guid>https://torumakabe.github.io/post/longtermsupport/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。 ソフトウェア、バージョン、サポート たいていのソフトウェアには</description>
     </item>
     
     <item>
       <title>ハンサムOpenStack</title>
-      <link>https://ToruMakabe.github.io/post/handsome-openstack/</link>
+      <link>https://torumakabe.github.io/post/handsome-openstack/</link>
       <pubDate>Sat, 06 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/handsome-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/handsome-openstack/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の6夜目担当作品です。 出オチ OpenStackも人気が出て、Advent Calen</description>
     </item>
     
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>
-      <link>https://ToruMakabe.github.io/post/openstack-tools/</link>
+      <link>https://torumakabe.github.io/post/openstack-tools/</link>
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-tools/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-tools/</guid>
       <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。 なぜ必要か? いけてるOpenS</description>
     </item>
     
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
+      <link>https://torumakabe.github.io/post/vagrant-openstack/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-openstack/</guid>
       <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも</description>
     </item>
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-icehouse/</link>
+      <link>https://torumakabe.github.io/post/vagrant-icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-icehouse/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-icehouse/</guid>
       <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。 では始めましょう。Op</description>
     </item>
     
     <item>
       <title>OpenStack超入門シリーズ 初期3部作完結</title>
-      <link>https://ToruMakabe.github.io/post/openstack-3primer/</link>
+      <link>https://torumakabe.github.io/post/openstack-3primer/</link>
       <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-3primer/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-3primer/</guid>
       <description>よく聞かれることをまとめました ひとまず、初期3部作完結。また書くかもしれません。 OpenStack超入門シリーズ いまさら聞けない Novaのデ</description>
     </item>
     
     <item>
       <title>OpenStack超入門シリーズ</title>
-      <link>https://ToruMakabe.github.io/post/openstack-primer/</link>
+      <link>https://torumakabe.github.io/post/openstack-primer/</link>
       <pubDate>Thu, 27 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-primer/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-primer/</guid>
       <description>基本的な質問が増えてきた OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増</description>
     </item>
     
     <item>
       <title>OpenStack Swiftへのファイル分割アップロード</title>
-      <link>https://ToruMakabe.github.io/post/swift-upload/</link>
+      <link>https://torumakabe.github.io/post/swift-upload/</link>
       <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/swift-upload/</guid>
+      <guid>https://torumakabe.github.io/post/swift-upload/</guid>
       <description>Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら</description>
     </item>
     
     <item>
       <title>Transparency is Noisy</title>
-      <link>https://ToruMakabe.github.io/post/transparency-is-noisy/</link>
+      <link>https://torumakabe.github.io/post/transparency-is-noisy/</link>
       <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/transparency-is-noisy/</guid>
+      <guid>https://torumakabe.github.io/post/transparency-is-noisy/</guid>
       <description>雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。 いっぽうで、みなで仕様を議論し、期限を定めて開発する。</description>
     </item>
     

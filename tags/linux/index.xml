@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Linux on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/linux/</link>
+    <link>https://torumakabe.github.io/tags/linux/</link>
     <description>Recent content in Linux on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Nov 2016 13:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタッ</description>
     </item>
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <link>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <guid>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを</description>
     </item>
     
     <item>
       <title>Linux on Azureでファイル共有する方法</title>
-      <link>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/fileshare_linuxonazure/</link>
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
       <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。 さて、これからクラウド、というお客様に、よく聞かれる質問があり</description>
     </item>
     
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>https://ToruMakabe.github.io/post/striping_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/striping_linuxonazure/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/striping_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>&amp;ldquo;俺の鉄板&amp;quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk I</description>
     </item>
     

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OpenSource on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/opensource/</link>
+    <link>https://torumakabe.github.io/tags/opensource/</link>
     <description>Recent content in OpenSource on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 02 Feb 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/opensource/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 02 Feb 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/opensource/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Transparency is Noisy</title>
-      <link>https://ToruMakabe.github.io/post/transparency-is-noisy/</link>
+      <link>https://torumakabe.github.io/post/transparency-is-noisy/</link>
       <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/transparency-is-noisy/</guid>
+      <guid>https://torumakabe.github.io/post/transparency-is-noisy/</guid>
       <description>雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。 いっぽうで、みなで仕様を議論し、期限を定めて開発する。</description>
     </item>
     

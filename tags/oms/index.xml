@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>OMS on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/oms/</link>
+    <link>https://torumakabe.github.io/tags/oms/</link>
     <description>Recent content in OMS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 25 Aug 2016 16:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/oms/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
+      <link>https://torumakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://torumakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、</description>
     </item>
     

@@ -2,126 +2,126 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Kubernetes on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/kubernetes/</link>
+    <link>https://torumakabe.github.io/tags/kubernetes/</link>
     <description>Recent content in Kubernetes on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Container Appsのネットワークオプションとアクセス可能なパターン</title>
-      <link>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</link>
+      <link>https://torumakabe.github.io/post/aca-nw-option-pattern/</link>
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</guid>
+      <guid>https://torumakabe.github.io/post/aca-nw-option-pattern/</guid>
       <description>何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無</description>
     </item>
     
     <item>
       <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>
-      <link>https://ToruMakabe.github.io/post/aks-disable-local-account/</link>
+      <link>https://torumakabe.github.io/post/aks-disable-local-account/</link>
       <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-disable-local-account/</guid>
+      <guid>https://torumakabe.github.io/post/aks-disable-local-account/</guid>
       <description>何の話か Azure Kubernetes Service(AKS)でローカルアカウントを無効化できるようになり、GAしました。ローカルアカウントを無効にすると、AKSをセ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Service アップグレード戦略 2021夏版</title>
-      <link>https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/</link>
+      <link>https://torumakabe.github.io/post/aks-upgrade-strategy-2021-summer/</link>
       <pubDate>Wed, 21 Jul 2021 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/</guid>
+      <guid>https://torumakabe.github.io/post/aks-upgrade-strategy-2021-summer/</guid>
       <description>何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</title>
-      <link>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</link>
+      <link>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</link>
       <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</guid>
+      <guid>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</guid>
       <description>何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</title>
-      <link>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</link>
+      <link>https://torumakabe.github.io/post/aks-bootstrap-202005/</link>
       <pubDate>Thu, 21 May 2020 13:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</guid>
+      <guid>https://torumakabe.github.io/post/aks-bootstrap-202005/</guid>
       <description>何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他</description>
     </item>
     
     <item>
       <title>Azure Kubernetes ServiceのObservabilityお試しキットを作った</title>
-      <link>https://ToruMakabe.github.io/post/aks_observability_trial_kit/</link>
+      <link>https://torumakabe.github.io/post/aks_observability_trial_kit/</link>
       <pubDate>Wed, 26 Jun 2019 18:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_observability_trial_kit/</guid>
+      <guid>https://torumakabe.github.io/post/aks_observability_trial_kit/</guid>
       <description>何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多く</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Serviceでシークレットを管理する6つの方法</title>
-      <link>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</link>
+      <link>https://torumakabe.github.io/post/aks_how_to_keep_secret/</link>
       <pubDate>Mon, 17 Jun 2019 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</guid>
+      <guid>https://torumakabe.github.io/post/aks_how_to_keep_secret/</guid>
       <description>何の話か Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しま</description>
     </item>
     
     <item>
       <title>Kubernetes DeschedulerでPodを再配置する</title>
-      <link>https://ToruMakabe.github.io/post/k8s_descheduler/</link>
+      <link>https://torumakabe.github.io/post/k8s_descheduler/</link>
       <pubDate>Sat, 01 Jun 2019 09:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/k8s_descheduler/</guid>
+      <guid>https://torumakabe.github.io/post/k8s_descheduler/</guid>
       <description>何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰</description>
     </item>
     
     <item>
       <title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする</title>
-      <link>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
+      <link>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
       <pubDate>Fri, 26 Apr 2019 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
+      <guid>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
       <description>何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr</description>
     </item>
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
-      <link>https://ToruMakabe.github.io/post/github_actions_aks/</link>
+      <link>https://torumakabe.github.io/post/github_actions_aks/</link>
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
+      <guid>https://torumakabe.github.io/post/github_actions_aks/</guid>
       <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移</description>
     </item>
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
+      <link>https://torumakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
+      <guid>https://torumakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時</description>
     </item>
     
     <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
-      <link>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</link>
+      <link>https://torumakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <guid>https://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり</description>
     </item>
     
     <item>
       <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
-      <link>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <link>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <guid>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
       <description>楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ</description>
     </item>
     

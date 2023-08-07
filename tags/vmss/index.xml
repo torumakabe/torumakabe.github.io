@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>VMSS on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/vmss/</link>
+    <link>https://torumakabe.github.io/tags/vmss/</link>
     <description>Recent content in VMSS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Mon, 26 Mar 2018 00:08:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/vmss/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 26 Mar 2018 00:08:30 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/vmss/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
-      <link>https://ToruMakabe.github.io/post/az_vmss_terraform/</link>
+      <link>https://torumakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/az_vmss_terraform/</guid>
       <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zones</description>
     </item>
     

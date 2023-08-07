@@ -2,54 +2,54 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>GitHub on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/github/</link>
+    <link>https://torumakabe.github.io/tags/github/</link>
     <description>Recent content in GitHub on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 02 Apr 2021 11:20:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/github/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Apr 2021 11:20:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/github/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Application Insightsのカスタム可用性テストを使って プライベートネットワーク対応の可用性テストプローブをGoで書く</title>
-      <link>https://ToruMakabe.github.io/post/az-healthprobe/</link>
+      <link>https://torumakabe.github.io/post/az-healthprobe/</link>
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-healthprobe/</guid>
+      <guid>https://torumakabe.github.io/post/az-healthprobe/</guid>
       <description>何の話か 以下のサンプル(C# &amp;amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。 Azure Functions を使用してカス</description>
     </item>
     
     <item>
       <title>Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する</title>
-      <link>https://ToruMakabe.github.io/post/servicetag-checker/</link>
+      <link>https://torumakabe.github.io/post/servicetag-checker/</link>
       <pubDate>Thu, 25 Feb 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/servicetag-checker/</guid>
+      <guid>https://torumakabe.github.io/post/servicetag-checker/</guid>
       <description>何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</title>
-      <link>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</link>
+      <link>https://torumakabe.github.io/post/aks-bootstrap-202005/</link>
       <pubDate>Thu, 21 May 2020 13:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</guid>
+      <guid>https://torumakabe.github.io/post/aks-bootstrap-202005/</guid>
       <description>何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他</description>
     </item>
     
     <item>
       <title>GitHub Actionsでオンデマンドに環境を再現する</title>
-      <link>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</link>
+      <link>https://torumakabe.github.io/post/gh-actions-trigger-label/</link>
       <pubDate>Sun, 22 Dec 2019 23:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</guid>
+      <guid>https://torumakabe.github.io/post/gh-actions-trigger-label/</guid>
       <description>何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフロー</description>
     </item>
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
-      <link>https://ToruMakabe.github.io/post/github_actions_aks/</link>
+      <link>https://torumakabe.github.io/post/github_actions_aks/</link>
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
+      <guid>https://torumakabe.github.io/post/github_actions_aks/</guid>
       <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移</description>
     </item>
     

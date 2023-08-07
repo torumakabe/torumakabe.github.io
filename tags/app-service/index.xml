@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>App Service on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/app-service/</link>
+    <link>https://torumakabe.github.io/tags/app-service/</link>
     <description>Recent content in App Service on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Mon, 12 Apr 2021 13:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/app-service/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 12 Apr 2021 13:30:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/app-service/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</title>
-      <link>https://ToruMakabe.github.io/post/website-vnet-route-all/</link>
+      <link>https://torumakabe.github.io/post/website-vnet-route-all/</link>
       <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/website-vnet-route-all/</guid>
+      <guid>https://torumakabe.github.io/post/website-vnet-route-all/</guid>
       <description>何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&amp;ldquo;WEBSITE_VNET</description>
     </item>
     

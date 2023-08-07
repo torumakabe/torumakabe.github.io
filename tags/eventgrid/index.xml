@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>EventGrid on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/eventgrid/</link>
+    <link>https://torumakabe.github.io/tags/eventgrid/</link>
     <description>Recent content in EventGrid on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Sep 2017 12:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/eventgrid/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
+      <link>https://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://torumakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手</description>
     </item>
     

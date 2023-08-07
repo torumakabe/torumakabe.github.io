@@ -7,22 +7,21 @@
 	<meta property="og:title" content="Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版" />
 <meta property="og:description" content="何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/aks-bootstrap-202005/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/aks-bootstrap-202005/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-05-21T13:05:00+09:00" />
 <meta property="article:modified_time" content="2020-05-21T13:05:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版"/>
 <meta name="twitter:description" content="何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -86,7 +85,7 @@
 </li>
 </ul>
 <h2 id="メインとなるhclの概説">メインとなるHCLの概説</h2>
-<p>ちょっと長いのですが、AKSに関する<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
+<p>ちょっと長いのですが、AKSに関する<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/modules/aks/main.tf">HCLコード</a>は通して読まないとピンとこないと思うので解説します。全体像は<a href="https://github.com/torumakabe/aks-bootstrap-202005">GitHub</a>を確認してください。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">data</span> <span style="color:#e6db74">&#34;azurerm_log_analytics_workspace&#34; &#34;aks&#34;</span> {
 </span></span><span style="display:flex;"><span>  name                <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_name</span>
 </span></span><span style="display:flex;"><span>  resource_group_name <span style="color:#f92672">=</span> <span style="color:#66d9ef">var</span>.<span style="color:#66d9ef">la_workspace_rg</span>
@@ -348,7 +347,7 @@
 <li>ただしAKS関連リソースが入るリソースグループ(MC_*)の外にあるリソースには、SystemAssigned指定で作られるManaged Identityから<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-managed-identity">操作する権限がない</a>ため、必要な場合はSystemAssignedではなく権限を持ったサービスプリンシパルを指定しましょう
 <ul>
 <li>もしくはSystemAssined指定で作成したManaged Identityに必要な権限を割り当てます</li>
-<li>例: AKSを既存の別リソースグループにあるVNetに参加させる場合に、オートスケール時にサブネット操作するための権限割当が必要(<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/assign_role_mi.sh">参考スクリプト</a>)</li>
+<li>例: AKSを既存の別リソースグループにあるVNetに参加させる場合に、オートスケール時にサブネット操作するための権限割当が必要(<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/scripts/assign_role_mi.sh">参考スクリプト</a>)</li>
 </ul>
 </li>
 </ul>
@@ -365,8 +364,8 @@
 <li>安定稼働が優先なのでオートスケール設定はしません</li>
 <li>コストと<a href="https://docs.microsoft.com/ja-jp/azure/aks/use-system-pools#system-and-user-node-pools">要件</a>のバランスから、VMはStandard_F2s_v2にしています</li>
 <li>CriticalAddonsOnlyでtolerationしているPodだけがこのプールで動けるようにtaintしています</li>
-<li>ただしCritical Addonがdefaultノードプールにスケジューリングされる可能性は残るので、厳密にしたい場合は合わせて<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools.sh">ノードプールのモード指定</a>、Critical Addonたちへ<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-nodeselecter-system-deployments.sh">nodeSelectorの指定</a>、<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/restart-system-deployments.sh">リスタート</a>が必要です</li>
-<li>なお、この追加したノードプールのモードをsystem、defaultプールのモードをuserにすると、destroy時に追加したsystemノードプールを先に削除しに行ってしまい「systemモードのプールが最低1つは要るぞ」と怒られますので、destroy前にモードを<a href="https://github.com/ToruMakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools-on-deletion.sh">再設定</a>しましょう</li>
+<li>ただしCritical Addonがdefaultノードプールにスケジューリングされる可能性は残るので、厳密にしたい場合は合わせて<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools.sh">ノードプールのモード指定</a>、Critical Addonたちへ<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/scripts/update-nodeselecter-system-deployments.sh">nodeSelectorの指定</a>、<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/scripts/restart-system-deployments.sh">リスタート</a>が必要です</li>
+<li>なお、この追加したノードプールのモードをsystem、defaultプールのモードをuserにすると、destroy時に追加したsystemノードプールを先に削除しに行ってしまい「systemモードのプールが最低1つは要るぞ」と怒られますので、destroy前にモードを<a href="https://github.com/torumakabe/aks-bootstrap-202005/blob/master/src/scripts/update-mode-aks-nodepools-on-deletion.sh">再設定</a>しましょう</li>
 <li>いずれこの流れはAKS APIとHCLで吸収できると期待しています</li>
 </ul>
 </li>
@@ -390,12 +389,12 @@
 <ul>
 <li>GitOpsのためにFluxとHelm-Operatorを導入しています</li>
 <li>variable enable_fluxをfalseにすれば導入されません</li>
-<li>ブートストラップ後に<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">Fluxの設定</a>を行ってください</li>
+<li>ブートストラップ後に<a href="https://github.com/torumakabe/aks-bootstrap-202005">Fluxの設定</a>を行ってください</li>
 </ul>
 </li>
 </ul>
 <h2 id="その他ワークフローに関する説明など">その他、ワークフローに関する説明など</h2>
-<p>長くなってしまったので、GitHubのリポジトリ<a href="https://github.com/ToruMakabe/aks-bootstrap-202005">README</a>をご確認ください。えんじょい。</p>
+<p>長くなってしまったので、GitHubのリポジトリ<a href="https://github.com/torumakabe/aks-bootstrap-202005">README</a>をご確認ください。えんじょい。</p>
 
 			
 		</section>
@@ -420,11 +419,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

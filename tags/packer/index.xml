@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Packer on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/packer/</link>
+    <link>https://torumakabe.github.io/tags/packer/</link>
     <description>Recent content in Packer on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 17 Mar 2016 23:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/packer/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10</description>
     </item>
     

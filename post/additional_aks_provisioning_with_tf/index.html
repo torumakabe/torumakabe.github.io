@@ -7,22 +7,21 @@
 	<meta property="og:title" content="作りかけのAKSクラスターにTerraformで追いプロビジョニングする" />
 <meta property="og:description" content="何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2019-04-26T18:00:00+09:00" />
 <meta property="article:modified_time" content="2019-04-26T18:00:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="作りかけのAKSクラスターにTerraformで追いプロビジョニングする"/>
 <meta name="twitter:description" content="何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -68,7 +67,7 @@
 <li>リアルタイムコンテナーログ表示設定</li>
 </ul>
 <p>kubectlやAzure CLIでコツコツ設定すると、まあ、めんどくさいわけです。クラスター作成時にAzure CLIやポータルで入れてくれたらなぁ、と思わなくもないですが、これらがみなに必要かという疑問ですし、過渡期に多くを飲み込もうと欲張ると肥大化します。Kubernetesエコシステムは新陳代謝が激しいので、現状の提供機能は妥当かな、と感じます。</p>
-<p>とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。<a href="https://www.amazon.co.jp/dp/B07L94XGPY">今年のはじめに書いた本</a>でも、Terraformの活用例を紹介しています。サンプルコードは<a href="https://github.com/ToruMakabe/Understanding-K8s">こちら</a>。</p>
+<p>とはいえクラスターを作るたびの追加作業量が無視できないので、わたしはTerraformをよく使います。Azure、Kubernetesリソースを同じツールで扱えるからです。環境をまるっと作成、廃棄できて、とても便利。<a href="https://www.amazon.co.jp/dp/B07L94XGPY">今年のはじめに書いた本</a>でも、Terraformの活用例を紹介しています。サンプルコードは<a href="https://github.com/torumakabe/Understanding-K8s">こちら</a>。</p>
 <p>で、ここまでは、Terraform Azure Providerが、使いたいAKSの機能をサポートしていれば、の話。リソースのライフサイクル管理はTerraformに集約しましょう。</p>
 <p>そしてここからが、このエントリーの本題です。</p>
 <p>AKSはインパクトの大きな機能を、プレビューというかたちで順次提供しています。プレビュー期間にユーザーとともに実績を積み、GAに持っていきます。たとえば2019/4時点で、下記のプレビューが提供されています。</p>
@@ -138,7 +137,7 @@
 <p>ここまでを、まとめます。Azure CLIやポータルを使って作ったAKSクラスターに対し、TerraformのData SourceやKubenetesのconfigファイルを使って属性、認証情報を取得し、追加プロビジョニングを一括で、楽にできる、という話でした。</p>
 <h2 id="サンプル">サンプル</h2>
 <p>ではどんなことができるのか、サンプルをGistに置いておきました。</p>
-<p><a href="https://gist.github.com/ToruMakabe/46ac0b31f7f8a07fa9a1254f862bc15c">サンプルコード</a></p>
+<p><a href="https://gist.github.com/torumakabe/46ac0b31f7f8a07fa9a1254f862bc15c">サンプルコード</a></p>
 <p>冒頭で挙げた、以下リソースの導入や設定ができます。</p>
 <ul>
 <li>Istio</li>
@@ -190,11 +189,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

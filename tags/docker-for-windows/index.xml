@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker for Windows on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/docker-for-windows/</link>
+    <link>https://torumakabe.github.io/tags/docker-for-windows/</link>
     <description>Recent content in Docker for Windows on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 28 Feb 2017 08:00:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/docker-for-windows/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 28 Feb 2017 08:00:30 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/docker-for-windows/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/dockerforwin_azurecli2/</link>
+      <link>https://torumakabe.github.io/post/dockerforwin_azurecli2/</link>
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli2/</guid>
+      <guid>https://torumakabe.github.io/post/dockerforwin_azurecli2/</guid>
       <description>Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始</description>
     </item>
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/dockerforwin_azurecli/</link>
+      <link>https://torumakabe.github.io/post/dockerforwin_azurecli/</link>
       <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli/</guid>
+      <guid>https://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
       <description>舌の根の乾かぬ内に 最近、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い</description>
     </item>
     

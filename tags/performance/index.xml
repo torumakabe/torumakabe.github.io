@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Performance on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/performance/</link>
+    <link>https://torumakabe.github.io/tags/performance/</link>
     <description>Recent content in Performance on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>https://ToruMakabe.github.io/post/striping_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/striping_linuxonazure/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/striping_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>&amp;ldquo;俺の鉄板&amp;quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk I</description>
     </item>
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
-      <link>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <link>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <guid>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
       <description>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。 具体的な数値で、正</description>
     </item>
     

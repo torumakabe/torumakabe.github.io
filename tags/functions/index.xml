@@ -2,54 +2,54 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Functions on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/functions/</link>
+    <link>https://torumakabe.github.io/tags/functions/</link>
     <description>Recent content in Functions on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Mon, 05 Jul 2021 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/functions/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 05 Jul 2021 14:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/functions/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Container Instancesの定期実行をAzure Functionsのタイマートリガーで行うパターン</title>
-      <link>https://ToruMakabe.github.io/post/aci-runner-on-functions/</link>
+      <link>https://torumakabe.github.io/post/aci-runner-on-functions/</link>
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aci-runner-on-functions/</guid>
+      <guid>https://torumakabe.github.io/post/aci-runner-on-functions/</guid>
       <description>何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点が</description>
     </item>
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
+      <link>https://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://torumakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手</description>
     </item>
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <link>https://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <guid>https://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。 AzureでChatOpsと言えば、Auth0</description>
     </item>
     
     <item>
       <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <link>https://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
       <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <guid>https://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている</description>
     </item>
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <link>https://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <guid>https://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。 Azure Functionsは、 アプリを放り込めば動く。サーバ</description>
     </item>
     

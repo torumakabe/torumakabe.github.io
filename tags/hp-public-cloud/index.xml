@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>HP Public Cloud on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/hp-public-cloud/</link>
+    <link>https://torumakabe.github.io/tags/hp-public-cloud/</link>
     <description>Recent content in HP Public Cloud on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 06 Sep 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/hp-public-cloud/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
+      <link>https://torumakabe.github.io/post/vagrant-openstack/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-openstack/</guid>
       <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも</description>
     </item>
     
     <item>
       <title>Vagrant HP Public Cloud Pluginを試す</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-hpcloud/</link>
+      <link>https://torumakabe.github.io/post/vagrant-hpcloud/</link>
       <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-hpcloud/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-hpcloud/</guid>
       <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て</description>
     </item>
     

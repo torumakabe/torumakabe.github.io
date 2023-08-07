@@ -2,54 +2,54 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Vagrant on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/vagrant/</link>
+    <link>https://torumakabe.github.io/tags/vagrant/</link>
     <description>Recent content in Vagrant on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 13 May 2016 18:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 13 May 2016 18:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/vagrant/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>https://ToruMakabe.github.io/post/azure_osstools_iac/</link>
+      <link>https://torumakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_osstools_iac/</guid>
+      <guid>https://torumakabe.github.io/post/azure_osstools_iac/</guid>
       <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようとい</description>
     </item>
     
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>
-      <link>https://ToruMakabe.github.io/post/openstack-tools/</link>
+      <link>https://torumakabe.github.io/post/openstack-tools/</link>
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-tools/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-tools/</guid>
       <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。 なぜ必要か? いけてるOpenS</description>
     </item>
     
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
+      <link>https://torumakabe.github.io/post/vagrant-openstack/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-openstack/</guid>
       <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも</description>
     </item>
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-icehouse/</link>
+      <link>https://torumakabe.github.io/post/vagrant-icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-icehouse/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-icehouse/</guid>
       <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。 では始めましょう。Op</description>
     </item>
     
     <item>
       <title>Vagrant HP Public Cloud Pluginを試す</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-hpcloud/</link>
+      <link>https://torumakabe.github.io/post/vagrant-hpcloud/</link>
       <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-hpcloud/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-hpcloud/</guid>
       <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て</description>
     </item>
     

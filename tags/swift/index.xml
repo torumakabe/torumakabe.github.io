@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Swift on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/swift/</link>
+    <link>https://torumakabe.github.io/tags/swift/</link>
     <description>Recent content in Swift on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 23 Mar 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/swift/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 23 Mar 2014 00:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/swift/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>OpenStack Swiftへのファイル分割アップロード</title>
-      <link>https://ToruMakabe.github.io/post/swift-upload/</link>
+      <link>https://torumakabe.github.io/post/swift-upload/</link>
       <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/swift-upload/</guid>
+      <guid>https://torumakabe.github.io/post/swift-upload/</guid>
       <description>Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら</description>
     </item>
     

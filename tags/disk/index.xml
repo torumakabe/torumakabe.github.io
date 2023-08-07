@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Disk on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/disk/</link>
+    <link>https://torumakabe.github.io/tags/disk/</link>
     <description>Recent content in Disk on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/disk/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 27 Jan 2016 00:19:30 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/disk/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>https://ToruMakabe.github.io/post/striping_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/striping_linuxonazure/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/striping_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>&amp;ldquo;俺の鉄板&amp;quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk I</description>
     </item>
     

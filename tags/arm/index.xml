@@ -2,72 +2,72 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ARM on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/arm/</link>
+    <link>https://torumakabe.github.io/tags/arm/</link>
     <description>Recent content in ARM on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 25 Mar 2016 22:50:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 25 Mar 2016 22:50:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/arm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイ</description>
     </item>
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager Providerのリソ</description>
     </item>
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10</description>
     </item>
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。 情報がありそうでない 以前のエントリで書いたとおり、TerraformでA</description>
     </item>
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。 Terraformのマイナーバ</description>
     </item>
     
     <item>
       <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</link>
+      <link>https://torumakabe.github.io/post/azure_infradeployment_selection/</link>
       <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</guid>
+      <guid>https://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
       <description>ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進</description>
     </item>
     
     <item>
       <title>Azure ARM Templateによるデプロイと冪等性</title>
-      <link>https://ToruMakabe.github.io/post/arm_idempotent/</link>
+      <link>https://torumakabe.github.io/post/arm_idempotent/</link>
       <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/arm_idempotent/</guid>
+      <guid>https://torumakabe.github.io/post/arm_idempotent/</guid>
       <description>宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です</description>
     </item>
     

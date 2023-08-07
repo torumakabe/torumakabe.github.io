@@ -2,126 +2,126 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Terraform on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/terraform/</link>
+    <link>https://torumakabe.github.io/tags/terraform/</link>
     <description>Recent content in Terraform on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 06 Oct 2020 16:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 06 Oct 2020 16:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</title>
-      <link>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</link>
+      <link>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</link>
       <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</guid>
+      <guid>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</guid>
       <description>何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート</description>
     </item>
     
     <item>
       <title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする</title>
-      <link>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
+      <link>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
       <pubDate>Fri, 26 Apr 2019 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
+      <guid>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
       <description>何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr</description>
     </item>
     
     <item>
       <title>TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</title>
-      <link>https://ToruMakabe.github.io/post/terraform_azure_secret/</link>
+      <link>https://torumakabe.github.io/post/terraform_azure_secret/</link>
       <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform_azure_secret/</guid>
+      <guid>https://torumakabe.github.io/post/terraform_azure_secret/</guid>
       <description>動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した</description>
     </item>
     
     <item>
       <title>俺のAzure CLI 2018春版</title>
-      <link>https://ToruMakabe.github.io/post/myazurecli201804/</link>
+      <link>https://torumakabe.github.io/post/myazurecli201804/</link>
       <pubDate>Mon, 09 Apr 2018 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/myazurecli201804/</guid>
+      <guid>https://torumakabe.github.io/post/myazurecli201804/</guid>
       <description>春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届</description>
     </item>
     
     <item>
       <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
       <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
       <description>カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新の</description>
     </item>
     
     <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
-      <link>https://ToruMakabe.github.io/post/azure_msi_terraform/</link>
+      <link>https://torumakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_msi_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/azure_msi_terraform/</guid>
       <description>TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの</description>
     </item>
     
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
-      <link>https://ToruMakabe.github.io/post/az_vmss_terraform/</link>
+      <link>https://torumakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/az_vmss_terraform/</guid>
       <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zones</description>
     </item>
     
     <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
-      <link>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <link>https://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <guid>https://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
       <description>サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの記事に目が止まりました。原則はいいと</description>
     </item>
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイ</description>
     </item>
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager Providerのリソ</description>
     </item>
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。 情報がありそうでない 以前のエントリで書いたとおり、TerraformでA</description>
     </item>
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。 Terraformのマイナーバ</description>
     </item>
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
-      <link>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</link>
+      <link>https://torumakabe.github.io/post/terraform-openstack-minimum/</link>
       <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <guid>https://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされま</description>
     </item>
     

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>MSI on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/msi/</link>
+    <link>https://torumakabe.github.io/tags/msi/</link>
     <description>Recent content in MSI on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 30 Mar 2018 16:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/msi/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 30 Mar 2018 16:30:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/msi/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
-      <link>https://ToruMakabe.github.io/post/azure_msi_terraform/</link>
+      <link>https://torumakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_msi_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/azure_msi_terraform/</guid>
       <description>TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの</description>
     </item>
     

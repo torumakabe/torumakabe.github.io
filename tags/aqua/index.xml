@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Aqua on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/aqua/</link>
+    <link>https://torumakabe.github.io/tags/aqua/</link>
     <description>Recent content in Aqua on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 09 Aug 2019 13:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/aqua/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Aug 2019 13:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/aqua/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Container Registry TasksでAqua MicroScannerを自動実行する</title>
-      <link>https://ToruMakabe.github.io/post/aqua_acr/</link>
+      <link>https://torumakabe.github.io/post/aqua_acr/</link>
       <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aqua_acr/</guid>
+      <guid>https://torumakabe.github.io/post/aqua_acr/</guid>
       <description>何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg</description>
     </item>
     

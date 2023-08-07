@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>DNS on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/dns/</link>
+    <link>https://torumakabe.github.io/tags/dns/</link>
     <description>Recent content in DNS on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 27 Mar 2018 00:10:30 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/dns/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 27 Mar 2018 00:10:30 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/dns/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure DNS Private Zonesの動きを確認する</title>
-      <link>https://ToruMakabe.github.io/post/azure_private_dns_preview/</link>
+      <link>https://torumakabe.github.io/post/azure_private_dns_preview/</link>
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_private_dns_preview/</guid>
+      <guid>https://torumakabe.github.io/post/azure_private_dns_preview/</guid>
       <description>プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレ</description>
     </item>
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
+      <link>https://torumakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
+      <guid>https://torumakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時</description>
     </item>
     

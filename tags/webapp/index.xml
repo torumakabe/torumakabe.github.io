@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WebApp on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/webapp/</link>
+    <link>https://torumakabe.github.io/tags/webapp/</link>
     <description>Recent content in WebApp on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 01 Sep 2020 14:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/webapp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 01 Sep 2020 14:30:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/webapp/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する</title>
-      <link>https://ToruMakabe.github.io/post/webapp-outbound/</link>
+      <link>https://torumakabe.github.io/post/webapp-outbound/</link>
       <pubDate>Tue, 01 Sep 2020 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/webapp-outbound/</guid>
+      <guid>https://torumakabe.github.io/post/webapp-outbound/</guid>
       <description>(2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるよ</description>
     </item>
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタッ</description>
     </item>
     

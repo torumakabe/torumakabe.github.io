@@ -7,22 +7,21 @@
 	<meta property="og:title" content="俺のAzure CLI 2018春版" />
 <meta property="og:description" content="春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/myazurecli201804/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/myazurecli201804/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2018-04-09T15:00:00+09:00" />
 <meta property="article:modified_time" content="2018-04-09T15:00:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="俺のAzure CLI 2018春版"/>
 <meta name="twitter:description" content="春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -129,7 +128,7 @@
 </span></span></code></pre></div><h3 id="引数を確認するのがめんどくさい系">引数を確認するのがめんどくさい系</h3>
 <p>リソースグループを消したくないけど、中身だけ消したいってケース、よくありますよね。そんなエイリアスも作りました。&ndash;template-uriで指定しているGistには、空っぽのAzure Resource Manager デプロイメントテンプレートが置いてあります。このuriをいちいち確認するのがめんどくさいので、エイリアスに。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[empty-rg]
-</span></span><span style="display:flex;"><span>command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/ToruMakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
+</span></span><span style="display:flex;"><span>command = group deployment create --mode Complete --template-uri https://gist.githubusercontent.com/torumakabe/28ad5177a6de525866027961aa33b1e7/raw/9b455bfc9608c637e1980d9286b7f77e76a5c74b/azuredeploy_empty.json
 </span></span></code></pre></div><p>以下のコマンドを打つだけで、リソースグループの中身をバッサリ消せます。投げっぱなしでさっさとPC閉じて帰りたいときは &ndash;no-waitオプションを。</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>$ az empty-rg
 </span></span></code></pre></div><p><a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#create-an-alias-command-with-arguments">位置引数</a>や<a href="https://docs.microsoft.com/ja-jp/cli/azure/azure-cli-extension-alias?view=azure-cli-latest#process-arguments-using-jinja2-templates">Jinja2テンプレート</a>を使ったエイリアスも作れるので、込み入ったブツを、という人は挑戦してみてください。</p>
@@ -172,11 +171,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

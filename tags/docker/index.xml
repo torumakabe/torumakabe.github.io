@@ -2,81 +2,81 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/docker/</link>
+    <link>https://torumakabe.github.io/tags/docker/</link>
     <description>Recent content in Docker on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 04 Dec 2017 22:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
-      <link>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <link>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <guid>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
       <description>小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要りま</description>
     </item>
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタッ</description>
     </item>
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
+      <link>https://torumakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://torumakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、</description>
     </item>
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>https://ToruMakabe.github.io/post/azure_osstools_iac/</link>
+      <link>https://torumakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_osstools_iac/</guid>
+      <guid>https://torumakabe.github.io/post/azure_osstools_iac/</guid>
       <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようとい</description>
     </item>
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/azure_batch_docker/</link>
+      <link>https://torumakabe.github.io/post/azure_batch_docker/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
+      <guid>https://torumakabe.github.io/post/azure_batch_docker/</guid>
       <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル</description>
     </item>
     
     <item>
       <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>https://ToruMakabe.github.io/post/azure_docker_cntk/</link>
+      <link>https://torumakabe.github.io/post/azure_docker_cntk/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_docker_cntk/</guid>
+      <guid>https://torumakabe.github.io/post/azure_docker_cntk/</guid>
       <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこ</description>
     </item>
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://torumakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://torumakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。 OpenStackの最前線から離れて3か月がたちました。OpenStackつ</description>
     </item>
     
     <item>
       <title>Azure Docker VM Extensionを使う3つの理由</title>
-      <link>https://ToruMakabe.github.io/post/azure_docker_extension/</link>
+      <link>https://torumakabe.github.io/post/azure_docker_extension/</link>
       <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_docker_extension/</guid>
+      <guid>https://torumakabe.github.io/post/azure_docker_extension/</guid>
       <description>まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると</description>
     </item>
     

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Book on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/book/</link>
+    <link>https://torumakabe.github.io/tags/book/</link>
     <description>Recent content in Book on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 27 Mar 2016 20:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/book/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Mar 2016 20:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/book/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>書評: Site Reliability Engineering</title>
-      <link>https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/</link>
+      <link>https://torumakabe.github.io/post/bookreview_site_reliability_engineering/</link>
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/</guid>
+      <guid>https://torumakabe.github.io/post/bookreview_site_reliability_engineering/</guid>
       <description>英語だけどぜひ読んでほしい Site Reliability Engineering: How Google Runs Production Systems 参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本で</description>
     </item>
     

@@ -7,22 +7,21 @@
 	<meta property="og:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン" />
 <meta property="og:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/aca-nw-option-pattern/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/aca-nw-option-pattern/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2022-07-06T14:00:00+09:00" />
 <meta property="article:modified_time" content="2022-07-06T14:00:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Azure Container Appsのネットワークオプションとアクセス可能なパターン"/>
 <meta name="twitter:description" content="何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -125,7 +124,7 @@
 <p><a href="https://docs.microsoft.com/ja-jp/azure/container-apps/connect-apps?tabs=bash">FQDN を使用して同じ環境で別のコンテナーを呼び出す場合、ネットワーク トラフィックが環境から出ることはありません</a></p>
 </blockquote>
 <p>とありますが、この仕組みが背景にあります。</p>
-<p>ところで、環境内部でのふるまいを確認するには、シェルが使えてツールの導入も容易な、<a href="https://github.com/ToruMakabe/aca-fqdn-access-pattern-list/blob/6386ca2f8a994f3a4cb4dcd9b0679e1b291050b8/managed-vnet/main.tf#L155">Ubuntuなどのコンテナを環境に作成</a>し、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/observability?tabs=bash#container-console">コンソールアクセス</a>してみてください。curlやdigなどで、環境内からアクセス可能か、どのように名前解決されるのか、体験できます。</p>
+<p>ところで、環境内部でのふるまいを確認するには、シェルが使えてツールの導入も容易な、<a href="https://github.com/torumakabe/aca-fqdn-access-pattern-list/blob/6386ca2f8a994f3a4cb4dcd9b0679e1b291050b8/managed-vnet/main.tf#L155">Ubuntuなどのコンテナを環境に作成</a>し、<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/observability?tabs=bash#container-console">コンソールアクセス</a>してみてください。curlやdigなどで、環境内からアクセス可能か、どのように名前解決されるのか、体験できます。</p>
 <p>では、マネージドVNetの場合のFQDNアクセスパターンをまとめてみましょう。</p>
 <table>
 <thead>
@@ -191,11 +190,11 @@
     Client-Public --> DNS-Azure-Public
 </div>
 
-<p>カスタムVNetの代表的なユースケースは、他マネージドサービスへのプライベートネットワーク経由でのアクセスです。図をシンプルにするために省略しましたが、<a href="https://gist.github.com/ToruMakabe/d81680ab13db82ffa2b0cf0094eddf04">Container Apps環境のアプリケーションから、プライベートエンドポイントを使ってストレージアカウントへアクセスしたい</a>、というケースが分かりやすいでしょう。マネージドVNetと違い、VNetをユーザが識別、操作できるため、可能となる構成です。</p>
+<p>カスタムVNetの代表的なユースケースは、他マネージドサービスへのプライベートネットワーク経由でのアクセスです。図をシンプルにするために省略しましたが、<a href="https://gist.github.com/torumakabe/d81680ab13db82ffa2b0cf0094eddf04">Container Apps環境のアプリケーションから、プライベートエンドポイントを使ってストレージアカウントへアクセスしたい</a>、というケースが分かりやすいでしょう。マネージドVNetと違い、VNetをユーザが識別、操作できるため、可能となる構成です。</p>
 <p>Container Apps環境が参加するVNetをユーザが操作できる他は、マネージドVNetの構成と大きく変わりません。ですが1点、意識すべきことがあります。同じVNet内の要素、たとえば仮想マシンからContainer Apps環境内のアプリケーションにアクセスする場合の名前解決です。</p>
 <p>カスタムVNet構成でContainer Apps環境を作る際、既定で外部からのアクセスは許可されます。この場合、Container Apps環境の内外をつなぐロードバランサには、パブリックIPが割り当てられます。よって、同じVNet内にある仮想マシンであっても、Container Apps環境内のアプリケーションには、パブリックIP経由でアクセスする必要があります。</p>
 <p>なお、公式ドキュメントには<a href="https://docs.microsoft.com/ja-jp/azure/container-apps/vnet-custom?tabs=bash&amp;pivots=azure-cli#optional-configuration">プライベートDNSゾーンを使った名前解決方法</a>が紹介されています。Container App環境は属性として、ドメイン名(defaultDomain)と外部アクセス向けIPアドレス(staticIp)を持ちます。これらの情報を組み合わせ、環境内すべてのアプリケーションの名前解決ができるワイルドカード DNS Aレコードを作れます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>*.&lt;defaultDomain&gt; IN A &lt;staticIp&gt;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-DNS" data-lang="DNS"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">*.&lt;defaultDomain&gt;</span> <span style="color:#66d9ef">IN</span> <span style="color:#66d9ef">A</span> <span style="color:#960050;background-color:#1e0010">&lt;staticIp&gt;</span>
 </span></span></code></pre></div><p>繰り返しになりますが、アプリケーションへの振り分けはIngressが行います。よって複数のアプリケーションやFQDNがあっても、必要なAレコードはロードバランサに割り当てたIP向けに、1つのみです。</p>
 <p>アクセスパターンを以下にまとめます。</p>
 <table>
@@ -318,7 +317,7 @@
 </tbody>
 </table>
 <h2 id="おまけ">おまけ</h2>
-<p>各オプション別に環境構築用のTerraform HCLコードを<a href="https://github.com/ToruMakabe/aca-fqdn-access-pattern-list">GitHubに置いています</a>ので、合わせて参考にしてください。</p>
+<p>各オプション別に環境構築用のTerraform HCLコードを<a href="https://github.com/torumakabe/aca-fqdn-access-pattern-list">GitHubに置いています</a>ので、合わせて参考にしてください。</p>
 
 			
 			<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
@@ -348,11 +347,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

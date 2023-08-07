@@ -7,22 +7,21 @@
 	<meta property="og:title" content="WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)" />
 <meta property="og:description" content="見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/wslenv_golang/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/wslenv_golang/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2018-05-02T17:00:00+09:00" />
 <meta property="article:modified_time" content="2018-05-02T17:00:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)"/>
 <meta name="twitter:description" content="見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -129,8 +128,8 @@
 </span></span><span style="display:flex;"><span>-a----       2018/05/02     11:09        5708288 godef.exe
 </span></span><span style="display:flex;"><span>[snip]
 </span></span></code></pre></div><p>サンプルコードのディレクトリへ移動し、中身を確認します。シンプルな挨拶アプリです。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span>&gt; <span style="color:#a6e22e">cd</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>\
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">ToruMakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>&gt; <span style="color:#a6e22e">cat</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">hello</span>.<span style="color:#66d9ef">go</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span>&gt; <span style="color:#a6e22e">cd</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">torumakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>\
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">PS</span> <span style="color:#a6e22e">C</span>:<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">Users</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">tomakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#66d9ef">go</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">src</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">com</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">torumakabe</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">work</span>&gt; <span style="color:#a6e22e">cat</span> .<span style="color:#960050;background-color:#1e0010">\</span><span style="color:#a6e22e">hello</span>.<span style="color:#66d9ef">go</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;fmt&#34;</span>
@@ -139,11 +138,11 @@
 </span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Hello Go on the new WSL&#34;</span>)
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>ビルドして動かしてみましょう。Windows環境ではデフォルトで実行ファイルとしてexeが作られます。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; go build .\hello.go
-</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; ls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\torumakabe\work&gt; go build .\hello.go
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\torumakabe\work&gt; ls
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Users\tomakabe\go\src\github.com\ToruMakabe\work
+</span></span><span style="display:flex;"><span>    ディレクトリ: C:\Users\tomakabe\go\src\github.com\torumakabe\work
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>Mode                LastWriteTime         Length Name
@@ -152,7 +151,7 @@
 </span></span><span style="display:flex;"><span>-a----       2018/05/02     11:10             91 hello.go
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; .\hello.exe
+</span></span><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\torumakabe\work&gt; .\hello.exe
 </span></span><span style="display:flex;"><span>Hello Go on the new WSL
 </span></span></code></pre></div><p>ここまでは従来のWindowsにおけるGo開発環境です。ではWSLに話を移しましょう。</p>
 <h3 id="そぞろ歩き-その2wslでのgo開発">そぞろ歩き その2(WSLでのGo開発)</h3>
@@ -184,7 +183,7 @@
 </span></span></code></pre></div><p>これではWSLとWindowsで、ソースもバイナリーも別々の管理になってしまいます。これはつらい。ああ、GOPATHを共有できればいいのに。</p>
 <h3 id="そぞろ歩き-その3解決編">そぞろ歩き その3(解決編)</h3>
 <p>そこで登場するのが、WSLENVです。Windowsで作業します。Windowsの環境変数GOPATHを、環境変数WSLENVへスイッチとともに設定します。/pスイッチは、「この環境変数はパスを格納しているから、いい感じにして」という指定です。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\ToruMakabe\work&gt; setx WSLENV &#34;$env:WSLENV`:GOPATH/p&#34;
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PS C:\Users\tomakabe\go\src\github.com\torumakabe\work&gt; setx WSLENV &#34;$env:WSLENV`:GOPATH/p&#34;
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>成功: 指定した値は保存されました。
 </span></span></code></pre></div><p>いい感じって何よ。それは環境に合わせたパス表現の変換です。WSLで見てみましょう。WSLENVを読ませる必要があるため、VS Codeを再起動します。そして、ターミナルで確認します。</p>
@@ -192,16 +191,16 @@
 </span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go
 </span></span></code></pre></div><p>GOPATHが読めるようになりました。かつ、Windowsのパス表現であるC:\Users\tomakabe\goから、WSLの表現である/mnt/c/Users/tomakabe/goへと変換して渡しています。素晴らしい。これでGOPATHはひとつになり、ソースやバイナリー、パッケージの管理を統一できます。</p>
 <p>ではWSLでサンプルコードを触ってみましょう。ソースのあるディレクトリへ移動します。ソースと先ほどビルドしたexeがあります。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ cd src/github.com/ToruMakabe/work/
-</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go $ cd src/github.com/torumakabe/work/
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/torumakabe/work $ ls
 </span></span><span style="display:flex;"><span>hello.exe  hello.go
 </span></span></code></pre></div><p>WSL上でビルドします。ELFバイナリー hello が作られました。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ go build hello.go
-</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ls
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/torumakabe/work $ go build hello.go
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/torumakabe/work $ ls
 </span></span><span style="display:flex;"><span>hello  hello.exe  hello.go
-</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ file ./hello
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/torumakabe/work $ file ./hello
 </span></span><span style="display:flex;"><span>./hello: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, not stripped
-</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/ToruMakabe/work $ ./hello
+</span></span><span style="display:flex;"><span>/mnt/c/Users/tomakabe/go/src/github.com/torumakabe/work $ ./hello
 </span></span><span style="display:flex;"><span>Hello Go on the new WSL
 </span></span></code></pre></div><h2 id="まとめ">まとめ</h2>
 <p>代表例としてGoの開発環境で説明しましたが、WSLENVは他の用途でも応用できるでしょう。スイッチの説明など、詳細は先ほど紹介した、<a href="https://blogs.msdn.microsoft.com/commandline/2017/12/22/share-environment-vars-between-wsl-and-windows/">こちら</a>を。</p>
@@ -227,11 +226,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

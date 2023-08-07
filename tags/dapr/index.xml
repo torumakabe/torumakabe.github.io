@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Dapr on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/dapr/</link>
+    <link>https://torumakabe.github.io/tags/dapr/</link>
     <description>Recent content in Dapr on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sat, 11 Dec 2021 00:05:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/dapr/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 11 Dec 2021 00:05:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/dapr/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Daprの回復性を支える仕組み 現状と展望</title>
-      <link>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</link>
+      <link>https://torumakabe.github.io/post/dapr-resiliency-now-and-future/</link>
       <pubDate>Sat, 11 Dec 2021 00:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</guid>
+      <guid>https://torumakabe.github.io/post/dapr-resiliency-now-and-future/</guid>
       <description>このエントリは、Dapr Advent Calendar 2021の参加作品(12/11)です。 何の話か クラウドでは、一過性の障害が起こりがちです。その原因は、以下のドキ</description>
     </item>
     

@@ -7,22 +7,21 @@
 	<meta property="og:title" content="Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する" />
 <meta property="og:description" content="何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/servicetag-checker/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/servicetag-checker/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-02-25T13:30:00+09:00" />
 <meta property="article:modified_time" content="2021-02-25T13:30:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する"/>
 <meta name="twitter:description" content="何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -70,7 +69,7 @@
 </ul>
 <h2 id="作ったもの">作ったもの</h2>
 <p>例として、ネットワークサービスタグの変更を日次でチェックし、差分をレポートするアプリを作りました。<a href="https://docs.microsoft.com/ja-jp/rest/api/virtualnetwork/servicetags/list">Service Tag Discovery API</a>を使います。Azure系サービスが利用しているIPアドレスのレンジの一覧を取得できるアレです。取得したタグデータをblobに保存しておき、次回以降は取得したタグとの差分があればレポートを作成します。最近ではIPレンジを抜き出さなくともタグの指定すれば済むサービスが増えてきたのですが、根強いニーズがあるのでサンプルにいいかな、と思いました。このサンプルはレポート止まりですが、慣れたらリソースの追加変更に取り組んでもいいでしょう。</p>
-<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/servicetags-checker-1.jpg?raw=true" width="500"/>
+<figure><img src="https://raw.githubusercontent.com/torumakabe/Images/master/servicetags-checker-1.jpg?raw=true" width="500"/>
 </figure>
 
 <ul>
@@ -81,7 +80,7 @@
 <li>実行ログをAzure Monitor Log Analyticsに転送し、変更レポート作成イベントログを検出したらメールで通知</li>
 </ul>
 <p>環境はTerraformでライフサイクル管理します。</p>
-<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/servicetags-checker-2.jpg?raw=true" width="600"/>
+<figure><img src="https://raw.githubusercontent.com/torumakabe/Images/master/servicetags-checker-2.jpg?raw=true" width="600"/>
 </figure>
 
 <ul>
@@ -89,14 +88,14 @@
 <li>GitHubリポジトリへのシークレット登録もTerraformで実行</li>
 </ul>
 <p>環境だけでなくアプリも同じリポジトリに入れてライフサイクル管理します。</p>
-<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/servicetags-checker-3.jpg?raw=true" width="400"/>
+<figure><img src="https://raw.githubusercontent.com/torumakabe/Images/master/servicetags-checker-3.jpg?raw=true" width="400"/>
 </figure>
 
 <ul>
 <li>ブランチへのプッシュをトリガーにアプリのCI(単体テスト)が走る</li>
 <li>バージョン規約(セマンティックバージョニング)を満たすタグのプッシュをトリガーに、コンテナのビルドとAzure Container Registryへのプッシュを実行</li>
 </ul>
-<p>コードはGitHubに<a href="https://github.com/ToruMakabe/az-servicetags-checker-go">公開</a>しています。</p>
+<p>コードはGitHubに<a href="https://github.com/torumakabe/az-servicetags-checker-go">公開</a>しています。</p>
 <h2 id="考えたことメモ">考えたことメモ</h2>
 <p>作りながら考えたことが参考になるかもしれないので、残しておきます。</p>
 <ul>
@@ -147,11 +146,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

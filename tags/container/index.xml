@@ -2,36 +2,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Container on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/container/</link>
+    <link>https://torumakabe.github.io/tags/container/</link>
     <description>Recent content in Container on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Tue, 16 Nov 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/container/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 16 Nov 2021 15:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/container/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</title>
-      <link>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</link>
+      <link>https://torumakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</link>
       <pubDate>Tue, 16 Nov 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</guid>
+      <guid>https://torumakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</guid>
       <description>何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実す</description>
     </item>
     
     <item>
       <title>Azure Container Appsを試す前に知っておきたいこと - Ingress編</title>
-      <link>https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/</link>
+      <link>https://torumakabe.github.io/post/az-containerapps-ingress-things-to-know/</link>
       <pubDate>Mon, 08 Nov 2021 19:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/</guid>
+      <guid>https://torumakabe.github.io/post/az-containerapps-ingress-things-to-know/</guid>
       <description>何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロ</description>
     </item>
     
     <item>
       <title>Azure Container Registry TasksでAqua MicroScannerを自動実行する</title>
-      <link>https://ToruMakabe.github.io/post/aqua_acr/</link>
+      <link>https://torumakabe.github.io/post/aqua_acr/</link>
       <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aqua_acr/</guid>
+      <guid>https://torumakabe.github.io/post/aqua_acr/</guid>
       <description>何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg</description>
     </item>
     

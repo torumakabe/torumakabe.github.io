@@ -2,783 +2,783 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on re-imagine</title>
-    <link>https://ToruMakabe.github.io/post/</link>
+    <link>https://torumakabe.github.io/post/</link>
     <description>Recent content in Posts on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 06 Jul 2022 14:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Container Appsのネットワークオプションとアクセス可能なパターン</title>
-      <link>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</link>
+      <link>https://torumakabe.github.io/post/aca-nw-option-pattern/</link>
       <pubDate>Wed, 06 Jul 2022 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aca-nw-option-pattern/</guid>
+      <guid>https://torumakabe.github.io/post/aca-nw-option-pattern/</guid>
       <description>何の話か Azure Container Appsには、以下のネットワークオプションがあります。 VNet: マネージド カスタム 外部からのアクセスを許可 内部 アプリケーション Ingress: 有効 or 無</description>
     </item>
     
     <item>
       <title>AKSのローカルアカウントを無効化しつつ、非対話型ログインを行う</title>
-      <link>https://ToruMakabe.github.io/post/aks-disable-local-account/</link>
+      <link>https://torumakabe.github.io/post/aks-disable-local-account/</link>
       <pubDate>Sun, 26 Dec 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-disable-local-account/</guid>
+      <guid>https://torumakabe.github.io/post/aks-disable-local-account/</guid>
       <description>何の話か Azure Kubernetes Service(AKS)でローカルアカウントを無効化できるようになり、GAしました。ローカルアカウントを無効にすると、AKSをセ</description>
     </item>
     
     <item>
       <title>Daprの回復性を支える仕組み 現状と展望</title>
-      <link>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</link>
+      <link>https://torumakabe.github.io/post/dapr-resiliency-now-and-future/</link>
       <pubDate>Sat, 11 Dec 2021 00:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dapr-resiliency-now-and-future/</guid>
+      <guid>https://torumakabe.github.io/post/dapr-resiliency-now-and-future/</guid>
       <description>このエントリは、Dapr Advent Calendar 2021の参加作品(12/11)です。 何の話か クラウドでは、一過性の障害が起こりがちです。その原因は、以下のドキ</description>
     </item>
     
     <item>
       <title>Azure Container Appsを試す前に知っておきたいこと - 定期実行 &amp; graceful shutdown編</title>
-      <link>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</link>
+      <link>https://torumakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</link>
       <pubDate>Tue, 16 Nov 2021 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</guid>
+      <guid>https://torumakabe.github.io/post/az-containerapps-scheduled-task-things-to-know/</guid>
       <description>何の話か Azure Container Appsを試すにあたり、知っておくときっと得をするエントリの第2弾です。プレビュー初期ということもあり、公式ドキュメントが充実す</description>
     </item>
     
     <item>
       <title>Azure Container Appsを試す前に知っておきたいこと - Ingress編</title>
-      <link>https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/</link>
+      <link>https://torumakabe.github.io/post/az-containerapps-ingress-things-to-know/</link>
       <pubDate>Mon, 08 Nov 2021 19:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-containerapps-ingress-things-to-know/</guid>
+      <guid>https://torumakabe.github.io/post/az-containerapps-ingress-things-to-know/</guid>
       <description>何の話か Ignite 2021秋でAzure Container Appsが発表されました。Kubernetesを基盤に、Envoy、KEDA、DaprといったCNCFプロ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Service アップグレード戦略 2021夏版</title>
-      <link>https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/</link>
+      <link>https://torumakabe.github.io/post/aks-upgrade-strategy-2021-summer/</link>
       <pubDate>Wed, 21 Jul 2021 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/</guid>
+      <guid>https://torumakabe.github.io/post/aks-upgrade-strategy-2021-summer/</guid>
       <description>何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩</description>
     </item>
     
     <item>
       <title>Azure Container Instancesの定期実行をAzure Functionsのタイマートリガーで行うパターン</title>
-      <link>https://ToruMakabe.github.io/post/aci-runner-on-functions/</link>
+      <link>https://torumakabe.github.io/post/aci-runner-on-functions/</link>
       <pubDate>Mon, 05 Jul 2021 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aci-runner-on-functions/</guid>
+      <guid>https://torumakabe.github.io/post/aci-runner-on-functions/</guid>
       <description>何の話か ACI(Azure Container Instances)の定期実行を、Azure Functionsのタイマートリガーを使って行う場合、いくつか設計、実装上の考慮点が</description>
     </item>
     
     <item>
       <title>Azure App Service WEBSITE_VNET_ROUTE_ALLの設定効果を確認する</title>
-      <link>https://ToruMakabe.github.io/post/website-vnet-route-all/</link>
+      <link>https://torumakabe.github.io/post/website-vnet-route-all/</link>
       <pubDate>Mon, 12 Apr 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/website-vnet-route-all/</guid>
+      <guid>https://torumakabe.github.io/post/website-vnet-route-all/</guid>
       <description>何の話か App ServiceのリージョンVNet統合をした場合、すべての送信トラフィックをVNetに向ける&amp;ldquo;WEBSITE_VNET</description>
     </item>
     
     <item>
       <title>Azure Application Insightsのカスタム可用性テストを使って プライベートネットワーク対応の可用性テストプローブをGoで書く</title>
-      <link>https://ToruMakabe.github.io/post/az-healthprobe/</link>
+      <link>https://torumakabe.github.io/post/az-healthprobe/</link>
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-healthprobe/</guid>
+      <guid>https://torumakabe.github.io/post/az-healthprobe/</guid>
       <description>何の話か 以下のサンプル(C# &amp;amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。 Azure Functions を使用してカス</description>
     </item>
     
     <item>
       <title>Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する</title>
-      <link>https://ToruMakabe.github.io/post/servicetag-checker/</link>
+      <link>https://torumakabe.github.io/post/servicetag-checker/</link>
       <pubDate>Thu, 25 Feb 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/servicetag-checker/</guid>
+      <guid>https://torumakabe.github.io/post/servicetag-checker/</guid>
       <description>何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Serviceの推奨メトリックアラートをTerraformで設定する</title>
-      <link>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</link>
+      <link>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</link>
       <pubDate>Tue, 06 Oct 2020 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-recommended-metrics-alert/</guid>
+      <guid>https://torumakabe.github.io/post/aks-recommended-metrics-alert/</guid>
       <description>何の話か Azure Monitor for containersで、Azure Kubernetes Service(AKS)の推奨メトリックアラートを設定できるようになりました。どのアラート</description>
     </item>
     
     <item>
       <title>マルチテナント型 Azure Web AppsでアウトバウンドIPを固定する</title>
-      <link>https://ToruMakabe.github.io/post/webapp-outbound/</link>
+      <link>https://torumakabe.github.io/post/webapp-outbound/</link>
       <pubDate>Tue, 01 Sep 2020 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/webapp-outbound/</guid>
+      <guid>https://torumakabe.github.io/post/webapp-outbound/</guid>
       <description>(2020/11/19更新) この記事ではアウトバウンド通信をAzure Firewallに向けていますが、NAT Gatewayにも向けられるよ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Service インフラ ブートストラップ開発フロー&amp;コードサンプル 2020春版</title>
-      <link>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</link>
+      <link>https://torumakabe.github.io/post/aks-bootstrap-202005/</link>
       <pubDate>Thu, 21 May 2020 13:05:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks-bootstrap-202005/</guid>
+      <guid>https://torumakabe.github.io/post/aks-bootstrap-202005/</guid>
       <description>何の話か マネージドサービスなどではコマンド1発で作れるほどKubernetesクラスターの作成は楽になってきているのですが、運用を考えると他</description>
     </item>
     
     <item>
       <title>GitHub Actionsでオンデマンドに環境を再現する</title>
-      <link>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</link>
+      <link>https://torumakabe.github.io/post/gh-actions-trigger-label/</link>
       <pubDate>Sun, 22 Dec 2019 23:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</guid>
+      <guid>https://torumakabe.github.io/post/gh-actions-trigger-label/</guid>
       <description>何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフロー</description>
     </item>
     
     <item>
       <title>Azure Container Registry TasksでAqua MicroScannerを自動実行する</title>
-      <link>https://ToruMakabe.github.io/post/aqua_acr/</link>
+      <link>https://torumakabe.github.io/post/aqua_acr/</link>
       <pubDate>Fri, 09 Aug 2019 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aqua_acr/</guid>
+      <guid>https://torumakabe.github.io/post/aqua_acr/</guid>
       <description>何の話か コンテナーイメージに脆弱性のあるパッケージが含まれないかチェックしてくれるAqua MicroScannerですが、Azure Container Reg</description>
     </item>
     
     <item>
       <title>Azure Container InstancesのGraceful Shutdown事情</title>
-      <link>https://ToruMakabe.github.io/post/aci_graceful_shutdown/</link>
+      <link>https://torumakabe.github.io/post/aci_graceful_shutdown/</link>
       <pubDate>Wed, 03 Jul 2019 23:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aci_graceful_shutdown/</guid>
+      <guid>https://torumakabe.github.io/post/aci_graceful_shutdown/</guid>
       <description>何の話か Azure Container Instances(ACI)はサクッとコンテナーを作れるところが幸せポイントですが、停止処理どうしてますか。クライアントとのコネ</description>
     </item>
     
     <item>
       <title>Azure Kubernetes ServiceのObservabilityお試しキットを作った</title>
-      <link>https://ToruMakabe.github.io/post/aks_observability_trial_kit/</link>
+      <link>https://torumakabe.github.io/post/aks_observability_trial_kit/</link>
       <pubDate>Wed, 26 Jun 2019 18:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_observability_trial_kit/</guid>
+      <guid>https://torumakabe.github.io/post/aks_observability_trial_kit/</guid>
       <description>何の話か Observabilityって言いたかっただけではありません。Azure Kubernetes Service(AKS)の監視について相談されることが多く</description>
     </item>
     
     <item>
       <title>Azure Kubernetes Serviceでシークレットを管理する6つの方法</title>
-      <link>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</link>
+      <link>https://torumakabe.github.io/post/aks_how_to_keep_secret/</link>
       <pubDate>Mon, 17 Jun 2019 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_how_to_keep_secret/</guid>
+      <guid>https://torumakabe.github.io/post/aks_how_to_keep_secret/</guid>
       <description>何の話か Kubernetesでアプリケーションが使うシークレットを扱うには、いくつかのやり方があります。地味ですが重要な要素なので、整理しま</description>
     </item>
     
     <item>
       <title>Kubernetes DeschedulerでPodを再配置する</title>
-      <link>https://ToruMakabe.github.io/post/k8s_descheduler/</link>
+      <link>https://torumakabe.github.io/post/k8s_descheduler/</link>
       <pubDate>Sat, 01 Jun 2019 09:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/k8s_descheduler/</guid>
+      <guid>https://torumakabe.github.io/post/k8s_descheduler/</guid>
       <description>何の話か KubernetesのSchedulerはPodをNodeに配置しますが、配置後に見直しを行いません。Nodeの追加や障害からの復帰</description>
     </item>
     
     <item>
       <title>作りかけのAKSクラスターにTerraformで追いプロビジョニングする</title>
-      <link>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
+      <link>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</link>
       <pubDate>Fri, 26 Apr 2019 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
+      <guid>https://torumakabe.github.io/post/additional_aks_provisioning_with_tf/</guid>
       <description>何の話か CLIやポータルで作ったAKSクラスターに、後からIstioなどの基盤ソフトや運用関連のツールを後から入れるのが面倒なので、Terr</description>
     </item>
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
-      <link>https://ToruMakabe.github.io/post/github_actions_aks/</link>
+      <link>https://torumakabe.github.io/post/github_actions_aks/</link>
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
+      <guid>https://torumakabe.github.io/post/github_actions_aks/</guid>
       <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移</description>
     </item>
     
     <item>
       <title>WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</title>
-      <link>https://ToruMakabe.github.io/post/wslenv_golang/</link>
+      <link>https://torumakabe.github.io/post/wslenv_golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/wslenv_golang/</guid>
+      <guid>https://torumakabe.github.io/post/wslenv_golang/</guid>
       <description>見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支</description>
     </item>
     
     <item>
       <title>TerraformでAzureのシークレットを受け渡す(ACI/AKS編)</title>
-      <link>https://ToruMakabe.github.io/post/terraform_azure_secret/</link>
+      <link>https://torumakabe.github.io/post/terraform_azure_secret/</link>
       <pubDate>Fri, 27 Apr 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform_azure_secret/</guid>
+      <guid>https://torumakabe.github.io/post/terraform_azure_secret/</guid>
       <description>動機 システム開発、運用の現場では、しばしばシークレットの受け渡しをします。代表例はデータベースの接続文字列です。データベース作成時に生成した</description>
     </item>
     
     <item>
       <title>俺のAzure CLI 2018春版</title>
-      <link>https://ToruMakabe.github.io/post/myazurecli201804/</link>
+      <link>https://torumakabe.github.io/post/myazurecli201804/</link>
       <pubDate>Mon, 09 Apr 2018 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/myazurecli201804/</guid>
+      <guid>https://torumakabe.github.io/post/myazurecli201804/</guid>
       <description>春の環境リフレッシュ祭り 最近KubernetesのCLI、kubectlを使う機会が多いのですが、なかなかイケてるんですよ。かゆい所に手が届</description>
     </item>
     
     <item>
       <title>TerraformでAzure VM/VMSSの最新のカスタムイメージを指定する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_customimage_desc/</link>
       <pubDate>Fri, 06 Apr 2018 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_customimage_desc/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_customimage_desc/</guid>
       <description>カスタムイメージではlatest指定できない Azure Marketplaceで提供されているVM/VMSSのイメージは、latest指定により最新の</description>
     </item>
     
     <item>
       <title>Azure MarketplaceからMSI対応でセキュアなTerraform環境を整える</title>
-      <link>https://ToruMakabe.github.io/post/azure_msi_terraform/</link>
+      <link>https://torumakabe.github.io/post/azure_msi_terraform/</link>
       <pubDate>Fri, 30 Mar 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_msi_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/azure_msi_terraform/</guid>
       <description>TerraformのプロビジョニングがMarketplaceから可能に Terraform使ってますか。Azureのリソースプロビジョニングの</description>
     </item>
     
     <item>
       <title>Azure DNS Private Zonesの動きを確認する</title>
-      <link>https://ToruMakabe.github.io/post/azure_private_dns_preview/</link>
+      <link>https://torumakabe.github.io/post/azure_private_dns_preview/</link>
       <pubDate>Tue, 27 Mar 2018 00:10:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_private_dns_preview/</guid>
+      <guid>https://torumakabe.github.io/post/azure_private_dns_preview/</guid>
       <description>プライベートゾーンのパブリックプレビュー開始 Azure DNSのプライベートゾーン対応が、全リージョンでパブリックプレビューとなりました。ゾーンとプレ</description>
     </item>
     
     <item>
       <title>AzureのAvailability Zonesへ分散するVMSSをTerraformで作る</title>
-      <link>https://ToruMakabe.github.io/post/az_vmss_terraform/</link>
+      <link>https://torumakabe.github.io/post/az_vmss_terraform/</link>
       <pubDate>Mon, 26 Mar 2018 00:08:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az_vmss_terraform/</guid>
+      <guid>https://torumakabe.github.io/post/az_vmss_terraform/</guid>
       <description>動機 Terraform Azure Provider 1.3.0で、VMSSを作る際にAvailability Zonesを指定できるようになりました。Availability Zones</description>
     </item>
     
     <item>
       <title>AKSのService作成時にホスト名を付ける</title>
-      <link>https://ToruMakabe.github.io/post/aks_dns/</link>
+      <link>https://torumakabe.github.io/post/aks_dns/</link>
       <pubDate>Mon, 12 Mar 2018 00:21:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_dns/</guid>
+      <guid>https://torumakabe.github.io/post/aks_dns/</guid>
       <description>2つのやり口 Azure Container Service(AKS)はServiceを公開する際、パブリックIPを割り当てられます。でもIPだけじゃなく、ホスト名も同時</description>
     </item>
     
     <item>
       <title>AKSのIngress TLS証明書を自動更新する</title>
-      <link>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</link>
+      <link>https://torumakabe.github.io/post/aks_tls_autorenewal/</link>
       <pubDate>Sun, 11 Feb 2018 00:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_tls_autorenewal/</guid>
+      <guid>https://torumakabe.github.io/post/aks_tls_autorenewal/</guid>
       <description>カジュアルな証明書管理方式が欲しい ChromeがHTTPサイトに対する警告を強化するそうです。非HTTPSサイトには、生きづらい世の中になり</description>
     </item>
     
     <item>
       <title>AKSのNGINX Ingress Controllerのデプロイで悩んだら</title>
-      <link>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</link>
+      <link>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</link>
       <pubDate>Sat, 10 Feb 2018 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/aks_ingress_quickdeploy/</guid>
+      <guid>https://torumakabe.github.io/post/aks_ingress_quickdeploy/</guid>
       <description>楽したいならhelmで入れましょう AKSに限った話ではありませんが、Kubernetesにぶら下げるアプリの数が多くなってくると、URLマッ</description>
     </item>
     
     <item>
       <title>Azureのリソースグループ限定 共同作成者をいい感じに作る</title>
-      <link>https://ToruMakabe.github.io/post/azure_rg_contributor/</link>
+      <link>https://torumakabe.github.io/post/azure_rg_contributor/</link>
       <pubDate>Mon, 22 Jan 2018 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_rg_contributor/</guid>
+      <guid>https://torumakabe.github.io/post/azure_rg_contributor/</guid>
       <description>共同作成者は、ちょっと強い Azureのリソースグループは、リソースを任意のグループにまとめ、ライフサイクルや権限の管理を一括して行える便利な</description>
     </item>
     
     <item>
       <title>TerraformでAzure サンプル 2018/1版</title>
-      <link>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</link>
+      <link>https://torumakabe.github.io/post/terraform_azure_sample_201801/</link>
       <pubDate>Mon, 08 Jan 2018 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform_azure_sample_201801/</guid>
+      <guid>https://torumakabe.github.io/post/terraform_azure_sample_201801/</guid>
       <description>サンプルのアップデート 年末にリポジトリの大掃除をしていて、2年前に書いたTerraform &amp;amp; Azureの記事に目が止まりました。原則はいいと</description>
     </item>
     
     <item>
       <title>Windows上でLinux向けGoバイナリをDockerでビルドする</title>
-      <link>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
+      <link>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</link>
       <pubDate>Mon, 04 Dec 2017 22:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
+      <guid>https://torumakabe.github.io/post/golang_build_onwin_tolnx_docker/</guid>
       <description>小ネタです Goはクロスプラットフォーム開発しやすい言語なのですが、Windows上でLinux向けバイナリーをビルドするなら、gccが要りま</description>
     </item>
     
     <item>
       <title>Azure Blob アップローダーをGoで書いた、そしてその理由</title>
-      <link>https://ToruMakabe.github.io/post/azblob_golang/</link>
+      <link>https://torumakabe.github.io/post/azblob_golang/</link>
       <pubDate>Tue, 28 Nov 2017 08:45:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azblob_golang/</guid>
+      <guid>https://torumakabe.github.io/post/azblob_golang/</guid>
       <description>Azure Blob アップローダーをGoで書いた ふたつほど理由があり、GolangでAzure Blobのファイルアップローダーを書きました。 ひとつめの理由:</description>
     </item>
     
     <item>
       <title>自動化を愛するWindows使いへ Boxstarterのすすめ</title>
-      <link>https://ToruMakabe.github.io/post/intro_boxstarter/</link>
+      <link>https://torumakabe.github.io/post/intro_boxstarter/</link>
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/intro_boxstarter/</guid>
+      <guid>https://torumakabe.github.io/post/intro_boxstarter/</guid>
       <description>Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いので</description>
     </item>
     
     <item>
       <title>Azure VPN Gateway Active/Active構成のスループット検証(リージョン内)</title>
-      <link>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</link>
+      <link>https://torumakabe.github.io/post/azure_vpngw_act_act_perf/</link>
       <pubDate>Sun, 08 Oct 2017 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
+      <guid>https://torumakabe.github.io/post/azure_vpngw_act_act_perf/</guid>
       <description>動機 焦げlogさんで、とても興味深いエントリを拝見しました。 Azure VPN ゲートウェイをアクティブ/アクティブ構成した場合にスループットが向上するのか</description>
     </item>
     
     <item>
       <title>Azure Event GridでBlobイベントを拾う</title>
-      <link>https://ToruMakabe.github.io/post/azure_blobevent/</link>
+      <link>https://torumakabe.github.io/post/azure_blobevent/</link>
       <pubDate>Tue, 05 Sep 2017 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_blobevent/</guid>
+      <guid>https://torumakabe.github.io/post/azure_blobevent/</guid>
       <description>Event GridがBlobに対応 Event GridがBlobのイベントを拾えるようになりました。まだ申請が必要なプライベートプレビュー段階ですが、使い勝手</description>
     </item>
     
     <item>
       <title>Azureでグローバルにデータをコピーするとどのくらい時間がかかるのか</title>
-      <link>https://ToruMakabe.github.io/post/azureblobcopy_perf/</link>
+      <link>https://torumakabe.github.io/post/azureblobcopy_perf/</link>
       <pubDate>Tue, 13 Jun 2017 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azureblobcopy_perf/</guid>
+      <guid>https://torumakabe.github.io/post/azureblobcopy_perf/</guid>
       <description>ファイルコピーの需要は根強い グローバルでAzureを使うとき、データをどうやって同期、複製するかは悩みの種です。Cosmos DBなどリージョ</description>
     </item>
     
     <item>
       <title>Azureユーザー視点のLatency測定 2017/4版</title>
-      <link>https://ToruMakabe.github.io/post/azure_latency/</link>
+      <link>https://torumakabe.github.io/post/azure_latency/</link>
       <pubDate>Sun, 09 Apr 2017 15:15:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_latency/</guid>
+      <guid>https://torumakabe.github.io/post/azure_latency/</guid>
       <description>関東の片隅で遅延を測る Twitterで「東阪の遅延って最近どのくらい？」と話題になっていたので。首都圏のAzureユーザー視線で測定しようと</description>
     </item>
     
     <item>
       <title>Azure Resource Manager テンプレートでManaged Diskを作るときのコツ</title>
-      <link>https://ToruMakabe.github.io/post/arm_template_managed_disk/</link>
+      <link>https://torumakabe.github.io/post/arm_template_managed_disk/</link>
       <pubDate>Thu, 23 Mar 2017 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/arm_template_managed_disk/</guid>
+      <guid>https://torumakabe.github.io/post/arm_template_managed_disk/</guid>
       <description>お伝えしたいこと ARMテンプレートのドキュメントが使いやすくなった Visual Studio CodeとAzure Resource Manager Toolsを使おう ARMテンプレートでMana</description>
     </item>
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI 2.0環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/dockerforwin_azurecli2/</link>
+      <link>https://torumakabe.github.io/post/dockerforwin_azurecli2/</link>
       <pubDate>Tue, 28 Feb 2017 08:00:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli2/</guid>
+      <guid>https://torumakabe.github.io/post/dockerforwin_azurecli2/</guid>
       <description>Azure CLI 2.0版です Docker for WindowsでインストールレスAzure CLI環境を作る、のAzure CLI 2.0版です。Azure CLI 2.0の一般提供開始</description>
     </item>
     
     <item>
       <title>Azure N-SeriesでPaintsChainerを動かす</title>
-      <link>https://ToruMakabe.github.io/post/paintschainer_on_azure/</link>
+      <link>https://torumakabe.github.io/post/paintschainer_on_azure/</link>
       <pubDate>Fri, 03 Feb 2017 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/paintschainer_on_azure/</guid>
+      <guid>https://torumakabe.github.io/post/paintschainer_on_azure/</guid>
       <description>PaintsChainer面白い クラスメソッドさんのDevelopers.IOでのエントリ&amp;ldquo;PaintsChainerをAmaz</description>
     </item>
     
     <item>
       <title>Azure App Service on LinuxのコンテナをCLIで更新する方法</title>
-      <link>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</link>
+      <link>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</link>
       <pubDate>Sun, 20 Nov 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
+      <guid>https://torumakabe.github.io/post/azure_webapponlinux_dockertag/</guid>
       <description>CLIでコンテナを更新したい Connect(); 2016にあわせ、Azure App Service on Linuxのコンテナ対応が発表されました。Azure Container Serviceほどタッ</description>
     </item>
     
     <item>
       <title>SlackとAzure FunctionsでChatOpsする</title>
-      <link>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</link>
+      <link>https://torumakabe.github.io/post/azure_chatops_onfunctions/</link>
       <pubDate>Fri, 07 Oct 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_chatops_onfunctions/</guid>
+      <guid>https://torumakabe.github.io/post/azure_chatops_onfunctions/</guid>
       <description>Azure Functionsでやってみよう Azure上でChatOpsしたい、と相談をいただきました。 AzureでChatOpsと言えば、Auth0</description>
     </item>
     
     <item>
       <title>Bash on WindowsでNode開発環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/bashonwindows_nvm/</link>
+      <link>https://torumakabe.github.io/post/bashonwindows_nvm/</link>
       <pubDate>Wed, 14 Sep 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/bashonwindows_nvm/</guid>
+      <guid>https://torumakabe.github.io/post/bashonwindows_nvm/</guid>
       <description>Bash on Windows 現時点での使いどころ Windows 10 Anniversary Updateでベータ提供がはじまったBash on Ubuntu on Windows、みなさん使ってますか。わたしは、まだベータ</description>
     </item>
     
     <item>
       <title>Azure Functionsで運用管理サーバレス生活(使用量データ取得編)</title>
-      <link>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</link>
+      <link>https://torumakabe.github.io/post/azurefunctions_getusagedata/</link>
       <pubDate>Tue, 13 Sep 2016 17:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azurefunctions_getusagedata/</guid>
+      <guid>https://torumakabe.github.io/post/azurefunctions_getusagedata/</guid>
       <description>背景と動機 Azure Functions使ってますか。「サーバレス」という、ネーミングに突っ込みたい衝動を抑えられないカテゴリに属するため損をしている</description>
     </item>
     
     <item>
       <title>OMSでLinuxコンテナのログを分析する</title>
-      <link>https://ToruMakabe.github.io/post/oms_container_linux/</link>
+      <link>https://torumakabe.github.io/post/oms_container_linux/</link>
       <pubDate>Thu, 25 Aug 2016 16:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/oms_container_linux/</guid>
+      <guid>https://torumakabe.github.io/post/oms_container_linux/</guid>
       <description>OMS Container Solution for Linux プレビュー開始 OMS Container Solution for Linuxのプレビューがはじまりました。OMSのログ分析機能は500MB/日のログ転送まで無料で使えるので、</description>
     </item>
     
     <item>
       <title>Docker for WindowsでインストールレスAzure CLI環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/dockerforwin_azurecli/</link>
+      <link>https://torumakabe.github.io/post/dockerforwin_azurecli/</link>
       <pubDate>Wed, 22 Jun 2016 15:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/dockerforwin_azurecli/</guid>
+      <guid>https://torumakabe.github.io/post/dockerforwin_azurecli/</guid>
       <description>舌の根の乾かぬ内に 最近、VagrantとVirualBoxで似たようなやり口を紹介しましたが、気にしないでください。テクノロジーの進化は早い</description>
     </item>
     
     <item>
       <title>Azure X-Plat CLIでResource Policyを設定する</title>
-      <link>https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/</link>
+      <link>https://torumakabe.github.io/post/azure_cli_resourcepolicy/</link>
       <pubDate>Sat, 21 May 2016 11:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_cli_resourcepolicy/</guid>
+      <guid>https://torumakabe.github.io/post/azure_cli_resourcepolicy/</guid>
       <description>Azure X-Plat CLIのリリースサイクル OSS/Mac/Linux派なAzurerの懐刀、Azure X-Plat CLIのリリースサイクルは、おおよそ月次です。改善</description>
     </item>
     
     <item>
       <title>VagrantとDockerによるAzure向けOSS開発・管理端末のコード化</title>
-      <link>https://ToruMakabe.github.io/post/azure_osstools_iac/</link>
+      <link>https://torumakabe.github.io/post/azure_osstools_iac/</link>
       <pubDate>Fri, 13 May 2016 18:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_osstools_iac/</guid>
+      <guid>https://torumakabe.github.io/post/azure_osstools_iac/</guid>
       <description>端末だってコード化されたい Infrastructure as Codeは特に騒ぐ話でもなくなってきました。このエントリは、じゃあ端末の開発環境やツール群もコード化しようとい</description>
     </item>
     
     <item>
       <title>Azure FunctionsとFacebook Messenger APIで好みなんて聞いてないBotを作る</title>
-      <link>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</link>
+      <link>https://torumakabe.github.io/post/azure_functions_fbmsgapi/</link>
       <pubDate>Sun, 08 May 2016 14:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_functions_fbmsgapi/</guid>
+      <guid>https://torumakabe.github.io/post/azure_functions_fbmsgapi/</guid>
       <description>まだ好みなんて聞いてないぜ Build 2016で、Azure Functionsが発表されました。 Azure Functionsは、 アプリを放り込めば動く。サーバ</description>
     </item>
     
     <item>
       <title>Azure BatchとDockerで管理サーバレスバッチ環境を作る</title>
-      <link>https://ToruMakabe.github.io/post/azure_batch_docker/</link>
+      <link>https://torumakabe.github.io/post/azure_batch_docker/</link>
       <pubDate>Fri, 29 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_batch_docker/</guid>
+      <guid>https://torumakabe.github.io/post/azure_batch_docker/</guid>
       <description>サーバレスって言いたいだけじゃないです Linux向けAzure BatchのPreviewがはじまりました。地味ですが、なかなかのポテンシャル</description>
     </item>
     
     <item>
       <title>Azure Linux VMのディスク利用料節約Tips</title>
-      <link>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</link>
+      <link>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</link>
       <pubDate>Thu, 21 Apr 2016 21:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_pageblob_billable_linux/</guid>
+      <guid>https://torumakabe.github.io/post/azure_pageblob_billable_linux/</guid>
       <description>定義領域全てが課金されるわけではありません AzureのIaaSでは、VMに接続するディスクとしてAzure StorageのPage Blobを</description>
     </item>
     
     <item>
       <title>AzureとDockerでDeep Learning(CNTK)環境をサク作する</title>
-      <link>https://ToruMakabe.github.io/post/azure_docker_cntk/</link>
+      <link>https://torumakabe.github.io/post/azure_docker_cntk/</link>
       <pubDate>Sun, 17 Apr 2016 10:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_docker_cntk/</guid>
+      <guid>https://torumakabe.github.io/post/azure_docker_cntk/</guid>
       <description>気軽に作って壊せる環境を作る Deep Learning環境設計のお手伝いをする機会に恵まれまして。インフラおじさんはDeep Learningであれこ</description>
     </item>
     
     <item>
       <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
-      <link>https://ToruMakabe.github.io/post/azure_auditlog_alert/</link>
+      <link>https://torumakabe.github.io/post/azure_auditlog_alert/</link>
       <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_auditlog_alert/</guid>
+      <guid>https://torumakabe.github.io/post/azure_auditlog_alert/</guid>
       <description>監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利</description>
     </item>
     
     <item>
       <title>書評: Site Reliability Engineering</title>
-      <link>https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/</link>
+      <link>https://torumakabe.github.io/post/bookreview_site_reliability_engineering/</link>
       <pubDate>Sun, 27 Mar 2016 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/bookreview_site_reliability_engineering/</guid>
+      <guid>https://torumakabe.github.io/post/bookreview_site_reliability_engineering/</guid>
       <description>英語だけどぜひ読んでほしい Site Reliability Engineering: How Google Runs Production Systems 参考になったのでご紹介。Googleのインフラ/Ops系技術チームの働き方や考え方を題材にした本で</description>
     </item>
     
     <item>
       <title>Azure &amp; Terraform Tips (ARM対応 2016春版)</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</link>
       <pubDate>Fri, 25 Mar 2016 22:50:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_earlyphase_tips/</guid>
       <description>俺の屍を越えていけ 今週リリースされたTerraform v0.6.14で、Azure Resource Manager ProviderのリソースにVMとテンプレートデプロイ</description>
     </item>
     
     <item>
       <title>Azure &amp; Terraform エラーコード429の対処法</title>
-      <link>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</link>
+      <link>https://torumakabe.github.io/post/azure_terraform_429_workaround/</link>
       <pubDate>Wed, 23 Mar 2016 13:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_terraform_429_workaround/</guid>
+      <guid>https://torumakabe.github.io/post/azure_terraform_429_workaround/</guid>
       <description>Terraformer増加に備えて 2016/3/21にリリースされたTerraform v0.6.14で、Azure Resource Manager Providerのリソ</description>
     </item>
     
     <item>
       <title>PackerとAnsibleでAzureのGolden Imageを作る(ARM対応)</title>
-      <link>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</link>
       <pubDate>Thu, 17 Mar 2016 23:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_packer_ansible_arm_sp/</guid>
       <description>いつの間に ナイスな感じにイメージを作ってくれるPackerですが、いつの間にかAzure ARM対応のBuilderが出ておりました。0.10</description>
     </item>
     
     <item>
       <title>Terraform &amp; Azure デプロイ設計4原則</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</link>
       <pubDate>Wed, 09 Mar 2016 16:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_fundamental_rules/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_fundamental_rules/</guid>
       <description>注: 2018/1/8にサンプルを更新しました。更新エントリはこちら。 情報がありそうでない 以前のエントリで書いたとおり、TerraformでA</description>
     </item>
     
     <item>
       <title>TerraformをAzure ARMで使う時の認証</title>
-      <link>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</link>
+      <link>https://torumakabe.github.io/post/azure_tf_arm_sp/</link>
       <pubDate>Sat, 27 Feb 2016 12:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_tf_arm_sp/</guid>
+      <guid>https://torumakabe.github.io/post/azure_tf_arm_sp/</guid>
       <description>高まってまいりました 全国10,000人のTerraformファンのみなさま、こんにちは。applyしてますか。 Terraformのマイナーバ</description>
     </item>
     
     <item>
       <title>Azure DDoS対策ことはじめ</title>
-      <link>https://ToruMakabe.github.io/post/azure_ddosprotection/</link>
+      <link>https://torumakabe.github.io/post/azure_ddosprotection/</link>
       <pubDate>Mon, 15 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_ddosprotection/</guid>
+      <guid>https://torumakabe.github.io/post/azure_ddosprotection/</guid>
       <description>すこぶるFAQ 攻撃者の荒ぶり具合が高まっており、ご相談いただく機会が増えました。「どうすればいいか見当がつかない」というケースも少なくないの</description>
     </item>
     
     <item>
       <title>Azure Blob Upload ツール別ベンチマーク</title>
-      <link>https://ToruMakabe.github.io/post/azureblobupload_perf/</link>
+      <link>https://torumakabe.github.io/post/azureblobupload_perf/</link>
       <pubDate>Thu, 11 Feb 2016 12:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azureblobupload_perf/</guid>
+      <guid>https://torumakabe.github.io/post/azureblobupload_perf/</guid>
       <description>同じ目的を達成できるツールがたくさん やりたいことがあり、それを達成する手段がたくさん。どう選ぼう。じゃあ特徴を知りましょう。という話です。 端</description>
     </item>
     
     <item>
       <title>Linux on Azureでファイル共有する方法</title>
-      <link>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/fileshare_linuxonazure/</link>
       <pubDate>Sun, 07 Feb 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/fileshare_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/fileshare_linuxonazure/</guid>
       <description>ファイル共有、あまりおすすめしないです いきなりタイトルを否定しました。ロック。 さて、これからクラウド、というお客様に、よく聞かれる質問があり</description>
     </item>
     
     <item>
       <title>Linux on AzureでDisk IO性能を確保する方法</title>
-      <link>https://ToruMakabe.github.io/post/striping_linuxonazure/</link>
+      <link>https://torumakabe.github.io/post/striping_linuxonazure/</link>
       <pubDate>Wed, 27 Jan 2016 00:19:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/striping_linuxonazure/</guid>
+      <guid>https://torumakabe.github.io/post/striping_linuxonazure/</guid>
       <description>&amp;ldquo;俺の鉄板&amp;quot;ができるまで 前半はポエムです。おそらくこのエントリにたどり着く人の期待はLinux on AzureのDisk I</description>
     </item>
     
     <item>
       <title>クラウドは本当に性能不足なのか</title>
-      <link>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <link>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <guid>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
       <description>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。 具体的な数値で、正</description>
     </item>
     
     <item>
       <title>Azureでインフラデプロイツールを選ぶ時に考えていること</title>
-      <link>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</link>
+      <link>https://torumakabe.github.io/post/azure_infradeployment_selection/</link>
       <pubDate>Mon, 11 Jan 2016 00:20:30 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_infradeployment_selection/</guid>
+      <guid>https://torumakabe.github.io/post/azure_infradeployment_selection/</guid>
       <description>ケースバイケースだけど Azureを生業にして、3か月たちます。ここまで、もっとも質問や議論が多いのが、デプロイメントの自動化についてです。進</description>
     </item>
     
     <item>
       <title>Azure ARM Templateによるデプロイと冪等性</title>
-      <link>https://ToruMakabe.github.io/post/arm_idempotent/</link>
+      <link>https://torumakabe.github.io/post/arm_idempotent/</link>
       <pubDate>Wed, 06 Jan 2016 00:16:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/arm_idempotent/</guid>
+      <guid>https://torumakabe.github.io/post/arm_idempotent/</guid>
       <description>宣言的に、冪等に ここ数年で生まれたデプロイメント手法、ツールは数多くありますが、似たような特徴があります。それは「より宣言的に、冪等に」です</description>
     </item>
     
     <item>
       <title>OpenStackとAzureにDocker Swarmをかぶせてみた</title>
-      <link>https://ToruMakabe.github.io/post/azure_openstack_swarm/</link>
+      <link>https://torumakabe.github.io/post/azure_openstack_swarm/</link>
       <pubDate>Sat, 19 Dec 2015 00:01:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_openstack_swarm/</guid>
+      <guid>https://torumakabe.github.io/post/azure_openstack_swarm/</guid>
       <description>どこいってもいじられる OpenStack Advent Calendar 2015 参加作品、19夜目のエントリです。 OpenStackの最前線から離れて3か月がたちました。OpenStackつ</description>
     </item>
     
     <item>
       <title>Azure Docker VM Extensionを使う3つの理由</title>
-      <link>https://ToruMakabe.github.io/post/azure_docker_extension/</link>
+      <link>https://torumakabe.github.io/post/azure_docker_extension/</link>
       <pubDate>Thu, 05 Nov 2015 15:40:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_docker_extension/</guid>
+      <guid>https://torumakabe.github.io/post/azure_docker_extension/</guid>
       <description>まずはじめに 先月からMicrosoftで働いてます。Azure担当のソリューションアーキテクトになりました。これからAzureネタが増えると</description>
     </item>
     
     <item>
       <title>Hugoへ移行</title>
-      <link>https://ToruMakabe.github.io/post/migrate-to-hugo/</link>
+      <link>https://torumakabe.github.io/post/migrate-to-hugo/</link>
       <pubDate>Sun, 20 Sep 2015 15:27:03 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/migrate-to-hugo/</guid>
+      <guid>https://torumakabe.github.io/post/migrate-to-hugo/</guid>
       <description>JekyllからHugoへ移行 サイトジェネレータをJekyllからHugoに変えました。深い理由はありません。気分転換です。Githubでソ</description>
     </item>
     
     <item>
       <title>いきなり Terraform OpenStack Provider</title>
-      <link>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</link>
+      <link>https://torumakabe.github.io/post/terraform-openstack-minimum/</link>
       <pubDate>Sat, 04 Apr 2015 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/terraform-openstack-minimum/</guid>
+      <guid>https://torumakabe.github.io/post/terraform-openstack-minimum/</guid>
       <description>Terraform 0.4でOpenStack Providerリリース 以前からOpenStack対応は表明されていたのですが、いよいよv0.4でリリースされま</description>
     </item>
     
     <item>
       <title>君はOpenStack Monascaを知っているか</title>
-      <link>https://ToruMakabe.github.io/post/monasca/</link>
+      <link>https://torumakabe.github.io/post/monasca/</link>
       <pubDate>Fri, 12 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/monasca/</guid>
+      <guid>https://torumakabe.github.io/post/monasca/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の12夜目担当作品です。 Monitoring as a Service 監視をサービスとして提供するって、どういうことでし</description>
     </item>
     
     <item>
       <title>OpenStackと長期バージョン固定</title>
-      <link>https://ToruMakabe.github.io/post/longtermsupport/</link>
+      <link>https://torumakabe.github.io/post/longtermsupport/</link>
       <pubDate>Tue, 09 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/longtermsupport/</guid>
+      <guid>https://torumakabe.github.io/post/longtermsupport/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の9夜目担当作品です。 ソフトウェア、バージョン、サポート たいていのソフトウェアには</description>
     </item>
     
     <item>
       <title>ハンサムOpenStack</title>
-      <link>https://ToruMakabe.github.io/post/handsome-openstack/</link>
+      <link>https://torumakabe.github.io/post/handsome-openstack/</link>
       <pubDate>Sat, 06 Dec 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/handsome-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/handsome-openstack/</guid>
       <description>このエントリーは、OpenStack (2枚目) Advent Calendar 2014の6夜目担当作品です。 出オチ OpenStackも人気が出て、Advent Calen</description>
     </item>
     
     <item>
       <title>OpenStackのツール環境をImmutableに整える</title>
-      <link>https://ToruMakabe.github.io/post/openstack-tools/</link>
+      <link>https://torumakabe.github.io/post/openstack-tools/</link>
       <pubDate>Sun, 14 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-tools/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-tools/</guid>
       <description>タイトルは釣りです すいません。でも、日本のどこかに、わたしを待ってる、理解し合える人がいらっしゃると思います。 なぜ必要か? いけてるOpenS</description>
     </item>
     
     <item>
       <title>Vagrant-hpからVagrant-openstack-pluginへ</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-openstack/</link>
+      <link>https://torumakabe.github.io/post/vagrant-openstack/</link>
       <pubDate>Sat, 06 Sep 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-openstack/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-openstack/</guid>
       <description>ツールやSDKはボチボチ集約したほうが これまでHP Public CloudむけのVagrantは、vagrant-hp plug-inを使ってました。でも</description>
     </item>
     
     <item>
       <title>いま最も楽にIcehouse環境を作る方法</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-icehouse/</link>
+      <link>https://torumakabe.github.io/post/vagrant-icehouse/</link>
       <pubDate>Tue, 06 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-icehouse/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-icehouse/</guid>
       <description>あえて言おう、これは甘えであると 現時点でもっとも楽にIcehouse環境を構築できる方法だと思う。所要時間、約30分。 では始めましょう。Op</description>
     </item>
     
     <item>
       <title>Vagrant HP Public Cloud Pluginを試す</title>
-      <link>https://ToruMakabe.github.io/post/vagrant-hpcloud/</link>
+      <link>https://torumakabe.github.io/post/vagrant-hpcloud/</link>
       <pubDate>Mon, 05 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/vagrant-hpcloud/</guid>
+      <guid>https://torumakabe.github.io/post/vagrant-hpcloud/</guid>
       <description>みんな大好きHashiCorp クラウド界隈のデベロッパーから熱く注目されているHashiCorp。Packer、Serf、Consulと立て</description>
     </item>
     
     <item>
       <title>OpenStack超入門シリーズ 初期3部作完結</title>
-      <link>https://ToruMakabe.github.io/post/openstack-3primer/</link>
+      <link>https://torumakabe.github.io/post/openstack-3primer/</link>
       <pubDate>Thu, 01 May 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-3primer/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-3primer/</guid>
       <description>よく聞かれることをまとめました ひとまず、初期3部作完結。また書くかもしれません。 OpenStack超入門シリーズ いまさら聞けない Novaのデ</description>
     </item>
     
     <item>
       <title>うちのクラウド、空いてます</title>
-      <link>https://ToruMakabe.github.io/post/cloud-vacancy/</link>
+      <link>https://torumakabe.github.io/post/cloud-vacancy/</link>
       <pubDate>Sun, 13 Apr 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/cloud-vacancy/</guid>
+      <guid>https://torumakabe.github.io/post/cloud-vacancy/</guid>
       <description>無限なんてあり得ない 「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウド</description>
     </item>
     
     <item>
       <title>OpenStack超入門シリーズ</title>
-      <link>https://ToruMakabe.github.io/post/openstack-primer/</link>
+      <link>https://torumakabe.github.io/post/openstack-primer/</link>
       <pubDate>Thu, 27 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/openstack-primer/</guid>
+      <guid>https://torumakabe.github.io/post/openstack-primer/</guid>
       <description>基本的な質問が増えてきた OpenStackerというと、これまではOpenStack環境を「作る」人が多かったわけですが、最近「使う」人が増</description>
     </item>
     
     <item>
       <title>OpenStack Swiftへのファイル分割アップロード</title>
-      <link>https://ToruMakabe.github.io/post/swift-upload/</link>
+      <link>https://torumakabe.github.io/post/swift-upload/</link>
       <pubDate>Sun, 23 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/swift-upload/</guid>
+      <guid>https://torumakabe.github.io/post/swift-upload/</guid>
       <description>Swiftへ、ファイルを分割してアップロードできる 今週偶然にも、何度か質問されたり、TwitterのTLにこの話題が流れてたり。もしかしたら</description>
     </item>
     
     <item>
       <title>クラウド = 発電所?</title>
-      <link>https://ToruMakabe.github.io/post/cloud-and-power/</link>
+      <link>https://torumakabe.github.io/post/cloud-and-power/</link>
       <pubDate>Sun, 16 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/cloud-and-power/</guid>
+      <guid>https://torumakabe.github.io/post/cloud-and-power/</guid>
       <description>思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるように</description>
     </item>
     
     <item>
       <title>Transparency is Noisy</title>
-      <link>https://ToruMakabe.github.io/post/transparency-is-noisy/</link>
+      <link>https://torumakabe.github.io/post/transparency-is-noisy/</link>
       <pubDate>Sun, 02 Feb 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/transparency-is-noisy/</guid>
+      <guid>https://torumakabe.github.io/post/transparency-is-noisy/</guid>
       <description>雑音が多いのは透明性の裏返し 秘密裏に開発し、ある日突然リリースする。いわゆる不言実行。 いっぽうで、みなで仕様を議論し、期限を定めて開発する。</description>
     </item>
     

@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Go on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/go/</link>
+    <link>https://torumakabe.github.io/tags/go/</link>
     <description>Recent content in Go on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 02 Apr 2021 11:20:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Apr 2021 11:20:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Azure Application Insightsのカスタム可用性テストを使って プライベートネットワーク対応の可用性テストプローブをGoで書く</title>
-      <link>https://ToruMakabe.github.io/post/az-healthprobe/</link>
+      <link>https://torumakabe.github.io/post/az-healthprobe/</link>
       <pubDate>Fri, 02 Apr 2021 11:20:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/az-healthprobe/</guid>
+      <guid>https://torumakabe.github.io/post/az-healthprobe/</guid>
       <description>何の話か 以下のサンプル(C# &amp;amp; Azure Functions)と同じことをGoでやりたいね、という相談をいただき、やってみた話です。 Azure Functions を使用してカス</description>
     </item>
     
     <item>
       <title>Goで書いたAzureのハウスキーピングアプリをContainer InstancesとGitHub Actionsで定期実行する</title>
-      <link>https://ToruMakabe.github.io/post/servicetag-checker/</link>
+      <link>https://torumakabe.github.io/post/servicetag-checker/</link>
       <pubDate>Thu, 25 Feb 2021 13:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/servicetag-checker/</guid>
+      <guid>https://torumakabe.github.io/post/servicetag-checker/</guid>
       <description>何の話か 以下のようなご相談をいただき、とても共感したのでサンプルを作りました。 運用系で定期実行したい作業、いわゆるハウスキーピング/レポーテ</description>
     </item>
     

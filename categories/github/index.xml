@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>GitHub on re-imagine</title>
-    <link>https://ToruMakabe.github.io/categories/github/</link>
+    <link>https://torumakabe.github.io/categories/github/</link>
     <description>Recent content in GitHub on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 22 Dec 2019 23:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/github/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 22 Dec 2019 23:30:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/categories/github/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitHub Actionsでオンデマンドに環境を再現する</title>
-      <link>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</link>
+      <link>https://torumakabe.github.io/post/gh-actions-trigger-label/</link>
       <pubDate>Sun, 22 Dec 2019 23:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/gh-actions-trigger-label/</guid>
+      <guid>https://torumakabe.github.io/post/gh-actions-trigger-label/</guid>
       <description>何の話か GitHubでインフラや環境を作るコードを管理している人は多いと多います。そして最近はGitHub Actionsを使ったワークフロー</description>
     </item>
     
     <item>
       <title>GitHub ActionsでAzure CLIとkubectlを動かす</title>
-      <link>https://ToruMakabe.github.io/post/github_actions_aks/</link>
+      <link>https://torumakabe.github.io/post/github_actions_aks/</link>
       <pubDate>Sat, 22 Dec 2018 20:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/github_actions_aks/</guid>
+      <guid>https://torumakabe.github.io/post/github_actions_aks/</guid>
       <description>(注: 2019/8/19追記) GitHub Actionsのワークフロー定義について、HCLからYAMLへの移行が発表されました。記事は更新しません。移</description>
     </item>
     

@@ -2,36 +2,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Cloud on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/cloud/</link>
+    <link>https://torumakabe.github.io/tags/cloud/</link>
     <description>Recent content in Cloud on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 24 Jan 2016 00:19:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/cloud/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>クラウドは本当に性能不足なのか</title>
-      <link>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</link>
+      <link>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</link>
       <pubDate>Sun, 24 Jan 2016 00:19:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
+      <guid>https://torumakabe.github.io/post/doubt_lackofperf_oncloud/</guid>
       <description>このエントリは2016/1/24に書きました。使えるリソースはどんどん増えていくので、適宜その時点で情報をとってください。 具体的な数値で、正</description>
     </item>
     
     <item>
       <title>うちのクラウド、空いてます</title>
-      <link>https://ToruMakabe.github.io/post/cloud-vacancy/</link>
+      <link>https://torumakabe.github.io/post/cloud-vacancy/</link>
       <pubDate>Sun, 13 Apr 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/cloud-vacancy/</guid>
+      <guid>https://torumakabe.github.io/post/cloud-vacancy/</guid>
       <description>無限なんてあり得ない 「お客様はキャパシティのことを気にすることはありません。事実上無限、それがクラウドのメリットです！！」なんていうクラウド</description>
     </item>
     
     <item>
       <title>クラウド = 発電所?</title>
-      <link>https://ToruMakabe.github.io/post/cloud-and-power/</link>
+      <link>https://torumakabe.github.io/post/cloud-and-power/</link>
       <pubDate>Sun, 16 Mar 2014 00:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/cloud-and-power/</guid>
+      <guid>https://torumakabe.github.io/post/cloud-and-power/</guid>
       <description>思考停止してないだろうか クラウドコンピューティングは、発電所に例えられることが多いです。そのうちみんな自家発電をやめて、発電所に任せるように</description>
     </item>
     

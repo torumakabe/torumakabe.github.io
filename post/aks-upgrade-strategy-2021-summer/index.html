@@ -7,22 +7,21 @@
 	<meta property="og:title" content="Azure Kubernetes Service アップグレード戦略 2021夏版" />
 <meta property="og:description" content="何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://ToruMakabe.github.io/post/aks-upgrade-strategy-2021-summer/" /><meta property="article:section" content="post" />
+<meta property="og:url" content="https://torumakabe.github.io/post/aks-upgrade-strategy-2021-summer/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-07-21T16:00:00+09:00" />
 <meta property="article:modified_time" content="2021-07-21T16:00:00+09:00" />
-
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Azure Kubernetes Service アップグレード戦略 2021夏版"/>
 <meta name="twitter:description" content="何の話か AKS(Azure Kubernetes Service)のアップグレード戦略を、今後の展望も踏まえ整理します。クラスターのBlue/Greenアップグレードなどリスク緩"/>
-<script src="https://ToruMakabe.github.io/js/feather.min.js"></script>
+<script src="https://torumakabe.github.io/js/feather.min.js"></script>
 	
 	
-        <link href="https://ToruMakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
+        <link href="https://torumakabe.github.io/css/fonts.b685ac6f654695232de7b82a9143a46f9e049c8e3af3a21d9737b01f4be211d1.css" rel="stylesheet">
 	
 
 	
-	<link rel="stylesheet" type="text/css" media="screen" href="https://ToruMakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
-		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://ToruMakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
+	<link rel="stylesheet" type="text/css" media="screen" href="https://torumakabe.github.io/css/main.f67360d4ae5a417ca06e26ba8456959ee8a741c2b58ea00c55471d8665ff264b.css" />
+		<link id="darkModeStyle" rel="stylesheet" type="text/css" href="https://torumakabe.github.io/css/dark.726cd11ca6eb7c4f7d48eb420354f814e5c1b94281aaf8fd0511c1319f7f78a4.css"  disabled />
 	
 	
 	
@@ -30,7 +29,7 @@
 <body>
         <div class="content"><header>
 	<div class="main">
-		<a href="https://ToruMakabe.github.io/">re-imagine</a>
+		<a href="https://torumakabe.github.io/">re-imagine</a>
 	</div>
 	<nav>
 		
@@ -41,7 +40,7 @@
 		<a href="/tags">Tags</a>
 		
 		| <a id="dark-mode-toggle" onclick="toggleTheme()" href=""></a>
-		<script src="https://ToruMakabe.github.io/js/themetoggle.js"></script>
+		<script src="https://torumakabe.github.io/js/themetoggle.js"></script>
 		
 	</nav>
 </header>
@@ -70,11 +69,11 @@
 <li>安定後に旧クラスターを消す</li>
 </ul>
 <p>という方式があります。いわゆる&quot;Blue/Green&quot;デプロイメントです。様々なパターンがありますが、以下は最近、わたしが公開した参考実装です。</p>
-<figure><img src="https://raw.githubusercontent.com/ToruMakabe/Images/master/aks-anti-dry.png?raw=true" width="800"/>
+<figure><img src="https://raw.githubusercontent.com/torumakabe/Images/master/aks-anti-dry.png?raw=true" width="800"/>
 </figure>
 
 <blockquote>
-<p><a href="https://github.com/ToruMakabe/aks-anti-dry-iac">Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy</a></p>
+<p><a href="https://github.com/torumakabe/aks-anti-dry-iac">Sample implementation of Azure Kubernetes Service &ldquo;anti-DRY&rdquo; bootstrap &amp; maintenance strategy</a></p>
 </blockquote>
 <p>IaC(Infrastructure as Code)やKubernetesの設計、運用を手の内に入れるまでは、敢えてコードをDRY(Don&rsquo;t Repeat Yourself)にしない手もある、というコンセプトで作り公開しましたが、AKSのBlue/Greenアップグレードの参考になると思います。</p>
 <p>とはいえ、仕組みを確立しリスクは緩和できても、その作業を短い周期で行いたくはない、が人情でしょう。できればもっと楽したい。コードによって環境を迅速に再現、リカバリする手段を確立できているのであれば、アップグレードの内容によってはインプレースで、Azure任せで自動実施してもいいのではないか、というのが、この記事の動機です。</p>
@@ -128,14 +127,14 @@
 </ul>
 </li>
 </ul>
-<p>実装は先ほど紹介した<a href="https://github.com/ToruMakabe/aks-anti-dry-iac">サンプル</a>などを参考にしてください。</p>
+<p>実装は先ほど紹介した<a href="https://github.com/torumakabe/aks-anti-dry-iac">サンプル</a>などを参考にしてください。</p>
 <h3 id="パッチバージョンノードイメージのアップグレードから自動化する">パッチバージョン、ノードイメージのアップグレードから自動化する</h3>
 <p>1.22の変更内容からも実感できるように、現状、マイナーバージョンアップには破壊的な変更が含まれます。となると、マイナーバージョンアップをAzureに任せて放置、という方針はまだ高リスクでしょう。そこで小さく実績、成功体験を積み重ねる意味でも、パッチバージョン、ノードイメージのアップグレードから自動化するのがよいのでは、と考えます。パッチバージョンやノードイメージの更新には緊急性の高いセキュリティ対応が含まれがちなので、ここを自動化するだけでも負担は大きく軽減されるはずです。</p>
 <p>なお、バージョンアップをAzureに任せると、環境を作るコードと現状の不一致が起こります。それは認めます。自動アップグレードで何か起こった時に、アップグレード前に戻せる(作り直せる)ことが価値だったりもするので。理想を追い過ぎず、自動アップグレード後、安定したら実環境に合わせてコードのバージョンを更新する、という運用もありなのでは、と考えます。</p>
 <h3 id="ノード更新時のアプリケーションへの影響を把握対処する">ノード更新時のアプリケーションへの影響を把握、対処する</h3>
 <p>先述の通り、AKSのアップグレード機能において、Kubernetes、ノードイメージのアップグレード実行中はノード追加とdrain、ノード削除が行われます。この際の影響を把握することが重要です。</p>
 <ul>
-<li><a href="https://www.slideshare.net/ToruMakabe/ingress-on-azure-kubernetes-service">セッションアフィニティに依存しない</a>など、Pod上のアプリケーションがステートレスであること</li>
+<li><a href="https://www.slideshare.net/torumakabe/ingress-on-azure-kubernetes-service">セッションアフィニティに依存しない</a>など、Pod上のアプリケーションがステートレスであること</li>
 <li>Pod削除時に、受け付けたリクエストへのレスポンスが終わるまで待つ仕組みがあること</li>
 <li>アップグレード中に要求が失敗したり接続が切れても、要求元がリトライすること</li>
 </ul>
@@ -175,11 +174,11 @@
 	</article>
 </main>
 <footer>
-  <div style="display:flex"><a class="soc" href="https://github.com/ToruMakabe" title="GitHub"><i data-feather="github"></i></a>
+  <div style="display:flex"><a class="soc" href="https://github.com/torumakabe" title="GitHub"><i data-feather="github"></i></a>
     <a class="border"></a><a class="soc" href="https://twitter.com/tmak_tw" title="Twitter"><i data-feather="twitter"></i></a>
     <a class="border"></a></div>
   <div class="footer-info">
-    2022  Copyright Toru Makabe |  <a
+    2023  Copyright Toru Makabe |  <a
       href="https://github.com/athul/archie">Archie Theme</a> | Built with <a href="https://gohugo.io">Hugo</a>
   </div>
 </footer>

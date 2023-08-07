@@ -2,27 +2,27 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Automation on re-imagine</title>
-    <link>https://ToruMakabe.github.io/tags/automation/</link>
+    <link>https://torumakabe.github.io/tags/automation/</link>
     <description>Recent content in Automation on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Fri, 13 Oct 2017 14:30:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/tags/automation/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 13 Oct 2017 14:30:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/tags/automation/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>自動化を愛するWindows使いへ Boxstarterのすすめ</title>
-      <link>https://ToruMakabe.github.io/post/intro_boxstarter/</link>
+      <link>https://torumakabe.github.io/post/intro_boxstarter/</link>
       <pubDate>Fri, 13 Oct 2017 14:30:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/intro_boxstarter/</guid>
+      <guid>https://torumakabe.github.io/post/intro_boxstarter/</guid>
       <description>Windowsのセットアップどうする問題 そろそろFall Creators Updateが来ますね。これを機にクリーンインストールしようか、という人も多いので</description>
     </item>
     
     <item>
       <title>Azureの監査ログアラートからWebhookの流れで楽をする</title>
-      <link>https://ToruMakabe.github.io/post/azure_auditlog_alert/</link>
+      <link>https://torumakabe.github.io/post/azure_auditlog_alert/</link>
       <pubDate>Wed, 06 Apr 2016 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/azure_auditlog_alert/</guid>
+      <guid>https://torumakabe.github.io/post/azure_auditlog_alert/</guid>
       <description>監査ログからアラートを上げられるようになります Azureの監査ログからアラートを上げる機能のプレビューがはじまりました。これ、地味ですが便利</description>
     </item>
     

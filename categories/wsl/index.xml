@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>WSL on re-imagine</title>
-    <link>https://ToruMakabe.github.io/categories/wsl/</link>
+    <link>https://torumakabe.github.io/categories/wsl/</link>
     <description>Recent content in WSL on re-imagine</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Copyright Toru Makabe</copyright>
-    <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate><atom:link href="https://ToruMakabe.github.io/categories/wsl/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 02 May 2018 17:00:00 +0900</lastBuildDate><atom:link href="https://torumakabe.github.io/categories/wsl/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>WSLENVでWSLとWindowsの環境変数を共有する(Go開発環境編)</title>
-      <link>https://ToruMakabe.github.io/post/wslenv_golang/</link>
+      <link>https://torumakabe.github.io/post/wslenv_golang/</link>
       <pubDate>Wed, 02 May 2018 17:00:00 +0900</pubDate>
       
-      <guid>https://ToruMakabe.github.io/post/wslenv_golang/</guid>
+      <guid>https://torumakabe.github.io/post/wslenv_golang/</guid>
       <description>見た目は地味だが役に立つ Windows 10 April 2018 Update (別名: バージョン1803)がリリースされました。タイムラインなど目立つ機能が注目されていますが、開発者支</description>
     </item>
     
